@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@types/jest": "^20.0.4",
     "@types/react": "^15.0.35",
     "@types/react-native": "^0.44.17",
     "@types/react-navigation": "^1.0.15",
     "babel-jest": "^20.0.3",
     "babel-preset-env": "^1.6.0",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-node6": "^11.0.0",
     "jest": "~20.0.0",
     "jest-fetch-mock": "^1.2.0",
+    "mock-async-storage": "^1.0.3",
     "react-native-debugger-open": "^0.3.11",
     "react-native-typescript-transformer": "^1.1.2",
     "react-test-renderer": "16.0.0-alpha.12",
@@ -37,6 +41,9 @@
       "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native|react-navigation)/"
+    ],
     "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "testPathIgnorePatterns": [
       "\\.snap$",
@@ -47,13 +54,6 @@
     "cacheDirectory": ".jest/cache"
   },
   "dependencies": {
-    "@types/jest": "^20.0.4",
-    "@types/react": "^15.0.35",
-    "@types/react-native": "^0.44.17",
-    "@types/react-navigation": "^1.0.15",
-    "babel-preset-es2016": "^6.24.1",
-    "jest": "~20.0.0",
-    "mock-async-storage": "^1.0.3",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.1",
     "react-native-easy-grid": "^0.1.13",
