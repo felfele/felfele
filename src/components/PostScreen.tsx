@@ -139,6 +139,35 @@ class PostScreen extends React.Component<any, any> {
         }
     }
 
+    async onSave() {
+        this.setState({
+           isUploading: true 
+        });
+
+        console.log(this.state.text, this.state.uploadedImages.length);
+
+        const post: Post = {
+            images: this.state.uploadedImages,
+            text: this.state.text,
+            createdAt: Date.now()
+        }
+
+        try {
+            await PostManager.saveDraft(post);
+            Debug.log('Draft saved', post._id);
+        } catch (e) {
+            Alert.alert(
+                'Error',
+                'Saving draft failed, try again later!',
+                [
+                    {text: 'OK', onPress: () => console.log('OK pressed')},
+                ]
+            );
+        }
+
+        this.onCancel();
+    }
+
     async onCancelConfirmation() {
         console.log('onCancelConfirmation', this.state.isKeyboardVisible);
         this.hideKeyboard();
@@ -242,10 +271,11 @@ class PostScreen extends React.Component<any, any> {
 
     renderActionButton(onPress, text, iconName, color, showText) {
         const iconSize = showText ? 20 : 30;
+        const justifyContent = showText ? 'center' : 'space-around';
         return (
-                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: 'center'}}>
-                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0}}>
-                        <View style={{flex: 1}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
+                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
+                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                        <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
                         { showText &&
                             <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
                         }
@@ -281,8 +311,8 @@ class PostScreen extends React.Component<any, any> {
                         <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
                     </View>
                     <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
-                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', 'green', showText)}
-                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', 'red', showText)}
+                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#32A850', showText)}
+                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#d53333', showText)}
                     </View>
             </View>            
         )

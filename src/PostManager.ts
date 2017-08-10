@@ -299,6 +299,11 @@ export class _PostManager {
             return null;
         }
     }
+
+    async saveDraft(post: Post): Promise<number | null> {
+        const draftId = await Storage.draft.set(post);
+        return draftId;
+    }
 }
 
 export const PostManager = new _PostManager();

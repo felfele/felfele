@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl } from 'react-native';
+import { Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl } from 'react-native';
 import { Card, Button, ButtonGroup, List, Tile, Icon } from 'react-native-elements';
 import { ImagePicker } from '../ImagePicker';
 import StateTracker from '../StateTracker';
@@ -14,6 +14,8 @@ class YourFeed extends React.Component<any, any> {
         header: <View style={{ height: 100, backgroundColor: 'magenta' }} />
     }
 
+    containerStyle = {};
+
     constructor(props) {
         super(props);
         this.state = {
@@ -22,6 +24,15 @@ class YourFeed extends React.Component<any, any> {
             posts: this.props.posts,
             selectedPost: null,
             refreshing: false,
+        }
+
+        this.containerStyle = {
+            backgroundColor: '#fff',
+            borderRadius: 3,
+            paddingBottom: 10,
+            paddingTop: 0,
+            marginBottom: 25,
+            marginTop: 0,
         }
 
         StateTracker.listen((oldVersion, newVersion) => this.updateVersion(oldVersion, newVersion));
@@ -95,11 +106,21 @@ class YourFeed extends React.Component<any, any> {
     renderButtonsIfSelected(post) {
         if (this.isPostSelected(post)) {
             return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}}>
+                <View style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    height: 40,
+                    margin: 0,
+                    padding: 0,
+                }}
+                >
                     <Button
                         containerViewStyle={{flex: 1, alignSelf: 'stretch', padding: 0, margin: 0}}
                         backgroundColor='#ff3325'
                         fontSize={12}
+                        size={30}
                         title='DELETE' 
                         icon={{name: 'delete'}} 
                         onPress={async () => {
@@ -111,6 +132,7 @@ class YourFeed extends React.Component<any, any> {
                         containerViewStyle={{flex: 1, alignSelf: 'stretch', padding: 0, margin: 0}}
                         backgroundColor='#4078ff'
                         fontSize={12}
+                        size={30}
                         title='SHARE' 
                         icon={{name: 'share'}} 
                         onPress={() => {
@@ -126,7 +148,11 @@ class YourFeed extends React.Component<any, any> {
     renderCardWithOnlyText(post) {
         return (
             <Card
-                containerStyle={{ padding: 0, paddingTop: 15, paddingBottom: 15, margin: 0 }}
+                containerStyle={{...this.containerStyle, 
+                    margin: 0,
+                    paddingTop: 20,
+                    paddingBottom: 20,
+                }}
                 key={'card-' + post._id}
             >
                 <TouchableOpacity
@@ -144,7 +170,7 @@ class YourFeed extends React.Component<any, any> {
     renderCardWithMultipleImages(post) {
         return (
             <Card
-                containerStyle={{ padding: 0, paddingTop: 15, paddingBottom: 15, margin: 0 }}
+                containerStyle={this.containerStyle}
                 key={'card-' + post._id}
 
             >
@@ -193,10 +219,13 @@ class YourFeed extends React.Component<any, any> {
                             imageSrc={{
                                 uri: post.images[0].uri,
                             }}
+                            width={Dimensions.get('window').width}
+                            height={Dimensions.get('window').width}
                             title={post.text}
-                            titleStyle={{ fontSize: 20 }}
+                            titleStyle={{ fontSize: 20, color: 'black' }}
                             featured={false}
-                            activeOpacity={0}
+                            activeOpacity={0.95}
+                            focusedOpacity={1}
                             key={`image-${post._id}`}
                             onPress={ () => {
                                 if (this.isPostSelected(post)) {
@@ -205,7 +234,24 @@ class YourFeed extends React.Component<any, any> {
                                     this.setState({selectedPost: post});
                                 }
                             }}
-                            contentContainerStyle={{height: this.isPostSelected(post) ? 80 : 0, padding: 0, margin: 0, paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0, marginBottom: 15}}
+                            containerStyle = {{
+                                backgroundColor: '#fff',
+                                borderRadius: 3,
+                                paddingBottom: 10,
+                                paddingTop: 0,
+                                marginBottom: 25,
+                                marginTop: 0,
+                            }}
+                            contentContainerStyle={{
+                                height: 80,
+                                padding: 0,
+                                margin: 0,
+                                paddingBottom: 0,
+                                paddingTop: 0,
+                                paddingLeft: 0,
+                                paddingRight: 0,
+                                backgroundColor: 'white',
+                            }}
                         >
                             { this.renderButtonsIfSelected(post) }
                         </Tile>
@@ -214,18 +260,67 @@ class YourFeed extends React.Component<any, any> {
         }
     }
 
+    renderHeader() {
+        return (
+            <View style={{
+                    flex: -1,
+                    flexDirection: 'row',
+                    backgroundColor: '#152E38',
+                    borderBottomColor: '#1f4153',
+                    borderBottomWidth: 20,
+                    alignContent: 'stretch',
+                }}
+            >
+                <TouchableOpacity onPress={() => this.openImagePicker()} style={{ flex: 1 }}>
+                    <Icon 
+                        name='camera-alt'
+                        size={30}
+                        color='white'
+                        style={{
+                            paddingTop: 4,
+                            paddingLeft: 10,
+                            margin: 0,
+                        }} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate(this.props.post)} style={{ flex: 6 }}>
+                    <Text 
+                        style={{
+                            height: 30,
+                            color: 'white',
+                            backgroundColor: '#1f4153',
+                            fontSize: 14,
+                            paddingLeft: 15,
+                            paddingTop: 6,
+                            marginLeft: 0,
+                            marginRight: 15,
+                            marginVertical: 3,
+                            marginBottom: 15,
+                            alignSelf: 'stretch',
+                            flex: 5,
+                            flexGrow: 10,
+                        }}
+                    >What's your story?</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
     render() {
         return (
-            <View style={{ flexDirection: 'column', padding: 0, flex: 1, height: '100%' }}>
-                <View style={{ flex: -1, flexDirection: 'row', borderBottomColor: 'lightgray', borderBottomWidth: 1, alignContent: 'stretch' }}>
-                    <TouchableOpacity onPress={() => this.openImagePicker()} style={{ flex: 1 }}>
-                        <Icon name='camera-alt' size={30} color='gray' style={{ paddingTop: 4, paddingLeft: 10 }} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate(this.props.post)} style={{ flex: 6 }}>
-                        <Text style={{ height: 40, color: 'gray', fontSize: 14, paddingLeft: 10, paddingTop: 10, alignSelf: 'stretch', flex: 5, flexGrow: 10 }}>What's on your mind?</Text>
-                    </TouchableOpacity>
-                </View>
+            <View style={{
+                flexDirection: 'column',
+                padding: 0,
+                flex: 1, 
+                height: '100%' }}
+            >
                 <FlatList
+                    style={{
+                        backgroundColor: '#152E38',
+                    }}
+                    contentContainerStyle={{
+                        backgroundColor: '#1f4153',
+                    }}
+                    ListHeaderComponent={this.renderHeader()}
                     data={this.state.posts}
                     renderItem={(obj) => this.renderCard(obj.item)}
                     keyExtractor={(item, index) => item._id}

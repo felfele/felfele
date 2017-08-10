@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View } from 'react-native';
+import { View, StatusBar } from 'react-native';
 
 import { Config } from './Config';
 import PostScreen from './components/PostScreen';
@@ -128,7 +128,9 @@ const AppNavigator = StackNavigator(Scenes,
     {
         mode: 'modal',
         navigationOptions: {
-            header: <View style={{height: 20}} />
+            header: <View style={{height: 20, backgroundColor: '#152E38'}}>
+                        <StatusBar barStyle="light-content" />
+                    </View>
         }
     }
 );

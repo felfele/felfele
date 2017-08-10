@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Text, View, Share as ReactShare } from 'react-native';
 import { Button } from 'react-native-elements'
 import * as QRCode from 'react-native-qrcode';
-import DefaultStyle from './DefaultStyle'
 
 export default class Share extends React.Component<any, any> {   
     constructor(props) {
