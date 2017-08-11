@@ -18,4 +18,5 @@ export interface Post extends Model {
     createdAt: number;
     location?: Location;
     syncId?: number;
+    deleted?: boolean;
 }

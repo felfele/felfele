@@ -5,6 +5,7 @@ import { ImagePicker } from '../ImagePicker';
 import StateTracker from '../StateTracker';
 import { Backend } from '../Backend';
 import { Config } from '../Config';
+import { NetworkStatus } from '../NetworkStatus';
 
 declare var window: any;
 declare var $: any;
@@ -88,13 +89,19 @@ class Feed extends React.Component<any, any> {
         StateTracker.listen((oldVersion, newVersion) => this.updateVersion(oldVersion, newVersion));
     }
 
+    reloadWebView() {
+        if (NetworkStatus.isConnected()) {
+            this.webView.reload();
+        }
+    }
+
     updateVersion(oldVersion, newVersion) {
         if (newVersion != this.state.version) {
             this.setState({
                 version: newVersion,
                 uri: this.state.uri + '#' + newVersion
             })
-            this.webView.reload();
+            this.reloadWebView();
         }
     }
 
@@ -109,7 +116,7 @@ class Feed extends React.Component<any, any> {
             eval(data);
         }
         if (data == 0) {
-            this.webView.reload();
+            this.reloadWebView();
         }
     }
 
@@ -160,7 +167,7 @@ class Feed extends React.Component<any, any> {
                 <WebView
                     javaScriptEnabled
                     injectedJavaScript={injectedJavaScript}
-                    source={{uri: this.state.uri}}
+                    source={{uri: NetworkStatus.isConnected() ? this.state.uri : ''}}
                     style={{marginTop: 0, flex: 10}}
                     ref={x => {this.webView = x}}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}

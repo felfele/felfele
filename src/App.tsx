@@ -3,6 +3,7 @@ import * as React from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { View, StatusBar } from 'react-native';
+import CameraRollPicker from 'react-native-camera-roll-picker';
 
 import { Config } from './Config';
 import PostScreen from './components/PostScreen';
@@ -122,6 +123,9 @@ const Scenes = {
     Share: {
         screen: Share
     },
+    ImagePicker: {
+        screen: ({navigation}) => (<CameraRollPicker callback={ console.log('CameraRollPicker: ')}/>)
+    }
 }
 
 const AppNavigator = StackNavigator(Scenes,

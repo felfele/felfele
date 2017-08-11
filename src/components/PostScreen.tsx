@@ -12,7 +12,8 @@ import {
     ActivityIndicator, 
     StyleSheet,
     Alert,
-    AlertIOS
+    AlertIOS,
+    CameraRoll,
 } from 'react-native';
 import { ImagePicker } from '../ImagePicker';
 import { NavigationActions } from 'react-navigation';
@@ -188,24 +189,30 @@ class PostScreen extends React.Component<any, any> {
     };
 
     openImagePicker = async () => {
-        const pickerResult = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: false,
-            aspect: [4,3],
-            base64: true,
-            exif: true,
-        });
-        if (pickerResult.cancelled == false) {
-            const data: ImageData = {
-                uri: pickerResult.uri,
-                width: pickerResult.width,
-                height: pickerResult.height,
-                data: pickerResult.base64,
-            }
-
-            this.setState({
-                uploadedImages: this.state.uploadedImages.concat([data])
-            });            
+        const params = {
+            first: 1,
         }
+        const photos = await CameraRoll.getPhotos(params);
+        // this.props.navigation.navigate('ImagePicker');
+
+        // const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        //     allowsEditing: false,
+        //     aspect: [4,3],
+        //     base64: true,
+        //     exif: true,
+        // });
+        // if (pickerResult.cancelled == false) {
+        //     const data: ImageData = {
+        //         uri: pickerResult.uri,
+        //         width: pickerResult.width,
+        //         height: pickerResult.height,
+        //         data: pickerResult.base64,
+        //     }
+
+        //     this.setState({
+        //         uploadedImages: this.state.uploadedImages.concat([data])
+        //     });            
+        // }
     }
 
     openLocationPicker = async () => {

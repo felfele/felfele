@@ -8,6 +8,8 @@ import { Backend } from '../Backend';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
+import { NetworkStatus } from '../NetworkStatus';
+import { Gravatar } from 'react-native-gravatar';
 
 class YourFeed extends React.Component<any, any> {
     static navigationOptions = {
@@ -23,7 +25,8 @@ class YourFeed extends React.Component<any, any> {
             uri: this.props.uri,
             posts: this.props.posts,
             selectedPost: null,
-            refreshing: false,
+            isRefreshing: false,
+            isOnline: NetworkStatus.isConnected(),
         }
 
         this.containerStyle = {
@@ -35,6 +38,7 @@ class YourFeed extends React.Component<any, any> {
             marginTop: 0,
         }
 
+        NetworkStatus.addConnectionStateChangeListener((result) => this.onConnectionStateChange(result));
         StateTracker.listen((oldVersion, newVersion) => this.updateVersion(oldVersion, newVersion));
     }
 
@@ -54,6 +58,12 @@ class YourFeed extends React.Component<any, any> {
                 posts: PostManager.getAllPosts(),
             })
         }
+    }
+
+    onConnectionStateChange(connected) {
+        this.setState({
+            isOnline: connected,
+        })
     }
 
     async onRefresh() {
@@ -160,6 +170,20 @@ class YourFeed extends React.Component<any, any> {
                         this.setState({selectedPost: post});
                     }}
                 >
+                    <Gravatar options={{
+                            email: Config.loginData.username,
+                            secure: true,
+                            parameters: { "size": "100", "d": "mm" },
+                        }}
+                        style={{
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            borderColor: 'white',
+                            width: 30,
+                            height: 30,
+                        }}
+                    />
+    
                     <Text>{post.text}</Text>
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
@@ -260,6 +284,25 @@ class YourFeed extends React.Component<any, any> {
         }
     }
 
+    renderOfflineHeader() {
+        if (NetworkStatus.isConnected()) {
+            return [];
+        }
+        return (
+            <View style={{
+                height: 20,
+                backgroundColor: '#152E38',
+            }}
+            >
+                <Text style={{
+                    color: 'white',
+                    textAlign: 'center'
+                }}
+                >You are offline</Text>
+            </View>
+        )
+    }
+
     renderHeader() {
         return (
             <View style={{
@@ -313,6 +356,7 @@ class YourFeed extends React.Component<any, any> {
                 flex: 1, 
                 height: '100%' }}
             >
+                { this.renderOfflineHeader() }
                 <FlatList
                     style={{
                         backgroundColor: '#152E38',
@@ -327,7 +371,7 @@ class YourFeed extends React.Component<any, any> {
                     extraData={this.state}
                     refreshControl={
                         <RefreshControl
-                            refreshing={this.state.refreshing}
+                            refreshing={this.state.isRefreshing}
                             onRefresh={async () => this.onRefresh() }
                         />
                     }

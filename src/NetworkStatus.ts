@@ -5,19 +5,24 @@ class _NetworkStatus {
     connectionType: string | null = null;
 
     constructor() {
-        NetInfo.isConnected.addEventListener('change', this.onConnectionStateChange);
-        NetInfo.addEventListener('change', this.onConnectionTypeChange);
+        NetInfo.isConnected.addEventListener('change', (isConnected) => this.onConnectionStateChange(isConnected));
+        NetInfo.addEventListener('change', (result) => this.onConnectionTypeChange(result));
+        NetInfo.isConnected.fetch().then(value => this.connectionState = value);
     }
 
-    async isConnected(): Promise<boolean> {
+    isConnected(): boolean {
         if (this.connectionState == null) {
-            this.connectionState = await NetInfo.isConnected.fetch();
+            return true;
         }
         return this.connectionState;
     }
 
     onConnectionStateChange(isConnected: boolean) {
         this.connectionState = isConnected;
+    }
+
+    addConnectionStateChangeListener(listener: (result: boolean) => void) {
+        NetInfo.isConnected.addEventListener('change', listener);
     }
 
     async getConnectionType(): Promise<string> {
@@ -31,3 +36,5 @@ class _NetworkStatus {
         this.connectionType = '' + result;
     }
 }
+
+export const NetworkStatus = new _NetworkStatus();

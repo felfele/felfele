@@ -7,6 +7,7 @@ import * as Ghost from './GhostAPI';
 import StateTracker from './StateTracker';
 import { ImageDownloader } from './ImageDownloader';
 import { Debug } from './Debug';
+import { NetworkStatus } from './NetworkStatus';
 
 class PostCache implements Queryable<Post> {
     private posts: Map<number, Post> = new Map();
@@ -38,7 +39,11 @@ class PostCache implements Queryable<Post> {
 
     async set(post) {
         await this.storage.set(post);
-        this.add(post);
+        if (post.deleted) {
+            this.remove(post);
+        } else {
+            this.add(post);
+        }
         return post._id;
     }
 
@@ -197,6 +202,10 @@ export class _PostManager {
             await Storage.sync.set(SyncStateDefaultKey, syncState);
         }
 
+        const isConnected = await NetworkStatus.isConnected();
+        if (!isConnected) {
+            return;
+        }
         const syncState = await getSyncState();
         const highestSeenPostId = await this.getHighestSeenPostId();
         const downstreamPosts = await fetchDownstreamPosts();
@@ -257,6 +266,7 @@ export class _PostManager {
         const highestSeenPostId = await this.getHighestSeenPostId()
         const localOnlyPosts = await this.postCache.query()
                                         .lte('_id', highestSeenPostId)
+                                        .isNull('deleted')
                                         .desc()
                                         .limit(highestSeenPostId)
                                         .execute();
@@ -267,9 +277,29 @@ export class _PostManager {
         return this.postCache.getPosts().sort((a, b) => diff(a._id, b._id));
     }
 
+    async syncLocalDeletedPosts() {
+        const highestSeenPostId = await this.getHighestSeenPostId()
+        const localOnlyDeletedPosts = await Storage.post.query()
+                                        .lte('_id', highestSeenPostId)
+                                        .eq('deleted', true)
+                                        .desc()
+                                        .limit(highestSeenPostId)
+                                        .execute();
+        
+        const syncIds = localOnlyDeletedPosts.map(post => post.syncId);
+        for (const syncId of syncIds) {
+            await Backend.ghostAPI.deletePost(syncId);
+        }
+    }
+
     async deletePost(post: Post) {
-        await Backend.ghostAPI.deletePost(post.syncId);
-        await this.syncPosts();
+        post.deleted = true;
+        if (post.syncId) {
+            await this.postCache.set(post);
+            await this.syncLocalDeletedPosts();
+        } else {
+            await this.postCache.delete(post);
+        }
 
         StateTracker.updateVersion(StateTracker.version + 1);
     }
