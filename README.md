@@ -10,3 +10,8 @@
 ## Start tests that run automatically
 
 `npm test`
+
+## Generate the icon
+
+`app-icon generate`
+
