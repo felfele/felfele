@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl } from 'react-native';
 import { Card, Button, ButtonGroup, List, Tile, Icon } from 'react-native-elements';
-import { ImagePicker } from '../ImagePicker';
+import { AsyncImagePicker } from '../AsyncImagePicker';
 import StateTracker from '../StateTracker';
 import { Config } from '../Config';
 import { Backend } from '../Backend';
@@ -74,18 +74,18 @@ class YourFeed extends React.Component<any, any> {
     }
 
     openImagePicker = async () => {
-        const pickerResult = await ImagePicker.launchCameraAsync({
+        const pickerResult = await AsyncImagePicker.showImagePicker({
             allowsEditing: true,
             aspect: [4, 3],
             base64: true,
             exif: true,
         });
-        if (pickerResult.cancelled == false) {
+        if (!pickerResult.didCancel) {
             const data: ImageData = {
                 uri: pickerResult.uri,
                 width: pickerResult.width,
                 height: pickerResult.height,
-                data: pickerResult.base64,
+                data: pickerResult.data,
             }
 
             const post: Post = {
