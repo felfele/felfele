@@ -9,6 +9,8 @@ import { ImageDownloader } from './ImageDownloader';
 import { Debug } from './Debug';
 import { NetworkStatus } from './NetworkStatus';
 
+const DefaultDraftId = 1;
+
 class PostCache implements Queryable<Post> {
     private posts: Map<number, Post> = new Map();
 
@@ -330,9 +332,23 @@ export class _PostManager {
         }
     }
 
-    async saveDraft(post: Post): Promise<number | null> {
-        const draftId = await Storage.draft.set(post);
-        return draftId;
+    async saveDraft(draft: Post): Promise<number | null> {
+        // We only support one draft at the moment
+        const draftId = DefaultDraftId;
+        draft._id = draftId;
+        return await Storage.draft.set(draft);
+    }
+
+    async loadDraft(): Promise<Post | null> {
+        const draft = await Storage.draft.get(DefaultDraftId);
+        if (draft != null) {
+            draft._id = undefined;
+        }
+        return draft;
+    }
+
+    async deleteDraft(): Promise<void> {
+        await Storage.draft.delete(DefaultDraftId);
     }
 }
 

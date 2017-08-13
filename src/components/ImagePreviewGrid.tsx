@@ -32,8 +32,6 @@ export class ImagePreviewGrid extends React.Component<any, any> {
         const maxWidth = Math.floor(this.width / columns);
         const maxHeight = Math.floor(this.max(this.height, maxWidth));
         
-        console.log('image', maxWidth);
-        
         const images = this.props.images.map((image) => 
             <Image source={{uri: image.uri}}
                 style={{width: this.max(image.width, maxWidth),

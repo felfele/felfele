@@ -15,7 +15,7 @@ import {
     AlertIOS,
     CameraRoll,
 } from 'react-native';
-import { ImagePicker } from '../ImagePicker';
+import { AsyncImagePicker } from '../AsyncImagePicker';
 import { NavigationActions } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -41,11 +41,26 @@ class PostScreen extends React.Component<any, any> {
             text: '',
             uploadedImages: [],
             isKeyboardVisible: false,
-            isUploading: false,
+            isLoading: true,
             paddingBottom: 0
         };
         navigationActions['Cancel'] = () => this.onCancelConfirmation();
         navigationActions['Post'] = () => this.onPressSubmit();
+
+        PostManager.loadDraft().then(post => {
+            if (post) {
+                const [text, images] = PostManager.extractTextAndImagesFromMarkdown(post.text);
+                this.setState({
+                    text: text,
+                    uploadedImages: images,
+                    isLoading: false,
+                })
+            } else {
+                this.setState({
+                    isLoading: false,
+                })
+            }
+        });
     }
 
     onKeyboardDidShow(e) {
@@ -116,33 +131,36 @@ class PostScreen extends React.Component<any, any> {
     }
 
     showCancelConfirmation() {
+        const options:any[] = [
+            { text: 'Save', onPress: async () => await this.onSave() },
+            { text: 'Discard', onPress: async () => await this.onDiscard() },
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        ];
+
         if (Platform.OS === 'ios') {
             AlertIOS.alert(
                 'Save this post as a draft?',
                 undefined,
-                [
-                    { text: 'Save', onPress: () => console.log('Save') },
-                    { text: 'Discard', onPress: () => this.onCancel() },
-                    { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                ],
+                options,
             )
         }
         else {
             Alert.alert('Save this post as a draft?',
                 undefined,
-                [
-                    { text: 'Save', onPress: () => console.log('Save') },
-                    { text: 'Discard', onPress: () => this.onCancel() },
-                    { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                ],
+                options,
                 { cancelable: true }
             );
         }
     }
 
+    async onDiscard() {
+        await PostManager.deleteDraft();
+        this.onCancel();
+    }
+
     async onSave() {
         this.setState({
-           isUploading: true 
+           isLoading: true 
         });
 
         console.log(this.state.text, this.state.uploadedImages.length);
@@ -189,30 +207,24 @@ class PostScreen extends React.Component<any, any> {
     };
 
     openImagePicker = async () => {
-        const params = {
-            first: 1,
+        const pickerResult = await AsyncImagePicker.launchImageLibrary({
+            allowsEditing: false,
+            aspect: [4,3],
+            base64: true,
+            exif: true,
+        });
+        if (!pickerResult.didCancel) {
+            const data: ImageData = {
+                uri: pickerResult.uri,
+                width: pickerResult.width,
+                height: pickerResult.height,
+                data: pickerResult.data,
+            }
+
+            this.setState({
+                uploadedImages: this.state.uploadedImages.concat([data])
+            });            
         }
-        const photos = await CameraRoll.getPhotos(params);
-        // this.props.navigation.navigate('ImagePicker');
-
-        // const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        //     allowsEditing: false,
-        //     aspect: [4,3],
-        //     base64: true,
-        //     exif: true,
-        // });
-        // if (pickerResult.cancelled == false) {
-        //     const data: ImageData = {
-        //         uri: pickerResult.uri,
-        //         width: pickerResult.width,
-        //         height: pickerResult.height,
-        //         data: pickerResult.base64,
-        //     }
-
-        //     this.setState({
-        //         uploadedImages: this.state.uploadedImages.concat([data])
-        //     });            
-        // }
     }
 
     openLocationPicker = async () => {
@@ -220,7 +232,7 @@ class PostScreen extends React.Component<any, any> {
     }
 
     async onPressSubmit() {
-        if (this.state.isUploading) {
+        if (this.state.isLoading) {
             return;
         }
 
@@ -230,7 +242,7 @@ class PostScreen extends React.Component<any, any> {
 
     async sendUpdate() {
         this.setState({
-           isUploading: true 
+           isLoading: true 
         });
 
         console.log(this.state.text, this.state.uploadedImages.length);
@@ -242,6 +254,7 @@ class PostScreen extends React.Component<any, any> {
         }
 
         try {
+            await PostManager.deleteDraft();
             await PostManager.saveAndSyncPost(post);
             Debug.log('Post saved and synced, ', post._id);
         } catch (e) {
@@ -292,8 +305,7 @@ class PostScreen extends React.Component<any, any> {
     }
 
     render() {
-        console.log('render', this.keyboardHeight);
-        if (this.state.isUploading) {
+        if (this.state.isLoading) {
             return this.renderActivityIndicator();
         }
 
@@ -306,11 +318,12 @@ class PostScreen extends React.Component<any, any> {
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
                         <TextInput
-                            style={{marginTop: 0, flex: 3, fontSize: 16, padding: 3}}
+                            style={{marginTop: 0, flex: 3, fontSize: 16, padding: 10, paddingVertical: 10}}
                             multiline={true} 
                             numberOfLines={4}  
                             onEndEditing={() => {this.hideKeyboard()}}
                             onChangeText={(text) => this.setState({text})}
+                            value={this.state.text}
                             placeholder="What's on your mind?"
                             placeholderTextColor='gray'
                         >
