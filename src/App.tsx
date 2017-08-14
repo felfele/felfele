@@ -128,8 +128,8 @@ const AppNavigator = StackNavigator(Scenes,
     {
         mode: 'modal',
         navigationOptions: {
-            header: <View style={{height: 20, backgroundColor: '#152E38'}}>
-                        <StatusBar barStyle="light-content" />
+            header: <View style={{height: 20}}>
+                        <StatusBar barStyle="dark-content" />
                     </View>
         }
     }

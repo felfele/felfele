@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl } from 'react-native';
 import { Card, Button, ButtonGroup, List, Tile, Icon } from 'react-native-elements';
+import { Gravatar } from 'react-native-gravatar';
+
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import StateTracker from '../StateTracker';
 import { Config } from '../Config';
@@ -9,7 +11,6 @@ import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
 import { NetworkStatus } from '../NetworkStatus';
-import { Gravatar } from 'react-native-gravatar';
 
 class YourFeed extends React.Component<any, any> {
     static navigationOptions = {
@@ -67,10 +68,24 @@ class YourFeed extends React.Component<any, any> {
     }
 
     async onRefresh() {
-        await PostManager.syncPosts();
-        this.setState({
-            posts: PostManager.getAllPosts()
-        })
+        try {
+            await PostManager.syncPosts();
+            this.setState({
+                posts: PostManager.getAllPosts()
+            })
+        } catch(e) {
+            this.setState({
+                isRefreshing: false
+            });
+            Alert.alert(
+                'Error',
+                'No connection to the server, try again later!',
+                [
+                    {text: 'OK', onPress: () => console.log('OK pressed')},
+                ]
+            );
+        }
+
     }
 
     openImagePicker = async () => {
@@ -80,33 +95,47 @@ class YourFeed extends React.Component<any, any> {
             base64: true,
             exif: true,
         });
-        if (!pickerResult.didCancel) {
-            const data: ImageData = {
-                uri: pickerResult.uri,
-                width: pickerResult.width,
-                height: pickerResult.height,
-                data: pickerResult.data,
-            }
-
-            const post: Post = {
-                images: [data],
-                text: '',
-                createdAt: Date.now(),
-            }
-
-            try {
-                PostManager.saveAndSyncPost(post);
-            } catch (e) {
-                console.log(e);
-                Alert.alert(
-                    'Error',
-                    'Posting failed, try again later!',
-                    [
-                        { text: 'OK', onPress: () => console.log('OK pressed') },
-                    ]
-                );
-            }
+        
+        if (pickerResult.error) {
+            console.error('openImagePicker: ', pickerResult.error);
+            return;
         }
+
+        if (pickerResult.didCancel) {
+            return;
+        }
+
+        const data: ImageData = {
+            uri: pickerResult.uri,
+            width: pickerResult.width,
+            height: pickerResult.height,
+            data: pickerResult.data,
+        }
+
+        const post: Post = {
+            images: [data],
+            text: '',
+            createdAt: Date.now(),
+        }
+
+        try {
+            PostManager.saveAndSyncPost(post);
+        } catch (e) {
+            Alert.alert(
+                'Error',
+                'Posting failed, try again later!',
+                [
+                    { text: 'OK', onPress: () => console.log('OK pressed') },
+                ]
+            );
+        }
+    }
+
+    getImageUri(image: ImageData) {
+        if (image.localPath) {
+            return image.localPath;
+        }
+        return image.uri;
     }
 
     isPostSelected(post) {
@@ -209,7 +238,7 @@ class YourFeed extends React.Component<any, any> {
                         post.images.map((image, index) => {
                             return <Tile
                                 imageSrc={{
-                                    uri: image.uri,
+                                    uri: this.getImageUri(image),
                                 }}
                                 featured={false}
                                 activeOpacity={0.1}
@@ -235,51 +264,46 @@ class YourFeed extends React.Component<any, any> {
             return this.renderCardWithMultipleImages(post);
         } else {
             return (
-                // <Card
-                //     containerStyle={{ padding: 0, paddingTop: 15, paddingBottom: 15, margin: 0 }}
-                //     key={'card-' + post._id}
-                // >
-                        <Tile
-                            imageSrc={{
-                                uri: post.images[0].uri,
-                            }}
-                            width={Dimensions.get('window').width}
-                            height={Dimensions.get('window').width}
-                            title={post.text}
-                            titleStyle={{ fontSize: 20, color: 'black' }}
-                            featured={false}
-                            activeOpacity={0.95}
-                            focusedOpacity={1}
-                            key={`image-${post._id}`}
-                            onPress={ () => {
-                                if (this.isPostSelected(post)) {
-                                    this.setState({selectedPost: null});
-                                } else {
-                                    this.setState({selectedPost: post});
-                                }
-                            }}
-                            containerStyle = {{
-                                backgroundColor: '#fff',
-                                borderRadius: 3,
-                                paddingBottom: 10,
-                                paddingTop: 0,
-                                marginBottom: 25,
-                                marginTop: 0,
-                            }}
-                            contentContainerStyle={{
-                                height: 80,
-                                padding: 0,
-                                margin: 0,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 0,
-                                backgroundColor: 'white',
-                            }}
-                        >
-                            { this.renderButtonsIfSelected(post) }
-                        </Tile>
-                // </Card>
+                <Tile
+                    imageSrc={{
+                        uri: this.getImageUri(post.images[0]),
+                    }}
+                    width={Dimensions.get('window').width}
+                    height={Dimensions.get('window').width}
+                    title={post.text}
+                    titleStyle={{ fontSize: 16, color: 'black' }}
+                    featured={false}
+                    activeOpacity={0.95}
+                    focusedOpacity={1}
+                    key={`image-${post._id}`}
+                    onPress={ () => {
+                        if (this.isPostSelected(post)) {
+                            this.setState({selectedPost: null});
+                        } else {
+                            this.setState({selectedPost: post});
+                        }
+                    }}
+                    containerStyle = {{
+                        backgroundColor: '#fff',
+                        borderRadius: 3,
+                        paddingBottom: 10,
+                        paddingTop: 0,
+                        marginBottom: 25,
+                        marginTop: 0,
+                    }}
+                    contentContainerStyle={{
+                        height: 90,
+                        padding: 0,
+                        margin: 0,
+                        paddingBottom: 0,
+                        paddingTop: 5,
+                        paddingLeft: 5,
+                        paddingRight: 0,
+                        backgroundColor: 'white',
+                    }}
+                >
+                    { this.renderButtonsIfSelected(post) }
+                </Tile>
             );
         }
     }
@@ -291,7 +315,7 @@ class YourFeed extends React.Component<any, any> {
         return (
             <View style={{
                 height: 20,
-                backgroundColor: '#152E38',
+                backgroundColor: 'black',
             }}
             >
                 <Text style={{
@@ -308,9 +332,8 @@ class YourFeed extends React.Component<any, any> {
             <View style={{
                     flex: -1,
                     flexDirection: 'row',
-                    backgroundColor: '#152E38',
-                    borderBottomColor: '#1f4153',
-                    borderBottomWidth: 20,
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'lightgray',
                     alignContent: 'stretch',
                 }}
             >
@@ -318,19 +341,25 @@ class YourFeed extends React.Component<any, any> {
                     <Icon 
                         name='camera-alt'
                         size={30}
-                        color='white'
+                        color='gray'
                         style={{
                             paddingTop: 4,
                             paddingLeft: 10,
                             margin: 0,
                         }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate(this.props.post)} style={{ flex: 6 }}>
+                <TouchableOpacity 
+                    onPress={() => 
+                        this.props.navigation.navigate(this.props.post)
+                    } 
+                    style={{ 
+                        flex: 6 
+                    }}
+                >
                     <Text 
                         style={{
                             height: 30,
-                            color: 'white',
-                            backgroundColor: '#1f4153',
+                            color: 'gray',
                             fontSize: 14,
                             paddingLeft: 15,
                             paddingTop: 6,
@@ -358,12 +387,6 @@ class YourFeed extends React.Component<any, any> {
             >
                 { this.renderOfflineHeader() }
                 <FlatList
-                    style={{
-                        backgroundColor: '#152E38',
-                    }}
-                    contentContainerStyle={{
-                        backgroundColor: '#1f4153',
-                    }}
                     ListHeaderComponent={this.renderHeader()}
                     data={this.state.posts}
                     renderItem={(obj) => this.renderCard(obj.item)}
