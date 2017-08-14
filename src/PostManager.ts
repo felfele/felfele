@@ -226,12 +226,9 @@ export class _PostManager {
         // TODO Download image data too so that it's stored locally as well
         // const defaultWidth = 300;
         // const defaultHeight = 300;
-        // for (const image of images) {
-        //     const width = image.width ? image.width : defaultWidth;
-        //     const height = image.height ? image.height : defaultHeight;
-        //     image.data = await ImageDownloader.imageUriToBase64(image.uri, width, height);
-        //     Debug.log(image.data.slice(0, 1000));
-        // }
+        for (const image of images) {
+            image.localPath = await ImageDownloader.downloadImageAndReturnLocalPath(image.uri);
+        }
 
         const post = {
             text: text,
@@ -298,7 +295,12 @@ export class _PostManager {
         post.deleted = true;
         if (post.syncId) {
             await this.postCache.set(post);
-            await this.syncLocalDeletedPosts();
+            
+            try {
+                await this.syncLocalDeletedPosts();
+            } catch(e) {
+                console.error(e);
+            }
         } else {
             await this.postCache.delete(post);
         }
@@ -312,7 +314,13 @@ export class _PostManager {
 
     async saveAndSyncPost(post: Post) {
         await this.postCache.set(post);
-        await this.syncPosts();
+        
+        this.syncPosts()
+            .then(() => {
+                console.log('Synced')
+                StateTracker.updateVersion(StateTracker.version + 1);
+            })
+            .catch((reason) => console.error('Sync failed, reason: ', reason));
 
         StateTracker.updateVersion(StateTracker.version + 1);
     }

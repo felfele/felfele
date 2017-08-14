@@ -1,4 +1,5 @@
-import { ImageEditor, ImageStore, ImageCropData } from 'react-native';
+import { ImageEditor, ImageStore, ImageCropData, Platform } from 'react-native';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 export class ImageDownloader {
     static imageUriToBase64(imageUri: string, width: number, height: number): Promise<string> {
@@ -34,5 +35,18 @@ export class ImageDownloader {
                 reject(reason)
             });
         });
+    }
+
+    static async downloadImageAndReturnLocalPath(imageUri: string): Promise<string> {
+        const ext = 'jpg';
+        const res = await RNFetchBlob
+                        .config({
+                            fileCache: true,
+                            appendExt: ext,
+                        })
+                        .fetch('GET', imageUri, {
+                        });
+        
+        return 'file://' + res.path();
     }
 }

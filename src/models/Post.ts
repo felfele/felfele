@@ -10,6 +10,7 @@ export interface ImageData {
     width?: number;
     height?: number;
     data?: string;
+    localPath?: string;
 }
 
 export interface Post extends Model {

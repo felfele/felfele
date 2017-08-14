@@ -1,5 +1,6 @@
 export const Config = {
     baseUri: 'http://192.168.1.49:2368/',
+    defaultTimeout: 5000,
     loginData: {
         username: 'agazso@gmail.com',
         password: '7ZQ-XZg-skq-AtK',
