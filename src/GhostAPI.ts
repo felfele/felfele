@@ -52,7 +52,7 @@ export class GhostAPI {
             response = await this.timeout(Config.defaultTimeout, responsePromise);
         } catch (e) {
             console.error(e)
-            throw e;
+            throw new Error(e);
         }
         if (!response.ok) {
             if (response.status == 401) {
@@ -60,7 +60,7 @@ export class GhostAPI {
             }
             console.error(response);
             const text = await response.text();
-            throw Error('' + response.status + ' ' + response.statusText + ' ' + response.url + ' ' + text);
+            throw new Error('' + response.status + ' ' + response.statusText + ' ' + response.url + ' ' + text);
         }
         return response;
     }
@@ -84,7 +84,7 @@ export class GhostAPI {
             return textResponse;
         } catch (e) {
             console.error(e);
-            throw e;
+            throw new Error(e);
         }
     }
 
@@ -99,7 +99,7 @@ export class GhostAPI {
             return post['posts'][0]['id'];
         } catch (e) {
             console.error('Upload failed ', e);
-            throw e;
+            throw new Error(e);
         }
     }
 
@@ -223,7 +223,7 @@ export class GhostAPI {
             await Storage.auth.set(AuthenticationDefaultKey, this.authenticationData);
         } catch (e) {
             console.log('GhostAPI.tryLogin: ', e);
-            throw e;
+            throw new Error(e);
         }
 
     }

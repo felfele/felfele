@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl } from 'react-native';
-import { Card, Button, ButtonGroup, List, Tile, Icon } from 'react-native-elements';
+import { CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet } from 'react-native';
+import { Card, Button, ButtonGroup, List, Tile, Icon as ElementIcon } from 'react-native-elements';
 import { Gravatar } from 'react-native-gravatar';
+import Markdown from 'react-native-easy-markdown';
+import Icon from 'react-native-vector-icons/Ionicons';
+import RNFetchBlob from 'react-native-fetch-blob';
 
-import { AsyncImagePicker } from '../AsyncImagePicker';
+import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
 import StateTracker from '../StateTracker';
 import { Config } from '../Config';
 import { Backend } from '../Backend';
@@ -11,6 +14,7 @@ import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
 import { NetworkStatus } from '../NetworkStatus';
+import { DateUtils } from '../DateUtils';
 
 class YourFeed extends React.Component<any, any> {
     static navigationOptions = {
@@ -33,6 +37,7 @@ class YourFeed extends React.Component<any, any> {
         this.containerStyle = {
             backgroundColor: '#fff',
             borderRadius: 3,
+            padding: 0,
             paddingBottom: 10,
             paddingTop: 0,
             marginBottom: 25,
@@ -88,6 +93,23 @@ class YourFeed extends React.Component<any, any> {
 
     }
 
+    isCameraRollPhoto(pickerResult: ImagePickerResponse) {
+        if (pickerResult.origURL) {
+            if (pickerResult.origURL.startsWith('assets-library://') || pickerResult.origURL.startsWith('content://')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getFilenameExtension(filename) {
+        const a = filename.split(".");
+        if(a.length === 1 || ( a[0] === "" && a.length === 2 ) ) {
+            return "";
+        }
+        return a.pop().toLowerCase();
+    }
+
     openImagePicker = async () => {
         const pickerResult = await AsyncImagePicker.showImagePicker({
             allowsEditing: true,
@@ -96,6 +118,8 @@ class YourFeed extends React.Component<any, any> {
             exif: true,
         });
         
+        console.log('openImagePicker result: ', pickerResult);
+
         if (pickerResult.error) {
             console.error('openImagePicker: ', pickerResult.error);
             return;
@@ -105,11 +129,25 @@ class YourFeed extends React.Component<any, any> {
             return;
         }
 
+        let localPath = pickerResult.origURL || '';
+        if (!this.isCameraRollPhoto(pickerResult) && Config.saveToCameraRoll) {
+            localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
+        }
+
+        console.log(localPath);
+
+        // Copy file to Document dir
+        // const hash = await RNFetchBlob.fs.hash(pickerResult.uri);
+        // const extension = this.getFilenameExtension(pickerResult.uri);
+        // const filename = `${RNFetchBlob.fs.dirs.DocumentDir}/${hash}.${extension}`
+        // await RNFetchBlob.fs.cp(pickerResult.uri, filename);
+        
         const data: ImageData = {
-            uri: pickerResult.uri,
+            uri: localPath,
             width: pickerResult.width,
             height: pickerResult.height,
             data: pickerResult.data,
+            localPath: localPath,
         }
 
         const post: Post = {
@@ -142,78 +180,88 @@ class YourFeed extends React.Component<any, any> {
         return this.state.selectedPost && this.state.selectedPost._id == post._id;
     }
 
+    togglePostSelection(post) {
+        if (this.isPostSelected(post)) {
+            this.setState({ selectedPost: null });
+        } else {
+            this.setState({ selectedPost: post });
+        }        
+    }
+
+    onDeleteConfirmation(post) {
+        Alert.alert(
+            'Are you sure you want to delete?',
+            undefined,
+            [
+                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: 'OK', onPress: async () => await PostManager.deletePost(post) },
+            ],
+            { cancelable: false }
+        );
+    }
+
     renderButtonsIfSelected(post) {
+        const iconSize = 24;
         if (this.isPostSelected(post)) {
             return (
-                <View style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    height: 40,
-                    margin: 0,
-                    padding: 0,
-                }}
-                >
-                    <Button
-                        containerViewStyle={{flex: 1, alignSelf: 'stretch', padding: 0, margin: 0}}
-                        backgroundColor='#ff3325'
-                        fontSize={12}
-                        size={30}
-                        title='DELETE' 
-                        icon={{name: 'delete'}} 
-                        onPress={async () => {
-                            this.setState({selectedPost: null});
-                            await PostManager.deletePost(post);
-                        }}
-                    />
-                    <Button 
-                        containerViewStyle={{flex: 1, alignSelf: 'stretch', padding: 0, margin: 0}}
-                        backgroundColor='#4078ff'
-                        fontSize={12}
-                        size={30}
-                        title='SHARE' 
-                        icon={{name: 'share'}} 
-                        onPress={() => {
-                            this.props.navigation.navigate('Share', {link: 'http://192.168.1.49:2368#' + post._id});
-                        }}
-                    />
+                <View style={styles.itemImageContainer}>
+                    <TouchableOpacity style={styles.like}>
+                        {!this.state.isLiked ? <Icon name="ios-heart-outline" size={iconSize} color="black" /> : <Icon name="ios-heart" size={30} color="red" />}
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
+                        <Icon name="ios-chatbubbles-outline" size={iconSize} color="black" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.share} onPress={() => this.props.navigation.navigate('Share', {link: 'http://192.168.1.49:2368#' + post._id})}>
+                        <Icon name="ios-redo-outline" size={iconSize} color="black" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
+                        <Icon name="ios-trash-outline" size={iconSize} color="black" />
+                    </TouchableOpacity>
                 </View>
             )
         }
         return [];
     }
 
+    renderCardTop(post) {
+        const printableTime = DateUtils.printableElapsedTime(post.createdAt);
+        return (
+            <View style={styles.infoContainer}>
+                <Gravatar options={{
+                    email: Config.loginData.username,
+                    secure: true,
+                    parameters: { "size": "100", "d": "mm" },
+                }}
+                    style={styles.image}
+                />
+                <View style={styles.usernameContainer}>
+                    <Text style={styles.username}>Attila</Text>
+                    <Text style={styles.location}>{printableTime}</Text>
+                </View>
+            </View>
+        )
+    }
+
     renderCardWithOnlyText(post) {
+        
         return (
             <Card
                 containerStyle={{...this.containerStyle, 
                     margin: 0,
-                    paddingTop: 20,
-                    paddingBottom: 20,
+                    paddingTop: 5,
+                    paddingBottom: 5,
+                    borderWidth: 0,
                 }}
                 key={'card-' + post._id}
             >
                 <TouchableOpacity
-                    onLongPress={ () => {
-                        this.setState({selectedPost: post});
-                    }}
+                    onLongPress={ () => this.togglePostSelection(post) }
                 >
-                    <Gravatar options={{
-                            email: Config.loginData.username,
-                            secure: true,
-                            parameters: { "size": "100", "d": "mm" },
-                        }}
-                        style={{
-                            borderWidth: 1,
-                            borderRadius: 10,
-                            borderColor: 'white',
-                            width: 30,
-                            height: 30,
-                        }}
-                    />
-    
-                    <Text>{post.text}</Text>
+                    { this.renderCardTop(post) }
+                    <Markdown style={{
+                        marginVertical: 10,
+                        marginHorizontal: 10,
+                    }}>{post.text}</Markdown>
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </Card>
@@ -229,11 +277,8 @@ class YourFeed extends React.Component<any, any> {
             >
                 <TouchableOpacity 
                     style={{ paddingTop: 0 }}
-                    onLongPress={ () => {
-                        this.setState({selectedPost: post});
-                    }}
+                    onLongPress={ () => this.togglePostSelection(post) }
                 >
-                    <Text>{post.text}</Text>
                     {
                         post.images.map((image, index) => {
                             return <Tile
@@ -249,6 +294,12 @@ class YourFeed extends React.Component<any, any> {
                             />
                         })
                     }
+                    { post.text == '' ||
+                        <Markdown style={{
+                            marginVertical: 10
+                        }}>{post.text}</Markdown>
+                    }
+
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </Card>
@@ -264,35 +315,36 @@ class YourFeed extends React.Component<any, any> {
             return this.renderCardWithMultipleImages(post);
         } else {
             return (
+                <Card
+                    containerStyle={{...this.containerStyle, 
+                        margin: 0,
+                        padding: 0,
+                        paddingTop: 5,
+                        paddingBottom: 5,
+                        borderWidth: 0,
+                    }}
+                    key={'card-' + post._id}
+                >
+
+                { this.renderCardTop(post) }
                 <Tile
                     imageSrc={{
                         uri: this.getImageUri(post.images[0]),
                     }}
                     width={Dimensions.get('window').width}
                     height={Dimensions.get('window').width}
-                    title={post.text}
-                    titleStyle={{ fontSize: 16, color: 'black' }}
                     featured={false}
                     activeOpacity={0.95}
                     focusedOpacity={1}
                     key={`image-${post._id}`}
-                    onPress={ () => {
-                        if (this.isPostSelected(post)) {
-                            this.setState({selectedPost: null});
-                        } else {
-                            this.setState({selectedPost: post});
-                        }
-                    }}
+                    onPress={ () => this.togglePostSelection(post) }
                     containerStyle = {{
                         backgroundColor: '#fff',
-                        borderRadius: 3,
-                        paddingBottom: 10,
+                        padding: 0,
                         paddingTop: 0,
-                        marginBottom: 25,
                         marginTop: 0,
                     }}
                     contentContainerStyle={{
-                        height: 90,
                         padding: 0,
                         margin: 0,
                         paddingBottom: 0,
@@ -301,9 +353,15 @@ class YourFeed extends React.Component<any, any> {
                         paddingRight: 0,
                         backgroundColor: 'white',
                     }}
-                >
+                >                    
+                    { post.text == '' ||
+                        <Markdown style={{
+                            marginVertical: 10
+                        }}>{post.text}</Markdown>
+                    }
                     { this.renderButtonsIfSelected(post) }
                 </Tile>
+                </Card>
             );
         }
     }
@@ -327,7 +385,7 @@ class YourFeed extends React.Component<any, any> {
         )
     }
 
-    renderHeader() {
+    renderListHeader() {
         return (
             <View style={{
                     flex: -1,
@@ -338,7 +396,7 @@ class YourFeed extends React.Component<any, any> {
                 }}
             >
                 <TouchableOpacity onPress={() => this.openImagePicker()} style={{ flex: 1 }}>
-                    <Icon 
+                    <ElementIcon 
                         name='camera-alt'
                         size={30}
                         color='gray'
@@ -387,7 +445,7 @@ class YourFeed extends React.Component<any, any> {
             >
                 { this.renderOfflineHeader() }
                 <FlatList
-                    ListHeaderComponent={this.renderHeader()}
+                    ListHeaderComponent={this.renderListHeader()}
                     data={this.state.posts}
                     renderItem={(obj) => this.renderCard(obj.item)}
                     keyExtractor={(item, index) => item._id}
@@ -403,5 +461,28 @@ class YourFeed extends React.Component<any, any> {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {backgroundColor:'white',paddingTop:5},
+    infoContainer : {flexDirection:'row',height:38,alignSelf:'stretch', marginBottom: 5, marginLeft: 5},
+    image: {borderRadius : 16 , width:32 , height:32, marginHorizontal :3 , marginVertical : 3 },
+    usernameContainer: {justifyContent:'center',flexDirection:'column'},
+    location: {fontSize:10},
+    itemImageContainer: {flexDirection:'row', height:40, alignSelf:'stretch', marginLeft: 5},
+    like: {marginHorizontal:5,marginVertical:5,marginLeft:5},
+    comment: {marginHorizontal:10,marginVertical:5},
+    share: {marginHorizontal:10,marginVertical:5},
+    likeCount: {flexDirection:'row',alignItems:'center',marginLeft:2},
+    commentItem: {fontSize:10 , color:'rgba(0, 0, 0, 0.5)',marginTop:5},
+    captionContainer: {marginTop:2 ,flexDirection:'row',alignItems:'center'},
+    captionText: { fontSize:12,fontWeight:'bold' },
+    dateText: {fontSize:8 , color:'rgba(0, 0, 0, 0.5)',marginTop:5},
+    seperator: {height:1,alignSelf:'stretch',marginHorizontal:10,backgroundColor:'rgba(0, 0, 0, 0.2)'},
+    hashTag: {fontStyle: 'italic',color:'blue'},
+    footer: {marginVertical:5,alignSelf:'stretch',marginHorizontal:20,flexDirection:'column'},
+    username: {fontWeight: 'bold'},
+    text: {fontSize:12,color:'black'},
+    likedContainer:{backgroundColor:'transparent',flex:1,justifyContent:'center',alignItems:'center'}
+})
 
 export default YourFeed;

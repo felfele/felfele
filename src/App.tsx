@@ -39,46 +39,46 @@ const Root = TabNavigator(
                 ),
             },
         },
-        PublicTab: {
-            screen: ({navigation}) => (<Feed 
-                                        uri={Config.baseUri} 
-                                        post='Post' 
-                                        error='Error'
-                                        navigation={navigation} />),
-            path: '/',
-            navigationOptions: {
-                header: <View style={{padding: 50}} />,
-                title: 'Welcome',
-                tabBarLabel: 'Public stories',
-                tabBarIcon: ({ tintColor, focused }) => (
-                    <Ionicons
-                        name={focused ? 'ios-paper' : 'ios-paper-outline'}
-                        size={20}
-                        style={{ color: tintColor }}
-                    />
-                ),
-            },
-        },
-        FeedTab: {
-            screen: ({navigation}) => (<Feed 
-                                        uri={Config.baseUri} 
-                                        post='Post' 
-                                        error='Error'
-                                        navigation={navigation} />),
-            path: '/',
-            navigationOptions: {
-                header: <View style={{padding: 50}} />,
-                title: 'Welcome',
-                tabBarLabel: 'All stories',
-                tabBarIcon: ({ tintColor, focused }) => (
-                    <Ionicons
-                        name={focused ? 'ios-globe' : 'ios-globe-outline'}
-                        size={20}
-                        style={{ color: tintColor }}
-                    />
-                ),
-            },
-        },
+        // PublicTab: {
+        //     screen: ({navigation}) => (<Feed 
+        //                                 uri={Config.baseUri} 
+        //                                 post='Post' 
+        //                                 error='Error'
+        //                                 navigation={navigation} />),
+        //     path: '/',
+        //     navigationOptions: {
+        //         header: <View style={{padding: 50}} />,
+        //         title: 'Welcome',
+        //         tabBarLabel: 'Public stories',
+        //         tabBarIcon: ({ tintColor, focused }) => (
+        //             <Ionicons
+        //                 name={focused ? 'ios-paper' : 'ios-paper-outline'}
+        //                 size={20}
+        //                 style={{ color: tintColor }}
+        //             />
+        //         ),
+        //     },
+        // },
+        // FeedTab: {
+        //     screen: ({navigation}) => (<Feed 
+        //                                 uri={Config.baseUri} 
+        //                                 post='Post' 
+        //                                 error='Error'
+        //                                 navigation={navigation} />),
+        //     path: '/',
+        //     navigationOptions: {
+        //         header: <View style={{padding: 50}} />,
+        //         title: 'Welcome',
+        //         tabBarLabel: 'All stories',
+        //         tabBarIcon: ({ tintColor, focused }) => (
+        //             <Ionicons
+        //                 name={focused ? 'ios-globe' : 'ios-globe-outline'}
+        //                 size={20}
+        //                 style={{ color: tintColor }}
+        //             />
+        //         ),
+        //     },
+        // },
         SettingsTab: {
             screen: ({navigation}) => (<Settings config={Config} error='Error' navigation={navigation} />),
             path: '/settings',

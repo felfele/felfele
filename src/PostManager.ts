@@ -8,6 +8,7 @@ import StateTracker from './StateTracker';
 import { ImageDownloader } from './ImageDownloader';
 import { Debug } from './Debug';
 import { NetworkStatus } from './NetworkStatus';
+import { DateUtils } from './DateUtils';
 
 const DefaultDraftId = 1;
 
@@ -147,7 +148,7 @@ export class _PostManager {
                     if (post.syncId && post.syncId > upstreamSyncState.highestSeenSyncId) {
                         upstreamSyncState.highestSeenSyncId = post.syncId;
                     }
-                    if (post._id && post._id > upstreamSyncState.highestSyncedPostId) {
+                    if (post._id && post.syncId && post._id > upstreamSyncState.highestSyncedPostId) {
                         upstreamSyncState.highestSyncedPostId = post._id;
                     }
                 }
@@ -233,7 +234,7 @@ export class _PostManager {
         const post = {
             text: text,
             images: images,
-            createdAt: Date.now(),
+            createdAt: DateUtils.parseDateString(ghostPost.created_at),
             syncId: ghostPost.id,
         }
 

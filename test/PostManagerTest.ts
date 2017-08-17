@@ -11,6 +11,17 @@ import { Debug } from '../src/Debug';
 
 mock();
 
+jest.mock('react-native-fetch-blob', () => {
+  return {
+    DocumentDir: () => {},
+    ImageCache: {
+      get: {
+        clear: () => {}
+      }
+    }
+  }
+})
+
 beforeEach(() => {
 });
 
@@ -102,6 +113,7 @@ test('Sync with deleted post on the server', async (done) => {
     }
     Backend.ghostAPI.getAllPosts = async () => { return ghostPosts; }
     PostManager.uploadPost = async () => { return ghostPosts.length; }
+
     Storage.post.getHighestSeenId = async () => {return syncState.highestSyncedPostId;}
     Storage.post.set = async (post) => {return <number>post._id;}
     Storage.post.getNumItems = async (...a) => {  return localPosts; }

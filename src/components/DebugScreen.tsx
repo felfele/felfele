@@ -40,13 +40,6 @@ class DebugScreen extends React.Component<any, any> {
         this.setState({ switchValue: value });
     }
 
-    async onDownloadImages() {
-        const posts = PostManager.getAllPosts();
-        const firstPost = posts[0];
-        const imgSrc = await ImageDownloader.imageUriToBase64(firstPost.images[0].uri, 300, 300);
-        console.log(imgSrc);
-    }
-
     async onListPosts() {
         const posts = PostManager.getAllPosts();
         posts.map(post => {
@@ -156,13 +149,6 @@ class DebugScreen extends React.Component<any, any> {
                             }
                             title='Sync posts'
                             onPress={async () => await this.onSyncPosts()}
-                        /> 
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-sync" size={30} color="gray" />
-                            }
-                            title='Download image'
-                            onPress={async () => await this.onDownloadImages()}
                         /> 
 
                     </SettingsList>
