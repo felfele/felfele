@@ -15,7 +15,7 @@ test('Test ISO8601 complete format to UTC timestamp', async () => {
 
 test('Test UTC timestamp to ISO8601 complete format', async () => {
     const input = 1502982086000;
-    const result = DateUtils.parseTimestamp(input);
+    const result = DateUtils.timestampToDateString(input);
 
     expect(result).toEqual('2017-08-17T15:01:26.000Z');
 })

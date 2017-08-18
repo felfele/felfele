@@ -110,7 +110,7 @@ export class _PostManager {
             // Store the posts from Ghost in the local database
             for (const post of downstreamPosts) {
                 if (post.syncId && post.syncId > syncState.highestSeenSyncId) {
-                    console.log(`Storing post ${post.syncId}: `, JSON.stringify(post));
+                    Debug.log(`Storing post ${post.syncId}: `, JSON.stringify(post));
                     await this.postCache.set(post);
                     // Record keeping
                     if (post.syncId > downstreamSyncState.highestSeenSyncId) {
@@ -136,9 +136,9 @@ export class _PostManager {
 
                 for (const post of localOnlyPosts) {
                     if (post.syncId == null) {
-                        console.log(`Uploading post ${post._id}`, {...post, images: []});
+                        Debug.log(`Uploading post ${post._id}`, {...post, images: 'images are retracted from logging'});
                         const syncId = await this.uploadPost(post);
-                        console.log(`Uploading post __ ${post._id} ${syncId}`, {...post, images: []});
+                        Debug.log(`Uploading post __ ${post._id} ${syncId}`, {...post, images: 'images are retracted from logging'});
                         if (syncId) {
                             post.syncId = syncId;
                             await this.postCache.set(post);

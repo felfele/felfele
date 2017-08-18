@@ -3,6 +3,7 @@ import { Model } from './models/Model';
 import { Post } from './models/Post';
 import { AuthenticationData } from './models/AuthenticationData';
 import { SyncState } from './models/SyncState';
+import { Debug } from './Debug';
 
 interface Metadata {
     highestSeenId: number;
@@ -416,7 +417,7 @@ export class AsyncStorageWrapper {
     }
 
     static removeItem(key) {
-        console.log('removeItem: ', key);
+        Debug.log('removeItem: ', key);
         try {
             return AsyncStorage.removeItem(key);
         } catch (e) {

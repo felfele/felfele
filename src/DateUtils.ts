@@ -3,9 +3,9 @@ export class DateUtils {
         return Date.parse(dateString);
     }
 
-    static parseTimestamp(timestamp: number): string {
+    static timestampToDateString(timestamp: number): string {
         const date = new Date(timestamp);
-        const prefix = (s, p) => (''+p+s).substring(('' + s).length);
+        const prefix = (s, p) => ('' + p + s).substring(('' + s).length);
         const prefix2 = (s) => prefix(s, '00');
         const prefix3 = (s) => prefix(s, '000');
         const datePart = `${date.getUTCFullYear()}-${prefix2(date.getUTCMonth()+1)}-${prefix2(date.getUTCDate())}`;
@@ -15,25 +15,31 @@ export class DateUtils {
 
     static printableElapsedTime(timestamp: number, now: number = Date.now()): string {
         const diff = new Date(now - timestamp);
+        const pluralize = (s, num) => num > 1 ? s + 's' : s;
 
-        if (diff.getUTCFullYear() > 1970) {
-            return `${diff.getUTCFullYear() - 1970} years ago`;
+        const years = diff.getUTCFullYear() - 1970;
+        if (years > 0) {
+            return `${years} ${pluralize('year', years)} ago`;
         }
 
-        if (diff.getUTCMonth() > 0) {
-            return `${diff.getUTCMonth()} months ago`;
+        const months = diff.getUTCMonth();
+        if (months > 0) {
+            return `${months} ${pluralize('month', months)} ago`;
         }
 
-        if (diff.getUTCDate() > 1) {
-            return `${diff.getUTCDate() - 1} days ago`;
+        const days = diff.getUTCDate() - 1;
+        if (days > 0) {
+            return `${days} ${pluralize('day', days)} ago`;
         }
 
-        if (diff.getUTCHours() > 0) {
-            return `${diff.getUTCHours() - 1} hours ago`;
+        const hours = diff.getUTCHours() - 1;
+        if (hours > 0) {
+            return `${hours} ${pluralize('hour', hours)} ago`;
         }
 
-        if (diff.getUTCMinutes() > 0) {
-            return `${diff.getUTCMinutes() - 1} minutes ago`;
+        const minutes = diff.getUTCMinutes() - 1;
+        if (minutes > 0) {
+            return `${minutes} ${pluralize('minute', minutes)} ago`;
         }
 
         return 'few seconds ago';

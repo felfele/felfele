@@ -129,7 +129,6 @@ test('Sync with deleted post on the server', async (done) => {
 })
 
 test('Sync with deleted last post on the server', async (done) => {
-    Debug.setDebug(true);
     const ghostPosts = [{...DefaultGhostPost, id: 1}];
     const localPosts = [{...DefaultPost, _id: 1, syncId: 1}, {...DefaultPost, _id: 2, syncId: 2}]
     const syncState = {
