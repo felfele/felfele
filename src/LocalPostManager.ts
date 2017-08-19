@@ -335,7 +335,8 @@ export class _LocalPostManager implements PostManager {
                 markdownText += `![](${path.replace(/\"/g, '')})`;
             }
             
-            return await Backend.ghostAPI.uploadPost(markdownText);
+            const createdAt = DateUtils.timestampToDateString(post.createdAt)
+            return await Backend.ghostAPI.uploadPost(markdownText, createdAt);
         } catch (e) {
             console.error('uploadPost: ', e);
             return null;

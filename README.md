@@ -11,7 +11,10 @@
 
 `npm test`
 
+## Start packager in terminal
+
+`react-native start --verbose --resetCache`
+
 ## Generate the icon
 
 `app-icon generate`
-

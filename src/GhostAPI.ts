@@ -88,11 +88,12 @@ export class GhostAPI {
         }
     }
 
-    async uploadPost(markdown: string): Promise<number> {
+    async uploadPost(markdown: string, createdAt: string): Promise<number> {
         try {
             const response = await this.uploadDraft(markdown);
             const draftResponse = await response.json();
             console.log('uploadPost draftResponse', draftResponse);
+            draftResponse['posts'][0]['created_at'] = createdAt;
             const postResponse = await this.publishPost(draftResponse['posts'][0]);
             const post = await postResponse.json();
             console.log('uploadPost draftResponse', post);

@@ -6,6 +6,7 @@ import StateTracker from '../StateTracker';
 import { Backend } from '../Backend';
 import { Config } from '../Config';
 import { NetworkStatus } from '../NetworkStatus';
+import { DateUtils } from '../DateUtils';
 
 declare var window: any;
 declare var $: any;
@@ -138,7 +139,7 @@ class Feed extends React.Component<any, any> {
             try {
                 const path = await Backend.ghostAPI.uploadImage(data.uri);
                 const markdownText = `![](${path.replace(/\"/g, '')})`;
-                await Backend.ghostAPI.uploadPost(markdownText);
+                await Backend.ghostAPI.uploadPost(markdownText, DateUtils.timestampToDateString(Date.now()));
             } catch (e) {
                 Alert.alert(
                     'Error',

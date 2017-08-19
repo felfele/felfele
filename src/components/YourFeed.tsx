@@ -104,14 +104,18 @@ class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
     }
 
     async onRefresh() {
+        this.setState({
+            isRefreshing: true,
+        });
         try {
             await this.props.postManager.syncPosts();
             this.setState({
-                posts: this.props.postManager.getAllPosts()
+                posts: this.props.postManager.getAllPosts(),
+                isRefreshing: false,
             })
         } catch(e) {
             this.setState({
-                isRefreshing: false
+                isRefreshing: false,
             });
             Alert.alert(
                 'Error',
