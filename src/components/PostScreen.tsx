@@ -24,7 +24,7 @@ import { ImagePreviewGrid } from './ImagePreviewGrid';
 import { Backend } from '../Backend';
 import StateTracker from '../StateTracker';
 import { Post, ImageData } from '../models/Post';
-import { PostManager } from '../PostManager';
+import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
 
 var navigationActions = {};
@@ -47,9 +47,9 @@ class PostScreen extends React.Component<any, any> {
         navigationActions['Cancel'] = () => this.onCancelConfirmation();
         navigationActions['Post'] = () => this.onPressSubmit();
 
-        PostManager.loadDraft().then(post => {
+        LocalPostManager.loadDraft().then(post => {
             if (post) {
-                const [text, images] = PostManager.extractTextAndImagesFromMarkdown(post.text);
+                const [text, images] = LocalPostManager.extractTextAndImagesFromMarkdown(post.text);
                 this.setState({
                     text: text,
                     uploadedImages: images,
@@ -154,7 +154,7 @@ class PostScreen extends React.Component<any, any> {
     }
 
     async onDiscard() {
-        await PostManager.deleteDraft();
+        await LocalPostManager.deleteDraft();
         this.onCancel();
     }
 
@@ -172,7 +172,7 @@ class PostScreen extends React.Component<any, any> {
         }
 
         try {
-            await PostManager.saveDraft(post);
+            await LocalPostManager.saveDraft(post);
             Debug.log('Draft saved', post._id);
         } catch (e) {
             Alert.alert(
@@ -254,8 +254,8 @@ class PostScreen extends React.Component<any, any> {
         }
 
         try {
-            await PostManager.deleteDraft();
-            await PostManager.saveAndSyncPost(post);
+            await LocalPostManager.deleteDraft();
+            await LocalPostManager.saveAndSyncPost(post);
             Debug.log('Post saved and synced, ', post._id);
         } catch (e) {
             Alert.alert(

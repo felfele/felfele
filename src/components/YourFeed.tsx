@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet } from 'react-native';
+import { Linking, Clipboard, CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet } from 'react-native';
 import { Card, Button, ButtonGroup, List, Tile, Icon as ElementIcon } from 'react-native-elements';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
@@ -17,7 +17,24 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 
-class YourFeed extends React.Component<any, any> {
+interface YourFeedProps {
+    uri: string;
+    navigation: any;
+    post: any;
+    postManager: PostManager;
+}
+
+interface YourFeedState {
+    version: number;
+    uri: string;
+    selectedPost: Post | null;
+    isRefreshing: boolean;
+    isOnline: boolean;
+    currentTime: number;
+    posts: Post[];
+}
+
+class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
     static navigationOptions = {
         header: <View style={{ height: 100, backgroundColor: 'magenta' }} />
     }
@@ -29,11 +46,11 @@ class YourFeed extends React.Component<any, any> {
         this.state = {
             version: StateTracker.version,
             uri: this.props.uri,
-            posts: this.props.posts,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
             currentTime: Date.now(),
+            posts: [],
         }
 
         this.containerStyle = {
@@ -42,7 +59,7 @@ class YourFeed extends React.Component<any, any> {
             padding: 0,
             paddingBottom: 10,
             paddingTop: 0,
-            marginBottom: 25,
+            marginBottom: 15,
             marginTop: 0,
         }
 
@@ -63,9 +80,9 @@ class YourFeed extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        PostManager.loadPosts().then(() => {
+        this.props.postManager.loadPosts().then(() => {
             this.setState({
-                posts: PostManager.getAllPosts()
+                posts: this.props.postManager.getAllPosts()
             })
         });
     }
@@ -75,7 +92,7 @@ class YourFeed extends React.Component<any, any> {
             this.setState({
                 version: newVersion,
                 uri: this.state.uri + '#' + newVersion,
-                posts: PostManager.getAllPosts(),
+                posts: this.props.postManager.getAllPosts(),
             })
         }
     }
@@ -88,9 +105,9 @@ class YourFeed extends React.Component<any, any> {
 
     async onRefresh() {
         try {
-            await PostManager.syncPosts();
+            await this.props.postManager.syncPosts();
             this.setState({
-                posts: PostManager.getAllPosts()
+                posts: this.props.postManager.getAllPosts()
             })
         } catch(e) {
             this.setState({
@@ -114,11 +131,17 @@ class YourFeed extends React.Component<any, any> {
         return image.uri;
     }
 
-    isPostSelected(post) {
+    async openPost(post: Post) {
+        if (post.link) {
+            await Linking.openURL(post.link);
+        }
+    }
+
+    isPostSelected(post: Post) {
         return this.state.selectedPost && this.state.selectedPost._id == post._id;
     }
 
-    togglePostSelection(post) {
+    togglePostSelection(post: Post) {
         if (this.isPostSelected(post)) {
             this.setState({ selectedPost: null });
         } else {
@@ -126,25 +149,26 @@ class YourFeed extends React.Component<any, any> {
         }        
     }
 
-    onDeleteConfirmation(post) {
+    onDeleteConfirmation(post: Post) {
         Alert.alert(
             'Are you sure you want to delete?',
             undefined,
             [
                 { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'OK', onPress: async () => await PostManager.deletePost(post) },
+                { text: 'OK', onPress: async () => await this.props.postManager.deletePost(post) },
             ],
             { cancelable: false }
         );
     }
 
-    renderButtonsIfSelected(post) {
+    renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
+        const isPostLiked = (post) => false;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
                     <TouchableOpacity style={styles.like}>
-                        {!this.state.isLiked ? <Icon name="ios-heart-outline" size={iconSize} color="black" /> : <Icon name="ios-heart" size={30} color="red" />}
+                        {!isPostLiked(post) ? <Icon name="ios-heart-outline" size={iconSize} color="black" /> : <Icon name="ios-heart" size={30} color="red" />}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
                         <Icon name="ios-chatbubbles-outline" size={iconSize} color="black" />
@@ -161,10 +185,13 @@ class YourFeed extends React.Component<any, any> {
         return [];
     }
 
-    renderCardTop(post) {
-        const printableTime = DateUtils.printableElapsedTime(post.createdAt);
-        return (
-            <View style={styles.infoContainer}>
+    renderCardTopIcon(post: Post) {
+        if (post.author) {
+            return (
+                <Image source={{uri: post.author.faviconUri}} style={styles.image} />
+            )
+        } else {
+            return (
                 <Gravatar options={{
                     email: Config.loginData.username,
                     secure: true,
@@ -172,16 +199,27 @@ class YourFeed extends React.Component<any, any> {
                 }}
                     style={styles.image}
                 />
+            )
+        }
+    }
+
+    renderCardTop(post: Post) {
+        const printableTime = DateUtils.printableElapsedTime(post.createdAt);
+        const humanTime = DateUtils.timestampToDateString(post.createdAt);
+        const currentTime = Date.now();
+        const username = post.author ? post.author.name : 'Attila';
+        return (
+            <View style={styles.infoContainer}>
+                { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
-                    <Text style={styles.username}>Attila</Text>
+                    <Text style={styles.username}>{username}</Text>
                     <Text style={styles.location}>{printableTime}</Text>
                 </View>
             </View>
         )
     }
 
-    renderCardWithOnlyText(post) {
-        
+    renderCardWithOnlyText(post: Post) {
         return (
             <Card
                 containerStyle={{...this.containerStyle, 
@@ -194,19 +232,17 @@ class YourFeed extends React.Component<any, any> {
             >
                 <TouchableOpacity
                     onLongPress={ () => this.togglePostSelection(post) }
+                    onPress={ () => this.openPost(post)}
                 >
                     { this.renderCardTop(post) }
-                    <Markdown style={{
-                        marginVertical: 10,
-                        marginHorizontal: 10,
-                    }}>{post.text}</Markdown>
+                    <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </Card>
         )
     }
 
-    renderCardWithMultipleImages(post) {
+    renderCardWithMultipleImages(post: Post) {
         return (
             <Card
                 containerStyle={this.containerStyle}
@@ -216,6 +252,7 @@ class YourFeed extends React.Component<any, any> {
                 <TouchableOpacity 
                     style={{ paddingTop: 0 }}
                     onLongPress={ () => this.togglePostSelection(post) }
+                    onPress={ () => this.openPost(post)}
                 >
                     {
                         post.images.map((image, index) => {
@@ -233,9 +270,7 @@ class YourFeed extends React.Component<any, any> {
                         })
                     }
                     { post.text == '' ||
-                        <Markdown style={{
-                            marginVertical: 10
-                        }}>{post.text}</Markdown>
+                        <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
 
                 </TouchableOpacity>
@@ -275,7 +310,8 @@ class YourFeed extends React.Component<any, any> {
                     activeOpacity={0.95}
                     focusedOpacity={1}
                     key={`image-${post._id}`}
-                    onPress={ () => this.togglePostSelection(post) }
+                    onLongPress={ () => this.togglePostSelection(post) }
+                    onPress={ () => this.openPost(post)}
                     containerStyle = {{
                         backgroundColor: '#fff',
                         padding: 0,
@@ -293,9 +329,7 @@ class YourFeed extends React.Component<any, any> {
                     }}
                 >                    
                     { post.text == '' ||
-                        <Markdown style={{
-                            marginVertical: 10
-                        }}>{post.text}</Markdown>
+                        <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
                     { this.renderButtonsIfSelected(post) }
                 </Tile>
@@ -325,7 +359,10 @@ class YourFeed extends React.Component<any, any> {
 
     renderListHeader() {
         return (
-            <FeedHeader post={this.props.post} navigation={this.props.navigation} />
+            <FeedHeader 
+                post={this.props.post} 
+                navigation={this.props.navigation} 
+                postManager={this.props.postManager} />
         )
     }
 
@@ -359,9 +396,9 @@ class YourFeed extends React.Component<any, any> {
 const styles = StyleSheet.create({
     container: {backgroundColor:'white',paddingTop:5},
     infoContainer : {flexDirection:'row',height:38,alignSelf:'stretch', marginBottom: 5, marginLeft: 5},
-    image: {borderRadius : 16 , width:32 , height:32, marginHorizontal :3 , marginVertical : 3 },
+    image: {borderRadius : 3, width:32 , height:32, marginHorizontal: 4 , marginVertical: 3 },
     usernameContainer: {justifyContent:'center',flexDirection:'column'},
-    location: {fontSize:10},
+    location: {fontSize:10, color: 'gray'},
     itemImageContainer: {flexDirection:'row', height:40, alignSelf:'stretch', marginLeft: 5},
     like: {marginHorizontal:5,marginVertical:5,marginLeft:5},
     comment: {marginHorizontal:10,marginVertical:5},
@@ -376,7 +413,8 @@ const styles = StyleSheet.create({
     footer: {marginVertical:5,alignSelf:'stretch',marginHorizontal:20,flexDirection:'column'},
     username: {fontWeight: 'bold'},
     text: {fontSize:12,color:'black'},
-    likedContainer:{backgroundColor:'transparent',flex:1,justifyContent:'center',alignItems:'center'}
+    likedContainer:{backgroundColor:'transparent',flex:1,justifyContent:'center',alignItems:'center'},
+    markdownStyle: {marginVertical: 10, marginHorizontal: 10},
 })
 
 export default YourFeed;

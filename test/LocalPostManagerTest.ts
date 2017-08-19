@@ -3,7 +3,7 @@ import { mock, release } from 'mock-async-storage';
 
 import { Storage } from '../src/Storage';
 import { Backend } from '../src/Backend';
-import { PostManager } from '../src/PostManager';
+import { LocalPostManager } from '../src/LocalPostManager';
 import { Post as GhostPost } from '../src/GhostAPI';
 import { SyncState } from '../src/models/SyncState';
 import { Post } from '../src/models/Post';
@@ -79,7 +79,7 @@ test('Sync one post', async (done) => {
         return;
     }
 
-    PostManager.syncPosts();
+    LocalPostManager.syncPosts();
 })
 
 test('Sync first post with the server already having posts', async (done) => {
@@ -89,7 +89,7 @@ test('Sync first post with the server already having posts', async (done) => {
         highestSyncedPostId: 0,
     }
     Backend.ghostAPI.getAllPosts = async () => { return Backend_ghostAPI_getAllPosts(numGhostPosts); }
-    PostManager.uploadPost = async () => { return numGhostPosts + 1; }
+    LocalPostManager.uploadPost = async () => { return numGhostPosts + 1; }
     Storage.post.getHighestSeenId = async () => {return <number>DefaultPost._id;}
     Storage.post.set = async (post) => {return <number>post._id;}
     Storage.post.getNumItems = async (...a) => {  return [DefaultPost]; }
@@ -101,7 +101,7 @@ test('Sync first post with the server already having posts', async (done) => {
         return;
     }
 
-    PostManager.syncPosts();
+    LocalPostManager.syncPosts();
 })
 
 test('Sync with deleted post on the server', async (done) => {
@@ -112,7 +112,7 @@ test('Sync with deleted post on the server', async (done) => {
         highestSyncedPostId: 2,
     }
     Backend.ghostAPI.getAllPosts = async () => { return ghostPosts; }
-    PostManager.uploadPost = async () => { return ghostPosts.length; }
+    LocalPostManager.uploadPost = async () => { return ghostPosts.length; }
 
     Storage.post.getHighestSeenId = async () => {return syncState.highestSyncedPostId;}
     Storage.post.set = async (post) => {return <number>post._id;}
@@ -125,7 +125,7 @@ test('Sync with deleted post on the server', async (done) => {
         return;
     }
 
-    PostManager.syncPosts();
+    LocalPostManager.syncPosts();
 })
 
 test('Sync with deleted last post on the server', async (done) => {
@@ -136,7 +136,7 @@ test('Sync with deleted last post on the server', async (done) => {
         highestSyncedPostId: 2,
     }
     Backend.ghostAPI.getAllPosts = async () => { return ghostPosts; }
-    PostManager.uploadPost = async () => { return ghostPosts.length; }
+    LocalPostManager.uploadPost = async () => { return ghostPosts.length; }
     Storage.post.getHighestSeenId = async () => {return syncState.highestSyncedPostId;}
     Storage.post.set = async (post) => {return <number>post._id;}
     Storage.post.getNumItems = async (...a) => {  return [localPosts[1]]; }
@@ -148,5 +148,5 @@ test('Sync with deleted last post on the server', async (done) => {
         return;
     }
 
-    PostManager.syncPosts();
+    LocalPostManager.syncPosts();
 })

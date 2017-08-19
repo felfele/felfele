@@ -22,7 +22,7 @@ export class DateUtils {
             return `${years} ${pluralize('year', years)} ago`;
         }
 
-        const months = diff.getUTCMonth();
+        const months = diff.getUTCMonth() - 1;
         if (months > 0) {
             return `${months} ${pluralize('month', months)} ago`;
         }
@@ -32,15 +32,16 @@ export class DateUtils {
             return `${days} ${pluralize('day', days)} ago`;
         }
 
-        const hours = diff.getUTCHours() - 1;
+        const hours = diff.getUTCHours();
         if (hours > 0) {
             return `${hours} ${pluralize('hour', hours)} ago`;
         }
 
-        const minutes = diff.getUTCMinutes() - 1;
+        const minutes = diff.getUTCMinutes();
         if (minutes > 0) {
             return `${minutes} ${pluralize('minute', minutes)} ago`;
         }
+
 
         return 'few seconds ago';
     }

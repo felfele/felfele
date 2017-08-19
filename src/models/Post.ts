@@ -13,11 +13,19 @@ export interface ImageData {
     localPath?: string;
 }
 
+export interface Author {
+    name: string;
+    uri: string;
+    faviconUri: string;
+}
+
 export interface Post extends Model {
     images: ImageData[];
     text: string;
     createdAt: number;
+    link?: string;
     location?: Location;
     syncId?: number;
     deleted?: boolean;
+    author?: Author;
 }

@@ -30,7 +30,9 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "postinstall": "npm run patch && rndebugger-open",
-    "patch": "./node_modules/.bin/replace '.*resizeMode.*' '' node_modules/react-native-elements/src/tile/Tile.js -s"
+    "patch": "npm run patchNativeElements && npm run patchCheerio",
+    "patchNativeElements": "./node_modules/.bin/replace '.*resizeMode.*' '' node_modules/react-native-elements/src/tile/Tile.js -s",
+    "patchCheerio": "./node_modules/.bin/replace '^exports.version' '// exports.version' node_modules/cheerio/index.js -s"
   },
   "jest": {
     "preset": "react-native",
@@ -66,8 +68,11 @@
     "react-native-image-picker": "^0.26.3",
     "react-native-qrcode": "^0.2.4",
     "react-native-settings-list": "^1.6.1",
+    "react-native-util": "^1.0.2",
     "react-native-vector-icons": "^4.3.0",
+    "react-native-xml2js": "^1.0.3",
     "react-navigation": "^1.0.0-beta.11",
-    "tslib": "^1.7.1"
+    "tslib": "^1.7.1",
+    "util": "^0.10.3"
   }
 }

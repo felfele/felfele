@@ -13,8 +13,10 @@ import Location from './components/Location';
 import DebugScreen from './components/DebugScreen';
 import Share from './components/Share';
 import { Debug } from './Debug';
+import { LocalPostManager } from './LocalPostManager';
+import { RSSPostManager } from './RSSPostManager';
 
-Debug.setDebug(true);
+Debug.setDebug(__DEV__);
 
 const Root = TabNavigator(
     {
@@ -22,9 +24,8 @@ const Root = TabNavigator(
             screen: ({navigation}) => (<YourFeed
                                         uri={Config.baseUri} 
                                         post='Post' 
-                                        error='Error'
-                                        posts={[]}
-                                        navigation={navigation} />),
+                                        navigation={navigation} 
+                                        postManager={LocalPostManager} />),
             path: '/',
             navigationOptions: {
                 header: <View style={{padding: 50}} />,
@@ -33,6 +34,26 @@ const Root = TabNavigator(
                 tabBarIcon: ({ tintColor, focused }) => (
                     <Ionicons
                         name={focused ? 'ios-list-box' : 'ios-list-box-outline'}
+                        size={20}
+                        style={{ color: tintColor }}
+                    />
+                ),
+            },
+        },
+        NewsTab: {
+            screen: ({navigation}) => (<YourFeed
+                                        uri={Config.baseUri} 
+                                        post='Post' 
+                                        navigation={navigation} 
+                                        postManager={RSSPostManager} />),
+            path: '/',
+            navigationOptions: {
+                header: <View style={{padding: 50}} />,
+                title: 'New stories',
+                tabBarLabel: 'New stories',
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <Ionicons
+                        name={focused ? 'ios-paper' : 'ios-paper-outline'}
                         size={20}
                         style={{ color: tintColor }}
                     />

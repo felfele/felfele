@@ -3,7 +3,7 @@ import { View, FlatList, Text, Alert, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AsyncStorageWrapper, Storage } from '../Storage';
-import { PostManager } from '../PostManager';
+import { LocalPostManager } from '../LocalPostManager';
 import { ImageDownloader } from '../ImageDownloader'
 import StateTracker from '../StateTracker';
 
@@ -41,7 +41,7 @@ class DebugScreen extends React.Component<any, any> {
     }
 
     async onListPosts() {
-        const posts = PostManager.getAllPosts();
+        const posts = LocalPostManager.getAllPosts();
         posts.map(post => {
             const postCopy = {...post, images: post.images.map(image => { return {...image, data: undefined}})};
             console.log(JSON.stringify(postCopy));
@@ -59,7 +59,7 @@ class DebugScreen extends React.Component<any, any> {
     }
 
     async onListCache() {
-        const posts = await PostManager.getAllPosts();
+        const posts = await LocalPostManager.getAllPosts();
         posts.map(post => console.log('onListCache: ', post));
     }
 
@@ -86,12 +86,12 @@ class DebugScreen extends React.Component<any, any> {
         for (const key of Object.keys(Storage)) {
             Storage[key].clear();
         }
-        PostManager.clearPosts();
+        LocalPostManager.clearPosts();
         Alert.alert('Database is cleared');
     }
 
     async onSyncPosts() {
-        await PostManager.syncPosts();
+        await LocalPostManager.syncPosts();
         StateTracker.updateVersion(StateTracker.version + 1);
     }
 

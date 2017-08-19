@@ -7,7 +7,13 @@ import { Config } from '../Config';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 
-export class FeedHeader extends React.Component<any, any> {
+interface FeedHeaderProps {
+    post: any;
+    navigation: any;
+    postManager: PostManager;
+}
+
+export class FeedHeader extends React.Component<FeedHeaderProps> {
     constructor(props) {
         super(props);
     }
@@ -76,7 +82,7 @@ export class FeedHeader extends React.Component<any, any> {
         }
 
         try {
-            PostManager.saveAndSyncPost(post);
+            this.props.postManager.saveAndSyncPost(post);
         } catch (e) {
             Alert.alert(
                 'Error',
