@@ -3,6 +3,7 @@ import { Post, ImageData } from './models/Post';
 import { Config } from './Config';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
+import { Utils } from './Utils';
 
 type RSSEnclosure = {
     url: string;
@@ -56,15 +57,7 @@ class _RSSPostManager implements PostManager {
 
     private async loadFeed(feed): Promise<FeedWithMetrics | null> {
         try {
-            const rss = await new Promise<FeedWithMetrics>((resolve, reject) => {
-                Feed.load(feed, function(err, rss) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(rss);
-                    }
-                });
-            });
+            const rss = await Feed.load(feed);              
             return rss;        
         } catch (e) {
             console.warn(e);
@@ -163,36 +156,40 @@ const xml2js = require('react-native-xml2js');
 
 
 const Feed = {
-    load: async (url, callback) => {
-        const response = await fetch(url,
-            {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-                    'Accept': 'text/html,application/xhtml+xml'
-                }
-            });
+    DefaultTimeout: 3000,
+    load: async (url): Promise<FeedWithMetrics> => {
+        const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
+                'Accept': 'text/html,application/xhtml+xml'
+            }
+        }));
         if (response.status == 200) {
             const xml = await response.text();
             const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
             parser.addListener("error", function (err) {
-                callback(err, null);
+                throw new Error(err);
             });
-            parser.parseString(xml, function (err, result) {
-                var rss = Feed.parser(result);
-                const feedWithMetrics: FeedWithMetrics = {
-                    feed: rss,
-                    size: xml.length,
-                }
-                callback(null, feedWithMetrics);
-                //console.log(JSON.stringify(result.rss.channel));
+            return await new Promise<FeedWithMetrics>((resolve, reject) => {
+                parser.parseString(xml, function (err, result) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    var rss = Feed.parser(result);
+                    const feedWithMetrics: FeedWithMetrics = {
+                        feed: rss,
+                        size: xml.length,
+                    }
+                    resolve(feedWithMetrics);
+                });
             });
-
         } else {
             throw new Error('Bad status code');
         }
     },
 
-    parser: function(json){
+    parser: function (json) {
         if (json.feed) {
             return Feed.parseAtom(json);
         } else if (json.rss) {
@@ -200,10 +197,10 @@ const Feed = {
         }
     },
 
-    parseAtom: function(json) {
+    parseAtom: function (json) {
         const feed = json.feed;
-        var rss: any = {items:[]};
-        
+        var rss: any = { items: [] };
+
         if (feed.title) {
             rss.title = feed.title[0];
         }
@@ -228,62 +225,62 @@ const Feed = {
         return rss;
     },
 
-    parseRSS: function(json) {
+    parseRSS: function (json) {
         var channel = json.rss.channel;
-        var rss: any = {items:[]};
-        if(util.isArray(json.rss.channel))
-          channel = json.rss.channel[0];
+        var rss: any = { items: [] };
+        if (util.isArray(json.rss.channel))
+            channel = json.rss.channel[0];
 
         if (channel.title) {
             rss.title = channel.title[0];
-         }
-         if (channel.description) {
-             rss.description = channel.description[0];
-         }
-         if (channel.link) {
-             rss.url = channel.link[0];
-         }
-         if (channel.item) {
-           if (!util.isArray(channel.item)) {
-             channel.item = [channel.item];
-           }
-           channel.item.forEach(function(val){
-             var obj: any = {};
-             obj.title = !util.isNullOrUndefined(val.title)?val.title[0]:'';
-             obj.description = !util.isNullOrUndefined(val.description)?val.description[0]:'';
-             obj.url = obj.link = !util.isNullOrUndefined(val.link)?val.link[0]:'';
+        }
+        if (channel.description) {
+            rss.description = channel.description[0];
+        }
+        if (channel.link) {
+            rss.url = channel.link[0];
+        }
+        if (channel.item) {
+            if (!util.isArray(channel.item)) {
+                channel.item = [channel.item];
+            }
+            channel.item.forEach(function (val) {
+                var obj: any = {};
+                obj.title = !util.isNullOrUndefined(val.title) ? val.title[0] : '';
+                obj.description = !util.isNullOrUndefined(val.description) ? val.description[0] : '';
+                obj.url = obj.link = !util.isNullOrUndefined(val.link) ? val.link[0] : '';
 
-             if (val.pubDate) {
-               //lets try basis js date parsing for now
-               obj.created = Date.parse(val.pubDate[0]);
-             }
-             if (val['media:content']) {
-               obj.media = val.media || {};
-               obj.media.content = val['media:content'];
-             }
-             if (val['media:thumbnail']) {
-                obj.media = val.media || {};
-                obj.media.thumbnail = val['media:thumbnail'];
-              }
-              if(val.enclosure){
-                obj.enclosures = [];
-                if(!util.isArray(val.enclosure))
-                    val.enclosure = [val.enclosure];
-                val.enclosure.forEach(function(enclosure){
-                   var enc = {};
-                   for (var x in enclosure) {
-                       enc[x] = enclosure[x][0];
-                   }
-                  obj.enclosures.push(enc);
-                });
+                if (val.pubDate) {
+                    //lets try basis js date parsing for now
+                    obj.created = Date.parse(val.pubDate[0]);
+                }
+                if (val['media:content']) {
+                    obj.media = val.media || {};
+                    obj.media.content = val['media:content'];
+                }
+                if (val['media:thumbnail']) {
+                    obj.media = val.media || {};
+                    obj.media.thumbnail = val['media:thumbnail'];
+                }
+                if (val.enclosure) {
+                    obj.enclosures = [];
+                    if (!util.isArray(val.enclosure))
+                        val.enclosure = [val.enclosure];
+                    val.enclosure.forEach(function (enclosure) {
+                        var enc = {};
+                        for (var x in enclosure) {
+                            enc[x] = enclosure[x][0];
+                        }
+                        obj.enclosures.push(enc);
+                    });
 
-              }
-              rss.items.push(obj);
+                }
+                rss.items.push(obj);
 
-           });
+            });
 
-         }
-         return rss;
+        }
+        return rss;
 
     },
 
