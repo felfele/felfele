@@ -16,6 +16,7 @@ import { Debug } from '../Debug';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
+import { Utils } from '../Utils';
 
 interface YourFeedProps {
     uri: string;
@@ -212,12 +213,14 @@ class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
         const humanTime = DateUtils.timestampToDateString(post.createdAt);
         const currentTime = Date.now();
         const username = post.author ? post.author.name : 'Attila';
+        const url = post.link || '';
+        const hostnameText = url == '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
             <View style={styles.infoContainer}>
                 { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
                     <Text style={styles.username}>{username}</Text>
-                    <Text style={styles.location}>{printableTime}</Text>
+                    <Text style={styles.location}>{printableTime}{hostnameText}</Text>
                 </View>
             </View>
         )
@@ -325,10 +328,10 @@ class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
                     contentContainerStyle={{
                         padding: 0,
                         margin: 0,
-                        paddingBottom: 0,
-                        paddingTop: 5,
-                        paddingLeft: 5,
+                        paddingLeft: 0,
+                        paddingTop: 0,
                         paddingRight: 0,
+                        paddingBottom: 0,
                         backgroundColor: 'white',
                     }}
                 >                    

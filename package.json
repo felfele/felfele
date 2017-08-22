@@ -73,6 +73,7 @@
     "react-native-xml2js": "^1.0.3",
     "react-navigation": "^1.0.0-beta.11",
     "tslib": "^1.7.1",
+    "url": "^0.11.0",
     "util": "^0.10.3"
   }
 }

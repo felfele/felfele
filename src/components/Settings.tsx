@@ -40,7 +40,8 @@ class Settings extends React.Component<any, any> {
                             title='Feed url'
                             titleInfo={this.props.config.baseUri}
                             onPress={() => Alert.alert('Route To Uri Config Page')}
-                        /> 
+                        />
+                        { __DEV__ &&
                          <SettingsList.Item
                             icon={
                                 <Ionicons style={styles.imageStyle} name="md-bug" size={30} color="gray" />
@@ -48,6 +49,7 @@ class Settings extends React.Component<any, any> {
                             title='Debug menu'
                             onPress={() => this.props.navigation.navigate('Debug')}
                         /> 
+                        }
                     </SettingsList>
                 </View>
             </View>

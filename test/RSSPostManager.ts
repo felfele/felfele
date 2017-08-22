@@ -55,3 +55,14 @@ test('Parse image from markdown', () => {
 
     expect(result).toEqual(expectedResult);
 })
+
+test('Parse link', () => {
+    const hostname = 'example.com';
+    const link = `http://${hostname}/content/2017/08/`;
+    const description = `<a href="${link}">description</a>`;
+    const expectedResult = `[description](${link}) _(${hostname})_`;
+
+    const result = RSSPostManager.formatDescription(description);
+
+    expect(result).toBe(expectedResult);
+})

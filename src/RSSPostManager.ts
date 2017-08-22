@@ -31,11 +31,16 @@ type RSSFeed = {
 type FeedWithMetrics = {
     feed: RSSFeed;
     size: number;
+    downloadTime: number;
+    xmlTime: number;
+    parseTime: number;
 }
+
+const FirstId = 1;
 
 class _RSSPostManager implements PostManager {
     posts: Post[] = [];
-    id = 1;
+    id = FirstId;
     idCache = {};
     feedUrls: string[] = [
         'https://news.ycombinator.com/rss',
@@ -66,27 +71,47 @@ class _RSSPostManager implements PostManager {
     }
 
     async loadPosts() {
-        this.posts = [];
+        const startTime = Date.now();
+        const posts = [];
+        const metrics: FeedWithMetrics[] = [];
         let downloadSize = 0;
-        for (const feedUrl of this.feedUrls) {
-            const feedWithMetrics = await this.loadFeed(feedUrl);
+        let firstLoad = this.id == FirstId;
+        const loadFeedPromises = this.feedUrls.map(url => this.loadFeed(url));
+        const feeds = await Promise.all(loadFeedPromises);
+        for (const feedWithMetrics of feeds) {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
                 const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
                 console.log('RSSPostManager: ', rssFeed, favicon);
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, favicon)
-                this.posts.push.apply(this.posts, convertedPosts);
+                posts.push.apply(posts, convertedPosts);
+                metrics.push(feedWithMetrics);
             }
         }
 
-        const firstPost: Post = {
-            _id: 1,
-            images: [],
-            text: `Debug message: downloaded ${downloadSize} bytes`,
-            createdAt: Date.now(),
+
+        // Don't update when there are no new posts, e.g. when the network is down
+        if (!firstLoad && posts.length == 0) {
+            return;
         }
-        this.posts.push(firstPost);
+
+        this.posts = posts;
+
+        if (__DEV__) {
+            const stats = metrics
+                .map(metric => `${Utils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
+                .join('\n');
+            
+            const elapsed = Date.now() - startTime;
+            const firstPost: Post = {
+                _id: 1,
+                images: [],
+                text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
+                createdAt: Date.now(),
+            }
+            this.posts.push(firstPost);
+        }
     }
 
     getAllPosts(): Post[] {
@@ -98,13 +123,19 @@ class _RSSPostManager implements PostManager {
     }
 
     formatDescription(description): string {
-        return description
+        const firstPhase = description
             .replace(/<!\[CDATA\[(.*)\]\]>/, '$1')
             .replace(/&hellip;/g, '...')
             .replace(/&amp;/g, '&')
-            .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1)')
+            .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1) #____($1)#____')
             .replace(/<img.*?src=['"](.*?)['"].*\/?>/gi, '![]($1)')
-            .replace(/<(\/?[a-z]+.*?>)/gi, '')
+            .replace(/<(\/?[a-z]+.*?>)/gi, '');
+
+        const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
+            return `_(${Utils.getHumanHostname(p1)})_`;
+        });
+
+        return secondPhase;
     }
 
     extractTextAndImagesFromMarkdown(markdown: string, baseUri = Config.baseUri): [string, ImageData[]] {
@@ -158,14 +189,17 @@ const xml2js = require('react-native-xml2js');
 const Feed = {
     DefaultTimeout: 3000,
     load: async (url): Promise<FeedWithMetrics> => {
+        const startTime = Date.now();
         const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
                 'Accept': 'text/html,application/xhtml+xml'
             }
         }));
+        const downloadTime = Date.now();
         if (response.status == 200) {
             const xml = await response.text();
+            const xmlTime = Date.now();
             const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
             parser.addListener("error", function (err) {
                 throw new Error(err);
@@ -176,10 +210,14 @@ const Feed = {
                         reject(err);
                         return;
                     }
-                    var rss = Feed.parser(result);
+                    const parseTime = Date.now();
+                    const rss = Feed.parser(result);
                     const feedWithMetrics: FeedWithMetrics = {
                         feed: rss,
                         size: xml.length,
+                        downloadTime: downloadTime - startTime,
+                        xmlTime: xmlTime - downloadTime,
+                        parseTime: parseTime - xmlTime,
                     }
                     resolve(feedWithMetrics);
                 });
