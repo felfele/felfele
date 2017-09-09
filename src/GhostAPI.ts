@@ -3,6 +3,7 @@ import { AuthenticationData, AuthenticationDefaultKey } from './models/Authentic
 import { Storage } from './Storage';
 import { ImageData } from './models/Post';
 import { Config } from './Config';
+import { Utils } from './Utils';
 
 export interface Draft {
     title: string;
@@ -39,17 +40,10 @@ export class GhostAPI {
     constructor(private baseUri, private loginData, private authenticationData: AuthenticationData) {
     }
 
-    async timeout<T>(ms, promise: Promise<T>): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            setTimeout(() => reject(new Error('timeout')), ms);
-            promise.then(resolve, reject);
-        });
-    }
-
     async handleResponseErrors(responsePromise: Promise<Response>) {
         let response;
         try {
-            response = await this.timeout(Config.defaultTimeout, responsePromise);
+            response = await Utils.timeout(Config.defaultTimeout, responsePromise);
         } catch (e) {
             console.error(e)
             throw new Error(e);

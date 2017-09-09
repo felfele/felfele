@@ -35,7 +35,7 @@ interface YourFeedState {
     posts: Post[];
 }
 
-class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
+class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
     static navigationOptions = {
         header: <View style={{ height: 100, backgroundColor: 'magenta' }} />
     }
@@ -379,7 +379,8 @@ class YourFeed extends React.Component<YourFeedProps, YourFeedState> {
                 flexDirection: 'column',
                 padding: 0,
                 flex: 1, 
-                height: '100%' }}
+                height: '100%',
+            }}
             >
                 { this.renderOfflineHeader() }
                 <FlatList

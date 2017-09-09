@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, StatusBar } from 'react-native';
+import { View, StatusBar, Platform } from 'react-native';
 
 import { Config } from './Config';
 import PostScreen from './components/PostScreen';
@@ -12,11 +12,19 @@ import Settings from './components/Settings';
 import Location from './components/Location';
 import DebugScreen from './components/DebugScreen';
 import Share from './components/Share';
+import { FeedListEditor } from './components/FeedListEditor';
+import { EditFeed } from './components/EditFeed';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
 
 Debug.setDebug(__DEV__);
+
+const NavigationHeaderComponent = Platform.OS == 'ios' ? 
+            <View style={{height: 20}}>
+                <StatusBar barStyle="dark-content" />     
+            </View> 
+            : <StatusBar backgroundColor="black" barStyle="light-content" />;
 
 const Root = TabNavigator(
     {
@@ -28,7 +36,6 @@ const Root = TabNavigator(
                                         postManager={LocalPostManager} />),
             path: '/',
             navigationOptions: {
-                header: <View style={{padding: 50}} />,
                 title: 'Your story',
                 tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }) => (
@@ -48,7 +55,6 @@ const Root = TabNavigator(
                                         postManager={RSSPostManager} />),
             path: '/',
             navigationOptions: {
-                header: <View style={{padding: 50}} />,
                 title: 'New stories',
                 tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }) => (
@@ -143,15 +149,19 @@ const Scenes = {
     Share: {
         screen: Share
     },
+    FeedListEditor: {
+        screen: FeedListEditor
+    },
+    EditFeed: {
+        screen: EditFeed
+    },
 }
 
 const AppNavigator = StackNavigator(Scenes,
     {
         mode: 'modal',
         navigationOptions: {
-            header: <View style={{height: 20}}>
-                        <StatusBar barStyle="dark-content" />
-                    </View>
+            header: NavigationHeaderComponent,
         }
     }
 );

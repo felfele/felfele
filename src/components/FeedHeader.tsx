@@ -13,7 +13,7 @@ interface FeedHeaderProps {
     postManager: PostManager;
 }
 
-export class FeedHeader extends React.Component<FeedHeaderProps> {
+export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
     constructor(props) {
         super(props);
     }

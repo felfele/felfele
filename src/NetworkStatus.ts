@@ -1,39 +1,37 @@
 import { NetInfo } from 'react-native';
 
+type Listener = (boolean) => void;
+
 class _NetworkStatus {
     connectionState: boolean | null = null;
-    connectionType: string | null = null;
+    listeners: Listener[] = [];
 
     constructor() {
-        NetInfo.isConnected.addEventListener('change', (isConnected) => this.onConnectionStateChange(isConnected));
-        NetInfo.addEventListener('change', (result) => this.onConnectionTypeChange(result));
-        NetInfo.isConnected.fetch().then(value => this.connectionState = value);
+        NetInfo.addEventListener('connectionChange', (connectionInfo) => this.onConnectionChange(connectionInfo));
+        // (<any>NetInfo).getConnectionInfo().then((connectionInfo) => this.onConnectionChange(connectionInfo));
     }
 
     isConnected(): boolean {
         if (this.connectionState == null) {
-            return true;
+            return false;
         }
         return this.connectionState;
     }
 
-    onConnectionStateChange(isConnected: boolean) {
-        this.connectionState = isConnected;
+    static getConnectionState(connectionInfo): boolean {
+        if (connectionInfo.type == 'none' || connectionInfo.type == 'unknown') {
+            return false;
+        }
+        return true;
+    }
+
+    onConnectionChange(connectionInfo) {
+        this.connectionState = _NetworkStatus.getConnectionState(connectionInfo);
+        this.listeners.map(listener => listener(this.connectionState));
     }
 
     addConnectionStateChangeListener(listener: (result: boolean) => void) {
-        NetInfo.isConnected.addEventListener('change', listener);
-    }
-
-    async getConnectionType(): Promise<string> {
-        if (this.connectionType == null) {
-            this.connectionType = await NetInfo.fetch();
-        }
-        return this.connectionType;
-    }
-
-    onConnectionTypeChange(result) {
-        this.connectionType = '' + result;
+        this.listeners.push(listener);
     }
 }
 

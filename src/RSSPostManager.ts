@@ -1,9 +1,12 @@
 import { PostManager } from './PostManager';
 import { Post, ImageData } from './models/Post';
+import { Feed } from './models/Feed';
 import { Config } from './Config';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
+import { Storage } from './Storage';
+import { HtmlUtils } from './HtmlUtils';
 
 type RSSEnclosure = {
     url: string;
@@ -36,19 +39,253 @@ type FeedWithMetrics = {
     parseTime: number;
 }
 
+type ContentWithMimeType = {
+    content: string;
+    mimeType: string;
+}
+
 const FirstId = 1;
+
+const RSSMimeTypes = [
+    'application/rss+xml',
+    'application/xml',
+    'text/xml',
+];
+
+export class RSSFeedManager {
+    readonly feeds: Feed[] = [
+        {
+            name: 'Hacker News',
+            url: 'https://news.ycombinator.com/',
+            feedUrl: 'https://news.ycombinator.com/rss',
+            favicon: '',
+        },
+        {
+            name: '444',
+            url: 'https://444.hu/',
+            feedUrl: 'https://444.hu/feed',
+            favicon: '',
+        },
+        {
+            name: 'The Good Life',
+            url: 'http://192.168.1.49:2368/',
+            feedUrl: 'http://192.168.1.49:2368/rss/',
+            favicon: '',
+        },
+        {
+            name: 'The Verge',
+            url: 'https://www.theverge.com/',
+            feedUrl: 'https://www.theverge.com/rss/frontpage',
+            favicon: '',
+        },
+        {
+            name: 'Digital Trends',
+            url: 'https://www.digitaltrends.com/',
+            feedUrl: 'https://www.digitaltrends.com/social-media/feed/',
+            favicon: '',
+        },
+        {
+            name: 'Forbes',
+            url: 'https://www.forbes.com/',
+            feedUrl: 'https://www.forbes.com/social-media/feed/',
+            favicon: '',
+        }
+
+        // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
+    ]
+
+    getFeedUrls(): string[] {
+        return this.feeds.map(feed => feed.feedUrl);
+    }
+
+
+    static getFeedUrlFromHtmlLink(link): string {
+        for (const mimeType of RSSMimeTypes) {
+            const matcher = [{name: 'type', value: mimeType}];
+            if (HtmlUtils.matchAttributes(link, matcher)) {
+                const feedUrl = HtmlUtils.getAttribute(link, 'href') || '';
+                if (feedUrl != '') {
+                    return feedUrl;
+                }
+            }
+        }
+        return '';
+    }
+
+    static parseFeedFromHtml(html): Feed {
+        const feed: Feed = {
+            name: '',
+            url: '',
+            feedUrl: '',
+            favicon: '',
+        };
+
+        const document = HtmlUtils.parse(html);
+        const links = HtmlUtils.findPath(document, ['html', 'head', 'link']);
+
+        for (const link of links) {
+            if (feed.feedUrl == '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'alternate'}])) {
+                const feedUrl = this.getFeedUrlFromHtmlLink(link);
+                if (feedUrl != '') {
+                    feed.feedUrl = feedUrl;
+                }
+            }
+            if (feed.favicon == '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'shortcut icon'}])) {
+                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
+                if (favicon != '') {
+                    feed.favicon = favicon;
+                }
+            }
+            if (feed.favicon == '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'icon'}])) {
+                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
+                if (favicon != '') {
+                    feed.favicon = favicon;
+                }
+            }
+            if (feed.favicon == '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'apple-touch-icon'}])) {
+                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
+                if (favicon != '') {
+                    feed.favicon = favicon;
+                }
+            }
+        }
+
+        const titles = HtmlUtils.findPath(document, ['html', 'head', 'title']);
+        for (const title of titles) {
+            if (title.childNodes.length > 0) {
+                feed.name = title.childNodes[0].value;
+            }
+        }
+
+        return feed;
+    }
+
+    static async fetchContentWithMimeType(url): Promise<ContentWithMimeType | null> {
+        const response = await fetch(url);
+        if (response.status != 200) {
+            return null;
+        }
+
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType) {
+            return null;
+        }
+
+        const parts = contentType.split(';', 2);
+        const mimeType = parts.length > 1 ? parts[0] : contentType;
+        
+        const content = await response.text();
+        
+        return {
+            content: content,
+            mimeType: mimeType,
+        }
+    }
+
+    static getFeedFromHtml(baseUrl, html): Feed {
+        const feed = RSSFeedManager.parseFeedFromHtml(html);
+        if (feed.feedUrl != '') {
+            feed.feedUrl = Utils.createUrlFromUrn(feed.feedUrl, baseUrl);
+        }
+        if (feed.favicon != '') {
+            feed.favicon = Utils.createUrlFromUrn(feed.favicon, baseUrl);
+        }
+        feed.url = baseUrl;
+        return feed;
+    }
+
+    static async fetchRSSFeedFromUrl(url): Promise<string> {
+        const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+        if (!contentWithMimeType) {
+            return '';
+        }
+
+        if (contentWithMimeType.mimeType == 'application/rss+xml' || 
+            contentWithMimeType.mimeType == 'application/xml' ||
+            contentWithMimeType.mimeType == 'text/xml'
+        ) {
+            return url;
+        }
+        
+        return '';
+    }
+
+    static async fetchFeedFromHtmlFromUrl(url): Promise<string> {
+        const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+        if (!contentWithMimeType) {
+            return '';
+        }
+
+        if (contentWithMimeType.mimeType == 'text/html') {
+            return url;
+        }
+        
+        return '';
+    }
+
+
+    // url can be either a website url or a feed url
+    static async fetchFeedFromUrl(url): Promise<Feed | null> {
+        const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+        if (!contentWithMimeType) {
+            return null;
+        }
+        
+        if (contentWithMimeType.mimeType == 'text/html') {
+            const baseUrl = Utils.getBaseUrl(url)
+            const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
+            if (feed.feedUrl == '') {
+                const altFeedLocations = ['/rss', '/feed', '/social-media/feed/', '/rss/', '/feed/'];
+                if (baseUrl != url) {
+                    altFeedLocations.unshift('/');
+                }
+                for (const altFeedLocation of altFeedLocations) {
+                    const altUrl = Utils.createUrlFromUrn(altFeedLocation, baseUrl);
+                    const altFeedUrl = await RSSFeedManager.fetchRSSFeedFromUrl(altUrl);
+                    if (altFeedUrl != '') {
+                        feed.feedUrl = altFeedUrl;
+                        return feed;
+                    }
+                }
+            }
+        }
+        
+        // It looks like there is a valid feed on the url
+        if (contentWithMimeType.mimeType == 'application/rss+xml' || 
+            contentWithMimeType.mimeType == 'application/xml' ||
+            contentWithMimeType.mimeType == 'text/xml'
+        ) {
+            const rssFeed = await Feed.load(contentWithMimeType.content);
+            const baseUrl = Utils.getBaseUrl(url);
+            const feed = {
+                url: baseUrl,
+                feedUrl: url,
+                name: rssFeed.feed.title,
+                favicon: '',
+            }
+            // Fetch the website to augment the feed data with favicon and title
+            const htmlWithMimeType = await RSSFeedManager.fetchContentWithMimeType(baseUrl);
+            if (!htmlWithMimeType) {
+                return null;
+            }
+            const feedFromHtml = RSSFeedManager.getFeedFromHtml(baseUrl, htmlWithMimeType.content);
+            // Override feedUrl if it's a valid RSS feed url
+            if (feed.name == '') {
+                feed.name = feedFromHtml.name;
+            }
+            feed.favicon = feedFromHtml.favicon;
+            return feed;
+        }
+     
+        return null;
+    }
+}
 
 class _RSSPostManager implements PostManager {
     posts: Post[] = [];
     id = FirstId;
     idCache = {};
-    feedUrls: string[] = [
-        'https://news.ycombinator.com/rss',
-        'https://444.hu/feed',
-        // // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
-        'http://192.168.1.49:2368/rss/',
-        'https://www.theverge.com/rss/frontpage',
-    ]
+    readonly feedManager = new RSSFeedManager();
 
     async saveAndSyncPost(post: Post) {
         // do nothing
@@ -62,10 +299,10 @@ class _RSSPostManager implements PostManager {
 
     private async loadFeed(feed): Promise<FeedWithMetrics | null> {
         try {
-            const rss = await Feed.load(feed);              
+            const rss = await Feed.fetch(feed);              
             return rss;        
         } catch (e) {
-            console.warn(e);
+            console.warn(e, feed);
             return null;
         }
     }
@@ -74,9 +311,10 @@ class _RSSPostManager implements PostManager {
         const startTime = Date.now();
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
+        const feedUrls = this.feedManager.getFeedUrls();
         let downloadSize = 0;
         let firstLoad = this.id == FirstId;
-        const loadFeedPromises = this.feedUrls.map(url => this.loadFeed(url));
+        const loadFeedPromises = feedUrls.map(url => this.loadFeed(url));
         const feeds = await Promise.all(loadFeedPromises);
         for (const feedWithMetrics of feeds) {
             if (feedWithMetrics) {
@@ -188,7 +426,7 @@ const xml2js = require('react-native-xml2js');
 
 const Feed = {
     DefaultTimeout: 3000,
-    load: async (url): Promise<FeedWithMetrics> => {
+    fetch: async (url): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
         const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
             headers: {
@@ -199,32 +437,36 @@ const Feed = {
         const downloadTime = Date.now();
         if (response.status == 200) {
             const xml = await response.text();
-            const xmlTime = Date.now();
-            const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
-            parser.addListener("error", function (err) {
-                throw new Error(err);
-            });
-            return await new Promise<FeedWithMetrics>((resolve, reject) => {
-                parser.parseString(xml, function (err, result) {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    const parseTime = Date.now();
-                    const rss = Feed.parser(result);
-                    const feedWithMetrics: FeedWithMetrics = {
-                        feed: rss,
-                        size: xml.length,
-                        downloadTime: downloadTime - startTime,
-                        xmlTime: xmlTime - downloadTime,
-                        parseTime: parseTime - xmlTime,
-                    }
-                    resolve(feedWithMetrics);
-                });
-            });
+            return Feed.load(xml, startTime, downloadTime);
         } else {
             throw new Error('Bad status code');
         }
+    },
+
+    load: async (xml, startTime = 0, downloadTime = 0): Promise<FeedWithMetrics> => {
+        const xmlTime = Date.now();
+        const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
+        parser.addListener("error", function (err) {
+            throw new Error(err);
+        });
+        return await new Promise<FeedWithMetrics>((resolve, reject) => {
+            parser.parseString(xml, function (err, result) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                const parseTime = Date.now();
+                const rss = Feed.parser(result);
+                const feedWithMetrics: FeedWithMetrics = {
+                    feed: rss,
+                    size: xml.length,
+                    downloadTime: downloadTime - startTime,
+                    xmlTime: xmlTime - downloadTime,
+                    parseTime: parseTime - xmlTime,
+                }
+                resolve(feedWithMetrics);
+            });
+        });
     },
 
     parser: function (json) {

@@ -6,6 +6,7 @@ import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
 import { ImageDownloader } from '../ImageDownloader'
 import StateTracker from '../StateTracker';
+import { Version } from '../Version';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -96,6 +97,7 @@ class DebugScreen extends React.Component<any, any> {
     }
 
     render() {
+        const version = Version;
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
@@ -149,6 +151,9 @@ class DebugScreen extends React.Component<any, any> {
                             }
                             title='Sync posts'
                             onPress={async () => await this.onSyncPosts()}
+                        /> 
+                        <SettingsList.Item
+                            title={version}
                         /> 
 
                     </SettingsList>

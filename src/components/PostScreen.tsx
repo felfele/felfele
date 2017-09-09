@@ -30,7 +30,6 @@ import { Debug } from '../Debug';
 var navigationActions = {};
 
 class PostScreen extends React.Component<any, any> {
-    keyboardHeight = 0;
     keyboardDidShowListener;
     keyboardWillShowListener;
     keyboardDidHideListener;
@@ -42,7 +41,8 @@ class PostScreen extends React.Component<any, any> {
             uploadedImages: [],
             isKeyboardVisible: false,
             isLoading: true,
-            paddingBottom: 0
+            paddingBottom: 0,
+            keyboardHeight: 0,
         };
         navigationActions['Cancel'] = () => this.onCancelConfirmation();
         navigationActions['Post'] = () => this.onPressSubmit();
@@ -64,7 +64,7 @@ class PostScreen extends React.Component<any, any> {
     }
 
     onKeyboardDidShow(e) {
-        console.log('onKeyboardDidShow', this.keyboardHeight);
+        console.log('onKeyboardDidShow', this.state.keyboardHeight);
 
         if (Platform.OS === 'android') {
             this.onKeyboardWillShow(e);
@@ -77,16 +77,20 @@ class PostScreen extends React.Component<any, any> {
 
     onKeyboardWillShow(e) {
         const extraKeyboardHeight = 15;
-        this.keyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
-        this.keyboardHeight += extraKeyboardHeight;
+        const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
+        this.setState({
+            keyboardHeight: baseKeyboardHeight + extraKeyboardHeight,
+        });
 
-        console.log('onKeyboardWillShow', this.keyboardHeight);
+        console.log('onKeyboardWillShow', this.state.keyboardHeight);
     }
 
     onKeyboardDidHide() {
         console.log('onKeyboardDidHide');
-        this.keyboardHeight = 0;
-        this.setState({isKeyboardVisible: false});
+        this.setState({
+            isKeyboardVisible: false,
+            keyboardHeight: 0,
+        });
     }
 
     componentWillMount() {
@@ -314,14 +318,14 @@ class PostScreen extends React.Component<any, any> {
         const iconDirection = showText ? 'column' : 'row';
         return (
             <View 
-                style={{flexDirection: 'column', paddingBottom: this.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
+                style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
                         <TextInput
                             style={{marginTop: 0, flex: 3, fontSize: 16, padding: 10, paddingVertical: 10}}
                             multiline={true} 
                             numberOfLines={4}  
-                            onEndEditing={() => {this.hideKeyboard()}}
+                            onEndEditing={() => {this.hideKeyboard()}} 
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
                             placeholder="What's on your mind?"

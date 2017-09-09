@@ -3,6 +3,7 @@ import { Model } from './models/Model';
 import { Post } from './models/Post';
 import { AuthenticationData } from './models/AuthenticationData';
 import { SyncState } from './models/SyncState';
+import { Feed } from './models/Feed';
 import { Debug } from './Debug';
 
 interface Metadata {
@@ -462,5 +463,6 @@ export const Storage = {
     'draft': new StorageWithAutoIds<Post>('draft'),
     'auth': new StorageWithStringKey<AuthenticationData>('auth'),
     'sync': new StorageWithStringKey<SyncState>('sync'),
+    'feed': new StorageWithAutoIds<Feed>('feed'),
 }
 

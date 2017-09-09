@@ -10,22 +10,72 @@ export class Utils {
     
     static take(list, num, defaultReturn) {
         if (list.length < num) {
-            return defaultReturn;
+            return [defaultReturn];
         }
         return list.slice(0, num);
     }
 
     static takeLast(list, num, defaultReturn) {
         if (list.length < num) {
-            return defaultReturn;
+            return [defaultReturn];
         }
         return list.slice(list.length - num);
     }
 
     static getHumanHostname(url: string): string {
+        if (url.startsWith('//')) {
+            url = 'https:' + url;
+        }
         const hostname = Url.parse(url).hostname;
-        const parts = hostname.split('.');
+        const parts = hostname ? hostname.split('.') : '';
         const humanHostname = Utils.takeLast(parts, 2, '').join('.');
         return humanHostname;
+    }
+
+    static createUrlFromUrn(urn: string, baseUrl: string): string {
+        if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+        }
+        if (urn.startsWith('//')) {
+            const parts = baseUrl.split(':', 2);
+            const protocol = parts.length > 1 ? parts[0] : 'https';
+            return protocol + ':' + urn;
+        }
+        if (urn.startsWith('http')) {
+            return urn;
+        }
+        if (urn.startsWith('/')) {
+            return baseUrl + urn.slice(1);
+        }
+        return baseUrl + urn;
+    }
+
+    static getBaseUrl(url: string): string {
+        if (url.startsWith('//')) {
+            url = 'https:' + url;
+        }
+
+        return url.replace(/(http.?:\/\/.*?\/).*/, '$1');
+    }
+
+    static getCanonicalUrl(url: string): string {
+        const parts = url.split('//', 2);
+        if (parts.length == 1) {
+            if (!url.includes('/')) {
+                url += '/';
+            }
+        }
+        else if (parts.length > 1) {
+            if (!parts[1].includes('/')) {
+                url += '/';
+            }
+        }
+        if (url.startsWith('//')) {
+            url = 'https:' + url;
+        }
+        if (!url.startsWith('http')) {
+            url = 'https://' + url;
+        }
+        return url;
     }
 }

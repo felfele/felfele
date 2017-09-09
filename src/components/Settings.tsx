@@ -3,6 +3,8 @@ import { View, FlatList, Text, Alert, StyleSheet } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import { Config } from '../Config';
+
 const styles = StyleSheet.create({
     imageStyle: {
         marginLeft: 15,
@@ -17,29 +19,42 @@ const styles = StyleSheet.create({
 });
 
 class Settings extends React.Component<any, any> {
-    constructor() {
-        super();
-        this.onValueChange = this.onValueChange.bind(this);
-        this.state = { switchValue: false };
+    constructor(props) {
+        super(props);
+        this.state = { 
+            saveToCameraRoll: Config.saveToCameraRoll,
+        };
     }
 
-    onValueChange(value) {
-        this.setState({ switchValue: value });
+    onSaveToCameraRollValueChange(value) {
+        Config.saveToCameraRoll = value;
+        this.setState({ saveToCameraRoll: Config.saveToCameraRoll });
     }
 
     render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                    <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
-                         <SettingsList.Header headerStyle={{ marginTop: 15 }} />  
-                         <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-link" size={30} color="gray" />
-                            }
-                            title='Feed url'
+                    <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
+                        <SettingsList.Header headerStyle={{ 
+                            marginBottom: 15,
+                            borderColor: 'grey'
+                        }} />   
+                        <SettingsList.Item
+                            title='Public blog'
                             titleInfo={this.props.config.baseUri}
                             onPress={() => Alert.alert('Route To Uri Config Page')}
+                        />
+                        <SettingsList.Item
+                            title='Feeds'
+                            onPress={() => this.props.navigation.navigate('FeedListEditor')}
+                        />
+                        <SettingsList.Item
+                            hasNavArrow={false}
+                            switchState={this.state.saveToCameraRoll}
+                            switchOnValueChange={(value) => this.onSaveToCameraRollValueChange(value)}
+                            hasSwitch={true}
+                            title='Save to Camera Roll'
                         />
                         { __DEV__ &&
                          <SettingsList.Item
