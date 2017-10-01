@@ -194,7 +194,7 @@ export class RSSFeedManager {
         return feed;
     }
 
-    static async fetchRSSFeedFromUrl(url): Promise<string> {
+    static async fetchRSSFeedUrlFromUrl(url): Promise<string> {
         const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
         if (!contentWithMimeType) {
             return '';
@@ -241,7 +241,7 @@ export class RSSFeedManager {
                 }
                 for (const altFeedLocation of altFeedLocations) {
                     const altUrl = Utils.createUrlFromUrn(altFeedLocation, baseUrl);
-                    const altFeedUrl = await RSSFeedManager.fetchRSSFeedFromUrl(altUrl);
+                    const altFeedUrl = await RSSFeedManager.fetchRSSFeedUrlFromUrl(altUrl);
                     if (altFeedUrl != '') {
                         feed.feedUrl = altFeedUrl;
                         return feed;
@@ -370,7 +370,7 @@ class _RSSPostManager implements PostManager {
             .replace(/<(\/?[a-z]+.*?>)/gi, '');
 
         const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
-            return `_(${Utils.getHumanHostname(p1)})_`;
+            return `_(${Utils.getHumanHostname(p1)})_ `;
         });
 
         return secondPhase;

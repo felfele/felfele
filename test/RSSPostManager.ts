@@ -60,7 +60,7 @@ test('Parse link', () => {
     const hostname = 'example.com';
     const link = `http://${hostname}/content/2017/08/`;
     const description = `<a href="${link}">description</a>`;
-    const expectedResult = `[description](${link}) _(${hostname})_`;
+    const expectedResult = `[description](${link}) _(${hostname})_ `;
 
     const result = RSSPostManager.formatDescription(description);
 
