@@ -173,9 +173,9 @@ export class RSSFeedManager {
 
         const parts = contentType.split(';', 2);
         const mimeType = parts.length > 1 ? parts[0] : contentType;
-        
+
         const content = await response.text();
-        
+
         return {
             content: content,
             mimeType: mimeType,
@@ -200,13 +200,13 @@ export class RSSFeedManager {
             return '';
         }
 
-        if (contentWithMimeType.mimeType == 'application/rss+xml' || 
+        if (contentWithMimeType.mimeType == 'application/rss+xml' ||
             contentWithMimeType.mimeType == 'application/xml' ||
             contentWithMimeType.mimeType == 'text/xml'
         ) {
             return url;
         }
-        
+
         return '';
     }
 
@@ -219,7 +219,7 @@ export class RSSFeedManager {
         if (contentWithMimeType.mimeType == 'text/html') {
             return url;
         }
-        
+
         return '';
     }
 
@@ -230,7 +230,7 @@ export class RSSFeedManager {
         if (!contentWithMimeType) {
             return null;
         }
-        
+
         if (contentWithMimeType.mimeType == 'text/html') {
             const baseUrl = Utils.getBaseUrl(url)
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
@@ -249,9 +249,9 @@ export class RSSFeedManager {
                 }
             }
         }
-        
+
         // It looks like there is a valid feed on the url
-        if (contentWithMimeType.mimeType == 'application/rss+xml' || 
+        if (contentWithMimeType.mimeType == 'application/rss+xml' ||
             contentWithMimeType.mimeType == 'application/xml' ||
             contentWithMimeType.mimeType == 'text/xml'
         ) {
@@ -276,7 +276,7 @@ export class RSSFeedManager {
             feed.favicon = feedFromHtml.favicon;
             return feed;
         }
-     
+
         return null;
     }
 }
@@ -299,10 +299,10 @@ class _RSSPostManager implements PostManager {
 
     private async loadFeed(feed): Promise<FeedWithMetrics | null> {
         try {
-            const rss = await Feed.fetch(feed);              
-            return rss;        
+            const rss = await Feed.fetch(feed);
+            return rss;
         } catch (e) {
-            console.warn(e, feed);
+            console.log(e, feed);
             return null;
         }
     }
@@ -340,7 +340,7 @@ class _RSSPostManager implements PostManager {
             const stats = metrics
                 .map(metric => `${Utils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
                 .join('\n');
-            
+
             const elapsed = Date.now() - startTime;
             const firstPost: Post = {
                 _id: 1,
@@ -367,6 +367,7 @@ class _RSSPostManager implements PostManager {
             .replace(/&amp;/g, '&')
             .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1) #____($1)#____')
             .replace(/<img.*?src=['"](.*?)['"].*\/?>/gi, '![]($1)')
+            .replace(/<p.*?>/gi, '\n\n')
             .replace(/<(\/?[a-z]+.*?>)/gi, '');
 
         const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
