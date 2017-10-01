@@ -18,6 +18,8 @@ import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
 
+const WindowWidth = Dimensions.get("window").width;
+
 interface YourFeedProps {
     uri: string;
     navigation: any;
@@ -309,39 +311,31 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                 >
 
                 { this.renderCardTop(post) }
-                <Tile
-                    imageSrc={{
-                        uri: this.getImageUri(post.images[0]),
-                    }}
-                    width={Dimensions.get('window').width}
-                    height={Dimensions.get('window').width}
-                    featured={false}
+                <TouchableOpacity
                     activeOpacity={1}
-                    focusedOpacity={1}
-                    key={`image-${post._id}`}
                     onLongPress={ () => this.togglePostSelection(post) }
                     onPress={ () => this.openPost(post)}
-                    containerStyle = {{
+                    style = {{
                         backgroundColor: '#fff',
                         padding: 0,
                         paddingTop: 0,
                         marginTop: 0,
                     }}
-                    contentContainerStyle={{
-                        padding: 0,
-                        margin: 0,
-                        paddingLeft: 0,
-                        paddingTop: 0,
-                        paddingRight: 0,
-                        paddingBottom: 0,
-                        backgroundColor: 'white',
-                    }}
                 >
+                    <Image
+                        source={{
+                            uri: this.getImageUri(post.images[0]),
+                        }}
+                        style={{
+                            width: WindowWidth,
+                            height: WindowWidth,
+                        }}
+                    />
                     { post.text == '' ||
                         <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
                     { this.renderButtonsIfSelected(post) }
-                </Tile>
+                </TouchableOpacity>
                 </Card>
             );
         }
