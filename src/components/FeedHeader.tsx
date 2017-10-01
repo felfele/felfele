@@ -105,7 +105,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                     alignContent: 'stretch',
                 }}
             >
-                <TouchableOpacity onPress={() => this.openImagePicker()} style={{ flex: 1 }}>
+                <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
                     <ElementIcon 
                         name='camera-alt'
                         size={30}
