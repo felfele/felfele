@@ -67,7 +67,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
         NetworkStatus.addConnectionStateChangeListener((result) => {
             this.onConnectionStateChange(result)
         });
-        
+
         StateTracker.listen((oldVersion, newVersion) => {
             this.updateVersion(oldVersion, newVersion)
         });
@@ -151,7 +151,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
             this.setState({ selectedPost: null });
         } else {
             this.setState({ selectedPost: post });
-        }        
+        }
     }
 
     onDeleteConfirmation(post: Post) {
@@ -229,7 +229,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
     renderCardWithOnlyText(post: Post) {
         return (
             <Card
-                containerStyle={{...this.containerStyle, 
+                containerStyle={{...this.containerStyle,
                     margin: 0,
                     paddingTop: 5,
                     paddingBottom: 5,
@@ -240,6 +240,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                 <TouchableOpacity
                     onLongPress={ () => this.togglePostSelection(post) }
                     onPress={ () => this.openPost(post)}
+                    activeOpacity={1}
                 >
                     { this.renderCardTop(post) }
                     <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
@@ -256,10 +257,11 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                 key={'card-' + post._id}
 
             >
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={{ paddingTop: 0 }}
                     onLongPress={ () => this.togglePostSelection(post) }
                     onPress={ () => this.openPost(post)}
+                    activeOpacity={1}
                 >
                     {
                         post.images.map((image, index) => {
@@ -296,7 +298,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
         } else {
             return (
                 <Card
-                    containerStyle={{...this.containerStyle, 
+                    containerStyle={{...this.containerStyle,
                         margin: 0,
                         padding: 0,
                         paddingTop: 5,
@@ -314,7 +316,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                     width={Dimensions.get('window').width}
                     height={Dimensions.get('window').width}
                     featured={false}
-                    activeOpacity={0.95}
+                    activeOpacity={1}
                     focusedOpacity={1}
                     key={`image-${post._id}`}
                     onLongPress={ () => this.togglePostSelection(post) }
@@ -334,7 +336,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                         paddingBottom: 0,
                         backgroundColor: 'white',
                     }}
-                >                    
+                >
                     { post.text == '' ||
                         <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
@@ -364,11 +366,11 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
         )
     }
 
-    renderListHeader() {
+    renderListHeader = () => {
         return (
-            <FeedHeader 
-                post={this.props.post} 
-                navigation={this.props.navigation} 
+            <FeedHeader
+                post={this.props.post}
+                navigation={this.props.navigation}
                 postManager={this.props.postManager} />
         )
     }
@@ -378,13 +380,13 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
             <View style={{
                 flexDirection: 'column',
                 padding: 0,
-                flex: 1, 
+                flex: 1,
                 height: '100%',
             }}
             >
                 { this.renderOfflineHeader() }
                 <FlatList
-                    ListHeaderComponent={this.renderListHeader()}
+                    ListHeaderComponent={this.renderListHeader}
                     data={this.state.posts}
                     renderItem={(obj) => this.renderCard(obj.item)}
                     keyExtractor={(item, index) => item._id}
