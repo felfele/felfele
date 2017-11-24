@@ -567,6 +567,7 @@
 				00E356EF1AD99517003FC87E /* postmodernTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				C5EBCAF29A6B43B68AAB0CD9 /* Resources */,
+				9A17750F1F81B18B0011EC29 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -581,6 +582,16 @@
 				2D02E4901E0B4A5D006451C7 /* postmodern-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9A17750F1F81B18B0011EC29 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				5DDF936AC86C45C887C0AF2C /* libRNFetchBlob.a */,
+				2626095CA0404F308AD61EED /* libRNVectorIcons.a */,
+				492D2D7228B64A6785A6D8E5 /* libRNImagePicker.a */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		9AE1EDA41F38ED7B0098CC9B /* Products */ = {

@@ -19,6 +19,7 @@
     "react-test-renderer": "16.0.0-alpha.12",
     "replace": "^0.3.0",
     "ts-jest": "^20.0.7",
+    "tslint": "^5.8.0",
     "typescript": "^2.4.1"
   },
   "scripts": {
@@ -27,6 +28,7 @@
     "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js --watch",
     "tsc": "tsc",
+    "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "postinstall": "npm run patch && rndebugger-open",
@@ -67,6 +69,7 @@
     "react-native-gravatar": "^1.0.2",
     "react-native-image-picker": "^0.26.4",
     "react-native-md5": "^1.0.0",
+    "react-native-parse-html": "^2.2.6",
     "react-native-qrcode": "^0.2.4",
     "react-native-settings-list": "^1.7.1",
     "react-native-util": "^1.0.2",

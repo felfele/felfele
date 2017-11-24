@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Linking, Clipboard, CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet } from 'react-native';
+import { Linking, Clipboard, CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet, StatusBar, Platform } from 'react-native';
 import { Card, Button, ButtonGroup, List, Tile, Icon as ElementIcon } from 'react-native-elements';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
@@ -18,7 +18,7 @@ import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
 
-const WindowWidth = Dimensions.get("window").width;
+const WindowWidth = Dimensions.get('window').width;
 
 interface YourFeedProps {
     uri: string;
@@ -38,10 +38,6 @@ interface YourFeedState {
 }
 
 class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
-    static navigationOptions = {
-        header: <View style={{ height: 100, backgroundColor: 'magenta' }} />
-    }
-
     containerStyle = {};
 
     constructor(props) {
@@ -353,7 +349,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
             >
                 <Text style={{
                     color: 'white',
-                    textAlign: 'center'
+                    textAlign: 'center',
                 }}
                 >You are offline</Text>
             </View>
@@ -371,32 +367,38 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
 
     render() {
         return (
-            <View style={{
-                flexDirection: 'column',
-                padding: 0,
-                flex: 1,
-                height: '100%',
-            }}
-            >
-                { this.renderOfflineHeader() }
-                <FlatList
-                    ListHeaderComponent={this.renderListHeader}
-                    data={this.state.posts}
-                    renderItem={(obj) => this.renderCard(obj.item)}
-                    keyExtractor={(item, index) => item._id}
-                    extraData={this.state}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.isRefreshing}
-                            onRefresh={async () => this.onRefresh() }
-                        />
-                    }
-                />
+            <View
+                style={{
+                    flexDirection: 'column',
+                    padding: 0,
+                    flex: 1,
+                    height: '100%',
+            }
+            }>
+                <StatusBar translucent={true} />
+                <View>
+                    { this.renderOfflineHeader() }
+                    <FlatList
+                        ListHeaderComponent={this.renderListHeader}
+                        data={this.state.posts}
+                        renderItem={(obj) => this.renderCard(obj.item)}
+                        keyExtractor={(item, index) => item._id}
+                        extraData={this.state}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.isRefreshing}
+                                onRefresh={async () => this.onRefresh() }
+                            />
+                        }
+                    />
+                </View>
+                <View style={styles.translucentBar} ></View>
             </View>
         )
     }
 }
 
+const TranslucentBarHeight = Platform.OS === 'ios' ? 20 : 0;
 const styles = StyleSheet.create({
     container: {backgroundColor:'white',paddingTop:5},
     infoContainer : {flexDirection:'row',height:38,alignSelf:'stretch', marginBottom: 5, marginLeft: 5},
@@ -419,6 +421,15 @@ const styles = StyleSheet.create({
     text: {fontSize:12,color:'black'},
     likedContainer:{backgroundColor:'transparent',flex:1,justifyContent:'center',alignItems:'center'},
     markdownStyle: {marginVertical: 10, marginHorizontal: 10},
-})
+    translucentBar: {
+        height: TranslucentBarHeight,
+        width: '100%',
+        position: 'absolute',
+        backgroundColor: '#e6e6e6',
+        opacity: 0.9,
+        top: 0,
+        left: 0,
+    },
+});
 
 export default YourFeed;

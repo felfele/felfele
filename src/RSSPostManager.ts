@@ -89,7 +89,13 @@ export class RSSFeedManager {
             url: 'https://www.forbes.com/',
             feedUrl: 'https://www.forbes.com/social-media/feed/',
             favicon: '',
-        }
+        },
+        {
+            name: 'The Guardian',
+            url: 'https://www.theguardian.com/',
+            feedUrl: 'https://www.theguardian.com/world/rss',
+            favicon: '',
+        },
 
         // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
     ]
@@ -362,16 +368,21 @@ class _RSSPostManager implements PostManager {
 
     formatDescription(description): string {
         const firstPhase = description
-            .replace(/<!\[CDATA\[(.*)\]\]>/, '$1')
+            .replace(/^( *)/gm, '')
+            .replace(/\n/gm, '')
+            .replace(/<!\[CDATA\[(.*?)\]\]>/gm, '$1')
             .replace(/&hellip;/g, '...')
             .replace(/&amp;/g, '&')
+            // .replace(/<noscript>.*?<\/noscript>/gim, '')
             .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1) #____($1)#____')
-            .replace(/<img.*?src=['"](.*?)['"].*\/?>/gi, '![]($1)')
+            .replace(/<img.*?src=['"](.*?)['"].*?>/gi, '![]($1)')
             .replace(/<p.*?>/gi, '\n\n')
             .replace(/<(\/?[a-z]+.*?>)/gi, '');
 
+
         const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
-            return `_(${Utils.getHumanHostname(p1)})_ `;
+            // return `_(${Utils.getHumanHostname(p1)})_ `;
+            return '';
         });
 
         return secondPhase;

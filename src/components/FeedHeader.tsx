@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, TouchableOpacity, Alert, CameraRoll } from 'react-native';
+import { Text, View, TouchableOpacity, Alert, CameraRoll, Platform } from 'react-native';
 import { Icon as ElementIcon } from 'react-native-elements';
 
 import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
@@ -42,7 +42,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
             base64: true,
             exif: true,
         });
-        
+
         console.log('openImagePicker result: ', pickerResult);
 
         if (pickerResult.error) {
@@ -66,7 +66,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         // const extension = this.getFilenameExtension(pickerResult.uri);
         // const filename = `${RNFetchBlob.fs.dirs.DocumentDir}/${hash}.${extension}`
         // await RNFetchBlob.fs.cp(pickerResult.uri, filename);
-        
+
         const data: ImageData = {
             uri: localPath,
             width: pickerResult.width,
@@ -94,8 +94,8 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         }
     }
 
-
-    render() {
+    public render() {
+        const paddingTop = Platform.OS === 'ios' ? 20 : 0;
         return (
             <View style={{
                     flex: -1,
@@ -103,10 +103,11 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                     borderBottomWidth: 1,
                     borderBottomColor: 'lightgray',
                     alignContent: 'stretch',
+                    paddingTop: paddingTop,
                 }}
             >
                 <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
-                    <ElementIcon 
+                    <ElementIcon
                         name='camera-alt'
                         size={30}
                         color='gray'
@@ -116,15 +117,15 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                             margin: 0,
                         }} />
                 </TouchableOpacity>
-                <TouchableOpacity 
-                    onPress={() => 
+                <TouchableOpacity
+                    onPress={() =>
                         this.props.navigation.navigate(this.props.post)
-                    } 
-                    style={{ 
-                        flex: 6 
+                    }
+                    style={{
+                        flex: 6
                     }}
                 >
-                    <Text 
+                    <Text
                         style={{
                             height: 30,
                             color: 'gray',

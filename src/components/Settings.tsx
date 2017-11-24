@@ -10,36 +10,31 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         alignSelf: 'center',
         height: 30,
-        width: 30
+        width: 30,
     },
     titleInfoStyle: {
         fontSize: 16,
-        color: '#8e8e93'
-    }
+        color: '#8e8e93',
+    },
 });
 
 class Settings extends React.Component<any, any> {
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             saveToCameraRoll: Config.saveToCameraRoll,
         };
     }
 
-    onSaveToCameraRollValueChange(value) {
-        Config.saveToCameraRoll = value;
-        this.setState({ saveToCameraRoll: Config.saveToCameraRoll });
-    }
-
-    render() {
+    public render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
-                        <SettingsList.Header headerStyle={{ 
+                        <SettingsList.Header headerStyle={{
                             marginBottom: 15,
-                            borderColor: 'grey'
-                        }} />   
+                            borderColor: 'grey',
+                        }} />
                         <SettingsList.Item
                             title='Public blog'
                             titleInfo={this.props.config.baseUri}
@@ -59,16 +54,21 @@ class Settings extends React.Component<any, any> {
                         { __DEV__ &&
                          <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name="md-bug" size={30} color="gray" />
+                                <Ionicons style={styles.imageStyle} name='md-bug' size={24} color='gray' />
                             }
                             title='Debug menu'
                             onPress={() => this.props.navigation.navigate('Debug')}
-                        /> 
+                        />
                         }
                     </SettingsList>
                 </View>
             </View>
-        )
+        );
+    }
+
+    private onSaveToCameraRollValueChange(value) {
+        Config.saveToCameraRoll = value;
+        this.setState({ saveToCameraRoll: Config.saveToCameraRoll });
     }
 }
 

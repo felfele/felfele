@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { View, StatusBar, Platform } from 'react-native';
 
 import { Config } from './Config';
@@ -20,27 +22,25 @@ import { RSSPostManager } from './RSSPostManager';
 
 Debug.setDebug(__DEV__);
 
-const NavigationHeaderComponent = Platform.OS == 'ios' ? 
-            <View style={{height: 20}}>
-                <StatusBar barStyle="dark-content" />     
-            </View> 
-            : <StatusBar backgroundColor="black" barStyle="light-content" />;
+const NavigationHeaderComponent = Platform.OS === 'ios'
+            ? null
+            : <StatusBar backgroundColor='black' barStyle='light-content' />;
 
 const Root = TabNavigator(
     {
         YourTab: {
             screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri} 
-                                        post='Post' 
-                                        navigation={navigation} 
+                                        uri={Config.baseUri}
+                                        post='Post'
+                                        navigation={navigation}
                                         postManager={LocalPostManager} />),
             path: '/',
             navigationOptions: {
                 title: 'Your story',
                 tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <Ionicons
-                        name={focused ? 'ios-list-box' : 'ios-list-box-outline'}
+                    <MaterialIcon
+                        name={focused ? 'rss-feed' : 'rss-feed'}
                         size={20}
                         style={{ color: tintColor }}
                     />
@@ -49,63 +49,23 @@ const Root = TabNavigator(
         },
         NewsTab: {
             screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri} 
-                                        post='Post' 
-                                        navigation={navigation} 
+                                        uri={Config.baseUri}
+                                        post='Post'
+                                        navigation={navigation}
                                         postManager={RSSPostManager} />),
             path: '/',
             navigationOptions: {
                 title: 'New stories',
                 tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <Ionicons
-                        name={focused ? 'ios-paper' : 'ios-paper-outline'}
+                    <FontAwesomeIcon
+                        name={focused ? 'newspaper-o' : 'newspaper-o'}
                         size={20}
                         style={{ color: tintColor }}
                     />
                 ),
             },
         },
-        // PublicTab: {
-        //     screen: ({navigation}) => (<Feed 
-        //                                 uri={Config.baseUri} 
-        //                                 post='Post' 
-        //                                 error='Error'
-        //                                 navigation={navigation} />),
-        //     path: '/',
-        //     navigationOptions: {
-        //         header: <View style={{padding: 50}} />,
-        //         title: 'Welcome',
-        //         tabBarLabel: 'Public stories',
-        //         tabBarIcon: ({ tintColor, focused }) => (
-        //             <Ionicons
-        //                 name={focused ? 'ios-paper' : 'ios-paper-outline'}
-        //                 size={20}
-        //                 style={{ color: tintColor }}
-        //             />
-        //         ),
-        //     },
-        // },
-        // FeedTab: {
-        //     screen: ({navigation}) => (<Feed 
-        //                                 uri={Config.baseUri} 
-        //                                 post='Post' 
-        //                                 error='Error'
-        //                                 navigation={navigation} />),
-        //     path: '/',
-        //     navigationOptions: {
-        //         header: <View style={{padding: 50}} />,
-        //         title: 'Welcome',
-        //         tabBarLabel: 'All stories',
-        //         tabBarIcon: ({ tintColor, focused }) => (
-        //             <Ionicons
-        //                 name={focused ? 'ios-globe' : 'ios-globe-outline'}
-        //                 size={20}
-        //                 style={{ color: tintColor }}
-        //             />
-        //         ),
-        //     },
-        // },
         SettingsTab: {
             screen: ({navigation}) => (<Settings config={Config} error='Error' navigation={navigation} />),
             path: '/settings',
@@ -113,8 +73,8 @@ const Root = TabNavigator(
                 header: undefined,
                 title: 'Settings',
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <Ionicons
-                        name={focused ? 'ios-settings' : 'ios-settings-outline'}
+                    <MaterialIcon
+                        name={focused ? 'settings' : 'settings'}
                         size={20}
                         style={{ color: tintColor }}
                     />
@@ -126,49 +86,49 @@ const Root = TabNavigator(
         tabBarPosition: 'bottom',
         animationEnabled: false,
         swipeEnabled: false,
-        navigationOptions: {
-
-        }
+        tabBarOptions: {
+            showLabel: false,
+            activeTintColor: 'gray',
+            inactiveTintColor: 'lightgray',
+        },
     }
 );
 
-
 const Scenes = {
     Root: {
-        screen: Root
+        screen: Root,
     },
     Post: {
-        screen: PostScreen
+        screen: PostScreen,
     },
     Location: {
-        screen: Location
+        screen: Location,
     },
     Debug: {
-        screen: DebugScreen
+        screen: DebugScreen,
     },
     Share: {
-        screen: Share
+        screen: Share,
     },
     FeedListEditor: {
-        screen: FeedListEditor
+        screen: FeedListEditor,
     },
     EditFeed: {
-        screen: EditFeed
+        screen: EditFeed,
     },
-}
+};
 
 const AppNavigator = StackNavigator(Scenes,
     {
         mode: 'modal',
         navigationOptions: {
-            header: NavigationHeaderComponent,
-        }
+            header: null,
+        },
     }
 );
 
 export default class App extends React.Component {
-
-    render() {
+    public render() {
         return (
             <AppNavigator />
         );
