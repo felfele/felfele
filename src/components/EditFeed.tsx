@@ -7,13 +7,16 @@ import { RSSFeedManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 
-const navigationActions = {};
+const navigationActions = {
+    Back: null,
+    Add: null,
+};
 
 const styles = StyleSheet.create({
-  titleInfoStyle:{
-    fontSize: 14,
-    color: '#8e8e93'
-  }
+    titleInfoStyle: {
+        fontSize: 14,
+        color: '#8e8e93',
+    },
 });
 
 interface EditFeedState {
@@ -23,31 +26,30 @@ interface EditFeedState {
 }
 
 export class EditFeed extends React.Component<any, EditFeedState> {
-    state = {
+    public static navigationOptions = {
+        header: undefined,
+        title: 'Feed list',
+        headerLeft: <Button title='Back' onPress={() => navigationActions.Back!()} />,
+        headerRight: <Button title='Add' onPress={() => navigationActions.Add!()} />,
+    };
+
+    public state = {
         feed: this.props.navigation.state.params.feed,
         checked: false,
         loading: false,
-    }
+    };
 
     constructor(props) {
         super(props);
-        navigationActions['Back'] = this.props.navigation.goBack;
-        navigationActions['Add'] = this.onAdd.bind(this);
+        navigationActions.Back = this.props.navigation.goBack;
+        navigationActions.Add = this.onAdd.bind(this);
     }
 
-    static navigationOptions = {
-        header: undefined,
-        title: 'Feed list',
-        headerLeft: <Button title='Back' onPress={() => navigationActions['Back']()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions['Add']()} />,
-    };
-
-    onAdd() {
-        
+    public onAdd() {
+        // TODO
     }
 
-
-    async fetchFeed() {
+    public async fetchFeed() {
         this.setState({
             loading: true,
         });
@@ -64,11 +66,11 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         } else {
             this.setState({
                 loading: false,
-            });            
+            });
         }
     }
 
-    render() {
+    public render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1, flexDirection: 'column' }}>
                 <Text>Link to the feed</Text>
@@ -88,9 +90,9 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                     }}
                     onChangeText={(text) => this.setState({feed: {...this.state.feed, feedUrl: text}})}
                 />
-                { this.state.checked 
-                ? <Ionicons name="md-checkmark" size={30} color="gray" />
-                : <Button 
+                { this.state.checked
+                ? <Ionicons name='md-checkmark' size={30} color='gray' />
+                : <Button
                     title='Fetch'
                     onPress={async () => await this.fetchFeed()}
                     disabled={this.state.loading}
@@ -102,6 +104,6 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                 <Text>{this.state.feed.feedUrl}</Text>
                 <Text>{this.state.feed.favicon}</Text>
             </View>
-        )
+        );
     }
 }

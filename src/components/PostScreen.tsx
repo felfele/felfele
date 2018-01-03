@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { 
-    TextInput, 
-    View, 
-    Text, 
-    TouchableOpacity, 
-    Image, 
-    KeyboardAvoidingView, 
-    Keyboard, 
-    Button, 
-    Platform, 
-    ActivityIndicator, 
+import {
+    TextInput,
+    View,
+    Text,
+    TouchableOpacity,
+    Image,
+    KeyboardAvoidingView,
+    Keyboard,
+    Button,
+    Platform,
+    ActivityIndicator,
     StyleSheet,
     Alert,
     AlertIOS,
@@ -27,13 +27,23 @@ import { Post, ImageData } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
 
-var navigationActions = {};
+const navigationActions = {
+    Cancel: null,
+    Post: null,
+};
 
-class PostScreen extends React.Component<any, any> {
-    keyboardDidShowListener;
-    keyboardWillShowListener;
-    keyboardDidHideListener;
-    
+export class PostScreen extends React.Component<any, any> {
+    public static navigationOptions = {
+        header: undefined,
+        title: 'Update status',
+        headerLeft: <Button title='Cancel' onPress={() => navigationActions.Cancel!()} />,
+        headerRight: <Button title='Post' onPress={() => navigationActions.Post!()} />,
+    };
+
+    private keyboardDidShowListener;
+    private keyboardWillShowListener;
+    private keyboardDidHideListener;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -44,8 +54,8 @@ class PostScreen extends React.Component<any, any> {
             paddingBottom: 0,
             keyboardHeight: 0,
         };
-        navigationActions['Cancel'] = () => this.onCancelConfirmation();
-        navigationActions['Post'] = () => this.onPressSubmit();
+        navigationActions.Cancel = () => this.onCancelConfirmation();
+        navigationActions.Post = () => this.onPressSubmit();
 
         LocalPostManager.loadDraft().then(post => {
             if (post) {
@@ -63,7 +73,7 @@ class PostScreen extends React.Component<any, any> {
         });
     }
 
-    onKeyboardDidShow(e) {
+    public onKeyboardDidShow(e) {
         console.log('onKeyboardDidShow', this.state.keyboardHeight);
 
         if (Platform.OS === 'android') {
@@ -75,7 +85,7 @@ class PostScreen extends React.Component<any, any> {
         });
     }
 
-    onKeyboardWillShow(e) {
+    public onKeyboardWillShow(e) {
         const extraKeyboardHeight = 15;
         const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
         this.setState({
@@ -85,7 +95,7 @@ class PostScreen extends React.Component<any, any> {
         console.log('onKeyboardWillShow', this.state.keyboardHeight);
     }
 
-    onKeyboardDidHide() {
+    public onKeyboardDidHide() {
         console.log('onKeyboardDidHide');
         this.setState({
             isKeyboardVisible: false,
@@ -93,13 +103,13 @@ class PostScreen extends React.Component<any, any> {
         });
     }
 
-    componentWillMount() {
+    public componentWillMount() {
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => this.onKeyboardDidShow(e));
         this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => this.onKeyboardWillShow(e));
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.onKeyboardDidHide());
     }
 
-    unregisterListeners() {
+    public unregisterListeners() {
         if (this.keyboardDidShowListener) {
             this.keyboardDidShowListener.remove();
             this.keyboardDidShowListener = null;
@@ -115,27 +125,27 @@ class PostScreen extends React.Component<any, any> {
 
     }
 
-    componentWillUnmount() {
+    public componentWillUnmount() {
         this.unregisterListeners();
     }
 
-    onCancel() {
+    public onCancel() {
         this.hideKeyboard();
         this.unregisterListeners();
         this.props.navigation.goBack();
     }
 
-    hideKeyboard() {
+    public hideKeyboard() {
         if (this.state.isKeyboardVisible) {
             Keyboard.dismiss();
             this.setState({
-                isKeyboardVisible: false
+                isKeyboardVisible: false,
             });
         }
     }
 
-    showCancelConfirmation() {
-        const options:any[] = [
+    public showCancelConfirmation() {
+        const options: any[] = [
             { text: 'Save', onPress: async () => await this.onSave() },
             { text: 'Discard', onPress: async () => await this.onDiscard() },
             { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
@@ -145,7 +155,7 @@ class PostScreen extends React.Component<any, any> {
             AlertIOS.alert(
                 'Save this post as a draft?',
                 undefined,
-                options,
+                options
             )
         }
         else {
@@ -157,14 +167,14 @@ class PostScreen extends React.Component<any, any> {
         }
     }
 
-    async onDiscard() {
+    public async onDiscard() {
         await LocalPostManager.deleteDraft();
         this.onCancel();
     }
 
-    async onSave() {
+    public async onSave() {
         this.setState({
-           isLoading: true 
+           isLoading: true,
         });
 
         console.log(this.state.text, this.state.uploadedImages.length);
@@ -172,7 +182,7 @@ class PostScreen extends React.Component<any, any> {
         const post: Post = {
             images: this.state.uploadedImages,
             text: this.state.text,
-            createdAt: Date.now()
+            createdAt: Date.now(),
         }
 
         try {
@@ -191,7 +201,7 @@ class PostScreen extends React.Component<any, any> {
         this.onCancel();
     }
 
-    async onCancelConfirmation() {
+    public async onCancelConfirmation() {
         console.log('onCancelConfirmation', this.state.isKeyboardVisible);
         this.hideKeyboard();
         await new Promise(resolve => setTimeout(resolve, 0));
@@ -203,14 +213,7 @@ class PostScreen extends React.Component<any, any> {
         }
     }
 
-    static navigationOptions = {
-        header: undefined,
-        title: 'Update status',
-        headerLeft: <Button title='Cancel' onPress={() => navigationActions['Cancel']()} />,
-        headerRight: <Button title='Post' onPress={() => navigationActions['Post']()} />
-    };
-
-    openImagePicker = async () => {
+    public openImagePicker = async () => {
         const pickerResult = await AsyncImagePicker.launchImageLibrary({
             allowsEditing: false,
             aspect: [4,3],
@@ -223,19 +226,19 @@ class PostScreen extends React.Component<any, any> {
                 width: pickerResult.width,
                 height: pickerResult.height,
                 data: pickerResult.data,
-            }
+            };
 
             this.setState({
-                uploadedImages: this.state.uploadedImages.concat([data])
-            });            
+                uploadedImages: this.state.uploadedImages.concat([data]),
+            });
         }
     }
 
-    openLocationPicker = async () => {
+    public openLocationPicker = async () => {
         this.props.navigation.navigate('Location');
     }
 
-    async onPressSubmit() {
+    public async onPressSubmit() {
         if (this.state.isLoading) {
             return;
         }
@@ -244,9 +247,9 @@ class PostScreen extends React.Component<any, any> {
         this.onCancel();
     }
 
-    async sendUpdate() {
+    public async sendUpdate() {
         this.setState({
-           isLoading: true 
+           isLoading: true,
         });
 
         console.log(this.state.text, this.state.uploadedImages.length);
@@ -254,8 +257,8 @@ class PostScreen extends React.Component<any, any> {
         const post: Post = {
             images: this.state.uploadedImages,
             text: this.state.text,
-            createdAt: Date.now()
-        }
+            createdAt: Date.now(),
+        };
 
         try {
             await LocalPostManager.deleteDraft();
@@ -272,20 +275,20 @@ class PostScreen extends React.Component<any, any> {
         }
     }
 
-    markdownEscape(text) {
+    public markdownEscape(text) {
         return text;
     }
 
-    renderActivityIndicator() {
+    public renderActivityIndicator() {
         return (
             <View
-                style={{ 
-                    flexDirection: 'column', 
-                    flex: 1, 
+                style={{
+                    flexDirection: 'column',
+                    flex: 1,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '100%', 
-                    width: '100%'
+                    height: '100%',
+                    width: '100%',
                 }}
             >
                 <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
@@ -293,7 +296,7 @@ class PostScreen extends React.Component<any, any> {
         );
     }
 
-    renderActionButton(onPress, text, iconName, color, showText) {
+    public renderActionButton(onPress, text, iconName, color, showText) {
         const iconSize = showText ? 20 : 30;
         const justifyContent = showText ? 'center' : 'space-around';
         return (
@@ -308,7 +311,7 @@ class PostScreen extends React.Component<any, any> {
         );
     }
 
-    render() {
+    public render() {
         if (this.state.isLoading) {
             return this.renderActivityIndicator();
         }
@@ -317,30 +320,28 @@ class PostScreen extends React.Component<any, any> {
         const showText = !this.state.isKeyboardVisible;
         const iconDirection = showText ? 'column' : 'row';
         return (
-            <View 
+            <View
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
                         <TextInput
                             style={{marginTop: 0, flex: 3, fontSize: 16, padding: 10, paddingVertical: 10}}
-                            multiline={true} 
-                            numberOfLines={4}  
-                            onEndEditing={() => {this.hideKeyboard()}} 
+                            multiline={true}
+                            numberOfLines={4}
+                            onEndEditing={() => {this.hideKeyboard(); }}
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
                             placeholder="What's on your mind?"
                             placeholderTextColor='gray'
                         >
-                        </TextInput> 
+                        </TextInput>
                         <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
                     </View>
                     <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
                         {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#32A850', showText)}
                         {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#d53333', showText)}
                     </View>
-            </View>            
-        )
+            </View>
+        );
     }
 }
-
-export default PostScreen;

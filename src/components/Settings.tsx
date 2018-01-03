@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     },
 });
 
-class Settings extends React.Component<any, any> {
+export class Settings extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
@@ -71,5 +71,3 @@ class Settings extends React.Component<any, any> {
         this.setState({ saveToCameraRoll: Config.saveToCameraRoll });
     }
 }
-
-export default Settings;

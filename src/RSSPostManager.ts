@@ -53,7 +53,7 @@ const RSSMimeTypes = [
 ];
 
 export class RSSFeedManager {
-    readonly feeds: Feed[] = [
+    private readonly feeds: Feed[] = [
         {
             name: 'Hacker News',
             url: 'https://news.ycombinator.com/',
@@ -64,12 +64,6 @@ export class RSSFeedManager {
             name: '444',
             url: 'https://444.hu/',
             feedUrl: 'https://444.hu/feed',
-            favicon: '',
-        },
-        {
-            name: 'The Good Life',
-            url: 'http://192.168.1.49:2368/',
-            feedUrl: 'http://192.168.1.49:2368/rss/',
             favicon: '',
         },
         {
@@ -98,12 +92,11 @@ export class RSSFeedManager {
         },
 
         // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
-    ]
+    ];
 
     getFeedUrls(): string[] {
         return this.feeds.map(feed => feed.feedUrl);
     }
-
 
     static getFeedUrlFromHtmlLink(link): string {
         for (const mimeType of RSSMimeTypes) {
@@ -435,19 +428,18 @@ export const RSSPostManager = new _RSSPostManager();
 const util = require('react-native-util');
 const xml2js = require('react-native-xml2js');
 
-
 const Feed = {
-    DefaultTimeout: 3000,
+    DefaultTimeout: 5000,
     fetch: async (url): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
         const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-                'Accept': 'text/html,application/xhtml+xml'
-            }
+                'Accept': 'text/html,application/xhtml+xml',
+            },
         }));
         const downloadTime = Date.now();
-        if (response.status == 200) {
+        if (response.status === 200) {
             const xml = await response.text();
             return Feed.load(xml, startTime, downloadTime);
         } else {

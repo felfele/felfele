@@ -4,7 +4,7 @@ import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
-import { ImageDownloader } from '../ImageDownloader'
+import { ImageDownloader } from '../ImageDownloader';
 import StateTracker from '../StateTracker';
 import { Version } from '../Version';
 
@@ -13,76 +13,158 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         alignSelf: 'center',
         height: 30,
-        width: 30
+        width: 30,
     },
     titleInfoStyle: {
         fontSize: 16,
-        color: '#8e8e93'
-    }
+        color: '#8e8e93',
+    },
 });
 
-const navigationActions = {}
+const navigationActions = {
+    Back: null,
+};
 
-class DebugScreen extends React.Component<any, any> {
+export class DebugScreen extends React.Component<any, any> {
+    public static navigationOptions = {
+        header: undefined,
+        title: 'Debug menu',
+        headerLeft: <Button title='Back' onPress={() => navigationActions.Back!()} />,
+    };
+
     constructor(props) {
         super(props);
         this.onValueChange = this.onValueChange.bind(this);
         this.state = { switchValue: false };
-        navigationActions['Back'] = this.props.navigation.goBack;
+        navigationActions.Back = this.props.navigation.goBack;
     }
 
-    static navigationOptions = {
-        header: undefined,
-        title: 'Debug menu',
-        headerLeft: <Button title='Back' onPress={() => navigationActions['Back']()} />,
-    };
+    public render() {
+        const version = Version;
+        return (
+            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+                <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+                    <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
+                         <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-list' size={30} color='gray' />
+                            }
+                            title='List database'
+                            onPress={async () => await this.onListDatabase()}
+                        />
+                         <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-list' size={30} color='gray' />
+                            }
+                            title='List posts'
+                            onPress={async () => await this.onListPosts()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                            }
+                            title='List database keys'
+                            onPress={async () => await this.onListDatabaseKeys()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                            }
+                            title='List cache'
+                            onPress={async () => await this.onListCache()}
+                        />
 
-    onValueChange(value) {
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                            }
+                            title='List sync state'
+                            onPress={async () => await this.onListSyncState()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-warning' size={30} color='gray' />
+                            }
+                            title='Clear database'
+                            onPress={async () => await this.onClearDatabase()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons style={styles.imageStyle} name='md-sync' size={30} color='gray' />
+                            }
+                            title='Sync posts'
+                            onPress={async () => await this.onSyncPosts()}
+                        />
+                        <SettingsList.Item
+                            title={version}
+                        />
+
+                    </SettingsList>
+                </View>
+            </View>
+        );
+    }
+
+    private onValueChange(value) {
         this.setState({ switchValue: value });
     }
 
-    async onListPosts() {
+    private async onListPosts() {
         const posts = LocalPostManager.getAllPosts();
         posts.map(post => {
-            const postCopy = {...post, images: post.images.map(image => { return {...image, data: undefined}})};
+            const postCopy = {
+                ...post,
+                images: post.images.map(image => {
+                    return {
+                        ...image,
+                        data: undefined,
+                    };
+                }),
+            };
+            // tslint:disable-next-line:no-console
             console.log(JSON.stringify(postCopy));
-        })
+        });
     }
 
-    async onListDatabase() {
+    private async onListDatabase() {
         const keyValues = await AsyncStorageWrapper.getAllKeyValues();
         if (keyValues) {
             keyValues.map((keyValue) => {
-                const [key, value] = keyValue
-                console.log('onListDatabase: ', key, value)
+                const [key, value] = keyValue;
+                // tslint:disable-next-line:no-console
+                console.log('onListDatabase: ', key, value);
             });
         }
     }
 
-    async onListCache() {
+    private async onListCache() {
         const posts = await LocalPostManager.getAllPosts();
+        // tslint:disable-next-line:no-console
         posts.map(post => console.log('onListCache: ', post));
     }
 
-    async onListSyncState() {
+    private async onListSyncState() {
         const post = await AsyncStorageWrapper.getItem('post');
         if (post) {
+            // tslint:disable-next-line:no-console
             console.log('Post state: ', post);
         }
         const sync = await AsyncStorageWrapper.getItem('sync:default');
         if (sync) {
+            // tslint:disable-next-line:no-console
             console.log('Sync state: ', sync);
         }
     }
 
-    async onListDatabaseKeys() {
+    private async onListDatabaseKeys() {
         const keys = await AsyncStorageWrapper.getAllKeys();
         if (keys) {
+            // tslint:disable-next-line:no-console
             keys.map((key) => console.log('onListDatabaseKeys: ', key));
         }
     }
 
-    async onClearDatabase() {
+    private async onClearDatabase() {
         await AsyncStorageWrapper.clear();
         for (const key of Object.keys(Storage)) {
             Storage[key].clear();
@@ -91,76 +173,8 @@ class DebugScreen extends React.Component<any, any> {
         Alert.alert('Database is cleared');
     }
 
-    async onSyncPosts() {
+    private async onSyncPosts() {
         await LocalPostManager.syncPosts();
         StateTracker.updateVersion(StateTracker.version + 1);
     }
-
-    render() {
-        const version = Version;
-        return (
-            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                    <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
-                         <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-list" size={30} color="gray" />
-                            }
-                            title='List database'
-                            onPress={async () => await this.onListDatabase()}
-                        />
-                         <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-list" size={30} color="gray" />
-                            }
-                            title='List posts'
-                            onPress={async () => await this.onListPosts()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-key" size={30} color="gray" />
-                            }
-                            title='List database keys'
-                            onPress={async () => await this.onListDatabaseKeys()}
-                        /> 
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-key" size={30} color="gray" />
-                            }
-                            title='List cache'
-                            onPress={async () => await this.onListCache()}
-                        /> 
-
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-key" size={30} color="gray" />
-                            }
-                            title='List sync state'
-                            onPress={async () => await this.onListSyncState()}
-                        /> 
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-warning" size={30} color="gray" />
-                            }
-                            title='Clear database'
-                            onPress={async () => await this.onClearDatabase()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons style={styles.imageStyle} name="md-sync" size={30} color="gray" />
-                            }
-                            title='Sync posts'
-                            onPress={async () => await this.onSyncPosts()}
-                        /> 
-                        <SettingsList.Item
-                            title={version}
-                        /> 
-
-                    </SettingsList>
-                </View>
-            </View>
-        )
-    }
 }
-
-export default DebugScreen;

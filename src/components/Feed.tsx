@@ -36,7 +36,7 @@ const injectedJavaScript = `(${String(function() {
         // For pull-to-refresh
         last_y_pos = $(window).scrollTop();
         if ($(window).scrollTop() + $(window).height() == $(document).height() &&
-            !reachedBottom) 
+            !reachedBottom)
         {
             $.get(url_blog + '/page/' + page, function (content) {
                 $('.content').append($(content).find(".post").fadeIn());
@@ -70,7 +70,7 @@ const injectedJavaScript = `(${String(function() {
     });
 })})();`;
 
-class Feed extends React.Component<any, any> {
+export class Feed extends React.Component<any, any> {
     // this is any because React Native components are not strictly typed
     // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/16318
     webView: any;
@@ -159,7 +159,7 @@ class Feed extends React.Component<any, any> {
             <View style={{flexDirection: 'column', padding: 0, flex: 1, height: '100%'}}>
                 <View style={{flex: -1, flexDirection: 'row', borderBottomColor: 'lightgray', borderBottomWidth: 1, alignContent: 'stretch'}}>
                     <TouchableOpacity onPress={() => this.openImagePicker()} style={{flex: 1}}>
-                        <Ionicons name='md-camera' size={30} color='gray' style={{paddingTop: 4, paddingLeft: 10}} /> 
+                        <Ionicons name='md-camera' size={30} color='gray' style={{paddingTop: 4, paddingLeft: 10}} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate(this.props.post)} style={{flex: 6}}>
                         <Text style={{ height: 40, color: 'gray', fontSize: 14, paddingLeft: 10, paddingTop: 10, alignSelf: 'stretch', flex: 5, flexGrow: 10}}>What's on your mind?</Text>
@@ -173,9 +173,7 @@ class Feed extends React.Component<any, any> {
                     ref={x => {this.webView = x}}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}
                 />
-            </View>            
-        )
+            </View>
+        );
     }
 }
-
-export default Feed;

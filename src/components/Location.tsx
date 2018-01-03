@@ -6,24 +6,27 @@ const patchPostMessageJsCode = `(${String(function() {
     var originalPostMessage = window.postMessage
     var patchedPostMessage = function(message, targetOrigin, transfer) {
         originalPostMessage(message, targetOrigin, transfer)
-    }
+    };
     patchedPostMessage.toString = function() {
         return String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')
     }
     window.postMessage = patchedPostMessage
-})})();`
+})})();`;
 
-export default class Location extends React.Component<any, any> {
-    webView: any;
+const navigationActions = {
+    Cancel: null,
+    Post: null,
+};
 
-    static navigationActions = {}
-
-    static navigationOptions = {
+export class Location extends React.Component<any, any> {
+    public static navigationOptions = {
         header: undefined,
         title: 'Select location',
-        headerLeft: <Button title='Cancel' onPress={() => Location.navigationActions['Cancel']()} />,
-        headerRight: <Button title='Post' onPress={() => Location.navigationActions['Post']()} />
+        headerLeft: <Button title='Cancel' onPress={() => navigationActions.Cancel!()} />,
+        headerRight: <Button title='Post' onPress={() => navigationActions.Post!()} />,
     };
+
+    private webView: any;
 
     constructor(props) {
         super(props);
@@ -32,10 +35,10 @@ export default class Location extends React.Component<any, any> {
             longitude: null,
             error: null,
         }
-        this.postMessage = this.postMessage.bind(this)
+        this.postMessage = this.postMessage.bind(this);
 
-        Location.navigationActions['Cancel'] = this.props.navigation.goBack;
-        Location.navigationActions['Post'] = this.props.navigation.goBack;
+        navigationActions.Cancel = this.props.navigation.goBack;
+        navigationActions.Post = this.props.navigation.goBack;
 
         navigator.geolocation.getCurrentPosition((position) => {
             this.setState({
@@ -45,20 +48,12 @@ export default class Location extends React.Component<any, any> {
             });
         },
             (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
 
     }
 
-    postMessage(action) {
-        this.webView.postMessage(JSON.stringify(action))
-    }
-
-    onMessage(data) {
-        console.log('data from webview', data);
-    }
-
-    render() {
+    public render() {
         return (
             <View style={{flexDirection: 'column', padding: 0, flex: 1, height: '100%'}}>
                 {/* <WebView
@@ -74,7 +69,15 @@ export default class Location extends React.Component<any, any> {
                     <Text>Longitude: {this.state.longitude}</Text>
                     {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
                 </View>
-            </View>            
-        )
+            </View>
+        );
+    }
+
+    private postMessage(action) {
+        this.webView.postMessage(JSON.stringify(action));
+    }
+
+    private onMessage(data) {
+        console.log('data from webview', data);
     }
 }

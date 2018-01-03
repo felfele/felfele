@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Text, View, TouchableOpacity, Alert, CameraRoll, Platform } from 'react-native';
+import {
+    Text,
+    View,
+    TouchableOpacity,
+    Alert,
+    CameraRoll,
+    Platform,
+    StyleSheet,
+} from 'react-native';
 import { Icon as ElementIcon } from 'react-native-elements';
 
 import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
@@ -14,11 +22,7 @@ interface FeedHeaderProps {
 }
 
 export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
-    constructor(props) {
-        super(props);
-    }
-
-    isCameraRollPhoto(pickerResult: ImagePickerResponse) {
+    public isCameraRollPhoto(pickerResult: ImagePickerResponse) {
         if (pickerResult.origURL) {
             if (pickerResult.origURL.startsWith('assets-library://') || pickerResult.origURL.startsWith('content://')) {
                 return true;
@@ -27,15 +31,15 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         return false;
     }
 
-    getFilenameExtension(filename) {
-        const a = filename.split(".");
-        if(a.length === 1 || ( a[0] === "" && a.length === 2 ) ) {
-            return "";
+    public getFilenameExtension(filename) {
+        const a = filename.split('.');
+        if (a.length === 1 || ( a[0] === '' && a.length === 2 ) ) {
+            return '';
         }
         return a.pop().toLowerCase();
     }
 
-    openImagePicker = async () => {
+    public openImagePicker = async () => {
         const pickerResult = await AsyncImagePicker.showImagePicker({
             allowsEditing: true,
             aspect: [4, 3],
@@ -73,13 +77,13 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
             height: pickerResult.height,
             data: pickerResult.data,
             localPath: localPath,
-        }
+        };
 
         const post: Post = {
             images: [data],
             text: '',
             createdAt: Date.now(),
-        }
+        };
 
         try {
             this.props.postManager.saveAndSyncPost(post);
@@ -95,54 +99,59 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
     }
 
     public render() {
-        const paddingTop = Platform.OS === 'ios' ? 20 : 0;
         return (
-            <View style={{
-                    flex: -1,
-                    flexDirection: 'row',
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'lightgray',
-                    alignContent: 'stretch',
-                    paddingTop: paddingTop,
-                }}
+            <View style={styles.headerContainer}
             >
                 <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
                     <ElementIcon
                         name='camera-alt'
                         size={30}
                         color='gray'
-                        style={{
-                            paddingTop: 4,
-                            paddingLeft: 10,
-                            margin: 0,
-                        }} />
+                        style={styles.cameraIcon} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() =>
                         this.props.navigation.navigate(this.props.post)
                     }
                     style={{
-                        flex: 6
+                        flex: 6,
                     }}
                 >
-                    <Text
-                        style={{
-                            height: 30,
-                            color: 'gray',
-                            fontSize: 14,
-                            paddingLeft: 15,
-                            paddingTop: 6,
-                            marginLeft: 0,
-                            marginRight: 15,
-                            marginVertical: 3,
-                            marginBottom: 15,
-                            alignSelf: 'stretch',
-                            flex: 5,
-                            flexGrow: 10,
-                        }}
+                    <Text style={styles.headerText}
                     >What's your story?</Text>
                 </TouchableOpacity>
             </View>
-        )
+        );
     }
 }
+
+const HeaderContainerPaddingTop = Platform.OS === 'ios' ? 20 : 0;
+const styles = StyleSheet.create({
+    headerContainer: {
+        flex: -1,
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: 'lightgray',
+        alignContent: 'stretch',
+        paddingTop: HeaderContainerPaddingTop,
+    },
+    cameraIcon: {
+        paddingTop: 4,
+        paddingLeft: 10,
+        margin: 0,
+    },
+    headerText: {
+        height: 30,
+        color: 'gray',
+        fontSize: 14,
+        paddingLeft: 15,
+        paddingTop: 6,
+        marginLeft: 0,
+        marginRight: 15,
+        marginVertical: 3,
+        marginBottom: 15,
+        alignSelf: 'stretch',
+        flex: 5,
+        flexGrow: 10,
+    }
+});

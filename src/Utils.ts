@@ -1,28 +1,29 @@
-var Url = require('url');
+// tslint:disable-next-line:no-var-requires
+const Url = require('url');
 
 export class Utils {
-    static async timeout<T>(ms, promise: Promise<T>): Promise<T> {
+    public static async timeout<T>(ms, promise: Promise<T>): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             setTimeout(() => reject(new Error('timeout')), ms);
             promise.then(resolve, reject);
         });
-    }   
-    
-    static take(list, num, defaultReturn) {
+    }
+
+    public static take(list, num, defaultReturn) {
         if (list.length < num) {
             return [defaultReturn];
         }
         return list.slice(0, num);
     }
 
-    static takeLast(list, num, defaultReturn) {
+    public static takeLast(list, num, defaultReturn) {
         if (list.length < num) {
             return [defaultReturn];
         }
         return list.slice(list.length - num);
     }
 
-    static getHumanHostname(url: string): string {
+    public static getHumanHostname(url: string): string {
         if (url.startsWith('//')) {
             url = 'https:' + url;
         }
@@ -32,7 +33,7 @@ export class Utils {
         return humanHostname;
     }
 
-    static createUrlFromUrn(urn: string, baseUrl: string): string {
+    public static createUrlFromUrn(urn: string, baseUrl: string): string {
         if (!baseUrl.endsWith('/')) {
             baseUrl += '/';
         }
@@ -50,7 +51,7 @@ export class Utils {
         return baseUrl + urn;
     }
 
-    static getBaseUrl(url: string): string {
+    public static getBaseUrl(url: string): string {
         if (url.startsWith('//')) {
             url = 'https:' + url;
         }
@@ -58,9 +59,9 @@ export class Utils {
         return url.replace(/(http.?:\/\/.*?\/).*/, '$1');
     }
 
-    static getCanonicalUrl(url: string): string {
+    public static getCanonicalUrl(url: string): string {
         const parts = url.split('//', 2);
-        if (parts.length == 1) {
+        if (parts.length === 1) {
             if (!url.includes('/')) {
                 url += '/';
             }

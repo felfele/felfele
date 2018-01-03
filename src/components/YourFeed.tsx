@@ -37,8 +37,8 @@ interface YourFeedState {
     posts: Post[];
 }
 
-class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
-    containerStyle = {};
+export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
+    private containerStyle = {};
 
     constructor(props) {
         super(props);
@@ -112,7 +112,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                 posts: this.props.postManager.getAllPosts(),
                 isRefreshing: false,
             })
-        } catch(e) {
+        } catch (e) {
             this.setState({
                 isRefreshing: false,
             });
@@ -171,16 +171,16 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
             return (
                 <View style={styles.itemImageContainer}>
                     <TouchableOpacity style={styles.like}>
-                        {!isPostLiked(post) ? <Icon name="ios-heart-outline" size={iconSize} color="black" /> : <Icon name="ios-heart" size={30} color="red" />}
+                        {!isPostLiked(post) ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
-                        <Icon name="ios-chatbubbles-outline" size={iconSize} color="black" />
+                        <Icon name='ios-chatbubbles-outline' size={iconSize} color='black' />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.share} onPress={() => this.props.navigation.navigate('Share', {link: 'http://192.168.1.49:2368#' + post._id})}>
-                        <Icon name="ios-redo-outline" size={iconSize} color="black" />
+                        <Icon name='ios-redo-outline' size={iconSize} color='black' />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
-                        <Icon name="ios-trash-outline" size={iconSize} color="black" />
+                        <Icon name='ios-trash-outline' size={iconSize} color='black' />
                     </TouchableOpacity>
                 </View>
             )
@@ -198,7 +198,7 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
                 <Gravatar options={{
                     email: Config.loginData.username,
                     secure: true,
-                    parameters: { "size": "100", "d": "mm" },
+                    parameters: { 'size': '100', 'd': 'mm' },
                 }}
                     style={styles.image}
                 />
@@ -400,36 +400,34 @@ class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
 
 const TranslucentBarHeight = Platform.OS === 'ios' ? 20 : 0;
 const styles = StyleSheet.create({
-    container: {backgroundColor:'white',paddingTop:5},
-    infoContainer : {flexDirection:'row',height:38,alignSelf:'stretch', marginBottom: 5, marginLeft: 5},
-    image: {borderRadius : 3, width:32 , height:32, marginHorizontal: 4 , marginVertical: 3 },
-    usernameContainer: {justifyContent:'center',flexDirection:'column'},
-    location: {fontSize:10, color: 'gray'},
-    itemImageContainer: {flexDirection:'row', height:40, alignSelf:'stretch', marginLeft: 5},
-    like: {marginHorizontal:5,marginVertical:5,marginLeft:5},
-    comment: {marginHorizontal:10,marginVertical:5},
-    share: {marginHorizontal:10,marginVertical:5},
-    likeCount: {flexDirection:'row',alignItems:'center',marginLeft:2},
-    commentItem: {fontSize:10 , color:'rgba(0, 0, 0, 0.5)',marginTop:5},
-    captionContainer: {marginTop:2 ,flexDirection:'row',alignItems:'center'},
-    captionText: { fontSize:12,fontWeight:'bold' },
-    dateText: {fontSize:8 , color:'rgba(0, 0, 0, 0.5)',marginTop:5},
-    seperator: {height:1,alignSelf:'stretch',marginHorizontal:10,backgroundColor:'rgba(0, 0, 0, 0.2)'},
-    hashTag: {fontStyle: 'italic',color:'blue'},
-    footer: {marginVertical:5,alignSelf:'stretch',marginHorizontal:20,flexDirection:'column'},
+    container: {backgroundColor: 'white', paddingTop: 5},
+    infoContainer : {flexDirection: 'row', height: 38, alignSelf: 'stretch', marginBottom: 5, marginLeft: 5},
+    image: {borderRadius : 3, width: 32 , height: 32, marginHorizontal: 4 , marginVertical: 3 },
+    usernameContainer: {justifyContent: 'center', flexDirection: 'column'},
+    location: {fontSize: 10, color: 'gray'},
+    itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5},
+    like: {marginHorizontal: 5, marginVertical: 5, marginLeft: 5},
+    comment: {marginHorizontal: 10, marginVertical: 5},
+    share: {marginHorizontal: 10, marginVertical: 5},
+    likeCount: {flexDirection: 'row', alignItems: 'center', marginLeft: 2},
+    commentItem: {fontSize: 10 , color: 'rgba(0, 0, 0, 0.5)', marginTop: 5},
+    captionContainer: {marginTop: 2 , flexDirection: 'row', alignItems: 'center'},
+    captionText: { fontSize: 12, fontWeight: 'bold' },
+    dateText: {fontSize: 8 , color: 'rgba(0, 0, 0, 0.5)', marginTop: 5},
+    seperator: {height: 1, alignSelf: 'stretch', marginHorizontal: 10, backgroundColor: 'rgba(0, 0, 0, 0.2)'},
+    hashTag: {fontStyle: 'italic', color: 'blue'},
+    footer: {marginVertical: 5, alignSelf: 'stretch', marginHorizontal: 20, flexDirection: 'column'},
     username: {fontWeight: 'bold'},
-    text: {fontSize:12,color:'black'},
-    likedContainer:{backgroundColor:'transparent',flex:1,justifyContent:'center',alignItems:'center'},
+    text: {fontSize: 12, color: 'black'},
+    likedContainer: {backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center'},
     markdownStyle: {marginVertical: 10, marginHorizontal: 10},
     translucentBar: {
         height: TranslucentBarHeight,
         width: '100%',
         position: 'absolute',
-        backgroundColor: '#e6e6e6',
-        opacity: 0.9,
+        backgroundColor: '#e6e6e6ff',
+        opacity: 0.5,
         top: 0,
         left: 0,
     },
 });
-
-export default YourFeed;
