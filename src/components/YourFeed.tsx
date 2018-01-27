@@ -164,6 +164,10 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
+    onEditPost(post: Post) {
+
+    }
+
     renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
         const isPostLiked = (post) => false;
@@ -182,8 +186,13 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
                         <Icon name='ios-trash-outline' size={iconSize} color='black' />
                     </TouchableOpacity>
+                    { post.author == null &&
+                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
+                            <Icon name='ios-pencil-outline' size={iconSize} color='black' />
+                        </TouchableOpacity>
+                    }
                 </View>
-            )
+            );
         }
         return [];
     }
@@ -192,7 +201,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         if (post.author) {
             return (
                 <Image source={{uri: post.author.faviconUri}} style={styles.image} />
-            )
+            );
         } else {
             return (
                 <Gravatar options={{
@@ -202,7 +211,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 }}
                     style={styles.image}
                 />
-            )
+            );
         }
     }
 
@@ -212,16 +221,16 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         const currentTime = Date.now();
         const username = post.author ? post.author.name : 'Attila';
         const url = post.link || '';
-        const hostnameText = url == '' ? '' : ' -  ' + Utils.getHumanHostname(url);
+        const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
             <View style={styles.infoContainer}>
                 { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
-                    <Text style={styles.username}>{username}</Text>
+                    <Text style={styles.username} numberOfLines={1}>{username}</Text>
                     <Text style={styles.location}>{printableTime}{hostnameText}</Text>
                 </View>
             </View>
-        )
+        );
     }
 
     renderCardWithOnlyText(post: Post) {
@@ -245,7 +254,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </Card>
-        )
+        );
     }
 
     renderCardWithMultipleImages(post: Post) {
@@ -273,23 +282,23 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                                 onLongPress={ () => {
                                     this.setState({selectedPost: post});
                                 }}
-                            />
+                            />;
                         })
                     }
-                    { post.text == '' ||
+                    { post.text === '' ||
                         <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
 
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </Card>
-        )
+        );
     }
 
     renderCard(post: Post) {
         const toBase64 = (data) => `data:image/gif;base64,${data}`;
 
-        if (post.images.length == 0) {
+        if (post.images.length === 0) {
             return this.renderCardWithOnlyText(post);
         } else if (post.images.length > 1) {
             return this.renderCardWithMultipleImages(post);
@@ -327,7 +336,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                             height: WindowWidth,
                         }}
                     />
-                    { post.text == '' ||
+                    { post.text === '' ||
                         <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                     }
                     { this.renderButtonsIfSelected(post) }
@@ -337,35 +346,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         }
     }
 
-    renderOfflineHeader() {
-        if (NetworkStatus.isConnected()) {
-            return [];
-        }
-        return (
-            <View style={{
-                height: 20,
-                backgroundColor: 'black',
-            }}
-            >
-                <Text style={{
-                    color: 'white',
-                    textAlign: 'center',
-                }}
-                >You are offline</Text>
-            </View>
-        )
-    }
-
-    renderListHeader = () => {
-        return (
-            <FeedHeader
-                post={this.props.post}
-                navigation={this.props.navigation}
-                postManager={this.props.postManager} />
-        )
-    }
-
-    render() {
+    public render() {
         return (
             <View
                 style={{
@@ -388,17 +369,43 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                             <RefreshControl
                                 refreshing={this.state.isRefreshing}
                                 onRefresh={async () => this.onRefresh() }
+                                progressViewOffset={HeaderOffset}
+                                style={styles.refreshControl}
                             />
                         }
                     />
                 </View>
                 <View style={styles.translucentBar} ></View>
             </View>
-        )
+        );
+    }
+
+    private renderOfflineHeader() {
+        if (NetworkStatus.isConnected()) {
+            return [];
+        }
+        return (
+            <View style={{
+                height: HeaderOffset,
+                backgroundColor: 'black',
+            }}
+            >
+            </View>
+        );
+    }
+
+    private renderListHeader = () => {
+        return (
+            <FeedHeader
+                post={this.props.post}
+                navigation={this.props.navigation}
+                postManager={this.props.postManager} />
+        );
     }
 }
 
-const TranslucentBarHeight = Platform.OS === 'ios' ? 20 : 0;
+const HeaderOffset = 20;
+const TranslucentBarHeight = Platform.OS === 'ios' ? HeaderOffset : 0;
 const styles = StyleSheet.create({
     container: {backgroundColor: 'white', paddingTop: 5},
     infoContainer : {flexDirection: 'row', height: 38, alignSelf: 'stretch', marginBottom: 5, marginLeft: 5},
@@ -409,6 +416,7 @@ const styles = StyleSheet.create({
     like: {marginHorizontal: 5, marginVertical: 5, marginLeft: 5},
     comment: {marginHorizontal: 10, marginVertical: 5},
     share: {marginHorizontal: 10, marginVertical: 5},
+    edit: {marginHorizontal: 10, marginVertical: 5},
     likeCount: {flexDirection: 'row', alignItems: 'center', marginLeft: 2},
     commentItem: {fontSize: 10 , color: 'rgba(0, 0, 0, 0.5)', marginTop: 5},
     captionContainer: {marginTop: 2 , flexDirection: 'row', alignItems: 'center'},
@@ -429,5 +437,7 @@ const styles = StyleSheet.create({
         opacity: 0.5,
         top: 0,
         left: 0,
+    },
+    refreshControl: {
     },
 });

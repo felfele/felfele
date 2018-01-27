@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'lightgray',
         alignContent: 'stretch',
-        paddingTop: HeaderContainerPaddingTop,
+        marginTop: HeaderContainerPaddingTop,
     },
     cameraIcon: {
         paddingTop: 4,

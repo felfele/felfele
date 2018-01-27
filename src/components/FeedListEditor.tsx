@@ -33,13 +33,14 @@ export class FeedListEditor extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            feeds: RSSPostManager.feedManager.feeds,
+            feeds: RSSPostManager.feedManager.getFeeds(),
         };
         navigationActions.Back = this.props.navigation.goBack;
         navigationActions.Add = this.onAddFeed.bind(this);
     }
 
     public render() {
+        console.log(this.state.feeds);
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>

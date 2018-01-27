@@ -52,8 +52,9 @@ const RSSMimeTypes = [
     'text/xml',
 ];
 
+// tslint:disable-next-line:member-ordering
 export class RSSFeedManager {
-    private readonly feeds: Feed[] = [
+    private readonly hardcodedFeeds: Feed[] = [
         {
             name: 'Hacker News',
             url: 'https://news.ycombinator.com/',
@@ -93,12 +94,9 @@ export class RSSFeedManager {
 
         // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
     ];
+    private feeds: Feed[] = this.hardcodedFeeds;
 
-    getFeedUrls(): string[] {
-        return this.feeds.map(feed => feed.feedUrl);
-    }
-
-    static getFeedUrlFromHtmlLink(link): string {
+    public static getFeedUrlFromHtmlLink(link): string {
         for (const mimeType of RSSMimeTypes) {
             const matcher = [{name: 'type', value: mimeType}];
             if (HtmlUtils.matchAttributes(link, matcher)) {
@@ -109,6 +107,21 @@ export class RSSFeedManager {
             }
         }
         return '';
+    }
+
+    public getFeeds(): Feed[] {
+        return this.feeds;
+    }
+
+    public getFeedUrls(): string[] {
+        return this.getFeeds().map(feed => feed.feedUrl);
+    }
+
+    public async loadFeedsFromStorage(): Promise<Feed[]> {
+        const feeds = await Storage.feed.getAllValues();
+        console.log('RSSPostManager.loadFeedsFromStorage:', feeds);
+        this.feeds = this.hardcodedFeeds.concat(feeds);
+        return this.feeds;
     }
 
     static parseFeedFromHtml(html): Feed {
@@ -310,6 +323,7 @@ class _RSSPostManager implements PostManager {
         const startTime = Date.now();
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
+        await this.feedManager.loadFeedsFromStorage()
         const feedUrls = this.feedManager.getFeedUrls();
         let downloadSize = 0;
         let firstLoad = this.id == FirstId;
@@ -403,7 +417,7 @@ class _RSSPostManager implements PostManager {
         const posts = rssFeed.items.map(item => {
             const description = this.formatDescription(item.description);
             const [text, images] = this.extractTextAndImagesFromMarkdown(description, '');
-            const title = item.title == '(Untitled)' ? '' : '**' + item.title + '**' + '\n\n';
+            const title = item.title === '(Untitled)' ? '' : '**' + item.title + '**' + '\n\n';
             const post: Post = {
                 _id: this.getNextId(),
                 text: title + text + '\n\n',

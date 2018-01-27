@@ -1,6 +1,6 @@
 class _FaviconCache {
     private favicons: Map<string, string> = new Map();
-    
+
     async getFavicon(url): Promise<string> {
         if (this.favicons.has(url)) {
             return this.favicons.get(url) || '';
@@ -13,7 +13,7 @@ class _FaviconCache {
         } catch (e) {
             console.log(e);
             return '';
-        }        
+        }
     }
 
     getBaseUrl(url) {

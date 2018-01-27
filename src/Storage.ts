@@ -67,7 +67,7 @@ export class Query<T extends Model> {
     constructor(private storage: Queryable<T>) {
     }
 
-    async execute() {        
+    async execute() {
         const highestSeenId = await this.storage.getHighestSeenId();
         if (this._limit == 0 && this.queryOrder == 'asc') {
             this._limit = highestSeenId;
@@ -77,7 +77,7 @@ export class Query<T extends Model> {
             start = highestSeenId;
         }
 
-        return this.storage.getNumItems(start, this._limit, this.queryOrder, this.conditions);       
+        return this.storage.getNumItems(start, this._limit, this.queryOrder, this.conditions);
     }
 
     limit(limit) {
@@ -172,7 +172,7 @@ export class StorageWithStringKey<T extends Model> {
         }
         return [];
     }
-    
+
     async get(key: string) {
         const keyWithPrefix = this.getPrefix() + key;
         const value = await AsyncStorageWrapper.getItem(keyWithPrefix);
@@ -193,14 +193,14 @@ export class StorageWithStringKey<T extends Model> {
         const keyWithPrefix = this.getPrefix() + key;
         await AsyncStorageWrapper.removeItem(keyWithPrefix);
     }
-    
+
 }
 
 export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
     private metadata: Metadata | null = null;
     private isMetadataUpdated: boolean = false;
     private storage: StorageWithStringKey<T>;
-    
+
     constructor(name: string) {
         this.storage = new StorageWithStringKey(name);
     }
@@ -222,7 +222,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             await AsyncStorageWrapper.setItem(this.storage.getName(), metaValue);
             this.isMetadataUpdated = false;
         }
-        
+
         return t._id;
     }
 
@@ -283,7 +283,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         if (startIndex === NaN) {
             return [];
         }
-        
+
         const items: T[] = [];
         while (items.length < num) {
             let [min, max] = StorageWithAutoIds.getMinMaxIndices(startIndex, num, order);
@@ -329,7 +329,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
                     break;
             }
         }
-        
+
         return items;
     }
 
@@ -345,14 +345,14 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             return [];
         }
 
-        const keys = this.generateKeys(0, metadata.highestSeenId);
+        const keys = this.generateKeys(1, metadata.highestSeenId);
         const keyValues = await AsyncStorage.multiGet(keys);
 
         return keyValues.map((elem) => {
             return JSON.parse(elem[1]);
         });
     }
-    
+
     query(): Query<T> {
         return new Query<T>(this);
     }
@@ -363,10 +363,10 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             if (value == null) {
                 this.metadata = {
                     highestSeenId: 0,
-                }
+                };
                 await AsyncStorageWrapper.setItem(this.storage.getName(), JSON.stringify(this.metadata));
             } else {
-                console.log('tryLoadMetadata: ', value);
+                console.log('tryLoadMetadata: ', this.storage.getName(), value);
                 this.metadata = <Metadata>JSON.parse(value);
             }
         }
@@ -445,7 +445,7 @@ export class AsyncStorageWrapper {
             console.log('getAllValues error: ', e);
             return null;
         }
-        
+
     }
 
     static clear() {
@@ -459,10 +459,9 @@ export class AsyncStorageWrapper {
 }
 
 export const Storage = {
-    'post': new StorageWithAutoIds<Post>('post'),
-    'draft': new StorageWithAutoIds<Post>('draft'),
-    'auth': new StorageWithStringKey<AuthenticationData>('auth'),
-    'sync': new StorageWithStringKey<SyncState>('sync'),
-    'feed': new StorageWithAutoIds<Feed>('feed'),
-}
-
+    post: new StorageWithAutoIds<Post>('post'),
+    draft: new StorageWithAutoIds<Post>('draft'),
+    auth: new StorageWithStringKey<AuthenticationData>('auth'),
+    sync: new StorageWithStringKey<SyncState>('sync'),
+    feed: new StorageWithAutoIds<Feed>('feed'),
+};

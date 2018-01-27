@@ -3,9 +3,10 @@ import { View, FlatList, Text, TextInput, Alert, StyleSheet, Button, Image } fro
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { RSSFeedManager } from '../RSSPostManager';
+import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
+import { Storage } from '../Storage';
 
 const navigationActions = {
     Back: null,
@@ -45,8 +46,9 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         navigationActions.Add = this.onAdd.bind(this);
     }
 
-    public onAdd() {
-        // TODO
+    public async onAdd() {
+        await Storage.feed.set(this.state.feed);
+        await RSSPostManager.feedManager.loadFeedsFromStorage();
     }
 
     public async fetchFeed() {
