@@ -90,6 +90,13 @@ const Root = TabNavigator(
             showLabel: false,
             activeTintColor: 'gray',
             inactiveTintColor: 'lightgray',
+            style: {
+                opacity: 0.96,
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+            },
         },
     }
 );
