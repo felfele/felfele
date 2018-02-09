@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, FlatList, Text, TextInput, Alert, StyleSheet, Button, Image } from 'react-native';
+import { View, FlatList, Text, TextInput, Alert, StyleSheet, Button, Image, ActivityIndicator } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -14,9 +14,40 @@ const navigationActions = {
 };
 
 const styles = StyleSheet.create({
-    titleInfoStyle: {
+    container: {
+        backgroundColor: '#EFEFF4',
+        flex: 1,
+        flexDirection: 'column',
+    },
+    titleInfo: {
         fontSize: 14,
         color: '#8e8e93',
+    },
+    linkInput: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 1,
+        borderTopColor: 'lightgray',
+        borderTopWidth: 1,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        color: 'gray',
+        fontSize: 16,
+    },
+    deleteButtonContainer: {
+        backgroundColor: 'white',
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+    },
+    centerIcon: {
+        width: '100%',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        height: 40,
+        backgroundColor: '#EFEFF4',
     },
 });
 
@@ -34,7 +65,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         headerRight: <Button title='Add' onPress={() => navigationActions.Add!()} />,
     };
 
-    public state = {
+    public state: EditFeedState = {
         feed: this.props.navigation.state.params.feed,
         checked: false,
         loading: false,
@@ -42,13 +73,18 @@ export class EditFeed extends React.Component<any, EditFeedState> {
 
     constructor(props) {
         super(props);
-        navigationActions.Back = this.props.navigation.goBack;
+        navigationActions.Back = this.goBack.bind(this);
         navigationActions.Add = this.onAdd.bind(this);
     }
 
     public async onAdd() {
         await Storage.feed.set(this.state.feed);
         await RSSPostManager.feedManager.loadFeedsFromStorage();
+        this.goBack();
+    }
+
+    public goBack() {
+        this.props.navigation.goBack();
     }
 
     public async fetchFeed() {
@@ -74,30 +110,28 @@ export class EditFeed extends React.Component<any, EditFeedState> {
 
     public render() {
         return (
-            <View style={{ backgroundColor: '#EFEFF4', flex: 1, flexDirection: 'column' }}>
-                <Text>Link to the feed</Text>
+            <View style={styles.container}>
                 <TextInput
                     value={this.state.feed.feedUrl}
-                    style={{
-                        width: '100%',
-                        backgroundColor: 'white',
-                        borderBottomColor: 'lightgray',
-                        borderBottomWidth: 1,
-                        borderTopColor: 'lightgray',
-                        borderTopWidth: 1,
-                        paddingHorizontal: 5,
-                        paddingVertical: 8,
-                        color: 'gray',
-                        fontSize: 14,
-                    }}
+                    style={styles.linkInput}
                     onChangeText={(text) => this.setState({feed: {...this.state.feed, feedUrl: text}})}
+                    placeholder='Link of the feed'
+                    autoCapitalize='none'
                 />
                 { this.state.checked
-                ? <Ionicons name='md-checkmark' size={30} color='gray' />
-                : <Button
-                    title='Fetch'
-                    onPress={async () => await this.fetchFeed()}
-                    disabled={this.state.loading}
+                  ?
+                    <View style={styles.centerIcon}>
+                        <Ionicons name='md-checkmark' size={40} color='green' />
+                    </View>
+                  : this.state.loading
+                    ?
+                        <View style={styles.centerIcon}>
+                            <ActivityIndicator size='large' color='grey' />
+                        </View>
+                    : <Button
+                        title='Fetch'
+                        onPress={async () => await this.fetchFeed()}
+                        disabled={this.state.loading}
                 />
                 }
 
@@ -105,7 +139,38 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                 <Text>{this.state.feed.url}</Text>
                 <Text>{this.state.feed.feedUrl}</Text>
                 <Text>{this.state.feed.favicon}</Text>
+
+                { this.state.feed._id != null &&
+                <View style={styles.deleteButtonContainer}>
+                    <Button
+                        title='Delete'
+                        onPress={this.onDelete}
+                        color='red'
+                    />
+                </View>
+                }
             </View>
         );
+    }
+
+    private onDelete = () => {
+        const options: any[] = [
+            { text: 'Yes', onPress: async () => await this.deleteFeedAndGoBack() },
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        ];
+
+        Alert.alert('Are you sure you want to delete the feed?',
+            undefined,
+            options,
+            { cancelable: true }
+        );
+    }
+
+    private deleteFeedAndGoBack = async () => {
+        if (this.state.feed._id != null) {
+            await Storage.feed.delete(this.state.feed._id);
+        }
+        await RSSPostManager.feedManager.loadFeedsFromStorage();
+        this.goBack();
     }
 }

@@ -348,9 +348,11 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         const keys = this.generateKeys(1, metadata.highestSeenId);
         const keyValues = await AsyncStorage.multiGet(keys);
 
-        return keyValues.map((elem) => {
-            return JSON.parse(elem[1]);
-        });
+        return keyValues
+            .filter(elem => elem[1] != null)
+            .map((elem) => {
+                return JSON.parse(elem[1]);
+            });
     }
 
     query(): Query<T> {

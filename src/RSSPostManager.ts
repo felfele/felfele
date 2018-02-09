@@ -269,10 +269,11 @@ export class RSSFeedManager {
         ) {
             const rssFeed = await Feed.load(contentWithMimeType.content);
             const baseUrl = Utils.getBaseUrl(url);
+            const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
                 url: baseUrl,
                 feedUrl: url,
-                name: rssFeed.feed.title,
+                name: name,
                 favicon: '',
             }
             // Fetch the website to augment the feed data with favicon and title
