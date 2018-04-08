@@ -40,26 +40,19 @@ export class GhostAPI {
     constructor(private baseUri, private loginData, private authenticationData: AuthenticationData) {
     }
 
-    private async handleResponseErrors(responsePromise: Promise<Response>) {
-        let response;
-        try {
-            response = await Utils.timeout(Config.defaultTimeout, responsePromise);
-        } catch (e) {
-            console.error(e);
-            throw new Error(e);
-        }
-        if (!response.ok) {
-            if (response.status === 401) {
-                this.authenticationData.loginState = 'logged-out';
-            }
-            console.error(response);
-            const text = await response.text();
-            throw new Error('' + response.status + ' ' + response.statusText + ' ' + response.url + ' ' + text);
-        }
-        return response;
+    public async getAllPosts(): Promise<Post[]> {
+        const uri = this.baseUri + 'ghost/api/v0.1/posts/?limit=all';
+        const response = await this.callApi('GET', uri);
+        const jsonResponse = await response.json();
+        return jsonResponse.posts;
     }
 
-    private async uploadImage(imageUri: string) {
+    public deletePost(id) {
+        const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
+        return this.callApi('DELETE', uri);
+    }
+
+    public async uploadImage(imageUri: string) {
         const uri = this.baseUri + 'ghost/api/v0.1/uploads/';
 
         const photo = {
@@ -82,7 +75,7 @@ export class GhostAPI {
         }
     }
 
-    private async uploadPost(markdown: string, createdAt: string): Promise<number> {
+    public async uploadPost(markdown: string, createdAt: string): Promise<number> {
         try {
             const response = await this.uploadDraft(markdown);
             const draftResponse = await response.json();
@@ -98,7 +91,7 @@ export class GhostAPI {
         }
     }
 
-    private publishPost(draftResponse) {
+    public publishPost(draftResponse) {
         const id = draftResponse.id;
         const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
         const post: Post = {
@@ -129,7 +122,7 @@ export class GhostAPI {
         return this.callApi('PUT', uri, body);
     }
 
-    private uploadDraft(markdown) {
+    public uploadDraft(markdown) {
         const uri = this.baseUri + 'ghost/api/v0.1/posts/?include=tags';
         const draft: Draft = {
             title: '(Untitled)',
@@ -153,21 +146,28 @@ export class GhostAPI {
         return this.callApi('POST', uri, body);
     }
 
-    private deletePost(id) {
-        const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
-        return this.callApi('DELETE', uri);
+    private async handleResponseErrors(responsePromise: Promise<Response>) {
+        let response;
+        try {
+            response = await Utils.timeout(Config.defaultTimeout, responsePromise);
+        } catch (e) {
+            console.error(e);
+            throw new Error(e);
+        }
+        if (!response.ok) {
+            if (response.status === 401) {
+                this.authenticationData.loginState = 'logged-out';
+            }
+            console.error(response);
+            const text = await response.text();
+            throw new Error('' + response.status + ' ' + response.statusText + ' ' + response.url + ' ' + text);
+        }
+        return response;
     }
 
     private fetchUsersMe() {
         const uri = this.baseUri + 'ghost/api/v0.1/users/me/?include=roles&status=all';
         return this.callApi('GET', uri);
-    }
-
-    private async getAllPosts(): Promise<Post[]> {
-        const uri = this.baseUri + 'ghost/api/v0.1/posts/?limit=all';
-        const response = await this.callApi('GET', uri);
-        const jsonResponse = await response.json();
-        return jsonResponse.posts;
     }
 
     private async tryLoadAuthenticationData() {

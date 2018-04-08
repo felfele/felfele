@@ -19,14 +19,43 @@ class PostCache implements Queryable<Post> {
     constructor(private storage: StorageWithAutoIds<Post>) {
     }
 
-    async getNumItems(start: number, num: number, queryOrder: QueryOrder, conditions: Condition<Post>[] = []) {
+    public async getNumItems(start: number, num: number, queryOrder: QueryOrder, conditions: Condition<Post>[] = []) {
         const posts = await this.storage.getNumItems(start, num, queryOrder, conditions);
         posts.map(post => this.add(post));
         return posts;
     }
-    
-    async getHighestSeenId(): Promise<number> {
+
+    public async getHighestSeenId(): Promise<number> {
         return this.storage.getHighestSeenId();
+    }
+
+    public async set(post) {
+        await this.storage.set(post);
+        if (post.deleted) {
+            this.remove(post);
+        } else {
+            this.add(post);
+        }
+        return post._id;
+    }
+
+    public async delete(post) {
+        if (post._id) {
+            await this.storage.delete(post._id);
+            this.remove(post);
+        }
+    }
+
+    public query(): Query<Post> {
+        return new Query(this);
+    }
+
+    public getPosts(): Post[] {
+        return [...this.posts.values()];
+    }
+
+    public clearCache() {
+        this.posts.clear();
     }
 
     private add(post) {
@@ -40,64 +69,34 @@ class PostCache implements Queryable<Post> {
             this.posts.delete(post._id);
         }
     }
-
-    async set(post) {
-        await this.storage.set(post);
-        if (post.deleted) {
-            this.remove(post);
-        } else {
-            this.add(post);
-        }
-        return post._id;
-    }
-
-    async delete(post) {
-        if (post._id) {
-            await this.storage.delete(post._id);
-            this.remove(post);
-        }
-    }
-
-    query(): Query<Post> {
-        return new Query(this);
-    }
-
-    getPosts(): Post[] {
-        return [...this.posts.values()];
-    }
-
-    clearCache() {
-        this.posts.clear();
-    }
 }
 
 export class _LocalPostManager implements PostManager {
-    postCache: PostCache = new PostCache(Storage.post);
+    private postCache: PostCache = new PostCache(Storage.post);
 
-    async getHighestSeenPostId() {
+    public async getHighestSeenPostId() {
         const highestSeenPostId = await Storage.post.getHighestSeenId();
         return highestSeenPostId;
     }
 
-    async syncPosts() {
+    public async syncPosts() {
         const getSyncState = async () => {
             let syncState = await Storage.sync.get(SyncStateDefaultKey);
             if (syncState == null) {
                 syncState = {
                     highestSeenSyncId: 0,
                     highestSyncedPostId: 0,
-                }
+                };
             }
             return syncState;
-        }
-
+        };
 
         // Download and convert the posts from Ghost
         const fetchDownstreamPosts = async () => {
             const ghostPosts = await Backend.ghostAPI.getAllPosts();
             Debug.log(ghostPosts);
             const reversePosts = ghostPosts.slice(0).reverse();
-            let convertedPosts: Post[] = [];
+            const convertedPosts: Post[] = [];
             for (const post of reversePosts) {
                 const convertedPost = await this.convertGhostPostToInternal(post);
                 convertedPosts.push(convertedPost);
@@ -124,7 +123,7 @@ export class _LocalPostManager implements PostManager {
             }
             return downstreamSyncState;
         }
-        
+
         const uploadLocalOnlyPosts = async (highestSeenPostId, syncState) => {
             // Upstream is from local to Ghost
             const upstreamSyncState = {...syncState};
@@ -202,7 +201,7 @@ export class _LocalPostManager implements PostManager {
                 downstreamSyncState.highestSyncedPostId, upstreamSyncState.highestSyncedPostId);
             syncState.highestSeenSyncId = Math.max(
                 downstreamSyncState.highestSeenSyncId, upstreamSyncState.highestSeenSyncId);
-            
+
             await Storage.sync.set(SyncStateDefaultKey, syncState);
         }
 
@@ -286,7 +285,7 @@ export class _LocalPostManager implements PostManager {
                                         .desc()
                                         .limit(highestSeenPostId)
                                         .execute();
-        
+
         const syncIds = localOnlyDeletedPosts.map(post => post.syncId);
         for (const syncId of syncIds) {
             await Backend.ghostAPI.deletePost(syncId);
@@ -297,7 +296,7 @@ export class _LocalPostManager implements PostManager {
         post.deleted = true;
         if (post.syncId) {
             await this.postCache.set(post);
-            
+
             try {
                 await this.syncLocalDeletedPosts();
             } catch(e) {
@@ -316,7 +315,7 @@ export class _LocalPostManager implements PostManager {
 
     async saveAndSyncPost(post: Post) {
         await this.postCache.set(post);
-        
+
         this.syncPosts()
             .then(() => {
                 console.log('Synced')
@@ -334,7 +333,7 @@ export class _LocalPostManager implements PostManager {
                 const path = await Backend.ghostAPI.uploadImage(image.uri);
                 markdownText += `![](${path.replace(/\"/g, '')})`;
             }
-            
+
             const createdAt = DateUtils.timestampToDateString(post.createdAt)
             return await Backend.ghostAPI.uploadPost(markdownText, createdAt);
         } catch (e) {
