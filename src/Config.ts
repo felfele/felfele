@@ -7,5 +7,5 @@ export const Config = {
         password: '7ZQ-XZg-skq-AtK',
         clientId: 'ghost-admin',
         clientSecret: 'fc0c590f04d3',
-    }
-}
+    },
+};

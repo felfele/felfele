@@ -2,17 +2,6 @@ import * as React from 'react';
 import { TextInput, View, WebView, Button, TouchableOpacity, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const patchPostMessageJsCode = `(${String(function() {
-    var originalPostMessage = window.postMessage
-    var patchedPostMessage = function(message, targetOrigin, transfer) {
-        originalPostMessage(message, targetOrigin, transfer)
-    };
-    patchedPostMessage.toString = function() {
-        return String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')
-    }
-    window.postMessage = patchedPostMessage
-})})();`;
-
 interface LocationNavigationActions {
     cancel?: () => void;
     post?: () => void;
@@ -39,7 +28,7 @@ export class Location extends React.Component<any, any> {
             latitude: null,
             longitude: null,
             error: null,
-        }
+        };
         this.postMessage = this.postMessage.bind(this);
 
         navigationActions.cancel = this.props.navigation.goBack;
@@ -61,14 +50,6 @@ export class Location extends React.Component<any, any> {
     public render() {
         return (
             <View style={{flexDirection: 'column', padding: 0, flex: 1, height: '100%'}}>
-                {/* <WebView
-                    javaScriptEnabled
-                    injectedJavaScript={patchPostMessageJsCode}
-                    source={{uri: 'https://maps.google.com/'}}
-                    style={{marginTop: 0, flex: 1}}
-                    ref={x => {this.webView = x}}
-                    onMessage={e => this.onMessage(JSON.parse(e.nativeEvent.data))}
-                /> */}
                 <View style={{flex: 1}}>
                     <Text>Latitude: {this.state.latitude}</Text>
                     <Text>Longitude: {this.state.longitude}</Text>

@@ -93,7 +93,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                 'Error',
                 'Posting failed, try again later!',
                 [
-                    { text: 'OK', onPress: () => console.log('OK pressed') },
+                    { text: 'OK', onPress: () => {console.log('OK pressed'); } },
                 ]
             );
         }
@@ -153,5 +153,5 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         flex: 5,
         flexGrow: 10,
-    }
+    },
 });

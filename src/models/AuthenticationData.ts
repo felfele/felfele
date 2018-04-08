@@ -17,5 +17,5 @@ export const AuthenticationDefaultData: AuthenticationData = {
     userId: null,
     loginState: 'logged-out',
     keyExpiry: 0,
-    gravatarUri: null
-}
+    gravatarUri: null,
+};

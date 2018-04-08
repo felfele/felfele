@@ -12,8 +12,8 @@ export interface Draft {
     image: string | null;
     featured: boolean;
     page: boolean;
-    status: "published" | "draft";
-    language: "en_US";
+    status: 'published' | 'draft';
+    language: 'en_US';
     meta_title: string | null;
     meta_description: string | null;
     author: string;
@@ -40,16 +40,16 @@ export class GhostAPI {
     constructor(private baseUri, private loginData, private authenticationData: AuthenticationData) {
     }
 
-    async handleResponseErrors(responsePromise: Promise<Response>) {
+    private async handleResponseErrors(responsePromise: Promise<Response>) {
         let response;
         try {
             response = await Utils.timeout(Config.defaultTimeout, responsePromise);
         } catch (e) {
-            console.error(e)
+            console.error(e);
             throw new Error(e);
         }
         if (!response.ok) {
-            if (response.status == 401) {
+            if (response.status === 401) {
                 this.authenticationData.loginState = 'logged-out';
             }
             console.error(response);
@@ -59,7 +59,7 @@ export class GhostAPI {
         return response;
     }
 
-    async uploadImage(imageUri: string) {
+    private async uploadImage(imageUri: string) {
         const uri = this.baseUri + 'ghost/api/v0.1/uploads/';
 
         const photo = {
@@ -70,7 +70,7 @@ export class GhostAPI {
 
         try {
             const form = new FormData();
-            form.append('uploadimage', <any>photo);
+            form.append('uploadimage', JSON.stringify(photo));
 
             const response = await this.callApi('POST', uri, form, 'multipart/form-data');
             const textResponse = await response.text();
@@ -82,56 +82,56 @@ export class GhostAPI {
         }
     }
 
-    async uploadPost(markdown: string, createdAt: string): Promise<number> {
+    private async uploadPost(markdown: string, createdAt: string): Promise<number> {
         try {
             const response = await this.uploadDraft(markdown);
             const draftResponse = await response.json();
             console.log('uploadPost draftResponse', draftResponse);
-            draftResponse['posts'][0]['created_at'] = createdAt;
-            const postResponse = await this.publishPost(draftResponse['posts'][0]);
+            draftResponse.posts[0].created_at = createdAt;
+            const postResponse = await this.publishPost(draftResponse.posts[0]);
             const post = await postResponse.json();
             console.log('uploadPost draftResponse', post);
-            return post['posts'][0]['id'];
+            return post.posts[0].id;
         } catch (e) {
             console.error('Upload failed ', e);
             throw new Error(e);
         }
     }
 
-    publishPost(draftResponse) {
-        const id = draftResponse['id'];
+    private publishPost(draftResponse) {
+        const id = draftResponse.id;
         const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
-        const post:Post = {
-            id: draftResponse['id'],
-            slug: draftResponse['slug'],
+        const post: Post = {
+            id: draftResponse.id,
+            slug: draftResponse.slug,
             title: '(Untitled)',
-            markdown: draftResponse['markdown'],
+            markdown: draftResponse.markdown,
             image: null,
             featured: false,
             page: false,
             status: 'published',
             language: 'en_US',
-            updated_at: draftResponse['updated_at'],
-            updated_by: draftResponse['updated_by'],
+            updated_at: draftResponse.updated_at,
+            updated_by: draftResponse.updated_by,
             published_at: null,
-            created_at: draftResponse['created_at'],
-            created_by: draftResponse['created_by'],
+            created_at: draftResponse.created_at,
+            created_by: draftResponse.created_by,
             meta_title: null,
             meta_description: null,
             author: '' + this.authenticationData.userId,
             publishedBy: null,
             tags: [],
-        }
+        };
 
         const body = JSON.stringify({
-            posts: [post]
+            posts: [post],
         });
         return this.callApi('PUT', uri, body);
     }
 
-    uploadDraft(markdown) {
+    private uploadDraft(markdown) {
         const uri = this.baseUri + 'ghost/api/v0.1/posts/?include=tags';
-        const draft:Draft = {
+        const draft: Draft = {
             title: '(Untitled)',
             slug: null,
             markdown: markdown,
@@ -145,29 +145,29 @@ export class GhostAPI {
             author: '' + this.authenticationData.userId,
             publishedBy: null,
             tags: [],
-        }
+        };
 
         const body = JSON.stringify({
-            posts: [draft]
+            posts: [draft],
         });
         return this.callApi('POST', uri, body);
     }
 
-    deletePost(id) {
+    private deletePost(id) {
         const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
-        return this.callApi('DELETE', uri)
+        return this.callApi('DELETE', uri);
     }
 
-    fetchUsersMe() {
+    private fetchUsersMe() {
         const uri = this.baseUri + 'ghost/api/v0.1/users/me/?include=roles&status=all';
         return this.callApi('GET', uri);
     }
 
-    async getAllPosts(): Promise<Post[]> {
+    private async getAllPosts(): Promise<Post[]> {
         const uri = this.baseUri + 'ghost/api/v0.1/posts/?limit=all';
         const response = await this.callApi('GET', uri);
         const jsonResponse = await response.json();
-        return jsonResponse['posts'];
+        return jsonResponse.posts;
     }
 
     private async tryLoadAuthenticationData() {
@@ -180,7 +180,7 @@ export class GhostAPI {
     private async tryLogin(): Promise<void> {
         const uri = this.baseUri + 'ghost/api/v0.1/authentication/token';
 
-        if (this.authenticationData.authKey == null && this.authenticationData.keyExpiry == 0) {
+        if (this.authenticationData.authKey == null && this.authenticationData.keyExpiry === 0) {
             await this.tryLoadAuthenticationData();
             if (this.isLoggedIn()) {
                 return;
@@ -190,31 +190,31 @@ export class GhostAPI {
 
         const headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
-        }
+        };
 
         const username = encodeURIComponent(this.loginData.username);
         const password = encodeURIComponent(this.loginData.password);
-        const client_id = encodeURIComponent(this.loginData.clientId);
-        const client_secret = encodeURIComponent(this.loginData.clientSecret);
-        const formData = `grant_type=password&username=${username}&password=${password}&client_id=${client_id}&client_secret=${client_secret}`;
+        const clientId = encodeURIComponent(this.loginData.clientId);
+        const clientSecret = encodeURIComponent(this.loginData.clientSecret);
+        const formData = `grant_type=password&username=${username}&password=${password}&client_id=${clientId}&client_secret=${clientSecret}`;
 
         try {
             const response = await this.handleResponseErrors(fetch(uri, {
                 method: 'POST',
                 headers: headers,
-                body: formData
+                body: formData,
             }));
 
             console.log('tryLogin', response);
             const jsonResponse = await response.json();
-            this.authenticationData.authKey = jsonResponse['token_type'] + ' ' + jsonResponse['access_token'];
-            this.authenticationData.keyExpiry = Date.now() + (jsonResponse['expires_in'] * 1000) - 1000;
+            this.authenticationData.authKey = jsonResponse.token_type + ' ' + jsonResponse.access_token;
+            this.authenticationData.keyExpiry = Date.now() + (jsonResponse.expires_in * 1000) - 1000;
             this.authenticationData.loginState = 'logged-in';
 
             const meResponse = await this.fetchUsersMe();
             const jsonMeResponse = await meResponse.json();
-            this.authenticationData.userId = jsonMeResponse['users'][0]['id'];
-            this.authenticationData.gravatarUri =  jsonMeResponse['users'][0]['image'];
+            this.authenticationData.userId = jsonMeResponse.users[0].id;
+            this.authenticationData.gravatarUri =  jsonMeResponse.users[0].image;
             await Storage.auth.set(AuthenticationDefaultKey, this.authenticationData);
         } catch (e) {
             console.log('GhostAPI.tryLogin: ', e);
@@ -224,7 +224,7 @@ export class GhostAPI {
     }
 
     private isLoggedIn() {
-        if (this.authenticationData.loginState == 'logged-in' && this.authenticationData.keyExpiry > Date.now()) {
+        if (this.authenticationData.loginState === 'logged-in' && this.authenticationData.keyExpiry > Date.now()) {
             return true;
         }
         return false;
@@ -240,7 +240,7 @@ export class GhostAPI {
         const headers = {
             'Content-Type': headerContentType,
             'Authorization': this.authenticationData.authKey!,
-        }
+        };
 
         if (body) {
             return this.handleResponseErrors(fetch(uri, {

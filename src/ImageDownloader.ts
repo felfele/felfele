@@ -1,6 +1,6 @@
 import { ImageEditor, ImageStore, ImageCropData, Platform, CameraRoll } from 'react-native';
 import RNFetchBlob from 'react-native-fetch-blob';
-import { hex_md5 } from "react-native-md5";
+import { hex_md5 } from 'react-native-md5';
 
 import { Config } from './Config';
 

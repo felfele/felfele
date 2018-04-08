@@ -45,7 +45,6 @@ export class FeedListEditor extends React.Component<any, any> {
     }
 
     public render() {
-        console.log(this.state.feeds);
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>

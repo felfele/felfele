@@ -49,7 +49,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
             isOnline: NetworkStatus.isConnected(),
             currentTime: Date.now(),
             posts: [],
-        }
+        };
 
         this.containerStyle = {
             backgroundColor: '#fff',
@@ -59,49 +59,83 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
             paddingTop: 0,
             marginBottom: 15,
             marginTop: 0,
-        }
+        };
 
         NetworkStatus.addConnectionStateChangeListener((result) => {
-            this.onConnectionStateChange(result)
+            this.onConnectionStateChange(result);
         });
 
         StateTracker.listen((oldVersion, newVersion) => {
-            this.updateVersion(oldVersion, newVersion)
+            this.updateVersion(oldVersion, newVersion);
         });
 
         const refreshInterval = 60 * 1000;
         setInterval(() => {
-                this.setState({currentTime: Date.now()})
+                this.setState({currentTime: Date.now()});
             },
             refreshInterval
         );
     }
 
-    componentDidMount() {
+    public render() {
+        return (
+            <View
+                style={{
+                    flexDirection: 'column',
+                    padding: 0,
+                    flex: 1,
+                    height: '100%',
+            }
+            }>
+                <StatusBar translucent={true} />
+                <View>
+                    { this.renderOfflineHeader() }
+                    <FlatList
+                        ListHeaderComponent={this.renderListHeader}
+                        data={this.state.posts}
+                        renderItem={(obj) => this.renderCard(obj.item)}
+                        keyExtractor={(item, index) => item._id}
+                        extraData={this.state}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.isRefreshing}
+                                onRefresh={async () => this.onRefresh() }
+                                progressViewOffset={HeaderOffset}
+                                style={styles.refreshControl}
+                            />
+                        }
+                    />
+                </View>
+                <View style={styles.translucentBar} ></View>
+            </View>
+        );
+    }
+
+    public componentDidMount() {
         this.props.postManager.loadPosts().then(() => {
             this.setState({
-                posts: this.props.postManager.getAllPosts()
-            })
+                posts: this.props.postManager.getAllPosts(),
+            });
         });
     }
 
-    updateVersion(oldVersion, newVersion) {
-        if (newVersion != this.state.version) {
+    private updateVersion(oldVersion, newVersion) {
+        if (newVersion !== this.state.version) {
             this.setState({
                 version: newVersion,
                 uri: this.state.uri + '#' + newVersion,
                 posts: this.props.postManager.getAllPosts(),
-            })
+            });
         }
     }
 
-    onConnectionStateChange(connected) {
+    private onConnectionStateChange(connected) {
         this.setState({
             isOnline: connected,
-        })
+        });
     }
 
-    async onRefresh() {
+    private async onRefresh() {
         this.setState({
             isRefreshing: true,
         });
@@ -110,7 +144,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
             this.setState({
                 posts: this.props.postManager.getAllPosts(),
                 isRefreshing: false,
-            })
+            });
         } catch (e) {
             this.setState({
                 isRefreshing: false,
@@ -126,24 +160,24 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
     }
 
-    getImageUri(image: ImageData) {
+    private getImageUri(image: ImageData) {
         if (image.localPath) {
             return image.localPath;
         }
         return image.uri;
     }
 
-    async openPost(post: Post) {
+    private async openPost(post: Post) {
         if (post.link) {
             await Linking.openURL(post.link);
         }
     }
 
-    isPostSelected(post: Post) {
-        return this.state.selectedPost && this.state.selectedPost._id == post._id;
+    private isPostSelected(post: Post) {
+        return this.state.selectedPost && this.state.selectedPost._id === post._id;
     }
 
-    togglePostSelection(post: Post) {
+    private togglePostSelection(post: Post) {
         if (this.isPostSelected(post)) {
             this.setState({ selectedPost: null });
         } else {
@@ -151,7 +185,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         }
     }
 
-    onDeleteConfirmation(post: Post) {
+    private onDeleteConfirmation(post: Post) {
         Alert.alert(
             'Are you sure you want to delete?',
             undefined,
@@ -163,13 +197,13 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
-    onEditPost(post: Post) {
+    private onEditPost(post: Post) {
         this.props.navigation.navigate('Post', {post: post});
     }
 
-    renderButtonsIfSelected(post: Post) {
+    private renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
-        const isPostLiked = (post) => false;
+        const isPostLiked = (p) => false;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
@@ -196,7 +230,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         return [];
     }
 
-    renderCardTopIcon(post: Post) {
+    private renderCardTopIcon(post: Post) {
         if (post.author) {
             return (
                 <Image source={{uri: post.author.faviconUri}} style={styles.image} />
@@ -206,7 +240,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 <Gravatar options={{
                     email: Config.loginData.username,
                     secure: true,
-                    parameters: { 'size': '100', 'd': 'mm' },
+                    parameters: { size: '100', d: 'mm' },
                 }}
                     style={styles.image}
                 />
@@ -214,7 +248,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         }
     }
 
-    renderCardTop(post: Post) {
+    private renderCardTop(post: Post) {
         const printableTime = DateUtils.printableElapsedTime(post.createdAt);
         const humanTime = DateUtils.timestampToDateString(post.createdAt);
         const currentTime = Date.now();
@@ -232,7 +266,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
-    renderCardWithOnlyText(post: Post) {
+    private renderCardWithOnlyText(post: Post) {
         return (
             <View
                 style={{...this.containerStyle,
@@ -256,7 +290,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
-    renderCardWithMultipleImages(post: Post) {
+    private renderCardWithMultipleImages(post: Post) {
         return (
             <View
                 style={this.containerStyle}
@@ -271,19 +305,21 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 >
                     {
                         post.images.map((image, index) => {
-                            return <TouchableOpacity
-                                        key={`image-${post._id}-${index}`}
-                                        onLongPress={ () => {
-                                            this.setState({selectedPost: post});
+                            return (
+                                <TouchableOpacity
+                                    key={`image-${post._id}-${index}`}
+                                    onLongPress={ () => {
+                                        this.setState({selectedPost: post});
+                                    }}
+                                    activeOpacity={0.1}
+                                >
+                                    <Image
+                                        source={{
+                                            uri: this.getImageUri(image),
                                         }}
-                                        activeOpacity={0.1}
-                                    >
-                                        <Image
-                                            source={{
-                                                uri: this.getImageUri(image),
-                                            }}
-                                        />;
-                                    </TouchableOpacity>
+                                    />;
+                                </TouchableOpacity>
+                            );
                         })
                     }
                     { post.text === '' ||
@@ -296,7 +332,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
-    renderCard(post: Post) {
+    private renderCard(post: Post) {
         const toBase64 = (data) => `data:image/gif;base64,${data}`;
 
         if (post.images.length === 0) {
@@ -345,40 +381,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 </View>
             );
         }
-    }
-
-    public render() {
-        return (
-            <View
-                style={{
-                    flexDirection: 'column',
-                    padding: 0,
-                    flex: 1,
-                    height: '100%',
-            }
-            }>
-                <StatusBar translucent={true} />
-                <View>
-                    { this.renderOfflineHeader() }
-                    <FlatList
-                        ListHeaderComponent={this.renderListHeader}
-                        data={this.state.posts}
-                        renderItem={(obj) => this.renderCard(obj.item)}
-                        keyExtractor={(item, index) => item._id}
-                        extraData={this.state}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={this.state.isRefreshing}
-                                onRefresh={async () => this.onRefresh() }
-                                progressViewOffset={HeaderOffset}
-                                style={styles.refreshControl}
-                            />
-                        }
-                    />
-                </View>
-                <View style={styles.translucentBar} ></View>
-            </View>
-        );
     }
 
     private renderOfflineHeader() {

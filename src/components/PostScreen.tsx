@@ -86,7 +86,7 @@ export class PostScreen extends React.Component<any, any> {
         }
 
         this.setState({
-            isKeyboardVisible: true
+            isKeyboardVisible: true,
         });
     }
 
@@ -121,7 +121,7 @@ export class PostScreen extends React.Component<any, any> {
         }
         if (this.keyboardWillShowListener) {
             this.keyboardWillShowListener.remove();
-            this.keyboardWillShowListener = null
+            this.keyboardWillShowListener = null;
         }
         if (this.keyboardDidHideListener) {
             this.keyboardDidHideListener.remove();
@@ -202,7 +202,7 @@ export class PostScreen extends React.Component<any, any> {
                 'Save this post as a draft?',
                 undefined,
                 options
-            )
+            );
         }
         else {
             Alert.alert('Save this post as a draft?',
@@ -229,7 +229,7 @@ export class PostScreen extends React.Component<any, any> {
             images: this.state.uploadedImages,
             text: this.state.text,
             createdAt: Date.now(),
-        }
+        };
 
         try {
             await LocalPostManager.saveDraft(post);
@@ -252,7 +252,7 @@ export class PostScreen extends React.Component<any, any> {
         this.hideKeyboard();
         await new Promise(resolve => setTimeout(resolve, 0));
         console.log('Cancel');
-        if (this.state.text != '' || this.state.uploadedImages.length > 0) {
+        if (this.state.text !== '' || this.state.uploadedImages.length > 0) {
             this.showCancelConfirmation();
         } else {
             this.onCancel();
@@ -262,7 +262,7 @@ export class PostScreen extends React.Component<any, any> {
     private openImagePicker = async () => {
         const pickerResult = await AsyncImagePicker.launchImageLibrary({
             allowsEditing: false,
-            aspect: [4,3],
+            aspect: [4, 3],
             base64: true,
             exif: true,
         });
