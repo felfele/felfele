@@ -26,6 +26,29 @@ const NavigationHeaderComponent = Platform.OS === 'ios'
             ? null
             : <StatusBar backgroundColor='black' barStyle='light-content' />;
 
+const TabBarOptions = Platform.OS === 'ios'
+    ?
+        {
+            showLabel: false,
+            activeTintColor: 'gray',
+            inactiveTintColor: 'lightgray',
+            style: {
+                opacity: 0.96,
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+            },
+        }
+    :
+        {
+            showLabel: true,
+            style: {
+                backgroundColor: 'black',
+            },
+        }
+    ;
+
 const Root = TabNavigator(
     {
         YourTab: {
@@ -86,18 +109,27 @@ const Root = TabNavigator(
         tabBarPosition: 'bottom',
         animationEnabled: false,
         swipeEnabled: false,
-        tabBarOptions: {
-            showLabel: false,
-            activeTintColor: 'gray',
-            inactiveTintColor: 'lightgray',
-            style: {
-                opacity: 0.96,
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-            },
-        },
+        tabBarOptions: Platform.OS === 'ios'
+            ?
+                {
+                    showLabel: false,
+                    activeTintColor: 'gray',
+                    inactiveTintColor: 'lightgray',
+                    style: {
+                        opacity: 0.96,
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                    },
+                }
+            :
+                {
+                    showLabel: true,
+                    style: {
+                        backgroundColor: 'black',
+                    },
+                },
     }
 );
 
