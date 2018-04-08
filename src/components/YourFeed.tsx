@@ -165,7 +165,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     }
 
     onEditPost(post: Post) {
-
+        this.props.navigation.navigate('Post', {post: post});
     }
 
     renderButtonsIfSelected(post: Post) {
@@ -174,6 +174,11 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
+                    { post.author == null &&
+                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
+                            <Icon name='ios-create-outline' size={iconSize} color='black' />
+                        </TouchableOpacity>
+                    }
                     <TouchableOpacity style={styles.like}>
                         {!isPostLiked(post) ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>
@@ -186,11 +191,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
                         <Icon name='ios-trash-outline' size={iconSize} color='black' />
                     </TouchableOpacity>
-                    { post.author == null &&
-                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
-                            <Icon name='ios-pencil-outline' size={iconSize} color='black' />
-                        </TouchableOpacity>
-                    }
                 </View>
             );
         }
