@@ -17,7 +17,7 @@ type BinaryConditionType = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte' | 'contain
 type ConditionType = UnaryConditionType | BinaryConditionType;
 
 function getProperty<T, K extends keyof T>(o: T, name: K): T[K] {
-    return o[name]; // o[name] is of type T[K]
+    return o[name];
 }
 
 export interface Condition<T extends Model> {
@@ -28,7 +28,7 @@ class UnaryCondition<T extends Model> {
     constructor(private key: keyof T, private type: UnaryConditionType) {
     }
 
-    compare(t) {
+    public compare(t) {
         switch (this.type) {
             case 'null': return getProperty(t, this.key) == null;
             case 'notnull': return getProperty(t, this.key) != null;
@@ -40,16 +40,16 @@ class BinaryCondition<T extends Model> {
     constructor(private key: keyof T, private type: BinaryConditionType, private testValue) {
     }
 
-    compare(t) {
+    public compare(t) {
         switch (this.type) {
-            case 'eq': return getProperty(t, this.key) == this.testValue;
-            case 'neq': return getProperty(t, this.key) != this.testValue;
+            case 'eq': return getProperty(t, this.key) === this.testValue;
+            case 'neq': return getProperty(t, this.key) !== this.testValue;
             case 'lt': return getProperty(t, this.key) < this.testValue;
             case 'lte': return getProperty(t, this.key) <= this.testValue;
             case 'gt': return getProperty(t, this.key) > this.testValue;
             case 'gte': return getProperty(t, this.key) >= this.testValue;
             case 'contains': return getProperty(t, this.key).indexOf(this.testValue) >= 0;
-            case 'in': return this.testValue.indexOf(getProperty(t, this.key)) >= 0
+            case 'in': return this.testValue.indexOf(getProperty(t, this.key)) >= 0;
         }
     }
 }
@@ -60,87 +60,87 @@ export interface Queryable<T extends Model> {
 }
 
 export class Query<T extends Model> {
-    private _limit = 0;
+    private limitResults = 0;
     private queryOrder: QueryOrder = 'asc';
     private conditions: Condition<T>[] = [];
 
     constructor(private storage: Queryable<T>) {
     }
 
-    async execute() {
+    public async execute() {
         const highestSeenId = await this.storage.getHighestSeenId();
-        if (this._limit == 0 && this.queryOrder == 'asc') {
-            this._limit = highestSeenId;
+        if (this.limitResults === 0 && this.queryOrder === 'asc') {
+            this.limitResults = highestSeenId;
         }
         let start = 0;
-        if (this.queryOrder == 'desc') {
+        if (this.queryOrder === 'desc') {
             start = highestSeenId;
         }
 
-        return this.storage.getNumItems(start, this._limit, this.queryOrder, this.conditions);
+        return this.storage.getNumItems(start, this.limitResults, this.queryOrder, this.conditions);
     }
 
-    limit(limit) {
-        this._limit = limit;
+    public limit(limit) {
+        this.limitResults = limit;
         return this;
     }
 
-    asc() {
+    public asc() {
         this.queryOrder = 'asc';
         return this;
     }
 
-    desc() {
+    public desc() {
         this.queryOrder = 'desc';
         return this;
     }
 
-    isNull(key: keyof T) {
+    public isNull(key: keyof T) {
         this.conditions.push(new UnaryCondition<T>(key, 'null'));
         return this;
     }
 
-    isNotNull(key: keyof T) {
+    public isNotNull(key: keyof T) {
         this.conditions.push(new UnaryCondition<T>(key, 'notnull'));
         return this;
     }
 
-    eq(key: keyof T, value) {
+    public eq(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'eq', value));
         return this;
     }
 
-    neq(key: keyof T, value) {
+    public neq(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'eq', value));
         return this;
     }
 
-    lt(key: keyof T, value) {
+    public lt(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'lt', value));
         return this;
     }
 
-    lte(key: keyof T, value) {
+    public lte(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'lte', value));
         return this;
     }
 
-    gt(key: keyof T, value) {
+    public gt(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'gt', value));
         return this;
     }
 
-    gte(key: keyof T, value) {
+    public gte(key: keyof T, value) {
         this.conditions.push(new BinaryCondition<T>(key, 'gte', value));
         return this;
     }
 
-    contains(key: keyof T, value: string) {
+    public contains(key: keyof T, value: string) {
         this.conditions.push(new BinaryCondition<T>(key, 'contains', value));
         return this;
     }
 
-    in(key: keyof T, value: any[]) {
+    public in(key: keyof T, value: any[]) {
         this.conditions.push(new BinaryCondition<T>(key, 'in', value));
         return this;
     }
@@ -151,45 +151,46 @@ export class StorageWithStringKey<T extends Model> {
 
     }
 
-    clear() {
+    public clear() {
+        // this is empty for now
     }
 
-    getPrefix(): string {
+    public getPrefix(): string {
         return this.name + ':';
     }
 
-    getName(): string {
+    public getName(): string {
         return this.name;
     }
 
-    async getAllKeys(): Promise<string[]> {
+    public async getAllKeys(): Promise<string[]> {
         const keys = await AsyncStorageWrapper.getAllKeys();
         if (keys) {
             const prefix = this.getPrefix();
             return keys
-                .filter((key) => key.indexOf(prefix) == 0)
-                .map((key) => {return key.replace(prefix, '')})
+                .filter((key) => key.indexOf(prefix) === 0)
+                .map((key) => key.replace(prefix, ''));
         }
         return [];
     }
 
-    async get(key: string) {
+    public async get(key: string) {
         const keyWithPrefix = this.getPrefix() + key;
         const value = await AsyncStorageWrapper.getItem(keyWithPrefix);
 
         if (value == null) {
             return null;
         }
-        return <T>JSON.parse(value);
+        return JSON.parse(value) as T;
     }
 
-    async set(key: string, t: T) {
+    public async set(key: string, t: T) {
         const keyWithPrefix = this.getPrefix() + key;
         const value = JSON.stringify(t);
         await AsyncStorageWrapper.setItem(keyWithPrefix, value);
     }
 
-    async delete(key: string) {
+    public async delete(key: string) {
         const keyWithPrefix = this.getPrefix() + key;
         await AsyncStorageWrapper.removeItem(keyWithPrefix);
     }
@@ -197,55 +198,6 @@ export class StorageWithStringKey<T extends Model> {
 }
 
 export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
-    private metadata: Metadata | null = null;
-    private isMetadataUpdated: boolean = false;
-    private storage: StorageWithStringKey<T>;
-
-    constructor(name: string) {
-        this.storage = new StorageWithStringKey(name);
-    }
-
-    clear() {
-        this.isMetadataUpdated = false;
-        this.metadata = null;
-    }
-
-    async set(t: T) {
-        if (t._id == null) {
-            const generatedId = await this.generateId(t);
-            t._id = generatedId;
-        }
-
-        await this.storage.set('' + t._id, t);
-        if (this.isMetadataUpdated) {
-            const metaValue = JSON.stringify(this.metadata);
-            await AsyncStorageWrapper.setItem(this.storage.getName(), metaValue);
-            this.isMetadataUpdated = false;
-        }
-
-        return t._id;
-    }
-
-    async get(id: number) {
-        return this.storage.get('' + id);
-    }
-
-    async delete(id: number) {
-        this.storage.delete('' + id);
-    }
-
-    private generateKeys(min, max) {
-        const keys: string[] = [];
-        if (min < 0) {
-            min = 0;
-        }
-        for (let i = min; i <= max; i++) {
-            keys.push(this.storage.getPrefix() + i);
-        }
-
-        return keys;
-    }
-
     private static generateIds(min, max, order: QueryOrder) {
         switch (order) {
             case 'asc':
@@ -274,13 +226,50 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         }
     }
 
-    async getNumItems(start, num, order: QueryOrder, conditions: Condition<T>[] = []): Promise<T[]> {
+    private metadata: Metadata | null = null;
+    private isMetadataUpdated: boolean = false;
+    private storage: StorageWithStringKey<T>;
+
+    constructor(name: string) {
+        this.storage = new StorageWithStringKey(name);
+    }
+
+    public clear() {
+        this.isMetadataUpdated = false;
+        this.metadata = null;
+    }
+
+    public async set(t: T) {
+        if (t._id == null) {
+            const generatedId = await this.generateId(t);
+            t._id = generatedId;
+        }
+
+        await this.storage.set('' + t._id, t);
+        if (this.isMetadataUpdated) {
+            const metaValue = JSON.stringify(this.metadata);
+            await AsyncStorageWrapper.setItem(this.storage.getName(), metaValue);
+            this.isMetadataUpdated = false;
+        }
+
+        return t._id;
+    }
+
+    public async get(id: number) {
+        return this.storage.get('' + id);
+    }
+
+    public async delete(id: number) {
+        this.storage.delete('' + id);
+    }
+
+    public async getNumItems(start, num, order: QueryOrder, conditions: Condition<T>[] = []): Promise<T[]> {
         const metadata = await this.tryLoadMetadata();
-        if (metadata.highestSeenId == 0) {
+        if (metadata.highestSeenId === 0) {
             return [];
         }
         let startIndex = parseInt(start, 10);
-        if (startIndex === NaN) {
+        if (isNaN(startIndex)) {
             return [];
         }
 
@@ -295,7 +284,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             }
 
             const ids = StorageWithAutoIds.generateIds(min, max, order);
-            if (ids.length == 0) {
+            if (ids.length === 0) {
                 return items;
             }
 
@@ -304,15 +293,15 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             }
 
             for (const id of ids) {
-                if (items.length == num) {
+                if (items.length === num) {
                     return items;
                 }
                 const key = this.storage.getPrefix() + id;
                 const item = await AsyncStorageWrapper.getItem(key);
                 if (item) {
                     const t = JSON.parse(item);
-                    const nonMatches = conditions.filter((cond) => { return !cond.compare(t)} );
-                    if (nonMatches.length == 0) {
+                    const nonMatches = conditions.filter((cond) => !cond.compare(t) );
+                    if (nonMatches.length === 0) {
                         items.push(t);
                     }
                 }
@@ -333,15 +322,15 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         return items;
     }
 
-    async getAllKeys(): Promise<number[]> {
+    public async getAllKeys(): Promise<number[]> {
         const stringKeys = await this.storage.getAllKeys();
         return stringKeys.map((key) => parseInt(key, 10));
     }
 
-    async getAllValues(): Promise<T[]> {
+    public async getAllValues(): Promise<T[]> {
         const metadata = await this.tryLoadMetadata();
 
-        if (metadata.highestSeenId == 0) {
+        if (metadata.highestSeenId === 0) {
             return [];
         }
 
@@ -355,8 +344,25 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             });
     }
 
-    query(): Query<T> {
+    public async getHighestSeenId() {
+        const metadata = await this.tryLoadMetadata();
+        return metadata.highestSeenId;
+    }
+
+    public query(): Query<T> {
         return new Query<T>(this);
+    }
+
+    private generateKeys(min, max) {
+        const keys: string[] = [];
+        if (min < 0) {
+            min = 0;
+        }
+        for (let i = min; i <= max; i++) {
+            keys.push(this.storage.getPrefix() + i);
+        }
+
+        return keys;
     }
 
     private async tryLoadMetadata(): Promise<Metadata> {
@@ -369,7 +375,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
                 await AsyncStorageWrapper.setItem(this.storage.getName(), JSON.stringify(this.metadata));
             } else {
                 console.log('tryLoadMetadata: ', this.storage.getName(), value);
-                this.metadata = <Metadata>JSON.parse(value);
+                this.metadata = JSON.parse(value) as Metadata;
             }
         }
         return this.metadata;
@@ -381,15 +387,10 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         this.isMetadataUpdated = true;
         return metadata.highestSeenId;
     }
-
-    async getHighestSeenId() {
-        const metadata = await this.tryLoadMetadata();
-        return metadata.highestSeenId;
-    }
 }
 
 export class AsyncStorageWrapper {
-    static setItem(key, value) {
+    public static setItem(key, value) {
         // console.log('setItem: ', key, typeof value, value);
         try {
             return AsyncStorage.setItem(key, value);
@@ -399,7 +400,7 @@ export class AsyncStorageWrapper {
         }
     }
 
-    static mergeItem(key, value) {
+    public static mergeItem(key, value) {
         // console.log('mergeItem: ', key, typeof value, value);
         try {
             return AsyncStorage.mergeItem(key, value);
@@ -409,7 +410,7 @@ export class AsyncStorageWrapper {
         }
     }
 
-    static getItem(key) {
+    public static getItem(key) {
         // console.log('getItem: ', key);
         try {
             return AsyncStorage.getItem(key);
@@ -419,7 +420,7 @@ export class AsyncStorageWrapper {
         }
     }
 
-    static removeItem(key) {
+    public static removeItem(key) {
         Debug.log('removeItem: ', key);
         try {
             return AsyncStorage.removeItem(key);
@@ -429,7 +430,7 @@ export class AsyncStorageWrapper {
         }
     }
 
-    static getAllKeys() {
+    public static getAllKeys() {
         try {
             return AsyncStorage.getAllKeys();
         } catch (e) {
@@ -438,7 +439,7 @@ export class AsyncStorageWrapper {
         }
     }
 
-    static async getAllKeyValues() {
+    public static async getAllKeyValues() {
         try {
             const keys = await AsyncStorage.getAllKeys();
             const keyValues = await AsyncStorage.multiGet(keys);
@@ -450,7 +451,7 @@ export class AsyncStorageWrapper {
 
     }
 
-    static clear() {
+    public static clear() {
         try {
             return AsyncStorage.clear();
         } catch (e) {
