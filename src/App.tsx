@@ -24,7 +24,7 @@ Debug.setDebug(__DEV__);
 
 const NavigationHeaderComponent = Platform.OS === 'ios'
             ? null
-            : <StatusBar backgroundColor='black' barStyle='light-content' />;
+            : <StatusBar hidden={true} barStyle='light-content' backgroundColor='blue' />;
 
 const TabBarOptions = Platform.OS === 'ios'
     ?

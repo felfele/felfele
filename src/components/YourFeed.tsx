@@ -78,6 +78,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     }
 
     public render() {
+        const isStatusBarHidden = Platform.OS === 'android' ? true : false;
         return (
             <View
                 style={{
@@ -87,7 +88,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     height: '100%',
             }
             }>
-                <StatusBar translucent={true} />
+                <StatusBar hidden={isStatusBarHidden} translucent={false} />
                 <View>
                     { this.renderOfflineHeader() }
                     <FlatList
