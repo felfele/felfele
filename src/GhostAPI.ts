@@ -69,7 +69,7 @@ export class GhostAPI {
         };
 
         try {
-            var form = new FormData();
+            const form = new FormData();
             form.append('uploadimage', <any>photo);
 
             const response = await this.callApi('POST', uri, form, 'multipart/form-data');
@@ -155,7 +155,7 @@ export class GhostAPI {
 
     deletePost(id) {
         const uri = this.baseUri + 'ghost/api/v0.1/posts/' + id + '/?include=tags';
-        return this.callApi('DELETE', uri)    
+        return this.callApi('DELETE', uri)
     }
 
     fetchUsersMe() {
@@ -173,12 +173,12 @@ export class GhostAPI {
     private async tryLoadAuthenticationData() {
         const auth = await Storage.auth.get(AuthenticationDefaultKey);
         if (auth) {
-            this.authenticationData = auth;            
+            this.authenticationData = auth;
         }
     }
 
     private async tryLogin(): Promise<void> {
-        const uri = this.baseUri + 'ghost/api/v0.1/authentication/token';        
+        const uri = this.baseUri + 'ghost/api/v0.1/authentication/token';
 
         if (this.authenticationData.authKey == null && this.authenticationData.keyExpiry == 0) {
             await this.tryLoadAuthenticationData();
@@ -223,14 +223,14 @@ export class GhostAPI {
 
     }
 
-    isLoggedIn() {
+    private isLoggedIn() {
         if (this.authenticationData.loginState == 'logged-in' && this.authenticationData.keyExpiry > Date.now()) {
             return true;
         }
         return false;
     }
 
-    async callApi(method, uri, body?, contentType?): Promise<Response> {
+    private async callApi(method: string, uri: string, body?: FormData | string, contentType?: string): Promise<Response> {
         console.log('callApi', this.isLoggedIn(), method, uri);
         if (!this.isLoggedIn()) {
             await this.tryLogin();
@@ -239,14 +239,14 @@ export class GhostAPI {
         const headerContentType = contentType ? contentType : 'application/json; charset=UTF-8';
         const headers = {
             'Content-Type': headerContentType,
-            'Authorization': this.authenticationData.authKey,
+            'Authorization': this.authenticationData.authKey!,
         }
 
         if (body) {
             return this.handleResponseErrors(fetch(uri, {
                 method: method,
                 headers: headers,
-                body: body
+                body: body,
             }));
         } else {
             return this.handleResponseErrors(fetch(uri, {

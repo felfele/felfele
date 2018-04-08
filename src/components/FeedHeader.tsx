@@ -7,8 +7,9 @@ import {
     CameraRoll,
     Platform,
     StyleSheet,
+    Image,
 } from 'react-native';
-import { Icon as ElementIcon } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
 import { Config } from '../Config';
@@ -100,10 +101,9 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
 
     public render() {
         return (
-            <View style={styles.headerContainer}
-            >
+            <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
-                    <ElementIcon
+                    <Icon
                         name='camera-alt'
                         size={30}
                         color='gray'

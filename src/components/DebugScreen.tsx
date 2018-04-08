@@ -4,7 +4,6 @@ import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
-import { ImageDownloader } from '../ImageDownloader';
 import StateTracker from '../StateTracker';
 import { Version } from '../Version';
 
@@ -21,22 +20,26 @@ const styles = StyleSheet.create({
     },
 });
 
-const navigationActions = {
-    Back: null,
+interface DebugScreenNavigationActions {
+    back: any;
+}
+
+const navigationActions: DebugScreenNavigationActions = {
+    back: undefined,
 };
 
 export class DebugScreen extends React.Component<any, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Debug menu',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.Back!()} />,
+        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
     };
 
     constructor(props) {
         super(props);
         this.onValueChange = this.onValueChange.bind(this);
         this.state = { switchValue: false };
-        navigationActions.Back = this.props.navigation.goBack;
+        navigationActions.back = this.props.navigation.goBack;
     }
 
     public render() {

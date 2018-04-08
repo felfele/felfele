@@ -108,7 +108,7 @@ export class PostScreen extends React.Component<any, any> {
         });
     }
 
-    public componentWillMount() {
+    public componentDidMount() {
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => this.onKeyboardDidShow(e));
         this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => this.onKeyboardWillShow(e));
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.onKeyboardDidHide());

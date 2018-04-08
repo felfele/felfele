@@ -8,9 +8,14 @@ import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { Storage } from '../Storage';
 
-const navigationActions = {
-    Back: null,
-    Add: null,
+interface EditFeedNavigationActions {
+    back?: () => void;
+    add?: () => void;
+}
+
+const navigationActions: EditFeedNavigationActions = {
+    back: undefined,
+    add: undefined,
 };
 
 const styles = StyleSheet.create({
@@ -61,8 +66,8 @@ export class EditFeed extends React.Component<any, EditFeedState> {
     public static navigationOptions = {
         header: undefined,
         title: 'Feed list',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.Back!()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions.Add!()} />,
+        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
+        headerRight: <Button title='Add' onPress={() => navigationActions.add!()} />,
     };
 
     public state: EditFeedState = {
@@ -73,8 +78,8 @@ export class EditFeed extends React.Component<any, EditFeedState> {
 
     constructor(props) {
         super(props);
-        navigationActions.Back = this.goBack.bind(this);
-        navigationActions.Add = this.onAdd.bind(this);
+        navigationActions.back = this.goBack.bind(this);
+        navigationActions.add = this.onAdd.bind(this);
     }
 
     public async onAdd() {

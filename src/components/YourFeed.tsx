@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Linking, Clipboard, CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet, StatusBar, Platform } from 'react-native';
-import { Card, Button, ButtonGroup, List, Tile, Icon as ElementIcon } from 'react-native-elements';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -235,8 +234,8 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
     renderCardWithOnlyText(post: Post) {
         return (
-            <Card
-                containerStyle={{...this.containerStyle,
+            <View
+                style={{...this.containerStyle,
                     margin: 0,
                     paddingTop: 5,
                     paddingBottom: 5,
@@ -253,14 +252,14 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
-            </Card>
+            </View>
         );
     }
 
     renderCardWithMultipleImages(post: Post) {
         return (
-            <Card
-                containerStyle={this.containerStyle}
+            <View
+                style={this.containerStyle}
                 key={'card-' + post._id}
 
             >
@@ -272,17 +271,19 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 >
                     {
                         post.images.map((image, index) => {
-                            return <Tile
-                                imageSrc={{
-                                    uri: this.getImageUri(image),
-                                }}
-                                featured={false}
-                                activeOpacity={0.1}
-                                key={`image-${post._id}-${index}`}
-                                onLongPress={ () => {
-                                    this.setState({selectedPost: post});
-                                }}
-                            />;
+                            return <TouchableOpacity
+                                        key={`image-${post._id}-${index}`}
+                                        onLongPress={ () => {
+                                            this.setState({selectedPost: post});
+                                        }}
+                                        activeOpacity={0.1}
+                                    >
+                                        <Image
+                                            source={{
+                                                uri: this.getImageUri(image),
+                                            }}
+                                        />;
+                                    </TouchableOpacity>
                         })
                     }
                     { post.text === '' ||
@@ -291,7 +292,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
-            </Card>
+            </View>
         );
     }
 
@@ -304,8 +305,8 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
             return this.renderCardWithMultipleImages(post);
         } else {
             return (
-                <Card
-                    containerStyle={{...this.containerStyle,
+                <View
+                    style={{...this.containerStyle,
                         margin: 0,
                         padding: 0,
                         paddingTop: 5,
@@ -315,33 +316,33 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     key={'card-' + post._id}
                 >
 
-                { this.renderCardTop(post) }
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onLongPress={ () => this.togglePostSelection(post) }
-                    onPress={ () => this.openPost(post)}
-                    style = {{
-                        backgroundColor: '#fff',
-                        padding: 0,
-                        paddingTop: 0,
-                        marginTop: 0,
-                    }}
-                >
-                    <Image
-                        source={{
-                            uri: this.getImageUri(post.images[0]),
+                    { this.renderCardTop(post) }
+                    <TouchableOpacity
+                        activeOpacity={1}
+                        onLongPress={ () => this.togglePostSelection(post) }
+                        onPress={ () => this.openPost(post)}
+                        style = {{
+                            backgroundColor: '#fff',
+                            padding: 0,
+                            paddingTop: 0,
+                            marginTop: 0,
                         }}
-                        style={{
-                            width: WindowWidth,
-                            height: WindowWidth,
-                        }}
-                    />
-                    { post.text === '' ||
-                        <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
-                    }
-                    { this.renderButtonsIfSelected(post) }
-                </TouchableOpacity>
-                </Card>
+                    >
+                        <Image
+                            source={{
+                                uri: this.getImageUri(post.images[0]),
+                            }}
+                            style={{
+                                width: WindowWidth,
+                                height: WindowWidth,
+                            }}
+                        />
+                        { post.text === '' ||
+                            <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
+                        }
+                        { this.renderButtonsIfSelected(post) }
+                    </TouchableOpacity>
+                </View>
             );
         }
     }

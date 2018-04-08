@@ -5,9 +5,9 @@ import { hex_md5 } from "react-native-md5";
 import { Config } from './Config';
 
 export class ImageDownloader {
-    static readonly DefaultExtension = 'jpg';
+    public static readonly DefaultExtension = 'jpg';
 
-    static async downloadImageAndReturnLocalPath(imageUri: string): Promise<string> {
+    public static async downloadImageAndReturnLocalPath(imageUri: string): Promise<string> {
         if (Config.saveToCameraRoll) {
             const res = await RNFetchBlob
                             .config({

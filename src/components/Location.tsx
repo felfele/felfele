@@ -13,17 +13,22 @@ const patchPostMessageJsCode = `(${String(function() {
     window.postMessage = patchedPostMessage
 })})();`;
 
-const navigationActions = {
-    Cancel: null,
-    Post: null,
+interface LocationNavigationActions {
+    cancel?: () => void;
+    post?: () => void;
+}
+
+const navigationActions: LocationNavigationActions = {
+    cancel: undefined,
+    post: undefined,
 };
 
 export class Location extends React.Component<any, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Select location',
-        headerLeft: <Button title='Cancel' onPress={() => navigationActions.Cancel!()} />,
-        headerRight: <Button title='Post' onPress={() => navigationActions.Post!()} />,
+        headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
+        headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
     };
 
     private webView: any;
@@ -37,8 +42,8 @@ export class Location extends React.Component<any, any> {
         }
         this.postMessage = this.postMessage.bind(this);
 
-        navigationActions.Cancel = this.props.navigation.goBack;
-        navigationActions.Post = this.props.navigation.goBack;
+        navigationActions.cancel = this.props.navigation.goBack;
+        navigationActions.post = this.props.navigation.goBack;
 
         navigator.geolocation.getCurrentPosition((position) => {
             this.setState({

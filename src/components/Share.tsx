@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Text, View, Share as ReactShare, StyleSheet} from 'react-native';
-import { Button } from 'react-native-elements';
+import { Text, View, Share as ReactShare, StyleSheet, Button} from 'react-native';
 import * as QRCode from 'react-native-qrcode';
 
 export class Share extends React.PureComponent<any, any> {
@@ -15,12 +14,9 @@ export class Share extends React.PureComponent<any, any> {
                     dimension={200}
                     />
                 <Button
-                    containerViewStyle={{flex: 1}}
                     onPress={async () => await ReactShare.share({url: link}, {})}
-                    icon={{name: 'share'}}
                     title='Share with app...' />
                 <Button
-                    containerViewStyle={{flex: 1}}
                     onPress={() => this.props.navigation.goBack()}
                     title='Ok' />
             </View>

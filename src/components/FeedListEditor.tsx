@@ -14,20 +14,25 @@ const styles = StyleSheet.create({
     titleInfoStyle: {
         fontSize: 16,
         color: '#8e8e93',
-    }
+    },
 });
 
-const navigationActions = {
-    Back: null,
-    Add: null,
+interface FeedListEditorNavigationActions {
+    back?: () => void;
+    add?: () => void;
+}
+
+const navigationActions: FeedListEditorNavigationActions = {
+    back: undefined,
+    add: undefined,
 };
 
 export class FeedListEditor extends React.Component<any, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Feed list',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.Back!()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions.Add!()} />,
+        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
+        headerRight: <Button title='Add' onPress={() => navigationActions.add!()} />,
     };
 
     constructor(props) {
@@ -35,8 +40,8 @@ export class FeedListEditor extends React.Component<any, any> {
         this.state = {
             feeds: RSSPostManager.feedManager.getFeeds(),
         };
-        navigationActions.Back = this.props.navigation.goBack;
-        navigationActions.Add = this.onAddFeed.bind(this);
+        navigationActions.back = this.props.navigation.goBack;
+        navigationActions.add = this.onAddFeed.bind(this);
     }
 
     public render() {
