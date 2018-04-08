@@ -27,17 +27,22 @@ import { Post, ImageData } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
 
-const navigationActions = {
-    Cancel: null,
-    Post: null,
+interface PostScreenNavigationActions {
+    cancel?: () => Promise<void>;
+    post?: () => Promise<void>;
+}
+
+const navigationActions: PostScreenNavigationActions = {
+    cancel: undefined,
+    post: undefined,
 };
 
 export class PostScreen extends React.Component<any, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Update status',
-        headerLeft: <Button title='Cancel' onPress={() => navigationActions.Cancel!()} />,
-        headerRight: <Button title='Post' onPress={() => navigationActions.Post!()} />,
+        headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
+        headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
     };
 
     private keyboardDidShowListener;
@@ -54,21 +59,21 @@ export class PostScreen extends React.Component<any, any> {
             paddingBottom: 0,
             keyboardHeight: 0,
         };
-        navigationActions.Cancel = () => this.onCancelConfirmation();
-        navigationActions.Post = () => this.onPressSubmit();
+        navigationActions.cancel = () => this.onCancelConfirmation();
+        navigationActions.post = () => this.onPressSubmit();
 
-        LocalPostManager.loadDraft().then(post => {
+        this.getPostForEditing().then(post => {
             if (post) {
                 const [text, images] = LocalPostManager.extractTextAndImagesFromMarkdown(post.text);
                 this.setState({
                     text: text,
                     uploadedImages: images,
                     isLoading: false,
-                })
+                });
             } else {
                 this.setState({
                     isLoading: false,
-                })
+                });
             }
         });
     }
@@ -129,188 +134,6 @@ export class PostScreen extends React.Component<any, any> {
         this.unregisterListeners();
     }
 
-    public onCancel() {
-        this.hideKeyboard();
-        this.unregisterListeners();
-        this.props.navigation.goBack();
-    }
-
-    public hideKeyboard() {
-        if (this.state.isKeyboardVisible) {
-            Keyboard.dismiss();
-            this.setState({
-                isKeyboardVisible: false,
-            });
-        }
-    }
-
-    public showCancelConfirmation() {
-        const options: any[] = [
-            { text: 'Save', onPress: async () => await this.onSave() },
-            { text: 'Discard', onPress: async () => await this.onDiscard() },
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-        ];
-
-        if (Platform.OS === 'ios') {
-            AlertIOS.alert(
-                'Save this post as a draft?',
-                undefined,
-                options
-            )
-        }
-        else {
-            Alert.alert('Save this post as a draft?',
-                undefined,
-                options,
-                { cancelable: true }
-            );
-        }
-    }
-
-    public async onDiscard() {
-        await LocalPostManager.deleteDraft();
-        this.onCancel();
-    }
-
-    public async onSave() {
-        this.setState({
-           isLoading: true,
-        });
-
-        console.log(this.state.text, this.state.uploadedImages.length);
-
-        const post: Post = {
-            images: this.state.uploadedImages,
-            text: this.state.text,
-            createdAt: Date.now(),
-        }
-
-        try {
-            await LocalPostManager.saveDraft(post);
-            Debug.log('Draft saved', post._id);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Saving draft failed, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
-            );
-        }
-
-        this.onCancel();
-    }
-
-    public async onCancelConfirmation() {
-        console.log('onCancelConfirmation', this.state.isKeyboardVisible);
-        this.hideKeyboard();
-        await new Promise(resolve => setTimeout(resolve, 0));
-        console.log('Cancel');
-        if (this.state.text != '' || this.state.uploadedImages.length > 0) {
-            this.showCancelConfirmation();
-        } else {
-            this.onCancel();
-        }
-    }
-
-    public openImagePicker = async () => {
-        const pickerResult = await AsyncImagePicker.launchImageLibrary({
-            allowsEditing: false,
-            aspect: [4,3],
-            base64: true,
-            exif: true,
-        });
-        if (!pickerResult.didCancel) {
-            const data: ImageData = {
-                uri: pickerResult.uri,
-                width: pickerResult.width,
-                height: pickerResult.height,
-                data: pickerResult.data,
-            };
-
-            this.setState({
-                uploadedImages: this.state.uploadedImages.concat([data]),
-            });
-        }
-    }
-
-    public openLocationPicker = async () => {
-        this.props.navigation.navigate('Location');
-    }
-
-    public async onPressSubmit() {
-        if (this.state.isLoading) {
-            return;
-        }
-
-        await this.sendUpdate();
-        this.onCancel();
-    }
-
-    public async sendUpdate() {
-        this.setState({
-           isLoading: true,
-        });
-
-        console.log(this.state.text, this.state.uploadedImages.length);
-
-        const post: Post = {
-            images: this.state.uploadedImages,
-            text: this.state.text,
-            createdAt: Date.now(),
-        };
-
-        try {
-            await LocalPostManager.deleteDraft();
-            await LocalPostManager.saveAndSyncPost(post);
-            Debug.log('Post saved and synced, ', post._id);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Posting failed, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
-            );
-        }
-    }
-
-    public markdownEscape(text) {
-        return text;
-    }
-
-    public renderActivityIndicator() {
-        return (
-            <View
-                style={{
-                    flexDirection: 'column',
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    width: '100%',
-                }}
-            >
-                <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
-            </View>
-        );
-    }
-
-    public renderActionButton(onPress, text, iconName, color, showText) {
-        const iconSize = showText ? 20 : 30;
-        const justifyContent = showText ? 'center' : 'space-around';
-        return (
-                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
-                        <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
-                        { showText &&
-                            <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
-                        }
-                    </View>
-                </TouchableOpacity>
-        );
-    }
-
     public render() {
         if (this.state.isLoading) {
             return this.renderActivityIndicator();
@@ -342,6 +165,195 @@ export class PostScreen extends React.Component<any, any> {
                         {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#d53333', showText)}
                     </View>
             </View>
+        );
+    }
+
+    private async getPostForEditing(): Promise<Post | null> {
+        if (this.props.navigation.state.params.post != null) {
+            return this.props.navigation.state.params.post;
+        }
+        return await LocalPostManager.loadDraft();
+    }
+
+    private onCancel() {
+        this.hideKeyboard();
+        this.unregisterListeners();
+        this.props.navigation.goBack();
+    }
+
+    private hideKeyboard() {
+        if (this.state.isKeyboardVisible) {
+            Keyboard.dismiss();
+            this.setState({
+                isKeyboardVisible: false,
+            });
+        }
+    }
+
+    private showCancelConfirmation() {
+        const options: any[] = [
+            { text: 'Save', onPress: async () => await this.onSave() },
+            { text: 'Discard', onPress: async () => await this.onDiscard() },
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        ];
+
+        if (Platform.OS === 'ios') {
+            AlertIOS.alert(
+                'Save this post as a draft?',
+                undefined,
+                options
+            )
+        }
+        else {
+            Alert.alert('Save this post as a draft?',
+                undefined,
+                options,
+                { cancelable: true }
+            );
+        }
+    }
+
+    private async onDiscard() {
+        await LocalPostManager.deleteDraft();
+        this.onCancel();
+    }
+
+    private async onSave() {
+        this.setState({
+           isLoading: true,
+        });
+
+        console.log(this.state.text, this.state.uploadedImages.length);
+
+        const post: Post = {
+            images: this.state.uploadedImages,
+            text: this.state.text,
+            createdAt: Date.now(),
+        }
+
+        try {
+            await LocalPostManager.saveDraft(post);
+            Debug.log('Draft saved', post._id);
+        } catch (e) {
+            Alert.alert(
+                'Error',
+                'Saving draft failed, try again later!',
+                [
+                    {text: 'OK', onPress: () => console.log('OK pressed')},
+                ]
+            );
+        }
+
+        this.onCancel();
+    }
+
+    private async onCancelConfirmation() {
+        console.log('onCancelConfirmation', this.state.isKeyboardVisible);
+        this.hideKeyboard();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        console.log('Cancel');
+        if (this.state.text != '' || this.state.uploadedImages.length > 0) {
+            this.showCancelConfirmation();
+        } else {
+            this.onCancel();
+        }
+    }
+
+    private openImagePicker = async () => {
+        const pickerResult = await AsyncImagePicker.launchImageLibrary({
+            allowsEditing: false,
+            aspect: [4,3],
+            base64: true,
+            exif: true,
+        });
+        if (!pickerResult.didCancel) {
+            const data: ImageData = {
+                uri: pickerResult.uri,
+                width: pickerResult.width,
+                height: pickerResult.height,
+                data: pickerResult.data,
+            };
+
+            this.setState({
+                uploadedImages: this.state.uploadedImages.concat([data]),
+            });
+        }
+    }
+
+    private openLocationPicker = async () => {
+        this.props.navigation.navigate('Location');
+    }
+
+    private async onPressSubmit() {
+        if (this.state.isLoading) {
+            return;
+        }
+
+        await this.sendUpdate();
+        this.onCancel();
+    }
+
+    private async sendUpdate() {
+        this.setState({
+           isLoading: true,
+        });
+
+        console.log(this.state.text, this.state.uploadedImages.length);
+
+        const post: Post = {
+            images: this.state.uploadedImages,
+            text: this.state.text,
+            createdAt: Date.now(),
+        };
+
+        try {
+            await LocalPostManager.deleteDraft();
+            await LocalPostManager.saveAndSyncPost(post);
+            Debug.log('Post saved and synced, ', post._id);
+        } catch (e) {
+            Alert.alert(
+                'Error',
+                'Posting failed, try again later!',
+                [
+                    {text: 'OK', onPress: () => console.log('OK pressed')},
+                ]
+            );
+        }
+    }
+
+    private markdownEscape(text) {
+        return text;
+    }
+
+    private renderActivityIndicator() {
+        return (
+            <View
+                style={{
+                    flexDirection: 'column',
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
+                <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
+            </View>
+        );
+    }
+
+    private renderActionButton(onPress, text, iconName, color, showText) {
+        const iconSize = showText ? 20 : 30;
+        const justifyContent = showText ? 'center' : 'space-around';
+        return (
+                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
+                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                        <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
+                        { showText &&
+                            <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
+                        }
+                    </View>
+                </TouchableOpacity>
         );
     }
 }
