@@ -95,7 +95,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                         ListHeaderComponent={this.renderListHeader}
                         data={this.state.posts}
                         renderItem={(obj) => this.renderCard(obj.item)}
-                        keyExtractor={(item, index) => item._id}
+                        keyExtractor={(item, index) => '' + item._id}
                         extraData={this.state}
                         refreshControl={
                             <RefreshControl
