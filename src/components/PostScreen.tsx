@@ -130,7 +130,7 @@ export class PostScreen extends React.Component<any, any> {
 
     }
 
-    public componentWillUnmount() {
+    public componentDidlUnmount() {
         this.unregisterListeners();
     }
 
