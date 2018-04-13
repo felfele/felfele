@@ -98,7 +98,9 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         });
 
         const url = Utils.getCanonicalUrl(this.state.feed.feedUrl);
+        console.log('fetchFeed: url: ', url);
         const feed = await RSSFeedManager.fetchFeedFromUrl(url);
+        console.log('fetchFeed: feed: ', feed);
         if (feed) {
             this.setState({
                 checked: true,
@@ -122,6 +124,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                     onChangeText={(text) => this.setState({feed: {...this.state.feed, feedUrl: text}})}
                     placeholder='Link of the feed'
                     autoCapitalize='none'
+                    autoFocus={true}
                 />
                 { this.state.checked
                   ?

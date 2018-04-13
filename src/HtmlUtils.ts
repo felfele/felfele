@@ -1,4 +1,3 @@
-
 import { parse } from 'react-native-parse-html';
 
 export interface HtmlAttrNameValue {
@@ -7,15 +6,15 @@ export interface HtmlAttrNameValue {
 }
 
 export class HtmlUtils {
-    static parse(html) {
+    public static parse(html): HTMLElement {
         return parse(html);
     }
 
-    static findPath(node, path) {
-        let foundNodes:any[] = [];
+    public static findPath(node: Node, path: string[]): Node[] {
+        const foundNodes: Node[] = [];
         const pathPart = path[0];
         for (const childNode of node.childNodes) {
-            if (childNode.nodeName == pathPart) {
+            if (childNode.nodeName === pathPart) {
                 if (path.length > 1) {
                     return HtmlUtils.findPath(childNode, path.slice(1));
                 } else {
@@ -27,11 +26,11 @@ export class HtmlUtils {
         return foundNodes;
     }
 
-    static matchAttributes(node, attrs: HtmlAttrNameValue[]) {
+    public static matchAttributes(node, attrs: HtmlAttrNameValue[]): boolean {
         for (const attr of attrs) {
             let found = false;
             for (const nodeAttr of node.attrs) {
-                if (nodeAttr.name == attr.name && nodeAttr.value == attr.value) {
+                if (nodeAttr.name === attr.name && nodeAttr.value === attr.value) {
                     found = true;
                     break;
                 }
@@ -43,9 +42,9 @@ export class HtmlUtils {
         return true;
     }
 
-    static getAttribute(node, name) {
+    public static getAttribute(node, name): string | null {
         for (const attr of node.attrs) {
-            if (attr.name == name) {
+            if (attr.name === name) {
                 return attr.value;
             }
         }

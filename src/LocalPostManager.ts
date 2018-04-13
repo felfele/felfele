@@ -263,7 +263,7 @@ export class _LocalPostManager implements PostManager {
     }
 
     async loadPosts() {
-        const highestSeenPostId = await this.getHighestSeenPostId()
+        const highestSeenPostId = await this.getHighestSeenPostId();
         const localOnlyPosts = await this.postCache.query()
                                         .lte('_id', highestSeenPostId)
                                         .isNull('deleted')
@@ -278,7 +278,7 @@ export class _LocalPostManager implements PostManager {
     }
 
     async syncLocalDeletedPosts() {
-        const highestSeenPostId = await this.getHighestSeenPostId()
+        const highestSeenPostId = await this.getHighestSeenPostId();
         const localOnlyDeletedPosts = await Storage.post.query()
                                         .lte('_id', highestSeenPostId)
                                         .eq('deleted', true)
