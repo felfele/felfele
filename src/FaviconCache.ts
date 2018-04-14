@@ -1,7 +1,7 @@
 class _FaviconCache {
     private favicons: Map<string, string> = new Map();
 
-    async getFavicon(url): Promise<string> {
+    public async getFavicon(url): Promise<string> {
         if (this.favicons.has(url)) {
             return this.favicons.get(url) || '';
         }
@@ -16,15 +16,15 @@ class _FaviconCache {
         }
     }
 
-    getBaseUrl(url) {
+    private getBaseUrl(url) {
         const baseUrl = url;
         return baseUrl.replace(/(http(s)?:\/\/.*?\/).*/, '$1');
     }
 
-    async downloadIndexAndParseFavicon(url) {
+    private async downloadIndexAndParseFavicon(url) {
         const defaults = {
             'https://444.hu/': 'https://444.hu/assets/blog/static/444-touch-60x60-9e787b1cc6bb60204e7419276bc82d59.png',
-        }
+        };
 
         return defaults.hasOwnProperty(url) ? defaults[url] : url + 'favicon.ico';
     }
