@@ -21,7 +21,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
 
-import { Backend } from '../Backend';
 import StateTracker from '../StateTracker';
 import { Post, ImageData } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';

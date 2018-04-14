@@ -113,6 +113,8 @@ export class RSSFeedManager {
                     feed.name = title.childNodes[0].textContent!;
                     break;
                 }
+                // The lib we use (react-native-parse-html) returns the value
+                // incorrectly in 'value' instead of 'textContent'
                 const value = title.childNodes[0]['value'];
                 if (value != null) {
                     feed.name = value;
@@ -413,7 +415,7 @@ class _RSSPostManager implements PostManager {
         return secondPhase;
     }
 
-    public extractTextAndImagesFromMarkdown(markdown: string, baseUri = Config.baseUri): [string, ImageData[]] {
+    public extractTextAndImagesFromMarkdown(markdown: string, baseUri): [string, ImageData[]] {
         const images: ImageData[] = [];
         const text = markdown.replace(/(\!\[\]\(.*?\))/gi, (uri) => {
             const image: ImageData = {
@@ -422,7 +424,7 @@ class _RSSPostManager implements PostManager {
                         .replace('[', '')
                         .replace(']', '')
                         .replace('(', '')
-                        .replace(')', '')
+                        .replace(')', ''),
             }
             images.push(image);
             return '';

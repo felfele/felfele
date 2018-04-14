@@ -1,9 +1,7 @@
 import { Config } from './Config';
 import { Storage, StorageWithAutoIds, Query, Queryable, QueryOrder, Condition } from './Storage';
-import { Backend } from './Backend';
 import { Post, ImageData } from './models/Post';
 import { SyncState, SyncStateDefaultKey } from './models/SyncState';
-import * as Ghost from './GhostAPI';
 import StateTracker from './StateTracker';
 import { ImageDownloader } from './ImageDownloader';
 import { Debug } from './Debug';
@@ -93,15 +91,7 @@ export class _LocalPostManager implements PostManager {
 
         // Download and convert the posts from Ghost
         const fetchDownstreamPosts = async () => {
-            const ghostPosts = await Backend.ghostAPI.getAllPosts();
-            Debug.log(ghostPosts);
-            const reversePosts = ghostPosts.slice(0).reverse();
-            const convertedPosts: Post[] = [];
-            for (const post of reversePosts) {
-                const convertedPost = await this.convertGhostPostToInternal(post);
-                convertedPosts.push(convertedPost);
-            }
-            return convertedPosts;
+            return [];
         }
 
         // Downstream is from Ghost to local
@@ -221,26 +211,6 @@ export class _LocalPostManager implements PostManager {
         await updateSyncState(syncState, downstreamSyncState, upstreamSyncState);
     }
 
-    async convertGhostPostToInternal(ghostPost: Ghost.Post): Promise<Post> {
-        const [text, images] = this.extractTextAndImagesFromMarkdown(ghostPost.markdown);
-
-        // TODO Download image data too so that it's stored locally as well
-        // const defaultWidth = 300;
-        // const defaultHeight = 300;
-        for (const image of images) {
-            image.localPath = await ImageDownloader.downloadImageAndReturnLocalPath(image.uri);
-        }
-
-        const post = {
-            text: text,
-            images: images,
-            createdAt: DateUtils.parseDateString(ghostPost.created_at),
-            syncId: ghostPost.id,
-        }
-
-        return post;
-    }
-
     extractTextAndImagesFromMarkdown(markdown: string): [string, ImageData[]] {
         let images: ImageData[] = [];
         const text = markdown.replace(/(\!\[\]\(.*?\))/gi, (uri) => {
@@ -287,9 +257,6 @@ export class _LocalPostManager implements PostManager {
                                         .execute();
 
         const syncIds = localOnlyDeletedPosts.map(post => post.syncId);
-        for (const syncId of syncIds) {
-            await Backend.ghostAPI.deletePost(syncId);
-        }
     }
 
     async deletePost(post: Post) {
@@ -327,19 +294,7 @@ export class _LocalPostManager implements PostManager {
     }
 
     async uploadPost(post: Post): Promise<number | null> {
-        let markdownText = this.markdownEscape(post.text);
-        try {
-            for (const image of post.images) {
-                const path = await Backend.ghostAPI.uploadImage(image.uri);
-                markdownText += `![](${path.replace(/\"/g, '')})`;
-            }
-
-            const createdAt = DateUtils.timestampToDateString(post.createdAt)
-            return await Backend.ghostAPI.uploadPost(markdownText, createdAt);
-        } catch (e) {
-            console.error('uploadPost: ', e);
-            return null;
-        }
+            return 0;
     }
 
     async saveDraft(draft: Post): Promise<number | null> {

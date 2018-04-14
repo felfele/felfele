@@ -8,7 +8,6 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
 import StateTracker from '../StateTracker';
 import { Config } from '../Config';
-import { Backend } from '../Backend';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
@@ -239,7 +238,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         } else {
             return (
                 <Gravatar options={{
-                    email: Config.loginData.username,
+                    email: Config.email,
                     secure: true,
                     parameters: { size: '100', d: 'mm' },
                 }}
