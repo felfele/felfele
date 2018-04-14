@@ -46,6 +46,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         left: 0,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
     },
     centerIcon: {
         width: '100%',
