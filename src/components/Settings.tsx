@@ -36,11 +36,6 @@ export class Settings extends React.Component<any, any> {
                             borderColor: 'grey',
                         }} />
                         <SettingsList.Item
-                            title='Public blog'
-                            titleInfo={this.props.config.baseUri}
-                            onPress={() => Alert.alert('Route To Uri Config Page')}
-                        />
-                        <SettingsList.Item
                             title='Feeds'
                             onPress={() => this.props.navigation.navigate('FeedListEditor')}
                         />

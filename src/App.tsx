@@ -8,7 +8,6 @@ import { View, StatusBar, Platform } from 'react-native';
 
 import { Config } from './Config';
 import { PostScreen } from './components/PostScreen';
-import { Feed } from './components/Feed';
 import { YourFeed } from './components/YourFeed';
 import { Settings } from './components/Settings';
 import { Location } from './components/Location';
