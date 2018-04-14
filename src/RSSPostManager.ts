@@ -160,6 +160,7 @@ export class RSSFeedManager {
 
     public static isRssMimeType(mimeType: string): boolean {
         if (mimeType === 'application/rss+xml' ||
+            mimeType === 'application/atom+xml' ||
             mimeType === 'application/xml' ||
             mimeType === 'text/xml'
         ) {
@@ -230,7 +231,9 @@ export class RSSFeedManager {
         // It looks like there is a valid feed on the url
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
             const rssFeed = await Feed.load(url, contentWithMimeType.content);
+            console.log('fetchFeedFromUrl rssFeed: ', rssFeed);
             const baseUrl = Utils.getBaseUrl(url);
+            console.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
                 url: baseUrl,
