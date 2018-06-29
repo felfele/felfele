@@ -156,6 +156,9 @@ export class RSSFeedManager {
         if (feed.favicon !== '') {
             feed.favicon = Utils.createUrlFromUrn(feed.favicon, baseUrl);
         }
+        if (feed.name.search(' - ') >= 0) {
+            feed.name = feed.name.replace(/ - .*/, '');
+        }
         feed.url = baseUrl;
         return feed;
     }
