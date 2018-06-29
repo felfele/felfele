@@ -138,27 +138,23 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                         <View style={styles.centerIcon}>
                             <ActivityIndicator size='large' color='grey' />
                         </View>
-                    : <Button
-                        title='Fetch'
-                        onPress={async () => await this.fetchFeed()}
-                        disabled={this.state.loading}
-                />
+                    : this.state.feed._id != null
+                        ? <Button
+                            title='Delete'
+                            onPress={async () => this.onDelete()}
+                            disabled={this.state.loading}
+                        />
+                        : <Button
+                            title='Fetch'
+                            onPress={async () => await this.fetchFeed()}
+                            disabled={this.state.loading}
+                        />
                 }
 
                 <Text>{this.state.feed.name}</Text>
                 <Text>{this.state.feed.url}</Text>
                 <Text>{this.state.feed.feedUrl}</Text>
                 <Text>{this.state.feed.favicon}</Text>
-
-                { this.state.feed._id != null &&
-                <View style={styles.deleteButtonContainer}>
-                    <Button
-                        title='Delete'
-                        onPress={this.onDelete}
-                        color='red'
-                    />
-                </View>
-                }
             </View>
         );
     }

@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { View, FlatList, Text, Alert, StyleSheet, Button, Image } from 'react-native';
+import { View, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RSSPostManager } from '../RSSPostManager';
 
 const styles = StyleSheet.create({
