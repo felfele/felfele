@@ -12,6 +12,7 @@ import {
     StyleSheet,
     StatusBar,
     Platform,
+    SafeAreaView,
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
@@ -89,7 +90,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     public render() {
         const isStatusBarHidden = Platform.OS === 'android' ? true : false;
         return (
-            <View
+            <SafeAreaView
                 style={{
                     flexDirection: 'column',
                     padding: 0,
@@ -117,7 +118,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     />
                 </View>
                 <View style={styles.translucentBar} ></View>
-            </View>
+            </SafeAreaView>
         );
     }
 

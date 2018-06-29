@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, FlatList, Text, Alert, StyleSheet } from 'react-native';
+import { View, FlatList, Text, Alert, StyleSheet, SafeAreaView } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -28,7 +28,7 @@ export class Settings extends React.Component<any, any> {
 
     public render() {
         return (
-            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
                         <SettingsList.Header headerStyle={{
@@ -57,7 +57,7 @@ export class Settings extends React.Component<any, any> {
                         }
                     </SettingsList>
                 </View>
-            </View>
+            </SafeAreaView>
         );
     }
 
