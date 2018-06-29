@@ -107,7 +107,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                         name='camera-alt'
                         size={30}
                         color='gray'
-                        style={styles.cameraIcon} />
+                    />
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() =>

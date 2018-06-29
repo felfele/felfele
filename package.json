@@ -33,8 +33,7 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "postinstall": "npm run patch",
-    "patch": "npm run patchNativeElements && npm run patchAndroidInstaller",
-    "patchNativeElements": "./node_modules/.bin/replace '.*resizeMode.*' '' node_modules/react-native-elements/src/tile/Tile.js -s",
+    "patch": "npm run patchAndroidInstaller",
     "patchAndroidInstaller": "./node_modules/.bin/replace \\'install\\',\\ pathToApk \\'install\\',\\ \\'-r\\',\\ pathToApk node_modules/react-native/local-cli/runAndroid/runAndroid.js -s"
   },
   "jest": {

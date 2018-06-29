@@ -473,7 +473,7 @@ const util = require('react-native-util');
 const xml2js = require('react-native-xml2js');
 
 const Feed = {
-    DefaultTimeout: 5000,
+    DefaultTimeout: 10000,
     fetch: async (url): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
         const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
@@ -487,7 +487,7 @@ const Feed = {
             const xml = await response.text();
             return Feed.load(url, xml, startTime, downloadTime);
         } else {
-            throw new Error('Bad status code');
+            throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
         }
     },
 

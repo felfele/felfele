@@ -64,7 +64,7 @@ const Root = TabNavigator(
                     <MaterialIcon
                         name={focused ? 'rss-feed' : 'rss-feed'}
                         size={20}
-                        style={{ color: tintColor }}
+                        color={tintColor}
                     />
                 ),
             },
@@ -83,7 +83,7 @@ const Root = TabNavigator(
                     <FontAwesomeIcon
                         name={focused ? 'newspaper-o' : 'newspaper-o'}
                         size={20}
-                        style={{ color: tintColor }}
+                        color={tintColor}
                     />
                 ),
             },
@@ -98,7 +98,7 @@ const Root = TabNavigator(
                     <MaterialIcon
                         name={focused ? 'settings' : 'settings'}
                         size={20}
-                        style={{ color: tintColor }}
+                        color={tintColor}
                     />
                 ),
             },

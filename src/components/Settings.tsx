@@ -49,7 +49,7 @@ export class Settings extends React.Component<any, any> {
                         { __DEV__ &&
                          <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-bug' size={24} color='gray' />
+                                <Ionicons name='md-bug' size={24} color='gray' />
                             }
                             title='Debug menu'
                             onPress={() => this.props.navigation.navigate('Debug')}

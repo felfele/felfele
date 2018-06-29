@@ -50,28 +50,28 @@ export class DebugScreen extends React.Component<any, any> {
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
                          <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-list' size={30} color='gray' />
+                                <Ionicons name='md-list' size={30} color='gray' />
                             }
                             title='List database'
                             onPress={async () => await this.onListDatabase()}
                         />
                          <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-list' size={30} color='gray' />
+                                <Ionicons name='md-list' size={30} color='gray' />
                             }
                             title='List posts'
                             onPress={async () => await this.onListPosts()}
                         />
                         <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                                <Ionicons name='md-key' size={30} color='gray' />
                             }
                             title='List database keys'
                             onPress={async () => await this.onListDatabaseKeys()}
                         />
                         <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                                <Ionicons name='md-key' size={30} color='gray' />
                             }
                             title='List cache'
                             onPress={async () => await this.onListCache()}
@@ -79,21 +79,21 @@ export class DebugScreen extends React.Component<any, any> {
 
                         <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-key' size={30} color='gray' />
+                                <Ionicons name='md-key' size={30} color='gray' />
                             }
                             title='List sync state'
                             onPress={async () => await this.onListSyncState()}
                         />
                         <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-warning' size={30} color='gray' />
+                                <Ionicons name='md-warning' size={30} color='gray' />
                             }
                             title='Clear database'
                             onPress={async () => await this.onClearDatabase()}
                         />
                         <SettingsList.Item
                             icon={
-                                <Ionicons style={styles.imageStyle} name='md-sync' size={30} color='gray' />
+                                <Ionicons name='md-sync' size={30} color='gray' />
                             }
                             title='Sync posts'
                             onPress={async () => await this.onSyncPosts()}

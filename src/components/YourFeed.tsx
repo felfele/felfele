@@ -1,16 +1,26 @@
 import * as React from 'react';
-import { Linking, Clipboard, CameraRoll, Dimensions, TextInput, Text, View, WebView, TouchableOpacity, Alert, ScrollView, FlatList, Image, RefreshControl, StyleSheet, StatusBar, Platform } from 'react-native';
+import {
+    Linking,
+    Dimensions,
+    Text,
+    View,
+    TouchableOpacity,
+    Alert,
+    FlatList,
+    Image,
+    RefreshControl,
+    StyleSheet,
+    StatusBar,
+    Platform,
+} from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
-import RNFetchBlob from 'react-native-fetch-blob';
 
-import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
 import StateTracker from '../StateTracker';
 import { Config } from '../Config';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
-import { Debug } from '../Debug';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
@@ -65,7 +75,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         });
 
         StateTracker.listen((oldVersion, newVersion) => {
-            this.updateVersion(oldVersion, newVersion);
+            this.updateVersion(newVersion);
         });
 
         const refreshInterval = 60 * 1000;
@@ -94,7 +104,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                         ListHeaderComponent={this.renderListHeader}
                         data={this.state.posts}
                         renderItem={(obj) => this.renderCard(obj.item)}
-                        keyExtractor={(item, index) => '' + item._id}
+                        keyExtractor={(item) => '' + item._id}
                         extraData={this.state}
                         refreshControl={
                             <RefreshControl
@@ -119,7 +129,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         });
     }
 
-    private updateVersion(oldVersion, newVersion) {
+    private updateVersion(newVersion) {
         if (newVersion !== this.state.version) {
             this.setState({
                 version: newVersion,
@@ -203,7 +213,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
     private renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
-        const isPostLiked = (p) => false;
+        const isPostLiked = () => false;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
@@ -213,7 +223,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                         </TouchableOpacity>
                     }
                     <TouchableOpacity style={styles.like}>
-                        {!isPostLiked(post) ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
+                        {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
                         <Icon name='ios-chatbubbles-outline' size={iconSize} color='black' />
@@ -250,8 +260,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
     private renderCardTop(post: Post) {
         const printableTime = DateUtils.printableElapsedTime(post.createdAt);
-        const humanTime = DateUtils.timestampToDateString(post.createdAt);
-        const currentTime = Date.now();
         const username = post.author ? post.author.name : 'Attila';
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
@@ -333,7 +341,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     }
 
     private renderCard(post: Post) {
-        const toBase64 = (data) => `data:image/gif;base64,${data}`;
 
         if (post.images.length === 0) {
             return this.renderCardWithOnlyText(post);
