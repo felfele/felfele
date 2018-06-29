@@ -1,10 +1,9 @@
 import * as React from 'react';
 
 import { StackNavigator, TabNavigator } from 'react-navigation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { View, StatusBar, Platform } from 'react-native';
+import { StatusBar, Platform } from 'react-native';
 
 import { Config } from './Config';
 import { PostScreen } from './components/PostScreen';
