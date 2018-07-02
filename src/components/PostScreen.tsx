@@ -168,7 +168,8 @@ export class PostScreen extends React.Component<any, any> {
     }
 
     private async getPostForEditing(): Promise<Post | null> {
-        if (this.props.navigation.state.params.post != null) {
+        console.log(this.props.navigation);
+        if (this.props.navigation.state.params != null && this.props.navigation.state.params.post != null) {
             return this.props.navigation.state.params.post;
         }
         return await LocalPostManager.loadDraft();
