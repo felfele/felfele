@@ -358,17 +358,31 @@ class _RSSPostManager implements PostManager {
 
     public formatDescription(description): string {
         const firstPhase = description
+            // strip spaces at the beginning of lines
             .replace(/^( *)/gm, '')
+            // strip newlines
             .replace(/\n/gm, '')
+            // replace CDATA tags with content
             .replace(/<!\[CDATA\[(.*?)\]\]>/gm, '$1')
+            // replace html ellipses
             .replace(/&hellip;/g, '...')
+            // replace html ampersands
             .replace(/&amp;/g, '&')
+            // replace html quotes
+            .replace(/&quot;/g, '"')
+            // strip html keycodes
             .replace(/&#[0-9]+;/g, '')
-            // .replace(/<noscript>.*?<\/noscript>/gim, '')
+            // replace html links to markdown links
             .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1)')
+            // replace html images to markdown images
             .replace(/<img.*?src=['"](.*?)['"].*?>/gi, '![]($1)')
+            // replace html paragraphs to markdown paragraphs
             .replace(/<p.*?>/gi, '\n\n')
+            // strip other html tags
             .replace(/<(\/?[a-z]+.*?>)/gi, '')
+            // strip html comments
+            .replace(/<!--.*?-->/g, '')
+            // replace multiple space with one space
             .replace(/ +/g, ' ')
             ;
 
