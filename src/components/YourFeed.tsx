@@ -96,6 +96,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     padding: 0,
                     flex: 1,
                     height: '100%',
+                    opacity: 0.96,
             }
             }>
                 <StatusBar hidden={isStatusBarHidden} translucent={false} />
