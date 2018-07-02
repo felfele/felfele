@@ -1,6 +1,13 @@
 import * as React from 'react';
-import { View, FlatList, Text, TextInput, Alert, StyleSheet, Button, Image, ActivityIndicator } from 'react-native';
-import * as SettingsList from 'react-native-settings-list';
+import {
+    TextInput,
+    Alert,
+    StyleSheet,
+    Button,
+    View,
+    Text,
+    ActivityIndicator,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
@@ -55,6 +62,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         height: 40,
         backgroundColor: '#EFEFF4',
+        paddingTop: 10,
     },
 });
 
@@ -69,7 +77,6 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         header: undefined,
         title: 'Feed list',
         headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions.add!()} />,
     };
 
     public state: EditFeedState = {
@@ -101,19 +108,18 @@ export class EditFeed extends React.Component<any, EditFeedState> {
 
         const url = Utils.getCanonicalUrl(this.state.feed.feedUrl);
         console.log('fetchFeed: url: ', url);
-        const feed = await RSSFeedManager.fetchFeedFromUrl(url);
+        const feed = await this.fetchFeedFromUrl(url);
         console.log('fetchFeed: feed: ', feed);
-        if (feed) {
+
+        if (feed != null && feed.feedUrl !== '') {
             this.setState({
                 checked: true,
                 loading: false,
                 feed: feed,
             });
-            return;
+            await this.onAdd();
         } else {
-            this.setState({
-                loading: false,
-            });
+            this.onFailedFeedLoad();
         }
     }
 
@@ -159,6 +165,17 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         );
     }
 
+    private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
+        try {
+            const feed = await RSSFeedManager.fetchFeedFromUrl(url);
+            console.log('fetchFeed: feed: ', feed);
+            return feed;
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
+    }
+
     private onDelete = () => {
         const options: any[] = [
             { text: 'Yes', onPress: async () => await this.deleteFeedAndGoBack() },
@@ -170,6 +187,22 @@ export class EditFeed extends React.Component<any, EditFeedState> {
             options,
             { cancelable: true }
         );
+    }
+
+    private onFailedFeedLoad = () => {
+        const options: any[] = [
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        ];
+
+        Alert.alert('Failed to load feed!',
+            undefined,
+            options,
+            { cancelable: true }
+        );
+
+        this.setState({
+            loading: false,
+        });
     }
 
     private deleteFeedAndGoBack = async () => {

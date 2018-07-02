@@ -1,7 +1,6 @@
 import { PostManager } from './PostManager';
 import { Post, ImageData } from './models/Post';
 import { Feed } from './models/Feed';
-import { Config } from './Config';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
@@ -263,47 +262,7 @@ export class RSSFeedManager {
         return null;
     }
 
-    private readonly hardcodedFeeds: Feed[] = [
-        {
-            name: 'Hacker News',
-            url: 'https://news.ycombinator.com/',
-            feedUrl: 'https://news.ycombinator.com/rss',
-            favicon: '',
-        },
-        {
-            name: '444',
-            url: 'https://444.hu/',
-            feedUrl: 'https://444.hu/feed',
-            favicon: '',
-        },
-        {
-            name: 'The Verge',
-            url: 'https://www.theverge.com/',
-            feedUrl: 'https://www.theverge.com/rss/frontpage',
-            favicon: '',
-        },
-        {
-            name: 'Digital Trends',
-            url: 'https://www.digitaltrends.com/',
-            feedUrl: 'https://www.digitaltrends.com/social-media/feed/',
-            favicon: '',
-        },
-        {
-            name: 'Forbes',
-            url: 'https://www.forbes.com/',
-            feedUrl: 'https://www.forbes.com/social-media/feed/',
-            favicon: '',
-        },
-        {
-            name: 'The Guardian',
-            url: 'https://www.theguardian.com/',
-            feedUrl: 'https://www.theguardian.com/world/rss',
-            favicon: '',
-        },
-
-        // 'http://index.hu/24ora/rss/', // plain HTTP is not working on iOS
-    ];
-    private feeds: Feed[] = this.hardcodedFeeds;
+    private feeds: Feed[] = [];
 
     public getFeeds(): Feed[] {
         return this.feeds;
@@ -316,7 +275,7 @@ export class RSSFeedManager {
     public async loadFeedsFromStorage(): Promise<Feed[]> {
         const feeds = await Storage.feed.getAllValues();
         console.log('RSSPostManager.loadFeedsFromStorage:', feeds);
-        this.feeds = this.hardcodedFeeds.concat(feeds);
+        this.feeds = feeds;
         return this.feeds;
     }
 }
@@ -404,11 +363,14 @@ class _RSSPostManager implements PostManager {
             .replace(/<!\[CDATA\[(.*?)\]\]>/gm, '$1')
             .replace(/&hellip;/g, '...')
             .replace(/&amp;/g, '&')
+            .replace(/&#[0-9]+;/g, '')
             // .replace(/<noscript>.*?<\/noscript>/gim, '')
             .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1)')
             .replace(/<img.*?src=['"](.*?)['"].*?>/gi, '![]($1)')
             .replace(/<p.*?>/gi, '\n\n')
-            .replace(/<(\/?[a-z]+.*?>)/gi, '');
+            .replace(/<(\/?[a-z]+.*?>)/gi, '')
+            .replace(/ +/g, ' ')
+            ;
 
         const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
             // return `_(${Utils.getHumanHostname(p1)})_ `;
@@ -466,6 +428,7 @@ class _RSSPostManager implements PostManager {
             return post;
         });
 
+        console.log('RSS items posts: ', posts);
         return posts;
     }
 }
@@ -529,6 +492,16 @@ const Feed = {
         }
     },
 
+    getDate: (entry): string | null => {
+        if (entry.published != null) {
+            return entry.published[0];
+        }
+        if (entry.updated != null) {
+            return entry.updated[0];
+        }
+        return null;
+    },
+
     parseAtom: (json) => {
         const feed = json.feed;
         const rss: any = { items: [] };
@@ -544,10 +517,11 @@ const Feed = {
         }
 
         rss.items = feed.entry.map(entry => {
+            const entryDate = Feed.getDate(entry);
             const item: RSSItem = {
                 title: entry.title ? entry.title[0] : '',
                 description: entry.content ? entry.content[0]._ : '',
-                created: entry.published ? DateUtils.parseDateString(entry.published[0]) : Date.now(),
+                created: entryDate ? DateUtils.parseDateString(entryDate) : Date.now(),
                 link: entry.link ? entry.link[0].href[0] : '',
                 url: entry.link ? entry.link[0].href[0] : '',
             };
