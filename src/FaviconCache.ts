@@ -16,9 +16,12 @@ class _FaviconCache {
         }
     }
 
-    private getBaseUrl(url) {
-        const baseUrl = url;
-        return baseUrl.replace(/(http(s)?:\/\/.*?\/).*/, '$1');
+    private getBaseUrl(url: string) {
+        let baseUrl = url.replace(/(http(s)?:\/\/.*?\/).*/, '$1');
+        if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+        }
+        return baseUrl;
     }
 
     private async downloadIndexAndParseFavicon(url) {

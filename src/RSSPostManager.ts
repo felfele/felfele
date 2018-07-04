@@ -421,8 +421,16 @@ class _RSSPostManager implements PostManager {
         }
     }
 
+    private stripTrailing = (s: string, trail: string): string => {
+        if (s.endsWith(trail)) {
+            return s.substr(0, s.length - trail.length);
+        }
+        return s;
+    }
+
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
         console.log('RSS items: ', rssFeed.items);
+        const strippedFaviconUri = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const description = this.formatDescription(item.description);
             const [text, images] = this.extractTextAndImagesFromMarkdown(description, '');
@@ -436,7 +444,7 @@ class _RSSPostManager implements PostManager {
                 author: {
                     name: feedName,
                     uri: rssFeed.url,
-                    faviconUri: favicon,
+                    faviconUri: strippedFaviconUri,
                 },
             };
             return post;
