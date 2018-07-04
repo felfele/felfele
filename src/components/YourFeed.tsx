@@ -104,6 +104,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                     { this.renderOfflineHeader() }
                     <FlatList
                         ListHeaderComponent={this.renderListHeader}
+                        ListFooterComponent={this.renderListFooter}
                         data={this.state.posts}
                         renderItem={(obj) => this.renderCard(obj.item)}
                         keyExtractor={(item) => '' + item._id}
@@ -412,6 +413,15 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 post={this.props.post}
                 navigation={this.props.navigation}
                 postManager={this.props.postManager} />
+        );
+    }
+
+    private renderListFooter = () => {
+        return (
+            <View style={{
+                height: 100,
+            }}
+            />
         );
     }
 }
