@@ -301,54 +301,9 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         );
     }
 
-    private renderCardWithMultipleImages(post: Post) {
-        return (
-            <View
-                style={this.containerStyle}
-                key={'card-' + post._id}
-
-            >
-                <TouchableOpacity
-                    style={{ paddingTop: 0 }}
-                    onLongPress={ () => this.togglePostSelection(post) }
-                    onPress={ () => this.openPost(post)}
-                    activeOpacity={1}
-                >
-                    {
-                        post.images.map((image, index) => {
-                            return (
-                                <TouchableOpacity
-                                    key={`image-${post._id}-${index}`}
-                                    onLongPress={ () => {
-                                        this.setState({selectedPost: post});
-                                    }}
-                                    activeOpacity={0.1}
-                                >
-                                    <Image
-                                        source={{
-                                            uri: this.getImageUri(image),
-                                        }}
-                                    />;
-                                </TouchableOpacity>
-                            );
-                        })
-                    }
-                    { post.text === '' ||
-                        <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
-                    }
-
-                </TouchableOpacity>
-                { this.renderButtonsIfSelected(post) }
-            </View>
-        );
-    }
-
     private renderCard(post: Post) {
-
         if (post.images.length === 0) {
             return this.renderCardWithOnlyText(post);
-        } else if (post.images.length > 1) {
-            return this.renderCardWithMultipleImages(post);
         } else {
             return (
                 <View
@@ -374,15 +329,18 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                             marginTop: 0,
                         }}
                     >
-                        <Image
-                            source={{
-                                uri: this.getImageUri(post.images[0]),
-                            }}
-                            style={{
-                                width: WindowWidth,
-                                height: WindowWidth,
-                            }}
-                        />
+                        {post.images.map(image =>
+                            <Image
+                                key={image.uri}
+                                source={{
+                                    uri: this.getImageUri(image),
+                                }}
+                                style={{
+                                    width: WindowWidth,
+                                    height: WindowWidth,
+                                }}
+                            />
+                        )}
                         { post.text === '' ||
                             <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                         }
