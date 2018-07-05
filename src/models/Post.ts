@@ -28,4 +28,5 @@ export interface Post extends Model {
     syncId?: number;
     deleted?: boolean;
     author?: Author;
+    updatedAt?: number;
 }

@@ -4,24 +4,18 @@ import {
     View,
     Text,
     TouchableOpacity,
-    Image,
-    KeyboardAvoidingView,
     Keyboard,
     Button,
     Platform,
     ActivityIndicator,
-    StyleSheet,
     Alert,
     AlertIOS,
-    CameraRoll,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { NavigationActions } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
 
-import StateTracker from '../StateTracker';
 import { Post, ImageData } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
@@ -57,6 +51,7 @@ export class PostScreen extends React.Component<any, any> {
             isLoading: true,
             paddingBottom: 0,
             keyboardHeight: 0,
+            post: undefined,
         };
         navigationActions.cancel = () => this.onCancelConfirmation();
         navigationActions.post = () => this.onPressSubmit();
@@ -68,10 +63,16 @@ export class PostScreen extends React.Component<any, any> {
                     text: text,
                     uploadedImages: images,
                     isLoading: false,
+                    post: post,
                 });
             } else {
                 this.setState({
                     isLoading: false,
+                    post: {
+                        images: [],
+                        text: '',
+                        createdAt: Date.now(),
+                    },
                 });
             }
         });
@@ -160,8 +161,8 @@ export class PostScreen extends React.Component<any, any> {
                         <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
                     </View>
                     <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
-                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#32A850', showText)}
-                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#d53333', showText)}
+                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', showText)}
+                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#808080', showText)}
                     </View>
             </View>
         );
@@ -298,16 +299,17 @@ export class PostScreen extends React.Component<any, any> {
            isLoading: true,
         });
 
-        console.log(this.state.text, this.state.uploadedImages.length);
+        console.log(this.state.text, this.state.uploadedImages.length, this.state.post);
 
-        const post: Post = {
-            images: this.state.uploadedImages,
-            text: this.state.text,
-            createdAt: Date.now(),
-        };
+        const post = this.state.post;
+        post.images = this.state.uploadedImages;
+        post.text = this.state.text;
+        post.updatedAt = Date.now();
 
         try {
-            await LocalPostManager.deleteDraft();
+            if (post._id == null) {
+                await LocalPostManager.deleteDraft();
+            }
             await LocalPostManager.saveAndSyncPost(post);
             Debug.log('Post saved and synced, ', post._id);
         } catch (e) {
