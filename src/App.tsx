@@ -3,7 +3,7 @@ import * as React from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { StatusBar, Platform } from 'react-native';
+import { Platform } from 'react-native';
 
 import { Config } from './Config';
 import { PostScreen } from './components/PostScreen';
