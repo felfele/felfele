@@ -20,33 +20,6 @@ import { RSSPostManager } from './RSSPostManager';
 
 Debug.setDebug(__DEV__);
 
-const NavigationHeaderComponent = Platform.OS === 'ios'
-            ? null
-            : <StatusBar hidden={true} barStyle='light-content' backgroundColor='blue' />;
-
-const TabBarOptions = Platform.OS === 'ios'
-    ?
-        {
-            showLabel: false,
-            activeTintColor: 'gray',
-            inactiveTintColor: 'lightgray',
-            style: {
-                opacity: 0.96,
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-            },
-        }
-    :
-        {
-            showLabel: true,
-            style: {
-                backgroundColor: 'black',
-            },
-        }
-    ;
-
 const Root = TabNavigator(
     {
         YourTab: {
