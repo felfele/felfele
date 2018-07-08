@@ -357,7 +357,7 @@ class _RSSPostManager implements PostManager {
     }
 
     public formatDescription(description): string {
-        const firstPhase = description
+        return description
             // strip spaces at the beginning of lines
             .replace(/^( *)/gm, '')
             // strip newlines
@@ -385,13 +385,6 @@ class _RSSPostManager implements PostManager {
             // replace multiple space with one space
             .replace(/ +/g, ' ')
             ;
-
-        const secondPhase = firstPhase.replace(/#____\((.*?)\)#____/g, (match, p1) => {
-            // return `_(${Utils.getHumanHostname(p1)})_ `;
-            return '';
-        });
-
-        return secondPhase;
     }
 
     public extractTextAndImagesFromMarkdown(markdown: string, baseUri): [string, ImageData[]] {
