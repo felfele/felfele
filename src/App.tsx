@@ -3,7 +3,9 @@ import * as React from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { Platform } from 'react-native';
+import { Platform, View, Text } from 'react-native';
+import { persistStore, Persistor } from 'redux-persist';
+import { Provider } from 'react-redux';
 
 import { Config } from './Config';
 import { PostScreen } from './components/PostScreen';
@@ -17,6 +19,7 @@ import { EditFeed } from './components/EditFeed';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
+import { store } from './reducers/index';
 
 Debug.setDebug(__DEV__);
 
@@ -140,7 +143,9 @@ const AppNavigator = StackNavigator(Scenes,
 export default class App extends React.Component {
     public render() {
         return (
-            <AppNavigator />
+            <Provider store={store}>
+                <AppNavigator/>
+            </Provider>
         );
     }
 }

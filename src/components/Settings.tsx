@@ -40,6 +40,10 @@ export class Settings extends React.Component<any, any> {
                             onPress={() => this.props.navigation.navigate('FeedListEditor')}
                         />
                         <SettingsList.Item
+                            title='Filters'
+                            onPress={() => this.props.navigation.navigate('ContentFilterEditor')}
+                        />
+                        <SettingsList.Item
                             hasNavArrow={false}
                             switchState={this.state.saveToCameraRoll}
                             switchOnValueChange={(value) => this.onSaveToCameraRollValueChange(value)}

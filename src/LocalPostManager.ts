@@ -92,7 +92,7 @@ export class _LocalPostManager implements PostManager {
         // Download and convert the posts from Ghost
         const fetchDownstreamPosts = async () => {
             return [];
-        }
+        };
 
         // Downstream is from Ghost to local
         const storeDownstreamPosts = async (downstreamPosts, syncState) => {
@@ -112,7 +112,7 @@ export class _LocalPostManager implements PostManager {
                 }
             }
             return downstreamSyncState;
-        }
+        };
 
         const uploadLocalOnlyPosts = async (highestSeenPostId, syncState) => {
             // Upstream is from local to Ghost
