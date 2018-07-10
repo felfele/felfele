@@ -79,4 +79,8 @@ export class Utils {
         }
         return url;
     }
+
+    public static stripNonAscii(s: string): string {
+        return s.replace(/[^\x00-\x7F]/g, '');
+    }
 }

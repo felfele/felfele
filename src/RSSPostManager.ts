@@ -364,14 +364,6 @@ class _RSSPostManager implements PostManager {
             .replace(/\n/gm, '')
             // replace CDATA tags with content
             .replace(/<!\[CDATA\[(.*?)\]\]>/gm, '$1')
-            // replace html ellipses
-            .replace(/&hellip;/g, '...')
-            // replace html ampersands
-            .replace(/&amp;/g, '&')
-            // replace html quotes
-            .replace(/&quot;/g, '"')
-            // strip html keycodes
-            .replace(/&#[0-9]+;/g, '')
             // replace html links to markdown links
             .replace(/<a.*?href=['"](.*?)['"].*?>(.*?)<\/a>/gi, '[$2]($1)')
             // replace html images to markdown images
@@ -382,6 +374,16 @@ class _RSSPostManager implements PostManager {
             .replace(/<(\/?[a-z]+.*?>)/gi, '')
             // strip html comments
             .replace(/<!--.*?-->/g, '')
+            // replace html ellipses
+            .replace(/&hellip;/g, '...')
+            // replace html ampersands
+            .replace(/&amp;/g, '&')
+            // replace html quotes
+            .replace(/&quot;/g, '"')
+            // replace html non-breaking spaces
+            .replace(/&nbsp;/g, ' ')
+            // strip html keycodes
+            .replace(/&#[0-9]+;/g, '')
             // replace multiple space with one space
             .replace(/ +/g, ' ')
             ;
@@ -397,11 +399,33 @@ class _RSSPostManager implements PostManager {
                         .replace(']', '')
                         .replace('(', '')
                         .replace(')', ''),
-            }
+            };
             images.push(image);
             return '';
         });
         return [text, images];
+    }
+
+    public matchString(a: string, b: string): boolean {
+        for (let i = 0; i < a.length; i++) {
+            if (i >= b.length) {
+                console.log('b is shorter');
+                return false;
+            }
+            if (a[i] !== b[i]) {
+                console.log('Diff at i: ', i, a.charCodeAt(i), b.charCodeAt(i));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public isTitleSameAsText(title: string, text: string): boolean {
+        const replacedText = Utils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
+        const trimmedTitle = Utils.stripNonAscii(title.trim());
+        const isSame =  this.matchString(trimmedTitle, replacedText);
+        console.log('"' + replacedText + '"', '\n\n', '"' + trimmedTitle + '"', '\n\n', 'isSame: ', isSame);
+        return isSame;
     }
 
     private async loadFeed(feedUrl: string): Promise<FeedWithMetrics | null> {
@@ -423,14 +447,21 @@ class _RSSPostManager implements PostManager {
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
         console.log('RSS items: ', rssFeed.items);
+        const links: Set<string> = new Set();
+        const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const description = this.formatDescription(item.description);
             const [text, images] = this.extractTextAndImagesFromMarkdown(description, '');
-            const title = item.title === '(Untitled)' ? '' : '**' + item.title + '**' + '\n\n';
+            const title = this.isTitleSameAsText(item.title, text)
+                ? ''
+                : item.title === '(Untitled)'
+                    ? ''
+                    : '**' + item.title + '**' + '\n\n'
+                ;
             const post: Post = {
                 _id: this.getNextId(),
-                text: title + text + '\n\n',
+                text: (title + text).trim() + '\n\n',
                 createdAt: item.created,
                 images: images,
                 link:  item.link,
@@ -441,6 +472,20 @@ class _RSSPostManager implements PostManager {
                 },
             };
             return post;
+        }).filter(post => {
+            if (post.link != null && links.has(post.link)) {
+                return false;
+            }
+            if (post.link != null) {
+                links.add(post.link);
+            }
+
+            if (uniques.has(post.text)) {
+                return false;
+            }
+            uniques.add(post.text);
+
+            return true;
         });
 
         console.log('RSS items posts: ', posts);
