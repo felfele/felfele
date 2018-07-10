@@ -409,11 +409,9 @@ class _RSSPostManager implements PostManager {
     public matchString(a: string, b: string): boolean {
         for (let i = 0; i < a.length; i++) {
             if (i >= b.length) {
-                console.log('b is shorter');
                 return false;
             }
             if (a[i] !== b[i]) {
-                console.log('Diff at i: ', i, a.charCodeAt(i), b.charCodeAt(i));
                 return false;
             }
         }
@@ -424,7 +422,6 @@ class _RSSPostManager implements PostManager {
         const replacedText = Utils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
         const trimmedTitle = Utils.stripNonAscii(title.trim());
         const isSame =  this.matchString(trimmedTitle, replacedText);
-        console.log('"' + replacedText + '"', '\n\n', '"' + trimmedTitle + '"', '\n\n', 'isSame: ', isSame);
         return isSame;
     }
 
