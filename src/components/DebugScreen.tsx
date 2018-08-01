@@ -99,6 +99,13 @@ export class DebugScreen extends React.Component<any, any> {
                             onPress={async () => await this.onSyncPosts()}
                         />
                         <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Upload to swarm'
+                            onPress={async () => await this.onUploadToSwarm()}
+                        />
+                        <SettingsList.Item
                             title={version}
                         />
 
@@ -179,5 +186,15 @@ export class DebugScreen extends React.Component<any, any> {
     private async onSyncPosts() {
         await LocalPostManager.syncPosts();
         StateTracker.updateVersion(StateTracker.version + 1);
+    }
+
+    private async onUploadToSwarm() {
+        const swarm = require('swarm-js').at('http://swarm.helmethair.co');
+        const data = 'hello';
+        // const hash = await swarm.upload(data);
+        // console.log('Uploaded file. Address:', hash);
+        const fileHash = '4c5b04446d5495f2887a76c4ad9f0050b991c2bc6a3ed085538a2287490537f1';
+        const array = await swarm.download(fileHash);
+        console.log('Downloaded file: ', swarm.toString(array));
     }
 }
