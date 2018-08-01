@@ -63,11 +63,12 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
         this.containerStyle = {
             backgroundColor: '#fff',
-            borderRadius: 3,
+            borderTopLeftRadius: 3,
+            borderTopRightRadius: 3,
             padding: 0,
-            paddingBottom: 10,
             paddingTop: 0,
-            marginBottom: 15,
+            paddingBottom: 0,
+            marginBottom: 12,
             marginTop: 0,
         };
 
@@ -283,7 +284,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 style={{...this.containerStyle,
                     margin: 0,
                     paddingTop: 5,
-                    paddingBottom: 5,
                     borderWidth: 0,
                 }}
                 key={'card-' + post._id}
@@ -311,7 +311,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                         margin: 0,
                         padding: 0,
                         paddingTop: 5,
-                        paddingBottom: 5,
                         borderWidth: 0,
                     }}
                     key={'card-' + post._id}
