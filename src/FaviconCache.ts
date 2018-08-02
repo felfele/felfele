@@ -57,7 +57,10 @@ class _FaviconCache {
         for (const link of links) {
             const icon = this.matchRelAttributes(link, ['shortcut icon', 'icon', 'apple-touch-icon']);
             if (icon != null) {
-                if (!icon.startsWith('http') && !icon.startsWith('//')) {
+                if (icon.startsWith('//')) {
+                    return 'https:' + icon;
+                }
+                if (!icon.startsWith('http')) {
                     return url + icon;
                 }
                 return icon;
