@@ -14,12 +14,13 @@ import { Settings } from './components/Settings';
 import { Location } from './components/Location';
 import { DebugScreen } from './components/DebugScreen';
 import { Share } from './components/Share';
-import { FeedListEditor } from './components/FeedListEditor';
-import { EditFeed } from './components/EditFeed';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
-import { store } from './reducers/index';
+import { store, persistor } from './reducers/index';
+import { PersistGate } from 'redux-persist/integration/react';
+import { FeedListEditorContainer } from './container/FeedListEditorContainer';
+import { EditFeedContainer } from './container/EditFeedContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -123,11 +124,11 @@ const Scenes = {
     Share: {
         screen: Share,
     },
-    FeedListEditor: {
-        screen: FeedListEditor,
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
     },
     EditFeed: {
-        screen: EditFeed,
+        screen: EditFeedContainer,
     },
 };
 
@@ -144,7 +145,9 @@ export default class App extends React.Component {
     public render() {
         return (
             <Provider store={store}>
-                <AppNavigator/>
+                <PersistGate loading={null} persistor={persistor}>
+                    <AppNavigator />
+                </PersistGate>
             </Provider>
         );
     }

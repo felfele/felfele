@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
-import { RSSPostManager } from '../RSSPostManager';
+import { Feed } from '../models/Feed';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -26,7 +26,16 @@ const navigationActions: FeedListEditorNavigationActions = {
     add: undefined,
 };
 
-export class FeedListEditor extends React.Component<any, any> {
+export interface DispatchProps {
+
+}
+
+export interface StateProps {
+    navigation: any;
+    feeds: Feed[];
+}
+
+export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
     public static navigationOptions = {
         header: undefined,
         title: 'Feed list',
@@ -36,9 +45,6 @@ export class FeedListEditor extends React.Component<any, any> {
 
     constructor(props) {
         super(props);
-        this.state = {
-            feeds: RSSPostManager.feedManager.getFeeds(),
-        };
         navigationActions.back = this.props.navigation.goBack;
         navigationActions.add = this.onAddFeed.bind(this);
     }
@@ -48,12 +54,14 @@ export class FeedListEditor extends React.Component<any, any> {
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
-                        {this.state.feeds.map(feed => (
+                        {this.props.feeds.map(feed => (
                             <SettingsList.Item
                                 title={feed.name}
                                 titleInfo={feed.url}
                                 key={feed.url}
-                                onPress={() => this.editFeed(feed)}
+                                onPress={() => {
+                                    this.editFeed(feed);
+                                }}
                             />
                         ))}
                     </SettingsList>
@@ -63,10 +71,16 @@ export class FeedListEditor extends React.Component<any, any> {
     }
 
     private onAddFeed() {
-        this.props.navigation.navigate('EditFeed', {feed: {}});
+        const feed: Feed = {
+            favicon: '',
+            feedUrl: '',
+            name: '',
+            url: '',
+        };
+        this.props.navigation.navigate('EditFeed', { feed: feed });
     }
 
     private editFeed(feed) {
-        this.props.navigation.navigate('EditFeed', {feed: feed});
+        this.props.navigation.navigate('EditFeed', { feed: feed });
     }
 }
