@@ -268,15 +268,12 @@ export class RSSFeedManager {
         return this.feeds;
     }
 
-    public getFeedUrls(): string[] {
-        return this.getFeeds().map(feed => feed.feedUrl);
+    public setFeeds(feeds: Feed[]) {
+        this.feeds = feeds;
     }
 
-    public async loadFeedsFromStorage(): Promise<Feed[]> {
-        const feeds = await Storage.feed.getAllValues();
-        console.log('RSSPostManager.loadFeedsFromStorage:', feeds);
-        this.feeds = feeds;
-        return this.feeds;
+    public getFeedUrls(): string[] {
+        return this.getFeeds().map(feed => feed.feedUrl);
     }
 }
 
@@ -302,7 +299,6 @@ class _RSSPostManager implements PostManager {
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
 
-        await this.feedManager.loadFeedsFromStorage();
         const storedFeeds = this.feedManager.getFeeds();
         const feedMap = {};
         for (const feed of storedFeeds) {

@@ -37,7 +37,11 @@ export class Settings extends React.Component<any, any> {
                         }} />
                         <SettingsList.Item
                             title='Feeds'
-                            onPress={() => this.props.navigation.navigate('FeedListEditor')}
+                            onPress={() => this.props.navigation.navigate('FeedListEditorContainer')}
+                        />
+                        <SettingsList.Item
+                            title='Filters'
+                            onPress={() => this.props.navigation.navigate('ContentFilterEditor')}
                         />
                         <SettingsList.Item
                             hasNavArrow={false}
