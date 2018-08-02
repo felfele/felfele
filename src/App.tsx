@@ -21,6 +21,7 @@ import { store, persistor } from './reducers/index';
 import { PersistGate } from 'redux-persist/integration/react';
 import { FeedListEditorContainer } from './container/FeedListEditorContainer';
 import { EditFeedContainer } from './container/EditFeedContainer';
+import { NewsFeedContainer } from './container/NewsFeedContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -28,7 +29,6 @@ const Root = TabNavigator(
     {
         YourTab: {
             screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri}
                                         post='Post'
                                         navigation={navigation}
                                         postManager={LocalPostManager} />),
@@ -46,8 +46,7 @@ const Root = TabNavigator(
             },
         },
         NewsTab: {
-            screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri}
+            screen: ({navigation}) => (<NewsFeedContainer
                                         post='Post'
                                         navigation={navigation}
                                         postManager={RSSPostManager} />),

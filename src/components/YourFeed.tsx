@@ -29,8 +29,9 @@ import { Utils } from '../Utils';
 
 const WindowWidth = Dimensions.get('window').width;
 
-interface YourFeedProps {
-    uri: string;
+export interface DispatchProps { }
+
+export interface StateProps {
     navigation: any;
     post: any;
     postManager: PostManager;
@@ -38,7 +39,6 @@ interface YourFeedProps {
 
 interface YourFeedState {
     version: number;
-    uri: string;
     selectedPost: Post | null;
     isRefreshing: boolean;
     isOnline: boolean;
@@ -46,14 +46,13 @@ interface YourFeedState {
     posts: Post[];
 }
 
-export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
+export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
     private containerStyle = {};
 
     constructor(props) {
         super(props);
         this.state = {
             version: StateTracker.version,
-            uri: this.props.uri,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
@@ -137,7 +136,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         if (newVersion !== this.state.version) {
             this.setState({
                 version: newVersion,
-                uri: this.state.uri + '#' + newVersion,
                 posts: this.props.postManager.getAllPosts(),
             });
         }
