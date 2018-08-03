@@ -18,7 +18,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         },
         onRemoveFeed: (feed: Feed) => {
             dispatch(Actions.removeFeedAction(feed));
-        }
+        },
     };
 };
 

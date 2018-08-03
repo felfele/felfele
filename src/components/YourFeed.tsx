@@ -33,7 +33,6 @@ export interface DispatchProps { }
 
 export interface StateProps {
     navigation: any;
-    post: any;
     postManager: PostManager;
 }
 
@@ -365,7 +364,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     private renderListHeader = () => {
         return (
             <FeedHeader
-                post={this.props.post}
                 navigation={this.props.navigation}
                 postManager={this.props.postManager} />
         );

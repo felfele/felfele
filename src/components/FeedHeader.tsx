@@ -17,7 +17,6 @@ import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 
 interface FeedHeaderProps {
-    post: any;
     navigation: any;
     postManager: PostManager;
 }
@@ -111,7 +110,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() =>
-                        this.props.navigation.navigate(this.props.post)
+                        this.props.navigation.navigate('Post')
                     }
                     style={{
                         flex: 6,

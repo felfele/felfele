@@ -8,7 +8,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     RSSPostManager.feedManager.setFeeds(state.feeds.toArray());
     return {
         navigation: ownProps.navigation,
-        post: null,
         postManager: RSSPostManager,
     };
 };
