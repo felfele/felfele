@@ -24,5 +24,5 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
 export const EditFeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(EditFeed);

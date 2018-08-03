@@ -23,6 +23,8 @@ export interface RemoveFeedAction {
     feed: Feed;
 }
 
+export const action = (t: ActionTypes): ActionTypes => (t);
+
 export const addContentFilterAction = (filter: string, createdAt: number, validUntil: number): AddContentFilterAction => ({
     type: 'ADD-CONTENT-FILTER',
     filter,

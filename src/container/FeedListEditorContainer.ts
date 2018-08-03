@@ -18,5 +18,5 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
 export const FeedListEditorContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(FeedListEditor);

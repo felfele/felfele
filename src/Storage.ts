@@ -2,7 +2,6 @@ import { AsyncStorage } from 'react-native';
 import { Model } from './models/Model';
 import { Post } from './models/Post';
 import { AuthenticationData } from './models/AuthenticationData';
-import { SyncState } from './models/SyncState';
 import { Feed } from './models/Feed';
 import { Debug } from './Debug';
 
@@ -465,6 +464,5 @@ export const Storage = {
     post: new StorageWithAutoIds<Post>('post'),
     draft: new StorageWithAutoIds<Post>('draft'),
     auth: new StorageWithStringKey<AuthenticationData>('auth'),
-    sync: new StorageWithStringKey<SyncState>('sync'),
     feed: new StorageWithAutoIds<Feed>('feed'),
 };

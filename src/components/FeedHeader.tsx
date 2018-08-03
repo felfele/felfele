@@ -23,10 +23,11 @@ interface FeedHeaderProps {
 
 export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
     public isCameraRollPhoto(pickerResult: ImagePickerResponse) {
-        if (pickerResult.origURL) {
-            if (pickerResult.origURL.startsWith('assets-library://') || pickerResult.origURL.startsWith('content://')) {
-                return true;
-            }
+        if (pickerResult.origURL != null && pickerResult.origURL.startsWith('assets-library://')) {
+            return true;
+        }
+        if (pickerResult.uri != null && pickerResult.uri.startsWith('content://')) {
+            return true;
         }
         return false;
     }
@@ -41,36 +42,31 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
 
     public openImagePicker = async () => {
         const pickerResult = await AsyncImagePicker.showImagePicker({
-            allowsEditing: true,
+            allowsEditing: false,
             aspect: [4, 3],
             base64: true,
             exif: true,
         });
-
         console.log('openImagePicker result: ', pickerResult);
 
         if (pickerResult.error) {
-            console.error('openImagePicker: ', pickerResult.error);
+            console.log('openImagePicker error: ', pickerResult.error);
             return;
         }
 
+        console.log('openImagePicker before didCancel');
         if (pickerResult.didCancel) {
             return;
         }
 
-        let localPath = pickerResult.origURL || '';
-        if (!this.isCameraRollPhoto(pickerResult) && Config.saveToCameraRoll) {
+        let localPath = pickerResult.uri || '';
+        const isCameraRollPhoto = this.isCameraRollPhoto(pickerResult);
+        console.log('isCameraRollPhoto: ', isCameraRollPhoto);
+        if (!isCameraRollPhoto && Config.saveToCameraRoll) {
             localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
         }
 
-        console.log(localPath);
-
-        // Copy file to Document dir
-        // const hash = await RNFetchBlob.fs.hash(pickerResult.uri);
-        // const extension = this.getFilenameExtension(pickerResult.uri);
-        // const filename = `${RNFetchBlob.fs.dirs.DocumentDir}/${hash}.${extension}`
-        // await RNFetchBlob.fs.cp(pickerResult.uri, filename);
-
+        console.log('openImagePicker: localPath: ', localPath);
         const data: ImageData = {
             uri: localPath,
             width: pickerResult.width,
