@@ -239,10 +239,13 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
     }
 
     public async set(t: T) {
+        console.log('set ', t);
         if (t._id == null) {
             const generatedId = await this.generateId(t);
             t._id = generatedId;
         }
+
+        console.log('set generatedId: ', t._id);
 
         await this.storage.set('' + t._id, t);
         if (this.isMetadataUpdated) {
@@ -365,8 +368,10 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
     }
 
     private async tryLoadMetadata(): Promise<Metadata> {
+        console.log('tryLoadMetadata: ', this.storage.getName());
         if (this.metadata === null) {
             const value = await AsyncStorageWrapper.getItem(this.storage.getName());
+            console.log('tryLoadMetadata: ', this.storage.getName(), value);
             if (value == null) {
                 this.metadata = {
                     highestSeenId: 0,
@@ -390,7 +395,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
 
 export class AsyncStorageWrapper {
     public static setItem(key, value) {
-        // console.log('setItem: ', key, typeof value, value);
+        console.log('setItem: ', key, typeof value, value);
         try {
             return AsyncStorage.setItem(key, value);
         } catch (e) {
@@ -410,9 +415,11 @@ export class AsyncStorageWrapper {
     }
 
     public static getItem(key) {
-        // console.log('getItem: ', key);
+        console.log('getItem: ', key);
         try {
-            return AsyncStorage.getItem(key);
+            const value = AsyncStorage.getItem(key);
+            console.log('getItem: ', key, value);
+            return value;
         } catch (e) {
             console.log('getItem error: ', e);
             return null;

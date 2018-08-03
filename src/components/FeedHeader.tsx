@@ -26,7 +26,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         if (pickerResult.origURL != null && pickerResult.origURL.startsWith('assets-library://')) {
             return true;
         }
-        if (pickerResult.uri != null && pickerResult.uri.startsWith('content://')) {
+        if (pickerResult.uri != null && pickerResult.uri.startsWith('content://media')) {
             return true;
         }
         return false;
@@ -63,7 +63,11 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         const isCameraRollPhoto = this.isCameraRollPhoto(pickerResult);
         console.log('isCameraRollPhoto: ', isCameraRollPhoto);
         if (!isCameraRollPhoto && Config.saveToCameraRoll) {
-            localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
+            if (Platform.OS === 'ios') {
+                localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
+            } else {
+                localPath = await CameraRoll.saveToCameraRoll('file://' + pickerResult.path);
+            }
         }
 
         console.log('openImagePicker: localPath: ', localPath);

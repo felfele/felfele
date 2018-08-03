@@ -2,10 +2,6 @@ import { Config } from './Config';
 import { Storage, StorageWithAutoIds, Query, Queryable, QueryOrder, Condition } from './Storage';
 import { Post, ImageData } from './models/Post';
 import StateTracker from './StateTracker';
-import { ImageDownloader } from './ImageDownloader';
-import { Debug } from './Debug';
-import { NetworkStatus } from './NetworkStatus';
-import { DateUtils } from './DateUtils';
 import { PostManager } from './PostManager';
 
 const DefaultDraftId = 1;
@@ -27,6 +23,7 @@ class PostCache implements Queryable<Post> {
     }
 
     public async set(post) {
+        console.log('PostCache.set ', post);
         await this.storage.set(post);
         if (post.deleted) {
             this.remove(post);
@@ -110,7 +107,7 @@ export class _LocalPostManager implements PostManager {
 
             try {
                 await this.syncLocalDeletedPosts();
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         } else {
@@ -125,6 +122,7 @@ export class _LocalPostManager implements PostManager {
     }
 
     public async saveAndSyncPost(post: Post) {
+        console.log('LocalPostManager.saveAndSyncPost: ', post);
         await this.postCache.set(post);
         StateTracker.updateVersion(StateTracker.version + 1);
     }
@@ -165,7 +163,7 @@ export class _LocalPostManager implements PostManager {
                         .replace('[', '')
                         .replace(']', '')
                         .replace('(', '')
-                        .replace(')', '')
+                        .replace(')', ''),
             };
             images.push(image);
             return '';
