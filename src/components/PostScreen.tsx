@@ -148,7 +148,14 @@ export class PostScreen extends React.Component<any, any> {
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
                         <TextInput
-                            style={{marginTop: 0, flex: 3, fontSize: 16, padding: 10, paddingVertical: 10}}
+                            style={{
+                                marginTop: 0,
+                                flex: 3,
+                                fontSize: 16,
+                                padding: 10,
+                                paddingVertical: 10,
+                                textAlignVertical: 'top',
+                            }}
                             multiline={true}
                             numberOfLines={4}
                             onEndEditing={() => {this.hideKeyboard(); }}
@@ -156,8 +163,8 @@ export class PostScreen extends React.Component<any, any> {
                             value={this.state.text}
                             placeholder="What's on your mind?"
                             placeholderTextColor='gray'
-                        >
-                        </TextInput>
+                            underlineColorAndroid='transparent'
+                        />
                         <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
                     </View>
                     <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
@@ -202,14 +209,14 @@ export class PostScreen extends React.Component<any, any> {
             AlertIOS.alert(
                 'Save this post as a draft?',
                 undefined,
-                options
+                options,
             );
         }
         else {
             Alert.alert('Save this post as a draft?',
                 undefined,
                 options,
-                { cancelable: true }
+                { cancelable: true },
             );
         }
     }
@@ -241,7 +248,7 @@ export class PostScreen extends React.Component<any, any> {
                 'Saving draft failed, try again later!',
                 [
                     {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
+                ],
             );
         }
 
@@ -318,13 +325,9 @@ export class PostScreen extends React.Component<any, any> {
                 'Posting failed, try again later!',
                 [
                     {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
+                ],
             );
         }
-    }
-
-    private markdownEscape(text) {
-        return text;
     }
 
     private renderActivityIndicator() {
