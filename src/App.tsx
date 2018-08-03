@@ -29,7 +29,6 @@ const Root = TabNavigator(
     {
         YourTab: {
             screen: ({navigation}) => (<YourFeed
-                                        post='Post'
                                         navigation={navigation}
                                         postManager={LocalPostManager} />),
             path: '/',
@@ -47,7 +46,6 @@ const Root = TabNavigator(
         },
         NewsTab: {
             screen: ({navigation}) => (<NewsFeedContainer
-                                        post='Post'
                                         navigation={navigation}
                                         postManager={RSSPostManager} />),
             path: '/',
