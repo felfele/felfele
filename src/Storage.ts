@@ -395,7 +395,7 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
 
 export class AsyncStorageWrapper {
     public static setItem(key, value) {
-        console.log('setItem: ', key, typeof value, value);
+        // console.log('setItem: ', key, typeof value, value);
         try {
             return AsyncStorage.setItem(key, value);
         } catch (e) {
