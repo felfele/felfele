@@ -1,6 +1,5 @@
 // tslint:disable-next-line:no-var-requires
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
-// import { ImagePicker } from 'react-native-image-picker';
 
 export interface Response {
     customButton: string;
