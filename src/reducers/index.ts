@@ -15,15 +15,23 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import * as immutableTransform from 'redux-persist-transform-immutable';
 import { Feed } from '../models/Feed';
+import { Settings } from '../models/Settings';
+import { Platform } from '../../node_modules/@types/react-native';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
-
+    settings: Settings;
 }
+
+const defaultSettings: Settings = {
+    saveToCameraRoll: true,
+};
+
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
+    settings: defaultSettings,
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: ActionTypes): List<ContentFilter> => {
@@ -56,6 +64,11 @@ const feedsReducer = (feeds = List<Feed>(), action: ActionTypes): List<Feed> => 
         }
     }
 };
+
+const settingsReducer = (settings = defaultSettings, action: ActionTypes): Settings => {
+    return defaultSettings;
+};
+
 const persistConfig = {
     transforms: [immutableTransform()],
     key: 'root',
@@ -65,6 +78,7 @@ const persistConfig = {
 export const reducer = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
+    settings: settingsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -74,7 +88,7 @@ export const store = createStore(
     defaultState,
     compose(
         applyMiddleware(thunkMiddleware),
-    )
+    ),
 );
 export const persistor = persistStore(store);
 
