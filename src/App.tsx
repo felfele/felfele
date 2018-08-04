@@ -19,11 +19,11 @@ import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { PersistGate } from 'redux-persist/integration/react';
-import { FeedListEditorContainer } from './container/FeedListEditorContainer';
-import { EditFeedContainer } from './container/EditFeedContainer';
-import { NewsFeedContainer } from './container/NewsFeedContainer';
-import { FilterListEditorContainer } from './container/FilterListEditorContainer';
-import { EditFilterContainer } from './container/EditFilterContainer';
+import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
+import { EditFeedContainer } from './containers/EditFeedContainer';
+import { NewsFeedContainer } from './containers/NewsFeedContainer';
+import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
+import { EditFilterContainer } from './containers/EditFilterContainer';
 
 Debug.setDebug(__DEV__);
 
