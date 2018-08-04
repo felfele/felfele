@@ -16,7 +16,6 @@ import storage from 'redux-persist/lib/storage';
 import * as immutableTransform from 'redux-persist-transform-immutable';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { Platform } from '../../node_modules/@types/react-native';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;

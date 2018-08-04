@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet, Button, Image } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import { Feed } from '../models/Feed';
+import { IconSize } from '../styles';
+import { Icon } from '../../node_modules/@types/react-native-vector-icons/Icon';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -35,6 +37,23 @@ export interface StateProps {
     feeds: Feed[];
 }
 
+const Favicon = (props) => (
+    <View style={{
+        paddingVertical: 10,
+        paddingLeft: 5,
+    }}>
+        <Image
+            source={{
+                uri: props.uri,
+            }}
+            style={{
+                width: IconSize.LARGE_LIST_ICON,
+                height: IconSize.LARGE_LIST_ICON,
+            }}
+        />
+    </View>
+);
+
 export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
     public static navigationOptions = {
         header: undefined,
@@ -50,6 +69,7 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
     }
 
     public render() {
+        console.log('feeds: ', this.props.feeds);
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
@@ -58,6 +78,7 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
                             <SettingsList.Item
                                 title={feed.name}
                                 titleInfo={feed.url}
+                                icon={<Favicon uri={feed.favicon} />}
                                 key={feed.url}
                                 onPress={() => {
                                     this.editFeed(feed);

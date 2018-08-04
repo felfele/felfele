@@ -161,7 +161,7 @@ export class PostScreen extends React.Component<any, any> {
                             onEndEditing={() => {this.hideKeyboard(); }}
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
-                            placeholder="What's on your mind?"
+                            placeholder="What's your story?"
                             placeholderTextColor='gray'
                             underlineColorAndroid='transparent'
                         />
