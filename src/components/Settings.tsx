@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, FlatList, Text, Alert, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -53,7 +53,9 @@ export class Settings extends React.Component<any, any> {
                         { __DEV__ &&
                          <SettingsList.Item
                             icon={
-                                <Ionicons name='md-bug' size={24} color='gray' />
+                                <this.SettingsIcon>
+                                    <Ionicons name='md-bug' size={24} color='gray' />
+                                </this.SettingsIcon>
                             }
                             title='Debug menu'
                             onPress={() => this.props.navigation.navigate('Debug')}
@@ -64,6 +66,15 @@ export class Settings extends React.Component<any, any> {
             </SafeAreaView>
         );
     }
+
+    private SettingsIcon = (props) => (
+        <View style={{
+            paddingVertical: 10,
+            paddingLeft: 5,
+        }}>
+            {props.children}
+        </View>
+    )
 
     private onSaveToCameraRollValueChange(value) {
         Config.saveToCameraRoll = value;
