@@ -1,22 +1,8 @@
 import * as React from 'react';
-import { View, StyleSheet, Button, Image } from 'react-native';
+import { View, Button, Image } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import { Feed } from '../models/Feed';
 import { IconSize } from '../styles';
-import { Icon } from '../../node_modules/@types/react-native-vector-icons/Icon';
-
-const styles = StyleSheet.create({
-    imageStyle: {
-        marginLeft: 15,
-        alignSelf: 'center',
-        height: 30,
-        width: 30,
-    },
-    titleInfoStyle: {
-        fontSize: 16,
-        color: '#8e8e93',
-    },
-});
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
@@ -69,7 +55,6 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
     }
 
     public render() {
-        console.log('feeds: ', this.props.feeds);
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>

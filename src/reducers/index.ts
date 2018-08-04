@@ -5,6 +5,7 @@ import {
     applyMiddleware,
     compose,
 } from 'redux';
+import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 
 import {
@@ -43,8 +44,12 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
             };
             return contentFilters.push(filter);
         }
+        case 'REMOVE-CONTENT-FILTER': {
+            const ind = contentFilters.findIndex(filter => filter != null && action.filter.filter === filter.filter);
+            return contentFilters.remove(ind);
+        }
         default: {
-            return List<ContentFilter>();
+            return contentFilters;
         }
     }
 };
@@ -59,19 +64,22 @@ const feedsReducer = (feeds = List<Feed>(), action: ActionTypes): List<Feed> => 
             return feeds.remove(ind);
         }
         default: {
-            return List<Feed>();
+            return feeds;
         }
     }
 };
 
 const settingsReducer = (settings = defaultSettings, action: ActionTypes): Settings => {
-    return defaultSettings;
+    return settings;
 };
 
 const persistConfig = {
-    transforms: [immutableTransform()],
+    transforms: [immutableTransform({
+        whitelist: ['contentFilters', 'feeds'],
+    })],
+    blacklist: [''],
     key: 'root',
-    storage,
+    storage: AsyncStorage,
 };
 
 export const reducer = combineReducers<AppState>({

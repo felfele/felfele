@@ -6,6 +6,7 @@ import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
 import { Storage } from './Storage';
 import { HtmlUtils } from './HtmlUtils';
+import { ContentFilter } from './models/ContentFilter';
 
 interface RSSEnclosure {
     url: string;
@@ -283,6 +284,11 @@ class _RSSPostManager implements PostManager {
     private posts: Post[] = [];
     private id = FirstId;
     private idCache = {};
+    private contentFilters: ContentFilter[] = [];
+
+    public setContentFilters(contentFilters: ContentFilter[]) {
+        this.contentFilters = contentFilters;
+    }
 
     public async saveAndSyncPost(post: Post) {
         // do nothing
@@ -466,6 +472,9 @@ class _RSSPostManager implements PostManager {
             };
             return post;
         }).filter(post => {
+            if (this.matchContentFilters(post.text)) {
+                return false;
+            }
             if (post.link != null && links.has(post.link)) {
                 return false;
             }
@@ -483,6 +492,16 @@ class _RSSPostManager implements PostManager {
 
         console.log('RSS items posts: ', posts);
         return posts;
+    }
+
+    private matchContentFilters(text: string): boolean {
+        for (const filter of this.contentFilters) {
+            const regexp = new RegExp(filter.filter, 'i');
+            if (text.search(regexp) !== -1) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

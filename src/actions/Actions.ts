@@ -1,7 +1,9 @@
 import { Feed } from '../models/Feed';
+import { ContentFilter } from '../models/ContentFilter';
 
 export type ActionTypes =
     | AddContentFilterAction
+    | RemoveContentFilterAction
     | AddFeedAction
     | RemoveFeedAction
     ;
@@ -11,6 +13,11 @@ export interface AddContentFilterAction {
     filter: string;
     createdAt: number;
     validUntil: number;
+}
+
+export interface RemoveContentFilterAction {
+    type: 'REMOVE-CONTENT-FILTER';
+    filter: ContentFilter;
 }
 
 export interface AddFeedAction {

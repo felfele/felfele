@@ -85,7 +85,7 @@ export interface StateProps {
 export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public static navigationOptions = {
         header: undefined,
-        title: 'Feed list',
+        title: 'Edit feed',
         headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
     };
 
@@ -189,7 +189,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         Alert.alert('Are you sure you want to delete the feed?',
             undefined,
             options,
-            { cancelable: true }
+            { cancelable: true },
         );
     }
 
@@ -201,7 +201,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         Alert.alert('Failed to load feed!',
             undefined,
             options,
-            { cancelable: true }
+            { cancelable: true },
         );
 
         this.setState({

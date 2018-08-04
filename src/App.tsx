@@ -17,11 +17,13 @@ import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
-import { store, persistor } from './reducers/index';
+import { store, persistor } from './reducers';
 import { PersistGate } from 'redux-persist/integration/react';
 import { FeedListEditorContainer } from './container/FeedListEditorContainer';
 import { EditFeedContainer } from './container/EditFeedContainer';
 import { NewsFeedContainer } from './container/NewsFeedContainer';
+import { FilterListEditorContainer } from './container/FilterListEditorContainer';
+import { EditFilterContainer } from './container/EditFilterContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -102,7 +104,7 @@ const Root = TabNavigator(
                         backgroundColor: 'black',
                     },
                 },
-    }
+    },
 );
 
 const Scenes = {
@@ -124,8 +126,14 @@ const Scenes = {
     FeedListEditorContainer: {
         screen: FeedListEditorContainer,
     },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
+    },
     EditFeed: {
         screen: EditFeedContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
     },
 };
 
@@ -135,7 +143,7 @@ const AppNavigator = StackNavigator(Scenes,
         navigationOptions: {
             header: null,
         },
-    }
+    },
 );
 
 export default class App extends React.Component {
