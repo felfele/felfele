@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import * as Actions from '../actions/Actions';
+import * as Actions from '../actions/actions';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { RSSPostManager } from '../RSSPostManager';
 

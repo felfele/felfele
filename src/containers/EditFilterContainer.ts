@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import * as Actions from '../actions/Actions';
+import { Actions } from '../actions/actions';
 import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
@@ -22,7 +22,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             ));
         },
         onRemoveFilter: (filter: ContentFilter) => {
-            dispatch(Actions.action({type: 'REMOVE-CONTENT-FILTER', filter: filter}));
+            dispatch(Actions.removeContentFilterAction(filter));
         },
     };
 };
