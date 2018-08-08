@@ -8,9 +8,7 @@ import {
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 
-import {
-    ActionTypes,
-} from '../actions/Actions';
+import { Actions } from '../actions/actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -34,18 +32,18 @@ const defaultState: AppState = {
     settings: defaultSettings,
 };
 
-const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: ActionTypes): List<ContentFilter> => {
+const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
     switch (action.type) {
         case 'ADD-CONTENT-FILTER': {
             const filter: ContentFilter = {
-                filter: action.filter,
-                createdAt: action.createdAt,
-                validUntil: action.validUntil,
+                filter: action.payload.filter,
+                createdAt: action.payload.createdAt,
+                validUntil: action.payload.validUntil,
             };
             return contentFilters.push(filter);
         }
         case 'REMOVE-CONTENT-FILTER': {
-            const ind = contentFilters.findIndex(filter => filter != null && action.filter.filter === filter.filter);
+            const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.filter === filter.filter);
             return contentFilters.remove(ind);
         }
         default: {
@@ -54,13 +52,13 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
     }
 };
 
-const feedsReducer = (feeds = List<Feed>(), action: ActionTypes): List<Feed> => {
+const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
-            return feeds.push(action.feed);
+            return feeds.push(action.payload.feed);
         }
         case 'REMOVE-FEED': {
-            const ind = feeds.findIndex(feed => feed != null && action.feed.feedUrl === feed.feedUrl);
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
             return feeds.remove(ind);
         }
         default: {
@@ -69,7 +67,7 @@ const feedsReducer = (feeds = List<Feed>(), action: ActionTypes): List<Feed> => 
     }
 };
 
-const settingsReducer = (settings = defaultSettings, action: ActionTypes): Settings => {
+const settingsReducer = (settings = defaultSettings, action: Actions): Settings => {
     return settings;
 };
 

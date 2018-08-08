@@ -1,50 +1,24 @@
+import { ActionsUnion } from './types';
+import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 
-export type ActionTypes =
-    | AddContentFilterAction
-    | RemoveContentFilterAction
-    | AddFeedAction
-    | RemoveFeedAction
-    ;
-
-export interface AddContentFilterAction {
-    type: 'ADD-CONTENT-FILTER';
-    filter: string;
-    createdAt: number;
-    validUntil: number;
+export enum ActionTypes {
+    ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
+    REMOVE_CONTENT_FILTER = 'REMOVE-CONTENT-FILTER',
+    ADD_FEED = 'ADD-FEED',
+    REMOVE_FEED = 'REMOVE-FEED',
 }
 
-export interface RemoveContentFilterAction {
-    type: 'REMOVE-CONTENT-FILTER';
-    filter: ContentFilter;
-}
+export const Actions = {
+    addContentFilterAction: (filter: string, createdAt: number, validUntil: number) =>
+        createAction(ActionTypes.ADD_CONTENT_FILTER, { filter, createdAt, validUntil }),
+    removeContentFilterAction: (filter: ContentFilter) =>
+        createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
+    addFeedAction: (feed: Feed) =>
+        createAction(ActionTypes.ADD_FEED, { feed }),
+    removeFeedAction: (feed: Feed) =>
+        createAction(ActionTypes.REMOVE_FEED, { feed }),
+};
 
-export interface AddFeedAction {
-    type: 'ADD-FEED';
-    feed: Feed;
-}
-
-export interface RemoveFeedAction {
-    type: 'REMOVE-FEED';
-    feed: Feed;
-}
-
-export const action = (t: ActionTypes): ActionTypes => (t);
-
-export const addContentFilterAction = (filter: string, createdAt: number, validUntil: number): AddContentFilterAction => ({
-    type: 'ADD-CONTENT-FILTER',
-    filter,
-    createdAt,
-    validUntil,
-});
-
-export const addFeedAction = (feed: Feed): AddFeedAction => ({
-    type: 'ADD-FEED',
-    feed,
-});
-
-export const removeFeedAction = (feed: Feed): RemoveFeedAction => ({
-    type: 'REMOVE-FEED',
-    feed,
-});
+export type Actions = ActionsUnion<typeof Actions>;
