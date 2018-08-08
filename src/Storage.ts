@@ -1,8 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { Model } from './models/Model';
 import { Post } from './models/Post';
-import { AuthenticationData } from './models/AuthenticationData';
-import { Feed } from './models/Feed';
 import { Debug } from './Debug';
 
 interface Metadata {
@@ -239,13 +237,10 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
     }
 
     public async set(t: T) {
-        console.log('set ', t);
         if (t._id == null) {
             const generatedId = await this.generateId(t);
             t._id = generatedId;
         }
-
-        console.log('set generatedId: ', t._id);
 
         await this.storage.set('' + t._id, t);
         if (this.isMetadataUpdated) {
@@ -368,17 +363,14 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
     }
 
     private async tryLoadMetadata(): Promise<Metadata> {
-        console.log('tryLoadMetadata: ', this.storage.getName());
         if (this.metadata === null) {
             const value = await AsyncStorageWrapper.getItem(this.storage.getName());
-            console.log('tryLoadMetadata: ', this.storage.getName(), value);
             if (value == null) {
                 this.metadata = {
                     highestSeenId: 0,
                 };
                 await AsyncStorageWrapper.setItem(this.storage.getName(), JSON.stringify(this.metadata));
             } else {
-                console.log('tryLoadMetadata: ', this.storage.getName(), value);
                 this.metadata = JSON.parse(value) as Metadata;
             }
         }
@@ -395,7 +387,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
 
 export class AsyncStorageWrapper {
     public static setItem(key, value) {
-        // console.log('setItem: ', key, typeof value, value);
         try {
             return AsyncStorage.setItem(key, value);
         } catch (e) {
@@ -405,7 +396,6 @@ export class AsyncStorageWrapper {
     }
 
     public static mergeItem(key, value) {
-        // console.log('mergeItem: ', key, typeof value, value);
         try {
             return AsyncStorage.mergeItem(key, value);
         } catch (e) {
@@ -415,10 +405,8 @@ export class AsyncStorageWrapper {
     }
 
     public static getItem(key) {
-        console.log('getItem: ', key);
         try {
             const value = AsyncStorage.getItem(key);
-            console.log('getItem: ', key, value);
             return value;
         } catch (e) {
             console.log('getItem error: ', e);
@@ -427,7 +415,6 @@ export class AsyncStorageWrapper {
     }
 
     public static removeItem(key) {
-        Debug.log('removeItem: ', key);
         try {
             return AsyncStorage.removeItem(key);
         } catch (e) {
@@ -470,6 +457,4 @@ export class AsyncStorageWrapper {
 export const Storage = {
     post: new StorageWithAutoIds<Post>('post'),
     draft: new StorageWithAutoIds<Post>('draft'),
-    auth: new StorageWithStringKey<AuthenticationData>('auth'),
-    feed: new StorageWithAutoIds<Feed>('feed'),
 };
