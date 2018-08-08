@@ -1,20 +1,21 @@
 import React from 'react';
-import App from '../src/App';
-
 import renderer from 'react-test-renderer';
 
+import App from '../src/App';
+
 jest.unmock('ScrollView');
-jest.mock('WebView', () => 'WebView')
+jest.mock('WebView', () => 'WebView');
 jest.mock('react-native-fetch-blob', () => {
   return {
     DocumentDir: () => {},
     ImageCache: {
       get: {
-        clear: () => {}
-      }
-    }
-  }
-})
+        clear: () => {},
+      },
+    },
+  };
+});
+jest.mock('react-native-settings-list', () => 'react-native-settings-list');
 
 it('renders without crashing', () => {
   const rendered = renderer.create(<App />).toJSON();
