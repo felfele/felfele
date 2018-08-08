@@ -2,7 +2,6 @@ import { connect } from 'react-redux';
 
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
-import * as Actions from '../actions/actions';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {

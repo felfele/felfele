@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import * as Actions from '../actions/actions';
+import * as Actions from '../actions/Actions';
 import { StateProps, DispatchProps, FilterListEditor } from '../components/FilterListEditor';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
