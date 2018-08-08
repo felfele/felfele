@@ -8,7 +8,7 @@ import {
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 
-import { Actions } from '../actions/actions';
+import { Actions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
