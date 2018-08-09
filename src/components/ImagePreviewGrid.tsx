@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
-import { Col, Row, Grid } from "react-native-easy-grid";
+import { Row, Grid } from 'react-native-easy-grid';
 
 export class ImagePreviewGrid extends React.Component<any, any> {
     private width = 0;
