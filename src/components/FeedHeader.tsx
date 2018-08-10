@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
+import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Config } from '../Config';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
@@ -22,65 +22,14 @@ interface FeedHeaderProps {
 }
 
 export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
-    public isCameraRollPhoto(pickerResult: ImagePickerResponse) {
-        if (pickerResult.origURL != null && pickerResult.origURL.startsWith('assets-library://')) {
-            return true;
-        }
-        if (pickerResult.uri != null && pickerResult.uri.startsWith('content://media')) {
-            return true;
-        }
-        return false;
-    }
-
-    public getFilenameExtension(filename) {
-        const a = filename.split('.');
-        if (a.length === 1 || ( a[0] === '' && a.length === 2 ) ) {
-            return '';
-        }
-        return a.pop().toLowerCase();
-    }
-
     public openImagePicker = async () => {
-        const pickerResult = await AsyncImagePicker.showImagePicker({
-            allowsEditing: false,
-            aspect: [4, 3],
-            base64: true,
-            exif: true,
-        });
-        console.log('openImagePicker result: ', pickerResult);
-
-        if (pickerResult.error) {
-            console.log('openImagePicker error: ', pickerResult.error);
+        const imageData = await AsyncImagePicker.showImagePicker();
+        if (imageData == null) {
             return;
         }
-
-        console.log('openImagePicker before didCancel');
-        if (pickerResult.didCancel) {
-            return;
-        }
-
-        let localPath = pickerResult.uri || '';
-        const isCameraRollPhoto = this.isCameraRollPhoto(pickerResult);
-        console.log('isCameraRollPhoto: ', isCameraRollPhoto);
-        if (!isCameraRollPhoto && Config.saveToCameraRoll) {
-            if (Platform.OS === 'ios') {
-                localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
-            } else {
-                localPath = await CameraRoll.saveToCameraRoll('file://' + pickerResult.path);
-            }
-        }
-
-        console.log('openImagePicker: localPath: ', localPath);
-        const data: ImageData = {
-            uri: localPath,
-            width: pickerResult.width,
-            height: pickerResult.height,
-            data: pickerResult.data,
-            localPath: localPath,
-        };
 
         const post: Post = {
-            images: [data],
+            images: [imageData],
             text: '',
             createdAt: Date.now(),
         };

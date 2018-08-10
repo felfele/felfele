@@ -43,7 +43,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Access to camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Access to photos</string>
 	<key>UIAppFonts</key>

@@ -58,10 +58,10 @@ export class PostScreen extends React.Component<any, any> {
 
         this.getPostForEditing().then(post => {
             if (post) {
-                const [text, images] = LocalPostManager.extractTextAndImagesFromMarkdown(post.text);
+                console.log('PostScreen.constructor: ', post);
                 this.setState({
-                    text: text,
-                    uploadedImages: images,
+                    text: post.text,
+                    uploadedImages: post.images,
                     isLoading: false,
                     post: post,
                 });
@@ -268,22 +268,10 @@ export class PostScreen extends React.Component<any, any> {
     }
 
     private openImagePicker = async () => {
-        const pickerResult = await AsyncImagePicker.launchImageLibrary({
-            allowsEditing: false,
-            aspect: [4, 3],
-            base64: true,
-            exif: true,
-        });
-        if (!pickerResult.didCancel) {
-            const data: ImageData = {
-                uri: pickerResult.uri,
-                width: pickerResult.width,
-                height: pickerResult.height,
-                data: pickerResult.data,
-            };
-
+        const imageData = await AsyncImagePicker.launchImageLibrary();
+        if (imageData != null) {
             this.setState({
-                uploadedImages: this.state.uploadedImages.concat([data]),
+                uploadedImages: this.state.uploadedImages.concat([imageData]),
             });
         }
     }
@@ -351,14 +339,14 @@ export class PostScreen extends React.Component<any, any> {
         const iconSize = showText ? 20 : 30;
         const justifyContent = showText ? 'center' : 'space-around';
         return (
-                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
-                        <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
-                        { showText &&
-                            <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
-                        }
-                    </View>
-                </TouchableOpacity>
+            <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
+                <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                    <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
+                    { showText &&
+                        <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
+                    }
+                </View>
+            </TouchableOpacity>
         );
     }
 }
