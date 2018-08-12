@@ -14,11 +14,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
-        onAddFilter: (filter: string) => {
+        onAddFilter: (filter: ContentFilter) => {
             dispatch(Actions.addContentFilterAction(
-                filter,
-                Date.now(),
-                0,
+                filter.text,
+                filter.createdAt,
+                filter.validUntil,
             ));
         },
         onRemoveFilter: (filter: ContentFilter) => {

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View, SafeAreaView, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
-import { ContentFilter } from '../models/ContentFilter';
+import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
+import { DateUtils } from '../DateUtils';
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
@@ -42,8 +43,9 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
                         {this.props.filters.map(filter => (
                             <SettingsList.Item
-                                title={filter.filter}
-                                key={filter.filter}
+                                title={filter.text}
+                                titleInfo={filterValidUntilToText(filter.validUntil) + ' from ' + DateUtils.printableElapsedTime(filter.createdAt) + ' ago'}
+                                key={filter.text}
                                 onPress={() => {
                                     this.editFilter(filter);
                                 }}
@@ -71,7 +73,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
 
     private onAddFilter = () => {
         const filter: ContentFilter = {
-            filter: '',
+            text: '',
             createdAt: 0,
             validUntil: 0,
         };

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, Button, Image } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import { Feed } from '../models/Feed';
-import { IconSize } from '../styles';
+import { IconSize, Colors } from '../styles';
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
@@ -25,7 +25,7 @@ export interface StateProps {
 
 const Favicon = (props) => (
     <View style={{
-        paddingVertical: 10,
+        paddingVertical: 16,
         paddingLeft: 5,
     }}>
         <Image
@@ -57,21 +57,19 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
     public render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                    <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
-                        {this.props.feeds.map(feed => (
-                            <SettingsList.Item
-                                title={feed.name}
-                                titleInfo={feed.url}
-                                icon={<Favicon uri={feed.favicon} />}
-                                key={feed.url}
-                                onPress={() => {
-                                    this.editFeed(feed);
-                                }}
-                            />
-                        ))}
-                    </SettingsList>
-                </View>
+                <SettingsList borderColor={Colors.LIGHTER_GRAY} defaultItemSize={60}>
+                    {this.props.feeds.map(feed => (
+                        <SettingsList.Item
+                            title={feed.name}
+                            titleInfo={feed.url}
+                            icon={<Favicon uri={feed.favicon} />}
+                            key={feed.url}
+                            onPress={() => {
+                                this.editFeed(feed);
+                            }}
+                        />
+                    ))}
+                </SettingsList>
             </View>
         );
     }

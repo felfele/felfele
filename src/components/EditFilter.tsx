@@ -6,15 +6,12 @@ import {
     Button,
     View,
     Text,
-    ActivityIndicator,
+    Slider,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
-import { Utils } from '../Utils';
-import { Feed } from '../models/Feed';
-import { Storage } from '../Storage';
-import { ContentFilter } from '../models/ContentFilter';
+import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
+import { Colors } from '../styles';
+import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
 
 interface EditFilterNavigationActions {
     back?: () => void;
@@ -63,14 +60,30 @@ const styles = StyleSheet.create({
         backgroundColor: '#EFEFF4',
         paddingTop: 10,
     },
+    sliderContainer: {
+        paddingHorizontal: 20,
+        flexDirection: 'column',
+        height: 80,
+    },
+    sliderText: {
+        flex: 1,
+        color: Colors.GRAY,
+        paddingTop: 20,
+    },
+    slider: {
+        flex: 1,
+    },
 });
 
+type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
+
 interface EditFilterState {
-    filter: string;
+    filterText: string;
+    filterSliderValue: SliderValue;
 }
 
 export interface DispatchProps {
-    onAddFilter: (filter: string) => void;
+    onAddFilter: (filter: ContentFilter) => void;
     onRemoveFilter: (filter: ContentFilter) => void;
 }
 
@@ -79,6 +92,32 @@ export interface StateProps {
     navigation: any;
 }
 
+const sliderValueToDateDiff = (value: SliderValue): number => {
+    switch (value) {
+        case 0: return 0;
+        case 1: return HOUR;
+        case 2: return DAY;
+        case 3: return WEEK;
+        case 4: return MONTH31;
+        case 5: return 0;
+    }
+};
+
+const sliderValueToText = (value: SliderValue): string => {
+    const dateDiff = sliderValueToDateDiff(value);
+    return filterValidUntilToText(dateDiff);
+};
+
+const filterValidUntilToSliderValue = (dateDiff: number): SliderValue => {
+    switch (dateDiff) {
+        case HOUR: return 1;
+        case DAY: return 2;
+        case WEEK: return 3;
+        case MONTH31: return 4;
+        default: return 0;
+    }
+};
+
 export class EditFilter extends React.Component<DispatchProps & StateProps, EditFilterState> {
     public static navigationOptions = {
         header: undefined,
@@ -86,28 +125,39 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
         headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
     };
 
-    public state: EditFilterState = {
-        filter: '',
-    };
-
     constructor(props) {
         super(props);
-        this.state.filter = this.props.filter.filter;
+        this.state = {
+            filterText: this.props.filter.text,
+            filterSliderValue: filterValidUntilToSliderValue(this.props.filter.validUntil),
+        };
         navigationActions.back = this.goBack.bind(this);
     }
 
     public render() {
+        const sliderText = 'Filter until: ' + sliderValueToText(this.state.filterSliderValue);
         return (
             <View style={styles.container}>
                 <TextInput
-                    value={this.state.filter}
+                    value={this.state.filterText}
                     style={styles.linkInput}
-                    onChangeText={(text) => this.setState({ filter: text })}
+                    onChangeText={(text) => this.setState({ filterText: text })}
                     placeholder='Text to be filtered'
                     autoCapitalize='none'
                     autoFocus={true}
                 />
-                { this.props.filter.filter.length > 0
+                <View style={styles.sliderContainer}>
+                    <Text style={styles.sliderText}>{sliderText}</Text>
+                    <Slider
+                        style={styles.slider}
+                        minimumValue={0}
+                        maximumValue={5}
+                        step={1}
+                        value={this.state.filterSliderValue}
+                        onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
+                    />
+                </View>
+                { this.props.filter.text.length > 0
                         ? <Button
                             title='Delete'
                             onPress={this.onDeleteFilter}
@@ -122,7 +172,12 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
     }
 
     private onAddFilter = () => {
-        this.props.onAddFilter(this.state.filter);
+        const filter: ContentFilter = {
+            text: this.state.filterText,
+            validUntil: sliderValueToDateDiff(this.state.filterSliderValue),
+            createdAt: Date.now(),
+        };
+        this.props.onAddFilter(filter);
         this.goBack();
     }
 

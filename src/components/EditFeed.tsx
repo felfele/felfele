@@ -172,7 +172,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
             const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-            console.log('fetchFeed: feed: ', feed);
+            console.log('fetchFeedFromUrl: feed: ', feed);
             return feed;
         } catch (e) {
             console.log(e);

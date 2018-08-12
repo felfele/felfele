@@ -88,31 +88,9 @@ export class _LocalPostManager implements PostManager {
         return this.postCache.getPosts().sort((a, b) => diff(a._id, b._id));
     }
 
-    public async syncLocalDeletedPosts() {
-        const highestSeenPostId = await this.getHighestSeenPostId();
-        const localOnlyDeletedPosts = await Storage.post.query()
-                                        .lte('_id', highestSeenPostId)
-                                        .eq('deleted', true)
-                                        .desc()
-                                        .limit(highestSeenPostId)
-                                        .execute();
-
-        const syncIds = localOnlyDeletedPosts.map(post => post.syncId);
-    }
-
     public async deletePost(post: Post) {
         post.deleted = true;
-        if (post.syncId) {
-            await this.postCache.set(post);
-
-            try {
-                await this.syncLocalDeletedPosts();
-            } catch (e) {
-                console.error(e);
-            }
-        } else {
-            await this.postCache.delete(post);
-        }
+        await this.postCache.delete(post);
 
         StateTracker.updateVersion(StateTracker.version + 1);
     }
@@ -128,7 +106,7 @@ export class _LocalPostManager implements PostManager {
     }
 
     public async syncPosts() {
-        // Empty
+        // TODO remove
     }
 
     public async uploadPost(post: Post): Promise<number | null> {

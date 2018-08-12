@@ -11,8 +11,8 @@ export enum ActionTypes {
 }
 
 export const Actions = {
-    addContentFilterAction: (filter: string, createdAt: number, validUntil: number) =>
-        createAction(ActionTypes.ADD_CONTENT_FILTER, { filter, createdAt, validUntil }),
+    addContentFilterAction: (text: string, createdAt: number, validUntil: number) =>
+        createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilterAction: (filter: ContentFilter) =>
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
     addFeedAction: (feed: Feed) =>

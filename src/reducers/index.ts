@@ -35,14 +35,14 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
     switch (action.type) {
         case 'ADD-CONTENT-FILTER': {
             const filter: ContentFilter = {
-                filter: action.payload.filter,
+                text: action.payload.text,
                 createdAt: action.payload.createdAt,
                 validUntil: action.payload.validUntil,
             };
             return contentFilters.push(filter);
         }
         case 'REMOVE-CONTENT-FILTER': {
-            const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.filter === filter.filter);
+            const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.text === filter.text);
             return contentFilters.remove(ind);
         }
         default: {

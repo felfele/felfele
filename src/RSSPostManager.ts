@@ -129,6 +129,7 @@ export class RSSFeedManager {
     public static async fetchContentWithMimeType(url): Promise<ContentWithMimeType | null> {
         const response = await fetch(url);
         if (response.status !== 200) {
+            console.log('fetch failed: ', response);
             return null;
         }
 
@@ -496,7 +497,7 @@ class _RSSPostManager implements PostManager {
 
     private matchContentFilters(text: string): boolean {
         for (const filter of this.contentFilters) {
-            const regexp = new RegExp(filter.filter, 'i');
+            const regexp = new RegExp(filter.text, 'i');
             if (text.search(regexp) !== -1) {
                 return true;
             }
