@@ -2,11 +2,14 @@ import * as React from 'react';
 import { View, Alert, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as Communications from 'react-native-communications';
+
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
 import StateTracker from '../StateTracker';
 import { Version } from '../Version';
 import { Post, ImageData } from '../models/Post';
+import { Config } from '../Config';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -105,6 +108,13 @@ export class DebugScreen extends React.Component<any, any> {
                             }
                             title='Clean post image data'
                             onPress={async () => await this.onClearPostImageData()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Send the database in an email'
+                            onPress={async () => await this.onSendEmailOfDatabase()}
                         />
                         <SettingsList.Item
                             title={version}
@@ -212,5 +222,12 @@ export class DebugScreen extends React.Component<any, any> {
             counter += 1;
         }
         console.log('onClearPostImageData: updated ', counter);
+    }
+
+    private async onSendEmailOfDatabase() {
+        const keyValues = await AsyncStorageWrapper.getAllKeyValues();
+        const databaseDump = JSON.stringify(keyValues);
+        const date = new Date(Date.now()).toJSON;
+        Communications.email(Config.email, '', '', 'Postmodern database dump ' + date, databaseDump);
     }
 }
