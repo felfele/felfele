@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { View, FlatList, Text, Alert, StyleSheet, Button } from 'react-native';
+import { View, Alert, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
 import StateTracker from '../StateTracker';
 import { Version } from '../Version';
+import { Post, ImageData } from '../models/Post';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -99,6 +100,13 @@ export class DebugScreen extends React.Component<any, any> {
                             onPress={async () => await this.onSyncPosts()}
                         />
                         <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Clean post image data'
+                            onPress={async () => await this.onClearPostImageData()}
+                        />
+                        <SettingsList.Item
                             title={version}
                         />
 
@@ -179,5 +187,30 @@ export class DebugScreen extends React.Component<any, any> {
     private async onSyncPosts() {
         await LocalPostManager.syncPosts();
         StateTracker.updateVersion(StateTracker.version + 1);
+    }
+
+    private async onClearPostImageData() {
+        const allPosts = await Storage.post.getAllValues();
+        console.log('onClearPostImageData: all posts ', allPosts.length);
+        const imageHasData = (image: ImageData) => image.data != null;
+        const postHasImageData = (post: Post) => post.images.filter(image => imageHasData(image)).length > 0;
+        const postsWithImageData = allPosts.filter(post => postHasImageData(post));
+        console.log('onClearPostImageData: posts with image data ', postsWithImageData.length);
+
+        let counter = 0;
+        for (const post of postsWithImageData) {
+            const updatedPost: Post = {
+                ...post,
+                images: post.images.map<ImageData>(image => {
+                    return {
+                        ...image,
+                        data: undefined,
+                    };
+                }),
+            };
+            Storage.post.set(updatedPost);
+            counter += 1;
+        }
+        console.log('onClearPostImageData: updated ', counter);
     }
 }
