@@ -8,6 +8,7 @@ export enum ActionTypes {
     REMOVE_CONTENT_FILTER = 'REMOVE-CONTENT-FILTER',
     ADD_FEED = 'ADD-FEED',
     REMOVE_FEED = 'REMOVE-FEED',
+    TIME_TICK = 'TIME-TICK',
 }
 
 export const Actions = {
@@ -19,6 +20,8 @@ export const Actions = {
         createAction(ActionTypes.ADD_FEED, { feed }),
     removeFeedAction: (feed: Feed) =>
         createAction(ActionTypes.REMOVE_FEED, { feed }),
+    timeTickAction: () =>
+        createAction(ActionTypes.TIME_TICK),
 };
 
 export type Actions = ActionsUnion<typeof Actions>;

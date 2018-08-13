@@ -19,16 +19,20 @@ export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
+    currentTimestamp: number;
 }
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
 };
 
+const defaultCurrentTimestamp = 0;
+
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
     settings: defaultSettings,
+    currentTimestamp: defaultCurrentTimestamp,
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -66,15 +70,24 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
     }
 };
 
-const settingsReducer = (settings = defaultSettings, action: Actions): Settings => {
+const settingsReducer = (settings = defaultSettings): Settings => {
     return settings;
+};
+
+const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, action: Actions): number => {
+    switch (action.type) {
+        case 'TIME-TICK': {
+            return Date.now();
+        }
+    }
+    return currentTimestamp;
 };
 
 const persistConfig = {
     transforms: [immutableTransform({
         whitelist: ['contentFilters', 'feeds'],
     })],
-    blacklist: [''],
+    blacklist: ['currentTimestamp'],
     key: 'root',
     storage: AsyncStorage,
 };
@@ -83,6 +96,7 @@ export const reducer = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     settings: settingsReducer,
+    currentTimestamp: currentTimestampReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -98,3 +112,5 @@ export const persistor = persistStore(store);
 
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
+
+setInterval(() => store.dispatch(Actions.timeTickAction()), 1000);
