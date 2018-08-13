@@ -1,0 +1,21 @@
+import { connect } from 'react-redux';
+
+import { AppState } from '../reducers';
+import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
+
+const mapStateToProps = (state: AppState, ownProps): StateProps => {
+    return {
+        feeds: state.feeds.toArray(),
+        navigation: ownProps.navigation,
+    };
+};
+
+const mapDispatchToProps = (dispatch): DispatchProps => {
+    return {
+    };
+};
+
+export const FeedListEditorContainer = connect<StateProps, DispatchProps, {}>(
+    mapStateToProps,
+    mapDispatchToProps,
+)(FeedListEditor);

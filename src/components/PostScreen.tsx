@@ -58,10 +58,10 @@ export class PostScreen extends React.Component<any, any> {
 
         this.getPostForEditing().then(post => {
             if (post) {
-                const [text, images] = LocalPostManager.extractTextAndImagesFromMarkdown(post.text);
+                console.log('PostScreen.constructor: ', post);
                 this.setState({
-                    text: text,
-                    uploadedImages: images,
+                    text: post.text,
+                    uploadedImages: post.images,
                     isLoading: false,
                     post: post,
                 });
@@ -148,16 +148,23 @@ export class PostScreen extends React.Component<any, any> {
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
                         <TextInput
-                            style={{marginTop: 0, flex: 3, fontSize: 16, padding: 10, paddingVertical: 10}}
+                            style={{
+                                marginTop: 0,
+                                flex: 3,
+                                fontSize: 16,
+                                padding: 10,
+                                paddingVertical: 10,
+                                textAlignVertical: 'top',
+                            }}
                             multiline={true}
                             numberOfLines={4}
                             onEndEditing={() => {this.hideKeyboard(); }}
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
-                            placeholder="What's on your mind?"
+                            placeholder="What's your story?"
                             placeholderTextColor='gray'
-                        >
-                        </TextInput>
+                            underlineColorAndroid='transparent'
+                        />
                         <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
                     </View>
                     <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
@@ -202,14 +209,14 @@ export class PostScreen extends React.Component<any, any> {
             AlertIOS.alert(
                 'Save this post as a draft?',
                 undefined,
-                options
+                options,
             );
         }
         else {
             Alert.alert('Save this post as a draft?',
                 undefined,
                 options,
-                { cancelable: true }
+                { cancelable: true },
             );
         }
     }
@@ -241,7 +248,7 @@ export class PostScreen extends React.Component<any, any> {
                 'Saving draft failed, try again later!',
                 [
                     {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
+                ],
             );
         }
 
@@ -261,22 +268,10 @@ export class PostScreen extends React.Component<any, any> {
     }
 
     private openImagePicker = async () => {
-        const pickerResult = await AsyncImagePicker.launchImageLibrary({
-            allowsEditing: false,
-            aspect: [4, 3],
-            base64: true,
-            exif: true,
-        });
-        if (!pickerResult.didCancel) {
-            const data: ImageData = {
-                uri: pickerResult.uri,
-                width: pickerResult.width,
-                height: pickerResult.height,
-                data: pickerResult.data,
-            };
-
+        const imageData = await AsyncImagePicker.launchImageLibrary();
+        if (imageData != null) {
             this.setState({
-                uploadedImages: this.state.uploadedImages.concat([data]),
+                uploadedImages: this.state.uploadedImages.concat([imageData]),
             });
         }
     }
@@ -318,13 +313,9 @@ export class PostScreen extends React.Component<any, any> {
                 'Posting failed, try again later!',
                 [
                     {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
+                ],
             );
         }
-    }
-
-    private markdownEscape(text) {
-        return text;
     }
 
     private renderActivityIndicator() {
@@ -348,14 +339,14 @@ export class PostScreen extends React.Component<any, any> {
         const iconSize = showText ? 20 : 30;
         const justifyContent = showText ? 'center' : 'space-around';
         return (
-                <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-                    <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
-                        <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
-                        { showText &&
-                            <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
-                        }
-                    </View>
-                </TouchableOpacity>
+            <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
+                <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                    <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
+                    { showText &&
+                        <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
+                    }
+                </View>
+            </TouchableOpacity>
         );
     }
 }

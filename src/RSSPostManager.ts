@@ -6,6 +6,7 @@ import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
 import { Storage } from './Storage';
 import { HtmlUtils } from './HtmlUtils';
+import { ContentFilter } from './models/ContentFilter';
 
 interface RSSEnclosure {
     url: string;
@@ -128,6 +129,7 @@ export class RSSFeedManager {
     public static async fetchContentWithMimeType(url): Promise<ContentWithMimeType | null> {
         const response = await fetch(url);
         if (response.status !== 200) {
+            console.log('fetch failed: ', response);
             return null;
         }
 
@@ -268,15 +270,12 @@ export class RSSFeedManager {
         return this.feeds;
     }
 
-    public getFeedUrls(): string[] {
-        return this.getFeeds().map(feed => feed.feedUrl);
+    public setFeeds(feeds: Feed[]) {
+        this.feeds = feeds;
     }
 
-    public async loadFeedsFromStorage(): Promise<Feed[]> {
-        const feeds = await Storage.feed.getAllValues();
-        console.log('RSSPostManager.loadFeedsFromStorage:', feeds);
-        this.feeds = feeds;
-        return this.feeds;
+    public getFeedUrls(): string[] {
+        return this.getFeeds().map(feed => feed.feedUrl);
     }
 }
 
@@ -286,6 +285,11 @@ class _RSSPostManager implements PostManager {
     private posts: Post[] = [];
     private id = FirstId;
     private idCache = {};
+    private contentFilters: ContentFilter[] = [];
+
+    public setContentFilters(contentFilters: ContentFilter[]) {
+        this.contentFilters = contentFilters;
+    }
 
     public async saveAndSyncPost(post: Post) {
         // do nothing
@@ -302,7 +306,6 @@ class _RSSPostManager implements PostManager {
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
 
-        await this.feedManager.loadFeedsFromStorage();
         const storedFeeds = this.feedManager.getFeeds();
         const feedMap = {};
         for (const feed of storedFeeds) {
@@ -470,6 +473,9 @@ class _RSSPostManager implements PostManager {
             };
             return post;
         }).filter(post => {
+            if (this.matchContentFilters(post.text)) {
+                return false;
+            }
             if (post.link != null && links.has(post.link)) {
                 return false;
             }
@@ -487,6 +493,16 @@ class _RSSPostManager implements PostManager {
 
         console.log('RSS items posts: ', posts);
         return posts;
+    }
+
+    private matchContentFilters(text: string): boolean {
+        for (const filter of this.contentFilters) {
+            const regexp = new RegExp(filter.text, 'i');
+            if (text.search(regexp) !== -1) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

@@ -1,11 +1,15 @@
 import * as React from 'react';
-import { View, FlatList, Text, Alert, StyleSheet, Button } from 'react-native';
+import { View, Alert, StyleSheet, Button } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as Communications from 'react-native-communications';
+
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
 import StateTracker from '../StateTracker';
 import { Version } from '../Version';
+import { Post, ImageData } from '../models/Post';
+import { Config } from '../Config';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -97,6 +101,20 @@ export class DebugScreen extends React.Component<any, any> {
                             }
                             title='Sync posts'
                             onPress={async () => await this.onSyncPosts()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Clean post image data'
+                            onPress={async () => await this.onClearPostImageData()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Send the database in an email'
+                            onPress={async () => await this.onSendEmailOfDatabase()}
                         />
                         <SettingsList.Item
                             icon={
@@ -196,5 +214,37 @@ export class DebugScreen extends React.Component<any, any> {
         const fileHash = '4c5b04446d5495f2887a76c4ad9f0050b991c2bc6a3ed085538a2287490537f1';
         const array = await swarm.download(fileHash);
         console.log('Downloaded file: ', swarm.toString(array));
+    }
+
+    private async onClearPostImageData() {
+        const allPosts = await Storage.post.getAllValues();
+        console.log('onClearPostImageData: all posts ', allPosts.length);
+        const imageHasData = (image: ImageData) => image.data != null;
+        const postHasImageData = (post: Post) => post.images.filter(image => imageHasData(image)).length > 0;
+        const postsWithImageData = allPosts.filter(post => postHasImageData(post));
+        console.log('onClearPostImageData: posts with image data ', postsWithImageData.length);
+
+        let counter = 0;
+        for (const post of postsWithImageData) {
+            const updatedPost: Post = {
+                ...post,
+                images: post.images.map<ImageData>(image => {
+                    return {
+                        ...image,
+                        data: undefined,
+                    };
+                }),
+            };
+            Storage.post.set(updatedPost);
+            counter += 1;
+        }
+        console.log('onClearPostImageData: updated ', counter);
+    }
+
+    private async onSendEmailOfDatabase() {
+        const keyValues = await AsyncStorageWrapper.getAllKeyValues();
+        const databaseDump = JSON.stringify(keyValues);
+        const date = new Date(Date.now()).toJSON;
+        Communications.email(Config.email, '', '', 'Postmodern database dump ' + date, databaseDump);
     }
 }

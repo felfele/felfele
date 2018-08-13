@@ -25,7 +25,6 @@ export interface Post extends Model {
     createdAt: number;
     link?: string;
     location?: Location;
-    syncId?: number;
     deleted?: boolean;
     author?: Author;
     updatedAt?: number;

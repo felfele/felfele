@@ -1,9 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { Model } from './models/Model';
 import { Post } from './models/Post';
-import { AuthenticationData } from './models/AuthenticationData';
-import { SyncState } from './models/SyncState';
-import { Feed } from './models/Feed';
 import { Debug } from './Debug';
 
 interface Metadata {
@@ -374,7 +371,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
                 };
                 await AsyncStorageWrapper.setItem(this.storage.getName(), JSON.stringify(this.metadata));
             } else {
-                console.log('tryLoadMetadata: ', this.storage.getName(), value);
                 this.metadata = JSON.parse(value) as Metadata;
             }
         }
@@ -391,7 +387,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
 
 export class AsyncStorageWrapper {
     public static setItem(key, value) {
-        // console.log('setItem: ', key, typeof value, value);
         try {
             return AsyncStorage.setItem(key, value);
         } catch (e) {
@@ -401,7 +396,6 @@ export class AsyncStorageWrapper {
     }
 
     public static mergeItem(key, value) {
-        // console.log('mergeItem: ', key, typeof value, value);
         try {
             return AsyncStorage.mergeItem(key, value);
         } catch (e) {
@@ -411,9 +405,9 @@ export class AsyncStorageWrapper {
     }
 
     public static getItem(key) {
-        // console.log('getItem: ', key);
         try {
-            return AsyncStorage.getItem(key);
+            const value = AsyncStorage.getItem(key);
+            return value;
         } catch (e) {
             console.log('getItem error: ', e);
             return null;
@@ -421,7 +415,6 @@ export class AsyncStorageWrapper {
     }
 
     public static removeItem(key) {
-        Debug.log('removeItem: ', key);
         try {
             return AsyncStorage.removeItem(key);
         } catch (e) {
@@ -464,7 +457,4 @@ export class AsyncStorageWrapper {
 export const Storage = {
     post: new StorageWithAutoIds<Post>('post'),
     draft: new StorageWithAutoIds<Post>('draft'),
-    auth: new StorageWithStringKey<AuthenticationData>('auth'),
-    sync: new StorageWithStringKey<SyncState>('sync'),
-    feed: new StorageWithAutoIds<Feed>('feed'),
 };

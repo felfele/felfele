@@ -67,33 +67,43 @@ const styles = StyleSheet.create({
 });
 
 interface EditFeedState {
-    feed: Feed;
+    url: string;
     checked: boolean;
     loading: boolean;
 }
 
-export class EditFeed extends React.Component<any, EditFeedState> {
+export interface DispatchProps {
+    onAddFeed: (feed: Feed) => void;
+    onRemoveFeed: (feed: Feed) => void;
+}
+
+export interface StateProps {
+    feed: Feed;
+    navigation: any;
+}
+
+export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public static navigationOptions = {
         header: undefined,
-        title: 'Feed list',
+        title: 'Edit feed',
         headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
     };
 
     public state: EditFeedState = {
-        feed: this.props.navigation.state.params.feed,
+        url: '',
         checked: false,
         loading: false,
     };
 
     constructor(props) {
         super(props);
+        this.state.url = this.props.feed.feedUrl;
         navigationActions.back = this.goBack.bind(this);
         navigationActions.add = this.onAdd.bind(this);
     }
 
-    public async onAdd() {
-        await Storage.feed.set(this.state.feed);
-        await RSSPostManager.feedManager.loadFeedsFromStorage();
+    public async onAdd(feed: Feed) {
+        this.props.onAddFeed(feed);
         this.goBack();
     }
 
@@ -106,7 +116,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
             loading: true,
         });
 
-        const url = Utils.getCanonicalUrl(this.state.feed.feedUrl);
+        const url = Utils.getCanonicalUrl(this.state.url);
         console.log('fetchFeed: url: ', url);
         const feed = await this.fetchFeedFromUrl(url);
         console.log('fetchFeed: feed: ', feed);
@@ -115,9 +125,8 @@ export class EditFeed extends React.Component<any, EditFeedState> {
             this.setState({
                 checked: true,
                 loading: false,
-                feed: feed,
             });
-            await this.onAdd();
+            await this.onAdd(feed);
         } else {
             this.onFailedFeedLoad();
         }
@@ -127,9 +136,9 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         return (
             <View style={styles.container}>
                 <TextInput
-                    value={this.state.feed.feedUrl}
+                    value={this.state.url}
                     style={styles.linkInput}
-                    onChangeText={(text) => this.setState({feed: {...this.state.feed, feedUrl: text}})}
+                    onChangeText={(text) => this.setState({ url: text })}
                     placeholder='Link of the feed'
                     autoCapitalize='none'
                     autoFocus={true}
@@ -144,7 +153,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                         <View style={styles.centerIcon}>
                             <ActivityIndicator size='large' color='grey' />
                         </View>
-                    : this.state.feed._id != null
+                    : this.props.feed.feedUrl.length > 0
                         ? <Button
                             title='Delete'
                             onPress={async () => this.onDelete()}
@@ -156,11 +165,6 @@ export class EditFeed extends React.Component<any, EditFeedState> {
                             disabled={this.state.loading}
                         />
                 }
-
-                <Text>{this.state.feed.name}</Text>
-                <Text>{this.state.feed.url}</Text>
-                <Text>{this.state.feed.feedUrl}</Text>
-                <Text>{this.state.feed.favicon}</Text>
             </View>
         );
     }
@@ -168,7 +172,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
             const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-            console.log('fetchFeed: feed: ', feed);
+            console.log('fetchFeedFromUrl: feed: ', feed);
             return feed;
         } catch (e) {
             console.log(e);
@@ -185,7 +189,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         Alert.alert('Are you sure you want to delete the feed?',
             undefined,
             options,
-            { cancelable: true }
+            { cancelable: true },
         );
     }
 
@@ -197,7 +201,7 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         Alert.alert('Failed to load feed!',
             undefined,
             options,
-            { cancelable: true }
+            { cancelable: true },
         );
 
         this.setState({
@@ -205,11 +209,8 @@ export class EditFeed extends React.Component<any, EditFeedState> {
         });
     }
 
-    private deleteFeedAndGoBack = async () => {
-        if (this.state.feed._id != null) {
-            await Storage.feed.delete(this.state.feed._id);
-        }
-        await RSSPostManager.feedManager.loadFeedsFromStorage();
+    private deleteFeedAndGoBack = () => {
+        this.props.onRemoveFeed(this.props.feed);
         this.goBack();
     }
 }

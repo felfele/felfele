@@ -29,16 +29,15 @@ import { Utils } from '../Utils';
 
 const WindowWidth = Dimensions.get('window').width;
 
-interface YourFeedProps {
-    uri: string;
+export interface DispatchProps { }
+
+export interface StateProps {
     navigation: any;
-    post: any;
     postManager: PostManager;
 }
 
 interface YourFeedState {
     version: number;
-    uri: string;
     selectedPost: Post | null;
     isRefreshing: boolean;
     isOnline: boolean;
@@ -46,14 +45,13 @@ interface YourFeedState {
     posts: Post[];
 }
 
-export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> {
+export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
     private containerStyle = {};
 
     constructor(props) {
         super(props);
         this.state = {
             version: StateTracker.version,
-            uri: this.props.uri,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
@@ -63,11 +61,12 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
 
         this.containerStyle = {
             backgroundColor: '#fff',
-            borderRadius: 3,
+            borderTopLeftRadius: 3,
+            borderTopRightRadius: 3,
             padding: 0,
-            paddingBottom: 10,
             paddingTop: 0,
-            marginBottom: 15,
+            paddingBottom: 0,
+            marginBottom: 12,
             marginTop: 0,
         };
 
@@ -136,7 +135,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
         if (newVersion !== this.state.version) {
             this.setState({
                 version: newVersion,
-                uri: this.state.uri + '#' + newVersion,
                 posts: this.props.postManager.getAllPosts(),
             });
         }
@@ -262,7 +260,7 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     }
 
     private renderCardTop(post: Post) {
-        const printableTime = DateUtils.printableElapsedTime(post.createdAt);
+        const printableTime = DateUtils.printableElapsedTime(post.createdAt) + ' ago';
         const username = post.author ? post.author.name : 'Attila';
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
@@ -283,7 +281,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                 style={{...this.containerStyle,
                     margin: 0,
                     paddingTop: 5,
-                    paddingBottom: 5,
                     borderWidth: 0,
                 }}
                 key={'card-' + post._id}
@@ -311,7 +308,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                         margin: 0,
                         padding: 0,
                         paddingTop: 5,
-                        paddingBottom: 5,
                         borderWidth: 0,
                     }}
                     key={'card-' + post._id}
@@ -329,9 +325,9 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
                             marginTop: 0,
                         }}
                     >
-                        {post.images.map(image =>
+                        {post.images.map((image, index) =>
                             <Image
-                                key={image.uri}
+                                key={image.uri + index}
                                 source={{
                                     uri: this.getImageUri(image),
                                 }}
@@ -368,7 +364,6 @@ export class YourFeed extends React.PureComponent<YourFeedProps, YourFeedState> 
     private renderListHeader = () => {
         return (
             <FeedHeader
-                post={this.props.post}
                 navigation={this.props.navigation}
                 postManager={this.props.postManager} />
         );

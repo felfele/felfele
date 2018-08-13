@@ -4,6 +4,7 @@ import { StackNavigator, TabNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
+import { Provider } from 'react-redux';
 
 import { Config } from './Config';
 import { PostScreen } from './components/PostScreen';
@@ -12,11 +13,16 @@ import { Settings } from './components/Settings';
 import { Location } from './components/Location';
 import { DebugScreen } from './components/DebugScreen';
 import { Share } from './components/Share';
-import { FeedListEditor } from './components/FeedListEditor';
-import { EditFeed } from './components/EditFeed';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
+import { store, persistor } from './reducers';
+import { PersistGate } from 'redux-persist/integration/react';
+import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
+import { EditFeedContainer } from './containers/EditFeedContainer';
+import { NewsFeedContainer } from './containers/NewsFeedContainer';
+import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
+import { EditFilterContainer } from './containers/EditFilterContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -24,8 +30,6 @@ const Root = TabNavigator(
     {
         YourTab: {
             screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri}
-                                        post='Post'
                                         navigation={navigation}
                                         postManager={LocalPostManager} />),
             path: '/',
@@ -42,9 +46,7 @@ const Root = TabNavigator(
             },
         },
         NewsTab: {
-            screen: ({navigation}) => (<YourFeed
-                                        uri={Config.baseUri}
-                                        post='Post'
+            screen: ({navigation}) => (<NewsFeedContainer
                                         navigation={navigation}
                                         postManager={RSSPostManager} />),
             path: '/',
@@ -101,7 +103,7 @@ const Root = TabNavigator(
                         backgroundColor: 'black',
                     },
                 },
-    }
+    },
 );
 
 const Scenes = {
@@ -120,11 +122,17 @@ const Scenes = {
     Share: {
         screen: Share,
     },
-    FeedListEditor: {
-        screen: FeedListEditor,
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
     },
     EditFeed: {
-        screen: EditFeed,
+        screen: EditFeedContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
     },
 };
 
@@ -134,13 +142,17 @@ const AppNavigator = StackNavigator(Scenes,
         navigationOptions: {
             header: null,
         },
-    }
+    },
 );
 
 export default class App extends React.Component {
     public render() {
         return (
-            <AppNavigator />
+            <Provider store={store}>
+                <PersistGate loading={null} persistor={persistor}>
+                    <AppNavigator />
+                </PersistGate>
+            </Provider>
         );
     }
 }

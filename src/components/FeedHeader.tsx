@@ -11,77 +11,25 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { AsyncImagePicker, Response as ImagePickerResponse } from '../AsyncImagePicker';
+import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Config } from '../Config';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 
 interface FeedHeaderProps {
-    post: any;
     navigation: any;
     postManager: PostManager;
 }
 
 export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
-    public isCameraRollPhoto(pickerResult: ImagePickerResponse) {
-        if (pickerResult.origURL) {
-            if (pickerResult.origURL.startsWith('assets-library://') || pickerResult.origURL.startsWith('content://')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public getFilenameExtension(filename) {
-        const a = filename.split('.');
-        if (a.length === 1 || ( a[0] === '' && a.length === 2 ) ) {
-            return '';
-        }
-        return a.pop().toLowerCase();
-    }
-
     public openImagePicker = async () => {
-        const pickerResult = await AsyncImagePicker.showImagePicker({
-            allowsEditing: true,
-            aspect: [4, 3],
-            base64: true,
-            exif: true,
-        });
-
-        console.log('openImagePicker result: ', pickerResult);
-
-        if (pickerResult.error) {
-            console.error('openImagePicker: ', pickerResult.error);
+        const imageData = await AsyncImagePicker.showImagePicker();
+        if (imageData == null) {
             return;
         }
-
-        if (pickerResult.didCancel) {
-            return;
-        }
-
-        let localPath = pickerResult.origURL || '';
-        if (!this.isCameraRollPhoto(pickerResult) && Config.saveToCameraRoll) {
-            localPath = await CameraRoll.saveToCameraRoll(pickerResult.uri);
-        }
-
-        console.log(localPath);
-
-        // Copy file to Document dir
-        // const hash = await RNFetchBlob.fs.hash(pickerResult.uri);
-        // const extension = this.getFilenameExtension(pickerResult.uri);
-        // const filename = `${RNFetchBlob.fs.dirs.DocumentDir}/${hash}.${extension}`
-        // await RNFetchBlob.fs.cp(pickerResult.uri, filename);
-
-        const data: ImageData = {
-            uri: localPath,
-            width: pickerResult.width,
-            height: pickerResult.height,
-            data: pickerResult.data,
-            localPath: localPath,
-        };
 
         const post: Post = {
-            images: [data],
+            images: [imageData],
             text: '',
             createdAt: Date.now(),
         };
@@ -111,7 +59,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() =>
-                        this.props.navigation.navigate(this.props.post)
+                        this.props.navigation.navigate('Post')
                     }
                     style={{
                         flex: 6,
