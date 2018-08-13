@@ -21,76 +21,7 @@ const navigationActions: EditFilterNavigationActions = {
     back: undefined,
 };
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#EFEFF4',
-        flex: 1,
-        flexDirection: 'column',
-    },
-    titleInfo: {
-        fontSize: 14,
-        color: '#8e8e93',
-    },
-    linkInput: {
-        width: '100%',
-        backgroundColor: 'white',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 1,
-        borderTopColor: 'lightgray',
-        borderTopWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        color: 'gray',
-        fontSize: 16,
-    },
-    deleteButtonContainer: {
-        backgroundColor: 'white',
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
-    centerIcon: {
-        width: '100%',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        height: 40,
-        backgroundColor: '#EFEFF4',
-        paddingTop: 10,
-    },
-    sliderContainer: {
-        paddingHorizontal: 20,
-        flexDirection: 'column',
-        height: 80,
-    },
-    sliderText: {
-        flex: 1,
-        color: Colors.GRAY,
-        paddingTop: 20,
-    },
-    slider: {
-        flex: 1,
-    },
-});
-
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
-
-interface EditFilterState {
-    filterText: string;
-    filterSliderValue: SliderValue;
-}
-
-export interface DispatchProps {
-    onAddFilter: (filter: ContentFilter) => void;
-    onRemoveFilter: (filter: ContentFilter) => void;
-}
-
-export interface StateProps {
-    filter: ContentFilter;
-    navigation: any;
-}
 
 const sliderValueToDateDiff = (value: SliderValue): number => {
     switch (value) {
@@ -117,6 +48,21 @@ const filterValidUntilToSliderValue = (dateDiff: number): SliderValue => {
         default: return 0;
     }
 };
+
+export interface DispatchProps {
+    onAddFilter: (filter: ContentFilter) => void;
+    onRemoveFilter: (filter: ContentFilter) => void;
+}
+
+export interface StateProps {
+    filter: ContentFilter;
+    navigation: any;
+}
+
+interface EditFilterState {
+    filterText: string;
+    filterSliderValue: SliderValue;
+}
 
 export class EditFilter extends React.Component<DispatchProps & StateProps, EditFilterState> {
     public static navigationOptions = {
@@ -203,3 +149,57 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
         this.goBack();
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#EFEFF4',
+        flex: 1,
+        flexDirection: 'column',
+    },
+    titleInfo: {
+        fontSize: 14,
+        color: '#8e8e93',
+    },
+    linkInput: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 1,
+        borderTopColor: 'lightgray',
+        borderTopWidth: 1,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        color: 'gray',
+        fontSize: 16,
+    },
+    deleteButtonContainer: {
+        backgroundColor: 'white',
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+    },
+    centerIcon: {
+        width: '100%',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        height: 40,
+        backgroundColor: '#EFEFF4',
+        paddingTop: 10,
+    },
+    sliderContainer: {
+        paddingHorizontal: 20,
+        flexDirection: 'column',
+        height: 80,
+    },
+    sliderText: {
+        flex: 1,
+        color: Colors.GRAY,
+        paddingTop: 20,
+    },
+    slider: {
+        flex: 1,
+    },
+});
