@@ -10,10 +10,11 @@ import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist';
 import * as immutableTransform from 'redux-persist-transform-immutable';
 
-import { Actions } from '../actions/Actions';
+import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
+import { SECOND, HOUR } from '../DateUtils';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
@@ -113,4 +114,5 @@ export const persistor = persistStore(store);
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
 
-setInterval(() => store.dispatch(Actions.timeTickAction()), 1000);
+store.dispatch(AsyncActions.cleanupContentFiltersAction());
+setInterval(() => store.dispatch(AsyncActions.cleanupContentFiltersAction()), HOUR);

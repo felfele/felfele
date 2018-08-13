@@ -3,8 +3,7 @@ import * as React from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { Platform, View, Text } from 'react-native';
-import { persistStore, Persistor } from 'redux-persist';
+import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { Config } from './Config';
