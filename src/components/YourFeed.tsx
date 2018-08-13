@@ -325,9 +325,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                             marginTop: 0,
                         }}
                     >
-                        {post.images.map(image =>
+                        {post.images.map((image, index) =>
                             <Image
-                                key={image.uri}
+                                key={image.uri + index}
                                 source={{
                                     uri: this.getImageUri(image),
                                 }}
