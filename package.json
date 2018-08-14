@@ -34,8 +34,9 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "postinstall": "npm run patch",
-    "patch": "npm run patchAndroidInstaller",
-    "patchAndroidInstaller": "./node_modules/.bin/replace \\'install\\',\\ pathToApk \\'install\\',\\ \\'-r\\',\\ pathToApk node_modules/react-native/local-cli/runAndroid/runAndroid.js -s"
+    "patch": "npm run patchAndroidInstaller && npm run deleteBabelrcFromNodeModules",
+    "patchAndroidInstaller": "./node_modules/.bin/replace \\'install\\',\\ pathToApk \\'install\\',\\ \\'-r\\',\\ pathToApk node_modules/react-native/local-cli/runAndroid/runAndroid.js -s",
+    "deleteBabelrcFromNodeModules": "rm -f ./node_modules/swarm-js/.babelrc && rm -f ./node_modules/eth-lib/.babelrc"
   },
   "jest": {
     "preset": "react-native",
