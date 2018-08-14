@@ -27,9 +27,8 @@ export const Actions = {
 };
 
 export const AsyncActions = {
-    cleanupContentFiltersAction: () => {
+    cleanupContentFiltersAction: (currentTimestamp: number = Date.now()) => {
         return async (dispatch, getState: () => AppState) => {
-            const currentTimestamp = getState().currentTimestamp;
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
