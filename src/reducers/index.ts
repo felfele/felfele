@@ -8,13 +8,13 @@ import {
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist';
-import * as immutableTransform from 'redux-persist-transform-immutable';
 
+import { immutableTransform } from './immutableTransform';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { SECOND, HOUR } from '../DateUtils';
+import { HOUR } from '../DateUtils';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
