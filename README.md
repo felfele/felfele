@@ -1,3 +1,6 @@
+# Postmodern
+
+[![Build Status](https://travis-ci.org/agazso/postmodern.svg?branch=master)](https://travis-ci.org/agazso/postmodern)
 
 ## Install dependencies
 
@@ -9,7 +12,7 @@
 
 ## Start tests that run automatically
 
-`npm test`
+`npm run watchTest`
 
 ## Start packager in terminal
 
