@@ -28,11 +28,15 @@ import { Utils } from '../Utils';
 
 const WindowWidth = Dimensions.get('window').width;
 
-export interface DispatchProps { }
+export interface DispatchProps {
+    onRefreshPosts: () => void;
+    onDeletePost: (post: Post) => void;
+}
 
 export interface StateProps {
     navigation: any;
     postManager: PostManager;
+    posts: Post[];
 }
 
 interface YourFeedState {
@@ -40,7 +44,6 @@ interface YourFeedState {
     isRefreshing: boolean;
     isOnline: boolean;
     currentTime: number;
-    posts: Post[];
 }
 
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
@@ -53,7 +56,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
             currentTime: Date.now(),
-            posts: [],
         };
 
         this.containerStyle = {
@@ -79,6 +81,15 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
+    public componentDidUpdate(prevProps) {
+        if (this.props.posts !== prevProps.posts) {
+            console.log('YourFeed.componentDidUpdate');
+            this.setState({
+                isRefreshing: false,
+            });
+        }
+    }
+
     public render() {
         const isStatusBarHidden = Platform.OS === 'android' ? true : false;
         return (
@@ -97,7 +108,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     <FlatList
                         ListHeaderComponent={this.renderListHeader}
                         ListFooterComponent={this.renderListFooter}
-                        data={this.state.posts}
+                        data={this.props.posts}
                         renderItem={(obj) => this.renderCard(obj.item)}
                         keyExtractor={(item) => '' + item._id}
                         extraData={this.state}
@@ -116,14 +127,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
-    public componentDidMount() {
-        this.props.postManager.loadPosts().then(() => {
-            this.setState({
-                posts: this.props.postManager.getAllPosts(),
-            });
-        });
-    }
-
     private onConnectionStateChange(connected) {
         this.setState({
             isOnline: connected,
@@ -134,25 +137,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.setState({
             isRefreshing: true,
         });
-        try {
-            await this.props.postManager.syncPosts();
-            this.setState({
-                posts: this.props.postManager.getAllPosts(),
-                isRefreshing: false,
-            });
-        } catch (e) {
-            this.setState({
-                isRefreshing: false,
-            });
-            Alert.alert(
-                'Error',
-                'No connection to the server, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
-            );
-        }
-
+        this.props.onRefreshPosts();
     }
 
     private getImageUri(image: ImageData) {
@@ -186,7 +171,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             undefined,
             [
                 { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'OK', onPress: async () => await this.props.postManager.deletePost(post) },
+                { text: 'OK', onPress: async () => await this.props.onDeletePost(post) },
             ],
             { cancelable: false }
         );
