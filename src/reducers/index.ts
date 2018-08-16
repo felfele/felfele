@@ -94,7 +94,7 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
         }
     }
     return rssPosts;
-}
+};
 
 const persistConfig = {
     transforms: [immutableTransform({
