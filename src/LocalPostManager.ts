@@ -1,7 +1,6 @@
 import { Config } from './Config';
 import { Storage, StorageWithAutoIds, Query, Queryable, QueryOrder, Condition } from './Storage';
 import { Post, ImageData } from './models/Post';
-import StateTracker from './StateTracker';
 import { PostManager } from './PostManager';
 
 const DefaultDraftId = 1;
@@ -65,6 +64,7 @@ class PostCache implements Queryable<Post> {
     }
 }
 
+// tslint:disable-next-line:class-name
 export class _LocalPostManager implements PostManager {
     private postCache: PostCache = new PostCache(Storage.post);
 
@@ -91,8 +91,6 @@ export class _LocalPostManager implements PostManager {
     public async deletePost(post: Post) {
         post.deleted = true;
         await this.postCache.delete(post);
-
-        StateTracker.updateVersion(StateTracker.version + 1);
     }
 
     public clearPosts() {
@@ -102,7 +100,6 @@ export class _LocalPostManager implements PostManager {
     public async saveAndSyncPost(post: Post) {
         console.log('LocalPostManager.saveAndSyncPost: ', post);
         await this.postCache.set(post);
-        StateTracker.updateVersion(StateTracker.version + 1);
     }
 
     public async syncPosts() {

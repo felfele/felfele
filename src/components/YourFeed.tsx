@@ -18,7 +18,6 @@ import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import StateTracker from '../StateTracker';
 import { Config } from '../Config';
 import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
@@ -37,7 +36,6 @@ export interface StateProps {
 }
 
 interface YourFeedState {
-    version: number;
     selectedPost: Post | null;
     isRefreshing: boolean;
     isOnline: boolean;
@@ -51,7 +49,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     constructor(props) {
         super(props);
         this.state = {
-            version: StateTracker.version,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
@@ -72,10 +69,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
         NetworkStatus.addConnectionStateChangeListener((result) => {
             this.onConnectionStateChange(result);
-        });
-
-        StateTracker.listen((oldVersion, newVersion) => {
-            this.updateVersion(newVersion);
         });
 
         const refreshInterval = 60 * 1000;
@@ -129,15 +122,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 posts: this.props.postManager.getAllPosts(),
             });
         });
-    }
-
-    private updateVersion(newVersion) {
-        if (newVersion !== this.state.version) {
-            this.setState({
-                version: newVersion,
-                posts: this.props.postManager.getAllPosts(),
-            });
-        }
     }
 
     private onConnectionStateChange(connected) {
