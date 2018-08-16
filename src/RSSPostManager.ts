@@ -108,7 +108,6 @@ export class RSSFeedManager {
         const titles = HtmlUtils.findPath(document, ['html', 'head', 'title']);
         for (const title of titles) {
             if (title.childNodes.length > 0) {
-                console.log('parseFeedFromHtml: title: ', title);
                 if (title.childNodes[0].textContent != null) {
                     feed.name = title.childNodes[0].textContent!;
                     break;
