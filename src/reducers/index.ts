@@ -15,12 +15,14 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { HOUR } from '../DateUtils';
+import { Post } from '../models/Post';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
     currentTimestamp: number;
+    rssPosts: List<Post>;
 }
 
 const defaultSettings: Settings = {
@@ -34,6 +36,7 @@ const defaultState: AppState = {
     feeds: List<Feed>(),
     settings: defaultSettings,
     currentTimestamp: defaultCurrentTimestamp,
+    rssPosts: List<Post>(),
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -84,9 +87,18 @@ const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, act
     return currentTimestamp;
 };
 
+const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'UPDATE-RSS-POSTS': {
+            return List<Post>(action.payload.posts);
+        }
+    }
+    return rssPosts;
+}
+
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds'],
+        whitelist: ['contentFilters', 'feeds', 'rssPosts'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -98,6 +110,7 @@ export const reducer = combineReducers<AppState>({
     feeds: feedsReducer,
     settings: settingsReducer,
     currentTimestamp: currentTimestampReducer,
+    rssPosts: rssPostsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -114,5 +127,6 @@ export const persistor = persistStore(store);
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
 
+store.dispatch(AsyncActions.loadLocalPosts());
 store.dispatch(AsyncActions.cleanupContentFiltersAction());
 setInterval(() => store.dispatch(AsyncActions.cleanupContentFiltersAction()), HOUR);

@@ -30,7 +30,17 @@ const navigationActions: PostScreenNavigationActions = {
     post: undefined,
 };
 
-export class PostScreen extends React.Component<any, any> {
+export interface StateProps {
+    navigation: any;
+}
+
+export interface DispatchProps {
+    onPost: (post: Post) => void;
+}
+
+type Props = StateProps & DispatchProps;
+
+export class EditPost extends React.Component<Props, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Update status',
@@ -301,21 +311,7 @@ export class PostScreen extends React.Component<any, any> {
         post.text = this.state.text;
         post.updatedAt = Date.now();
 
-        try {
-            if (post._id == null) {
-                await LocalPostManager.deleteDraft();
-            }
-            await LocalPostManager.saveAndSyncPost(post);
-            Debug.log('Post saved and synced, ', post._id);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Posting failed, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ],
-            );
-        }
+        this.props.onPost(post);
     }
 
     private renderActivityIndicator() {
