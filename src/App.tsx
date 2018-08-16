@@ -1,14 +1,13 @@
 import * as React from 'react';
 
-import { StackNavigator, TabNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator, NavigationRouteConfigMap } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { Config } from './Config';
-import { PostScreen } from './components/PostScreen';
-import { YourFeed } from './components/YourFeed';
+import { EditPost } from './components/EditPost';
 import { Settings } from './components/Settings';
 import { Location } from './components/Location';
 import { DebugScreen } from './components/DebugScreen';
@@ -23,15 +22,18 @@ import { EditFeedContainer } from './containers/EditFeedContainer';
 import { NewsFeedContainer } from './containers/NewsFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
+import { YourFeedContainer } from './containers/YourFeedContainer';
+import { EditPostContainer } from './containers/EditPostContainer';
 
 Debug.setDebug(__DEV__);
 
 const Root = TabNavigator(
     {
         YourTab: {
-            screen: ({navigation}) => (<YourFeed
+            screen: ({navigation}) => (<YourFeedContainer
                                         navigation={navigation}
-                                        postManager={LocalPostManager} />),
+                                        postManager={LocalPostManager}
+                                    />),
             path: '/',
             navigationOptions: {
                 title: 'Your story',
@@ -106,12 +108,12 @@ const Root = TabNavigator(
     },
 );
 
-const Scenes = {
+const Scenes: NavigationRouteConfigMap = {
     Root: {
         screen: Root,
     },
     Post: {
-        screen: PostScreen,
+        screen: EditPostContainer,
     },
     Location: {
         screen: Location,
