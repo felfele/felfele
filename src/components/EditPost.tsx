@@ -19,6 +19,7 @@ import { ImagePreviewGrid } from './ImagePreviewGrid';
 import { Post, ImageData } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
+import { SimpleTextInput } from './SimpleTextInput';
 
 interface PostScreenNavigationActions {
     cancel?: () => Promise<void>;
@@ -157,7 +158,7 @@ export class EditPost extends React.Component<Props, any> {
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                     <View style={{flex: 14, flexDirection: 'column'}}>
-                        <TextInput
+                        <SimpleTextInput
                             style={{
                                 marginTop: 0,
                                 flex: 3,
@@ -168,9 +169,9 @@ export class EditPost extends React.Component<Props, any> {
                             }}
                             multiline={true}
                             numberOfLines={4}
-                            onEndEditing={() => {this.hideKeyboard(); }}
+                            onSubmitEditing={() => {this.hideKeyboard(); }}
                             onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
+                            defaultValue={this.state.text}
                             placeholder="What's your story?"
                             placeholderTextColor='gray'
                             underlineColorAndroid='transparent'
