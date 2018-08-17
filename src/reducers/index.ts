@@ -122,7 +122,12 @@ export const store = createStore(
         applyMiddleware(thunkMiddleware),
     ),
 );
-export const persistor = persistStore(store);
+
+const initStore = () => {
+    console.log('initStore: ', store.getState());
+};
+
+export const persistor = persistStore(store, {}, initStore);
 
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
