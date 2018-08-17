@@ -125,12 +125,11 @@ export const store = createStore(
 
 const initStore = () => {
     console.log('initStore: ', store.getState());
+    store.dispatch(AsyncActions.loadLocalPosts());
+    store.dispatch(AsyncActions.cleanupContentFilters());
 };
 
 export const persistor = persistStore(store, {}, initStore);
 
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
-
-store.dispatch(AsyncActions.loadLocalPosts());
-store.dispatch(AsyncActions.cleanupContentFilters());
