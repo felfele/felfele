@@ -129,4 +129,3 @@ store.subscribe(() => console.log('store updated: ', store.getState()));
 
 store.dispatch(AsyncActions.loadLocalPosts());
 store.dispatch(AsyncActions.cleanupContentFilters());
-setInterval(() => store.dispatch(AsyncActions.cleanupContentFilters()), HOUR);
