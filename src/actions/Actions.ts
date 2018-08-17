@@ -20,29 +20,29 @@ export enum ActionTypes {
 }
 
 export const Actions = {
-    addContentFilterAction: (text: string, createdAt: number, validUntil: number) =>
+    addContentFilter: (text: string, createdAt: number, validUntil: number) =>
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
-    removeContentFilterAction: (filter: ContentFilter) =>
+    removeContentFilter: (filter: ContentFilter) =>
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
-    addFeedAction: (feed: Feed) =>
+    addFeed: (feed: Feed) =>
         createAction(ActionTypes.ADD_FEED, { feed }),
-    removeFeedAction: (feed: Feed) =>
+    removeFeed: (feed: Feed) =>
         createAction(ActionTypes.REMOVE_FEED, { feed }),
-    timeTickAction: () =>
+    timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
 };
 
 export const AsyncActions = {
-    cleanupContentFiltersAction: (currentTimestamp: number = Date.now()) => {
+    cleanupContentFilters: (currentTimestamp: number = Date.now()) => {
         return async (dispatch, getState: () => AppState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
             expiredFilters.map(filter => {
                 if (filter != null) {
-                    dispatch(Actions.removeContentFilterAction(filter));
+                    dispatch(Actions.removeContentFilter(filter));
                 }
             });
         };
@@ -57,7 +57,7 @@ export const AsyncActions = {
     loadLocalPosts: () => {
         return async (dispatch, getState: () => AppState) => {
             await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTickAction());
+            dispatch(Actions.timeTick());
         };
     },
     addPost: (post: Post) => {
@@ -66,7 +66,7 @@ export const AsyncActions = {
                 await LocalPostManager.deleteDraft();
             }
             await LocalPostManager.saveAndSyncPost(post);
-            dispatch(Actions.timeTickAction());
+            dispatch(Actions.timeTick());
             Debug.log('Post saved and synced, ', post._id);
         };
     },
@@ -74,7 +74,7 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             await LocalPostManager.deletePost(post);
             await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTickAction());
+            dispatch(Actions.timeTick());
         };
     },
 };

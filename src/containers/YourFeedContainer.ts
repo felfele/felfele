@@ -20,7 +20,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: () => {
             // workaround to finish refresh
-            dispatch(Actions.timeTickAction());
+            dispatch(Actions.timeTick());
         },
         onDeletePost: (post: Post) => {
             dispatch(AsyncActions.removePost(post));
