@@ -143,6 +143,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     placeholder='Link of the feed'
                     autoCapitalize='none'
                     autoFocus={true}
+                    autoCorrect={false}
                 />
                 { this.state.checked
                   ?

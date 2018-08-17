@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-    TextInput,
     View,
     Text,
     TouchableOpacity,
@@ -15,8 +14,7 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
-
-import { Post, ImageData } from '../models/Post';
+import { ImageData, Post } from '../models/Post';
 import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
 import { SimpleTextInput } from './SimpleTextInput';
@@ -41,13 +39,25 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-export class EditPost extends React.Component<Props, any> {
+interface State {
+    text: string;
+    uploadedImages: ImageData[];
+    isKeyboardVisible: boolean;
+    isLoading: boolean;
+    paddingBottom: number;
+    keyboardHeight: number;
+    post?: Post;
+}
+
+export class EditPost extends React.Component<Props, State> {
     public static navigationOptions = {
         header: undefined,
         title: 'Update status',
         headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
         headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
     };
+
+    public state: State;
 
     private keyboardDidShowListener;
     private keyboardWillShowListener;
@@ -150,9 +160,8 @@ export class EditPost extends React.Component<Props, any> {
             return this.renderActivityIndicator();
         }
 
-        const minHeight = this.state.uploadedImages.length > 0 ? 100 : 0;
-        const showText = !this.state.isKeyboardVisible;
-        const iconDirection = showText ? 'column' : 'row';
+        console.log('EditPost.render: ', this, this.state);
+
         return (
             <View
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
@@ -175,15 +184,34 @@ export class EditPost extends React.Component<Props, any> {
                             placeholder="What's your story?"
                             placeholderTextColor='gray'
                             underlineColorAndroid='transparent'
+                            autoFocus={true}
                         />
-                        <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
+                        <ImagePreviewGrid
+                            columns={4}
+                            images={this.state.uploadedImages}
+                            onRemoveImage={this.onRemoveImage}
+                            height={100}
+                        />
                     </View>
-                    <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
-                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', showText)}
-                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#808080', showText)}
+                    <View style={{
+                        flexDirection: 'row',
+                        borderTopWidth: 1,
+                        borderTopColor: 'lightgray',
+                        padding: 5,
+                        margin: 0,
+                        height: 30,
+                    }}>
+                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
                     </View>
             </View>
         );
+    }
+
+    private onRemoveImage = (removedImage: ImageData) => {
+        const uploadedImages = this.state.uploadedImages.filter(image => image != null && image.uri !== removedImage.uri);
+        this.setState({
+            uploadedImages,
+        });
     }
 
     private async getPostForEditing(): Promise<Post | null> {
@@ -287,10 +315,6 @@ export class EditPost extends React.Component<Props, any> {
         }
     }
 
-    private openLocationPicker = async () => {
-        this.props.navigation.navigate('Location');
-    }
-
     private async onPressSubmit() {
         if (this.state.isLoading) {
             return;
@@ -308,11 +332,13 @@ export class EditPost extends React.Component<Props, any> {
         console.log(this.state.text, this.state.uploadedImages.length, this.state.post);
 
         const post = this.state.post;
-        post.images = this.state.uploadedImages;
-        post.text = this.state.text;
-        post.updatedAt = Date.now();
+        if (post != null) {
+            post.images = this.state.uploadedImages;
+            post.text = this.state.text;
+            post.updatedAt = Date.now();
 
-        this.props.onPost(post);
+            this.props.onPost(post);
+        }
     }
 
     private renderActivityIndicator() {

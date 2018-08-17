@@ -1,22 +1,19 @@
 import * as React from 'react';
-
 import { StackNavigator, TabNavigator, NavigationRouteConfigMap } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import { Config } from './Config';
-import { EditPost } from './components/EditPost';
 import { Settings } from './components/Settings';
-import { Location } from './components/Location';
 import { DebugScreen } from './components/DebugScreen';
 import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
-import { PersistGate } from 'redux-persist/integration/react';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer } from './containers/EditFeedContainer';
 import { NewsFeedContainer } from './containers/NewsFeedContainer';
@@ -114,9 +111,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
-    },
-    Location: {
-        screen: Location,
     },
     Debug: {
         screen: DebugScreen,
