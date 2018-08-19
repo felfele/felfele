@@ -128,23 +128,6 @@ export class _LocalPostManager implements PostManager {
     public async deleteDraft(): Promise<void> {
         await Storage.draft.delete(DefaultDraftId);
     }
-
-    public extractTextAndImagesFromMarkdown(markdown: string): [string, ImageData[]] {
-        const images: ImageData[] = [];
-        const text = markdown.replace(/(\!\[\]\(.*?\))/gi, (uri) => {
-            const image: ImageData = {
-                uri: Config.baseUri + uri
-                        .replace('!', '')
-                        .replace('[', '')
-                        .replace(']', '')
-                        .replace('(', '')
-                        .replace(')', ''),
-            };
-            images.push(image);
-            return '';
-        });
-        return [text, images];
-    }
 }
 
 export const LocalPostManager = new _LocalPostManager();
