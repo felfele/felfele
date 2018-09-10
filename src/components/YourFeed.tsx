@@ -31,11 +31,11 @@ const WindowWidth = Dimensions.get('window').width;
 export interface DispatchProps {
     onRefreshPosts: () => void;
     onDeletePost: (post: Post) => void;
+    onSavePost: (post: Post) => void;
 }
 
 export interface StateProps {
     navigation: any;
-    postManager: PostManager;
     posts: Post[];
 }
 
@@ -334,7 +334,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         return (
             <FeedHeader
                 navigation={this.props.navigation}
-                postManager={this.props.postManager} />
+                onSavePost={this.props.onSavePost} />
         );
     }
 

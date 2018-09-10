@@ -11,7 +11,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
     return {
         navigation: ownProps.navigation,
-        postManager: LocalPostManager,
         posts: filteredPosts,
     };
 };
@@ -24,6 +23,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         },
         onDeletePost: (post: Post) => {
             dispatch(AsyncActions.removePost(post));
+        },
+        onSavePost: (post: Post) => {
+            dispatch(AsyncActions.addPost(post));
         },
     };
 };

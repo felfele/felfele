@@ -14,7 +14,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
     return {
         navigation: ownProps.navigation,
-        postManager: RSSPostManager,
         posts: filteredPosts,
     };
 };
@@ -25,6 +24,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.downloadRssPosts());
         },
         onDeletePost: (post: Post) => {
+            // do nothing
+        },
+        onSavePost: (post: Post) => {
             // do nothing
         },
     };

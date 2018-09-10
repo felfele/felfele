@@ -4,24 +4,26 @@ import {
     View,
     TouchableOpacity,
     Alert,
-    CameraRoll,
     Platform,
     StyleSheet,
-    Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Config } from '../Config';
 import { PostManager } from '../PostManager';
-import { Post, ImageData } from '../models/Post';
+import { Post } from '../models/Post';
 
-interface FeedHeaderProps {
+export interface StateProps {
     navigation: any;
-    postManager: PostManager;
 }
 
-export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
+export interface DispatchProps {
+    onSavePost: (post: Post) => void;
+}
+
+type Props = StateProps & DispatchProps;
+
+export class FeedHeader extends React.PureComponent<Props> {
     public openImagePicker = async () => {
         const imageData = await AsyncImagePicker.showImagePicker();
         if (imageData == null) {
@@ -35,7 +37,7 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
         };
 
         try {
-            this.props.postManager.saveAndSyncPost(post);
+            this.props.onSavePost(post);
         } catch (e) {
             Alert.alert(
                 'Error',
