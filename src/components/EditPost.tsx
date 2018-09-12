@@ -151,7 +151,6 @@ export class EditPost extends React.Component<Props, State> {
                         }}
                         multiline={true}
                         numberOfLines={4}
-                        onSubmitEditing={() => {this.hideKeyboard(); }}
                         onChangeText={this.onChangeText}
                         defaultValue={this.state.post.text}
                         placeholder="What's your story?"
