@@ -17,15 +17,15 @@ import { ImagePreviewGrid } from './ImagePreviewGrid';
 import { ImageData, Post } from '../models/Post';
 import { SimpleTextInput } from './SimpleTextInput';
 
-// interface PostScreenNavigationActions {
-//     cancel?: () => void;
-//     post?: () => void;
-// }
+interface PostScreenNavigationActions {
+    cancel?: () => void;
+    post?: () => void;
+}
 
-// const navigationActions: PostScreenNavigationActions = {
-//     cancel: undefined,
-//     post: undefined,
-// };
+const navigationActions: PostScreenNavigationActions = {
+    cancel: undefined,
+    post: undefined,
+};
 
 export interface StateProps {
     navigation: any;
@@ -41,110 +41,105 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 interface State {
-    // isKeyboardVisible: boolean;
-    // isLoading: boolean;
-    // paddingBottom: number;
-    // keyboardHeight: number;
-    // post: Post;
+    isKeyboardVisible: boolean;
+    isLoading: boolean;
+    paddingBottom: number;
+    keyboardHeight: number;
+    post: Post;
 }
 
 export class EditPost extends React.Component<Props, State> {
-    // public static navigationOptions = {
-    //     header: undefined,
-    //     title: 'Update status',
-    //     headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
-    //     headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
-    // };
+    public static navigationOptions = {
+        header: undefined,
+        title: 'Update status',
+        headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
+        headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
+    };
 
     public state: State;
 
-    // private keyboardDidShowListener;
-    // private keyboardWillShowListener;
-    // private keyboardDidHideListener;
+    private keyboardDidShowListener;
+    private keyboardWillShowListener;
+    private keyboardDidHideListener;
 
     constructor(props) {
         super(props);
         this.state = {
-            // isKeyboardVisible: false,
-            // isLoading: false,
-            // paddingBottom: 0,
-            // keyboardHeight: 0,
-            // post: this.getPostFromDraft(this.props.draft),
+            isKeyboardVisible: false,
+            isLoading: false,
+            paddingBottom: 0,
+            keyboardHeight: 0,
+            post: this.getPostFromDraft(this.props.draft),
         };
-        // navigationActions.cancel = this.onCancelConfirmation;
-        // navigationActions.post = this.onPressSubmit;
+        navigationActions.cancel = this.onCancelConfirmation;
+        navigationActions.post = this.onPressSubmit;
     }
 
-    // public onKeyboardDidShow(e) {
-    //     console.log('onKeyboardDidShow', this.state.keyboardHeight);
+    public onKeyboardDidShow = (e) => {
+        console.log('onKeyboardDidShow', this.state.keyboardHeight);
 
-    //     if (Platform.OS === 'android') {
-    //         this.onKeyboardWillShow(e);
-    //     }
+        if (Platform.OS === 'android') {
+            this.onKeyboardWillShow(e);
+        }
 
-    //     this.setState({
-    //         isKeyboardVisible: true,
-    //     });
-    // }
+        this.setState({
+            isKeyboardVisible: true,
+        });
+    }
 
-    // public onKeyboardWillShow(e) {
-    //     const extraKeyboardHeight = 15;
-    //     const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
-    //     this.setState({
-    //         keyboardHeight: baseKeyboardHeight + extraKeyboardHeight,
-    //     });
+    public onKeyboardWillShow = (e) => {
+        const extraKeyboardHeight = 15;
+        const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
+        this.setState({
+            keyboardHeight: baseKeyboardHeight + extraKeyboardHeight,
+        });
 
-    //     console.log('onKeyboardWillShow', this.state.keyboardHeight);
-    // }
+        console.log('onKeyboardWillShow', this.state.keyboardHeight);
+    }
 
-    // public onKeyboardDidHide() {
-    //     console.log('onKeyboardDidHide');
-    //     this.setState({
-    //         isKeyboardVisible: false,
-    //         keyboardHeight: 0,
-    //     });
-    // }
+    public onKeyboardDidHide = () => {
+        console.log('onKeyboardDidHide');
+        this.setState({
+            isKeyboardVisible: false,
+            keyboardHeight: 0,
+        });
+    }
 
-    // public componentDidMount() {
-    //     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => this.onKeyboardDidShow(e));
-    //     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => this.onKeyboardWillShow(e));
-    //     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.onKeyboardDidHide());
-    // }
+    public componentDidMount() {
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.onKeyboardDidShow);
+        this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.onKeyboardWillShow);
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.onKeyboardDidHide);
+    }
 
-    // public unregisterListeners() {
-    //     if (this.keyboardDidShowListener) {
-    //         this.keyboardDidShowListener.remove();
-    //         this.keyboardDidShowListener = null;
-    //     }
-    //     if (this.keyboardWillShowListener) {
-    //         this.keyboardWillShowListener.remove();
-    //         this.keyboardWillShowListener = null;
-    //     }
-    //     if (this.keyboardDidHideListener) {
-    //         this.keyboardDidHideListener.remove();
-    //         this.keyboardDidHideListener = null;
-    //     }
+    public unregisterListeners = () => {
+        if (this.keyboardDidShowListener) {
+            this.keyboardDidShowListener.remove();
+            this.keyboardDidShowListener = null;
+        }
+        if (this.keyboardWillShowListener) {
+            this.keyboardWillShowListener.remove();
+            this.keyboardWillShowListener = null;
+        }
+        if (this.keyboardDidHideListener) {
+            this.keyboardDidHideListener.remove();
+            this.keyboardDidHideListener = null;
+        }
+    }
 
-    // }
-
-    // public componentDidlUnmount() {
-    //     this.unregisterListeners();
-    // }
+    public componentWillUnmount() {
+        this.unregisterListeners();
+    }
 
     public render() {
-        // if (this.state.isLoading) {
-        //     return this.renderActivityIndicator();
-        // }
+        if (this.state.isLoading) {
+            return this.renderActivityIndicator();
+        }
 
-        // console.log('EditPost.render: ', this, this.state);
-
-        const keyboardHeight = 0;
         return (
             <View
-                // style={{flexDirection: 'column', paddingBottom: keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
+                style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
-                <Text>hello</Text>
-                {/* <View style={{flex: 14, flexDirection: 'column'}}>
+                <View style={{flex: 14, flexDirection: 'column'}}>
                     <SimpleTextInput
                         style={{
                             marginTop: 0,
@@ -180,170 +175,170 @@ export class EditPost extends React.Component<Props, State> {
                     height: 30,
                 }}>
                     {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
-                </View> */}
+                </View>
             </View>
         );
     }
 
-    // private onRemoveImage = (removedImage: ImageData) => {
-    //     const images = this.state.post.images.filter(image => image != null && image.uri !== removedImage.uri);
-    //     const post = {
-    //         ...this.state.post,
-    //         images,
-    //     };
-    //     this.setState({
-    //         post,
-    //     });
-    // }
+    private onRemoveImage = (removedImage: ImageData) => {
+        const images = this.state.post.images.filter(image => image != null && image.uri !== removedImage.uri);
+        const post = {
+            ...this.state.post,
+            images,
+        };
+        this.setState({
+            post,
+        });
+    }
 
-    // private onChangeText = (text: string) => {
-    //     const post: Post = {
-    //         ...this.state.post,
-    //         text,
-    //     };
-    //     this.setState({
-    //         post,
-    //     });
-    // }
+    private onChangeText = (text: string) => {
+        const post: Post = {
+            ...this.state.post,
+            text,
+        };
+        this.setState({
+            post,
+        });
+    }
 
-    // private getPostFromDraft = (draft: Post | null): Post => {
-    //     if (draft != null) {
-    //         return draft;
-    //     } else {
-    //         return {
-    //             images: [],
-    //             text: '',
-    //             createdAt: Date.now(),
-    //         };
-    //     }
-    // }
+    private getPostFromDraft = (draft: Post | null): Post => {
+        if (draft != null) {
+            return draft;
+        } else {
+            return {
+                images: [],
+                text: '',
+                createdAt: Date.now(),
+            };
+        }
+    }
 
-    // private onCancel = () => {
-    //     this.hideKeyboard();
-    //     // this.unregisterListeners();
-    //     this.props.navigation.goBack();
-    // }
+    private onDiscard = () => {
+        this.props.onDeleteDraft();
+        this.onCancel();
+    }
 
-    // private hideKeyboard = () => {
-    //     if (this.state.isKeyboardVisible) {
-    //         Keyboard.dismiss();
-    //         this.setState({
-    //             isKeyboardVisible: false,
-    //         });
-    //     }
-    // }
+    private onSave = () => {
+        this.setState({
+           isLoading: true,
+        });
 
-    // private onDiscard = () => {
-    //     this.props.onDeleteDraft();
-    //     this.onCancel();
-    // }
+        console.log(this.state.post);
 
-    // private onSave = () => {
-    //     this.setState({
-    //        isLoading: true,
-    //     });
+        this.props.onSaveDraft(this.state.post);
+        this.onCancel();
+    }
 
-    //     console.log(this.state.post);
+    private onCancel = () => {
+        this.hideKeyboard();
+        this.unregisterListeners();
+        this.props.navigation.goBack();
+    }
 
-    //     this.props.onSaveDraft(this.state.post);
-    //     this.onCancel();
-    // }
+    private hideKeyboard = () => {
+        if (this.state.isKeyboardVisible) {
+            Keyboard.dismiss();
+            this.setState({
+                isKeyboardVisible: false,
+            });
+        }
+    }
 
-    // private showCancelConfirmation = () => {
-    //     const options: any[] = [
-    //         { text: 'Save', onPress: () => this.onSave() },
-    //         { text: 'Discard', onPress: () => this.onDiscard() },
-    //         { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-    //     ];
+    private showCancelConfirmation = () => {
+        const options: any[] = [
+            { text: 'Save', onPress: () => this.onSave() },
+            { text: 'Discard', onPress: () => this.onDiscard() },
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        ];
 
-    //     if (Platform.OS === 'ios') {
-    //         AlertIOS.alert(
-    //             'Save this post as a draft?',
-    //             undefined,
-    //             options,
-    //         );
-    //     }
-    //     else {
-    //         Alert.alert('Save this post as a draft?',
-    //             undefined,
-    //             options,
-    //             { cancelable: true },
-    //         );
-    //     }
-    // }
+        if (Platform.OS === 'ios') {
+            AlertIOS.alert(
+                'Save this post as a draft?',
+                undefined,
+                options,
+            );
+        }
+        else {
+            Alert.alert('Save this post as a draft?',
+                undefined,
+                options,
+                { cancelable: true },
+            );
+        }
+    }
 
-    // private onCancelConfirmation = () => {
-    //     console.log('onCancelConfirmation', this.state.isKeyboardVisible);
-    //     this.hideKeyboard();
-    //     console.log('Cancel');
-    //     if (this.state.post.text !== '' || this.state.post.images.length > 0) {
-    //         this.showCancelConfirmation();
-    //     } else {
-    //         this.onCancel();
-    //     }
-    // }
+    private onCancelConfirmation = () => {
+        console.log('onCancelConfirmation', this.state.isKeyboardVisible);
+        this.hideKeyboard();
+        console.log('Cancel');
+        if (this.state.post.text !== '' || this.state.post.images.length > 0) {
+            this.showCancelConfirmation();
+        } else {
+            this.onCancel();
+        }
+    }
 
-    // private openImagePicker = async () => {
-    //     const imageData = await AsyncImagePicker.launchImageLibrary();
-    //     if (imageData != null) {
-    //         const images = this.state.post.images.concat([imageData]);
-    //         const post = {
-    //             ...this.state.post,
-    //             images,
-    //         };
-    //         this.setState({
-    //             post,
-    //         });
-    //     }
-    // }
+    private openImagePicker = async () => {
+        const imageData = await AsyncImagePicker.launchImageLibrary();
+        if (imageData != null) {
+            const images = this.state.post.images.concat([imageData]);
+            const post = {
+                ...this.state.post,
+                images,
+            };
+            this.setState({
+                post,
+            });
+        }
+    }
 
-    // private onPressSubmit = () => {
-    //     if (this.state.isLoading) {
-    //         return;
-    //     }
+    private onPressSubmit = () => {
+        if (this.state.isLoading) {
+            return;
+        }
 
-    //     this.sendUpdate();
-    //     this.onCancel();
-    // }
+        this.sendUpdate();
+        this.onCancel();
+    }
 
-    // private sendUpdate = () => {
-    //     this.setState({
-    //        isLoading: true,
-    //     });
+    private sendUpdate = () => {
+        this.setState({
+           isLoading: true,
+        });
 
-    //     console.log(this.state.post);
-    //     this.props.onPost(this.state.post);
-    // }
+        console.log(this.state.post);
+        this.props.onPost(this.state.post);
+    }
 
-    // private renderActivityIndicator() {
-    //     return (
-    //         <View
-    //             style={{
-    //                 flexDirection: 'column',
-    //                 flex: 1,
-    //                 justifyContent: 'center',
-    //                 alignItems: 'center',
-    //                 height: '100%',
-    //                 width: '100%',
-    //             }}
-    //         >
-    //             <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
-    //         </View>
-    //     );
-    // }
+    private renderActivityIndicator() {
+        return (
+            <View
+                style={{
+                    flexDirection: 'column',
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
+                <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
+            </View>
+        );
+    }
 
-    // private renderActionButton(onPress, text, iconName, color, showText) {
-    //     const iconSize = showText ? 20 : 30;
-    //     const justifyContent = showText ? 'center' : 'space-around';
-    //     return (
-    //         <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-    //             <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
-    //                 <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
-    //                 { showText &&
-    //                     <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
-    //                 }
-    //             </View>
-    //         </TouchableOpacity>
-    //     );
-    // }
+    private renderActionButton(onPress, text, iconName, color, showText) {
+        const iconSize = showText ? 20 : 30;
+        const justifyContent = showText ? 'center' : 'space-around';
+        return (
+            <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
+                <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                    <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
+                    { showText &&
+                        <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
+                    }
+                </View>
+            </TouchableOpacity>
+        );
+    }
 }
