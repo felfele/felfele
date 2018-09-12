@@ -10,7 +10,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { PostManager } from '../PostManager';
 import { Post } from '../models/Post';
 
 export interface StateProps {

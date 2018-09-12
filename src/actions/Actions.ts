@@ -17,6 +17,8 @@ export enum ActionTypes {
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
     REMOVE_POST = 'REMOVE-POST',
+    ADD_DRAFT = 'ADD-DRAFT',
+    REMOVE_DRAFT = 'REMOVE-DRAFT',
 }
 
 export const Actions = {
@@ -32,6 +34,10 @@ export const Actions = {
         createAction(ActionTypes.TIME_TICK),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
+    addDraft: (draft: Post) =>
+        createAction(ActionTypes.ADD_DRAFT, { draft }),
+    removeDraft: () =>
+        createAction(ActionTypes.REMOVE_DRAFT),
 };
 
 export const AsyncActions = {

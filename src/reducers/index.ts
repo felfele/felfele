@@ -14,7 +14,6 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { HOUR } from '../DateUtils';
 import { Post } from '../models/Post';
 
 export interface AppState {
@@ -23,6 +22,7 @@ export interface AppState {
     settings: Settings;
     currentTimestamp: number;
     rssPosts: List<Post>;
+    draft: Post | null;
 }
 
 const defaultSettings: Settings = {
@@ -37,6 +37,7 @@ const defaultState: AppState = {
     settings: defaultSettings,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
+    draft: null,
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -96,6 +97,18 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
+const draftReducer = (draft: Post | null = null, action: Actions): Post | null => {
+    switch (action.type) {
+        case 'ADD-DRAFT': {
+            return action.payload.draft;
+        }
+        case 'REMOVE-DRAFT': {
+            return null;
+        }
+    }
+    return draft;
+};
+
 const persistConfig = {
     transforms: [immutableTransform({
         whitelist: ['contentFilters', 'feeds', 'rssPosts'],
@@ -111,6 +124,7 @@ export const reducer = combineReducers<AppState>({
     settings: settingsReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
+    draft: draftReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
