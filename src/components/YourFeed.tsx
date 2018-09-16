@@ -19,7 +19,6 @@ import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Config } from '../Config';
-import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
@@ -177,21 +176,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
-    private onEditPost(post: Post) {
-        this.props.navigation.navigate('Post', {post: post});
-    }
-
     private renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
         const isPostLiked = () => false;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    { post.author == null &&
-                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
-                            <Icon name='ios-create-outline' size={iconSize} color='black' />
-                        </TouchableOpacity>
-                    }
                     <TouchableOpacity style={styles.like}>
                         {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>

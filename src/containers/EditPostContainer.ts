@@ -5,9 +5,11 @@ import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
 import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-   return {
+    console.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
+    const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
+    return {
        navigation: ownProps.navigation,
-       draft: state.draft,
+       draft: post != null ? post : state.draft,
    };
 };
 
