@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-    TextInput,
     View,
     Text,
     TouchableOpacity,
@@ -15,14 +14,12 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
-
-import { Post, ImageData } from '../models/Post';
-import { LocalPostManager } from '../LocalPostManager';
-import { Debug } from '../Debug';
+import { ImageData, Post } from '../models/Post';
+import { SimpleTextInput } from './SimpleTextInput';
 
 interface PostScreenNavigationActions {
-    cancel?: () => Promise<void>;
-    post?: () => Promise<void>;
+    cancel?: () => void;
+    post?: () => void;
 }
 
 const navigationActions: PostScreenNavigationActions = {
@@ -32,21 +29,34 @@ const navigationActions: PostScreenNavigationActions = {
 
 export interface StateProps {
     navigation: any;
+    draft: Post | null;
 }
 
 export interface DispatchProps {
     onPost: (post: Post) => void;
+    onSaveDraft: (draft: Post) => void;
+    onDeleteDraft: () => void;
 }
 
 type Props = StateProps & DispatchProps;
 
-export class EditPost extends React.Component<Props, any> {
+interface State {
+    isKeyboardVisible: boolean;
+    isLoading: boolean;
+    paddingBottom: number;
+    keyboardHeight: number;
+    post: Post;
+}
+
+export class EditPost extends React.Component<Props, State> {
     public static navigationOptions = {
         header: undefined,
         title: 'Update status',
         headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
         headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
     };
+
+    public state: State;
 
     private keyboardDidShowListener;
     private keyboardWillShowListener;
@@ -55,40 +65,17 @@ export class EditPost extends React.Component<Props, any> {
     constructor(props) {
         super(props);
         this.state = {
-            text: '',
-            uploadedImages: [],
             isKeyboardVisible: false,
-            isLoading: true,
+            isLoading: false,
             paddingBottom: 0,
             keyboardHeight: 0,
-            post: undefined,
+            post: this.getPostFromDraft(this.props.draft),
         };
-        navigationActions.cancel = () => this.onCancelConfirmation();
-        navigationActions.post = () => this.onPressSubmit();
-
-        this.getPostForEditing().then(post => {
-            if (post) {
-                console.log('PostScreen.constructor: ', post);
-                this.setState({
-                    text: post.text,
-                    uploadedImages: post.images,
-                    isLoading: false,
-                    post: post,
-                });
-            } else {
-                this.setState({
-                    isLoading: false,
-                    post: {
-                        images: [],
-                        text: '',
-                        createdAt: Date.now(),
-                    },
-                });
-            }
-        });
+        navigationActions.cancel = this.onCancelConfirmation;
+        navigationActions.post = this.onPressSubmit;
     }
 
-    public onKeyboardDidShow(e) {
+    public onKeyboardDidShow = (e) => {
         console.log('onKeyboardDidShow', this.state.keyboardHeight);
 
         if (Platform.OS === 'android') {
@@ -100,7 +87,7 @@ export class EditPost extends React.Component<Props, any> {
         });
     }
 
-    public onKeyboardWillShow(e) {
+    public onKeyboardWillShow = (e) => {
         const extraKeyboardHeight = 15;
         const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
         this.setState({
@@ -110,7 +97,7 @@ export class EditPost extends React.Component<Props, any> {
         console.log('onKeyboardWillShow', this.state.keyboardHeight);
     }
 
-    public onKeyboardDidHide() {
+    public onKeyboardDidHide = () => {
         console.log('onKeyboardDidHide');
         this.setState({
             isKeyboardVisible: false,
@@ -119,12 +106,12 @@ export class EditPost extends React.Component<Props, any> {
     }
 
     public componentDidMount() {
-        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => this.onKeyboardDidShow(e));
-        this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => this.onKeyboardWillShow(e));
-        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.onKeyboardDidHide());
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.onKeyboardDidShow);
+        this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.onKeyboardWillShow);
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.onKeyboardDidHide);
     }
 
-    public unregisterListeners() {
+    public unregisterListeners = () => {
         if (this.keyboardDidShowListener) {
             this.keyboardDidShowListener.remove();
             this.keyboardDidShowListener = null;
@@ -137,10 +124,9 @@ export class EditPost extends React.Component<Props, any> {
             this.keyboardDidHideListener.remove();
             this.keyboardDidHideListener = null;
         }
-
     }
 
-    public componentDidlUnmount() {
+    public componentWillUnmount() {
         this.unregisterListeners();
     }
 
@@ -149,57 +135,106 @@ export class EditPost extends React.Component<Props, any> {
             return this.renderActivityIndicator();
         }
 
-        const minHeight = this.state.uploadedImages.length > 0 ? 100 : 0;
-        const showText = !this.state.isKeyboardVisible;
-        const iconDirection = showText ? 'column' : 'row';
         return (
             <View
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
-                    <View style={{flex: 14, flexDirection: 'column'}}>
-                        <TextInput
-                            style={{
-                                marginTop: 0,
-                                flex: 3,
-                                fontSize: 16,
-                                padding: 10,
-                                paddingVertical: 10,
-                                textAlignVertical: 'top',
-                            }}
-                            multiline={true}
-                            numberOfLines={4}
-                            onEndEditing={() => {this.hideKeyboard(); }}
-                            onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
-                            placeholder="What's your story?"
-                            placeholderTextColor='gray'
-                            underlineColorAndroid='transparent'
-                        />
-                        <ImagePreviewGrid columns={4} style={{flex: 1, width: '100%', minHeight: minHeight}} images={this.state.uploadedImages} />
-                    </View>
-                    <View style={{flex: 2, flexDirection: iconDirection, borderTopWidth: 1, borderTopColor: 'lightgray', padding: 5}}>
-                        {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', showText)}
-                        {this.renderActionButton(this.openLocationPicker, 'Location', 'md-locate', '#808080', showText)}
-                    </View>
+                <View style={{flex: 14, flexDirection: 'column'}}>
+                    <SimpleTextInput
+                        style={{
+                            marginTop: 0,
+                            flex: 3,
+                            fontSize: 16,
+                            padding: 10,
+                            paddingVertical: 10,
+                            textAlignVertical: 'top',
+                        }}
+                        multiline={true}
+                        numberOfLines={4}
+                        onChangeText={this.onChangeText}
+                        defaultValue={this.state.post.text}
+                        placeholder="What's your story?"
+                        placeholderTextColor='gray'
+                        underlineColorAndroid='transparent'
+                        autoFocus={true}
+                    />
+                    <ImagePreviewGrid
+                        columns={4}
+                        images={this.state.post.images}
+                        onRemoveImage={this.onRemoveImage}
+                        height={100}
+                    />
+                </View>
+                <View style={{
+                    flexDirection: 'row',
+                    borderTopWidth: 1,
+                    borderTopColor: 'lightgray',
+                    padding: 5,
+                    margin: 0,
+                    height: 30,
+                }}>
+                    {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
+                </View>
             </View>
         );
     }
 
-    private async getPostForEditing(): Promise<Post | null> {
-        console.log(this.props.navigation);
-        if (this.props.navigation.state.params != null && this.props.navigation.state.params.post != null) {
-            return this.props.navigation.state.params.post;
-        }
-        return await LocalPostManager.loadDraft();
+    private onRemoveImage = (removedImage: ImageData) => {
+        const images = this.state.post.images.filter(image => image != null && image.uri !== removedImage.uri);
+        const post = {
+            ...this.state.post,
+            images,
+        };
+        this.setState({
+            post,
+        });
     }
 
-    private onCancel() {
+    private onChangeText = (text: string) => {
+        const post: Post = {
+            ...this.state.post,
+            text,
+        };
+        this.setState({
+            post,
+        });
+    }
+
+    private getPostFromDraft = (draft: Post | null): Post => {
+        if (draft != null) {
+            return draft;
+        } else {
+            return {
+                images: [],
+                text: '',
+                createdAt: Date.now(),
+            };
+        }
+    }
+
+    private onDiscard = () => {
+        this.props.onDeleteDraft();
+        this.onCancel();
+    }
+
+    private onSave = () => {
+        this.setState({
+           isLoading: true,
+        });
+
+        console.log(this.state.post);
+
+        this.props.onSaveDraft(this.state.post);
+        this.onCancel();
+    }
+
+    private onCancel = () => {
         this.hideKeyboard();
         this.unregisterListeners();
         this.props.navigation.goBack();
     }
 
-    private hideKeyboard() {
+    private hideKeyboard = () => {
         if (this.state.isKeyboardVisible) {
             Keyboard.dismiss();
             this.setState({
@@ -208,10 +243,10 @@ export class EditPost extends React.Component<Props, any> {
         }
     }
 
-    private showCancelConfirmation() {
+    private showCancelConfirmation = () => {
         const options: any[] = [
-            { text: 'Save', onPress: async () => await this.onSave() },
-            { text: 'Discard', onPress: async () => await this.onDiscard() },
+            { text: 'Save', onPress: () => this.onSave() },
+            { text: 'Discard', onPress: () => this.onDiscard() },
             { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
         ];
 
@@ -231,46 +266,11 @@ export class EditPost extends React.Component<Props, any> {
         }
     }
 
-    private async onDiscard() {
-        await LocalPostManager.deleteDraft();
-        this.onCancel();
-    }
-
-    private async onSave() {
-        this.setState({
-           isLoading: true,
-        });
-
-        console.log(this.state.text, this.state.uploadedImages.length);
-
-        const post: Post = {
-            images: this.state.uploadedImages,
-            text: this.state.text,
-            createdAt: Date.now(),
-        };
-
-        try {
-            await LocalPostManager.saveDraft(post);
-            Debug.log('Draft saved', post._id);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Saving draft failed, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ],
-            );
-        }
-
-        this.onCancel();
-    }
-
-    private async onCancelConfirmation() {
+    private onCancelConfirmation = () => {
         console.log('onCancelConfirmation', this.state.isKeyboardVisible);
         this.hideKeyboard();
-        await new Promise(resolve => setTimeout(resolve, 0));
         console.log('Cancel');
-        if (this.state.text !== '' || this.state.uploadedImages.length > 0) {
+        if (this.state.post.text !== '' || this.state.post.images.length > 0) {
             this.showCancelConfirmation();
         } else {
             this.onCancel();
@@ -280,38 +280,33 @@ export class EditPost extends React.Component<Props, any> {
     private openImagePicker = async () => {
         const imageData = await AsyncImagePicker.launchImageLibrary();
         if (imageData != null) {
+            const images = this.state.post.images.concat([imageData]);
+            const post = {
+                ...this.state.post,
+                images,
+            };
             this.setState({
-                uploadedImages: this.state.uploadedImages.concat([imageData]),
+                post,
             });
         }
     }
 
-    private openLocationPicker = async () => {
-        this.props.navigation.navigate('Location');
-    }
-
-    private async onPressSubmit() {
+    private onPressSubmit = () => {
         if (this.state.isLoading) {
             return;
         }
 
-        await this.sendUpdate();
+        this.sendUpdate();
         this.onCancel();
     }
 
-    private async sendUpdate() {
+    private sendUpdate = () => {
         this.setState({
            isLoading: true,
         });
 
-        console.log(this.state.text, this.state.uploadedImages.length, this.state.post);
-
-        const post = this.state.post;
-        post.images = this.state.uploadedImages;
-        post.text = this.state.text;
-        post.updatedAt = Date.now();
-
-        this.props.onPost(post);
+        console.log(this.state.post);
+        this.props.onPost(this.state.post);
     }
 
     private renderActivityIndicator() {

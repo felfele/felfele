@@ -6,7 +6,6 @@ import * as Communications from 'react-native-communications';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { LocalPostManager } from '../LocalPostManager';
-import StateTracker from '../StateTracker';
 import { Version } from '../Version';
 import { Post, ImageData } from '../models/Post';
 import { Config } from '../Config';
@@ -196,7 +195,6 @@ export class DebugScreen extends React.Component<any, any> {
 
     private async onSyncPosts() {
         await LocalPostManager.syncPosts();
-        StateTracker.updateVersion(StateTracker.version + 1);
     }
 
     private async onClearPostImageData() {

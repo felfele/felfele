@@ -108,13 +108,13 @@ export class RSSFeedManager {
         const titles = HtmlUtils.findPath(document, ['html', 'head', 'title']);
         for (const title of titles) {
             if (title.childNodes.length > 0) {
-                console.log('parseFeedFromHtml: title: ', title);
                 if (title.childNodes[0].textContent != null) {
                     feed.name = title.childNodes[0].textContent!;
                     break;
                 }
                 // The lib we use (react-native-parse-html) returns the value
                 // incorrectly in 'value' instead of 'textContent'
+                // tslint:disable-next-line:no-string-literal
                 const value = title.childNodes[0]['value'];
                 if (value != null) {
                     feed.name = value;
@@ -279,6 +279,7 @@ export class RSSFeedManager {
     }
 }
 
+// tslint:disable-next-line:class-name
 class _RSSPostManager implements PostManager {
     public readonly feedManager = new RSSFeedManager();
 
@@ -346,7 +347,7 @@ class _RSSPostManager implements PostManager {
                 images: [],
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
-            }
+            };
             this.posts.push(firstPost);
         }
     }
@@ -508,7 +509,9 @@ class _RSSPostManager implements PostManager {
 
 export const RSSPostManager = new _RSSPostManager();
 
+// tslint:disable-next-line:no-var-requires
 const util = require('react-native-util');
+// tslint:disable-next-line:no-var-requires
 const xml2js = require('react-native-xml2js');
 
 const Feed = {
@@ -551,7 +554,7 @@ const Feed = {
                     downloadTime: downloadTime - startTime,
                     xmlTime: xmlTime - downloadTime,
                     parseTime: parseTime - xmlTime,
-                }
+                };
                 resolve(feedWithMetrics);
             });
         });
@@ -647,6 +650,8 @@ const Feed = {
                     }
                     val.enclosure.forEach((enclosure) => {
                         const enc = {};
+
+                        // tslint:disable-next-line:forin
                         for (const x in enclosure) {
                             enc[x] = enclosure[x][0];
                         }

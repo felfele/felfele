@@ -18,9 +18,7 @@ import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import StateTracker from '../StateTracker';
 import { Config } from '../Config';
-import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
@@ -32,16 +30,15 @@ const WindowWidth = Dimensions.get('window').width;
 export interface DispatchProps {
     onRefreshPosts: () => void;
     onDeletePost: (post: Post) => void;
+    onSavePost: (post: Post) => void;
 }
 
 export interface StateProps {
     navigation: any;
-    postManager: PostManager;
     posts: Post[];
 }
 
 interface YourFeedState {
-    version: number;
     selectedPost: Post | null;
     isRefreshing: boolean;
     isOnline: boolean;
@@ -54,7 +51,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     constructor(props) {
         super(props);
         this.state = {
-            version: StateTracker.version,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
@@ -180,21 +176,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
-    private onEditPost(post: Post) {
-        this.props.navigation.navigate('Post', {post: post});
-    }
-
     private renderButtonsIfSelected(post: Post) {
         const iconSize = 24;
         const isPostLiked = () => false;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    { post.author == null &&
-                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
-                            <Icon name='ios-create-outline' size={iconSize} color='black' />
-                        </TouchableOpacity>
-                    }
                     <TouchableOpacity style={styles.like}>
                         {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>
@@ -337,7 +324,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         return (
             <FeedHeader
                 navigation={this.props.navigation}
-                postManager={this.props.postManager} />
+                onSavePost={this.props.onSavePost} />
         );
     }
 
