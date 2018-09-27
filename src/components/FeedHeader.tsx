@@ -49,7 +49,10 @@ export class FeedHeader extends React.PureComponent<FeedHeaderProps> {
 
     public render() {
         return (
-            <View style={styles.headerContainer}>
+            <View
+                style={styles.headerContainer}
+                testID='welcome'
+            >
                 <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
                     <Icon
                         name='camera-alt'
