@@ -206,12 +206,9 @@ export class DebugScreen extends React.Component<any, any> {
 
     private async onUploadToSwarm() {
         const swarm = require('swarm-js').at('http://swarm.helmethair.co:80');
-        const data = 'hello';
-        // const hash = await swarm.upload(data);
-        // console.log('Uploaded file. Address:', hash);
-        const fileHash = await swarm.upload('na vajon fel, aztán le?');
-       // const fileHash = 'e9ab1de4294766d4dde10c93bdc76a413d1629d9a500e1c1411e97a74d4abec9';
-        const array = await swarm.download(fileHash);
+        const hash = await swarm.upload('na vajon fel, aztán le?');
+        console.log('Uploaded file. Address:', hash);
+        const array = await swarm.download(hash);
         console.log('Downloaded file: ', swarm.toString(array));
     }
 
