@@ -207,11 +207,12 @@ export class DebugScreen extends React.Component<any, any> {
     }
 
     private async onUploadToSwarm() {
-        const swarm = require('swarm-js').at('http://swarm.helmethair.co');
+        const swarm = require('swarm-js').at('http://swarm.helmethair.co:80');
         const data = 'hello';
         // const hash = await swarm.upload(data);
         // console.log('Uploaded file. Address:', hash);
-        const fileHash = '4c5b04446d5495f2887a76c4ad9f0050b991c2bc6a3ed085538a2287490537f1';
+        const fileHash = await swarm.upload('na vajon fel, aztán le?');
+       // const fileHash = 'e9ab1de4294766d4dde10c93bdc76a413d1629d9a500e1c1411e97a74d4abec9';
         const array = await swarm.download(fileHash);
         console.log('Downloaded file: ', swarm.toString(array));
     }

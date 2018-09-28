@@ -67,8 +67,8 @@
     "node-libs-browser": "^2.1.0",
     "react": "16.3.1",
     "react-native": "^0.55.1",
-    "react-native-crypto": "^2.1.2",
     "react-native-communications": "^2.2.1",
+    "react-native-crypto": "^2.1.2",
     "react-native-easy-grid": "^0.1.17",
     "react-native-easy-markdown": "^1.2.0",
     "react-native-gravatar": "^1.0.2",
@@ -85,7 +85,7 @@
     "redux-persist": "^5.10.0",
     "redux-persist-transform-immutable": "^5.0.0",
     "redux-thunk": "^2.2.0",
-    "swarm-js": "^0.1.37",
+    "swarm-js": "git+ssh://git@github.com/MaiaVictor/swarm-js.git",
     "tslib": "^1.9.3",
     "url": "^0.11.0",
     "util": "^0.10.4"
