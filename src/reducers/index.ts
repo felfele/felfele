@@ -22,6 +22,7 @@ export interface AppState {
     settings: Settings;
     currentTimestamp: number;
     rssPosts: List<Post>;
+    localPosts: List<Post>;
     draft: Post | null;
 }
 
@@ -37,6 +38,7 @@ const defaultState: AppState = {
     settings: defaultSettings,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
+    localPosts: List<Post>(),
     draft: null,
 };
 
@@ -97,6 +99,22 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
+const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'ADD-POST': {
+            return localPosts.insert(0, action.payload.post);
+        }
+        case 'DELETE-POST': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            return localPosts.remove(ind);
+        }
+        case 'LOCAL-POSTS-LOADED': {
+            return List<Post>(action.payload.posts);
+        }
+    }
+    return localPosts;
+};
+
 const draftReducer = (draft: Post | null = null, action: Actions): Post | null => {
     switch (action.type) {
         case 'ADD-DRAFT': {
@@ -111,7 +129,7 @@ const draftReducer = (draft: Post | null = null, action: Actions): Post | null =
 
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'rssPosts'],
+        whitelist: ['contentFilters', 'feeds', 'rssPosts', 'localPosts'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -124,6 +142,7 @@ export const reducer = combineReducers<AppState>({
     settings: settingsReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
+    localPosts: localPostsReducer,
     draft: draftReducer,
 });
 

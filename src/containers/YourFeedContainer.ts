@@ -1,12 +1,11 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
-import { LocalPostManager } from '../LocalPostManager';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const posts = LocalPostManager.getAllPosts();
+    const posts = state.localPosts.toArray();
     const filteredPosts = posts;
 
     return {

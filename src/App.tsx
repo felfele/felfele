@@ -11,7 +11,6 @@ import { Settings } from './components/Settings';
 import { DebugScreen } from './components/DebugScreen';
 import { Share } from './components/Share';
 import { Debug } from './Debug';
-import { LocalPostManager } from './LocalPostManager';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
@@ -29,7 +28,6 @@ const Root = TabNavigator(
         YourTab: {
             screen: ({navigation}) => (<YourFeedContainer
                                         navigation={navigation}
-                                        postManager={LocalPostManager}
                                     />),
             path: '/',
             navigationOptions: {

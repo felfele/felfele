@@ -81,6 +81,7 @@ export class _LocalPostManager implements PostManager {
                                         .desc()
                                         .limit(highestSeenPostId)
                                         .execute();
+        return localOnlyPosts;
     }
 
     public getAllPosts() {

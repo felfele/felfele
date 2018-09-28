@@ -19,6 +19,9 @@ export enum ActionTypes {
     REMOVE_POST = 'REMOVE-POST',
     ADD_DRAFT = 'ADD-DRAFT',
     REMOVE_DRAFT = 'REMOVE-DRAFT',
+    LOCAL_POSTS_LOADED = 'LOCAL-POSTS-LOADED',
+    ADD_POST = 'ADD-POST',
+    DELETE_POST = 'DELETE-POST',
 }
 
 export const Actions = {
@@ -32,6 +35,12 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_FEED, { feed }),
     timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
+    localPostsLoaded: (posts: Post[]) =>
+        createAction(ActionTypes.LOCAL_POSTS_LOADED, { posts }),
+    addPost: (post: Post) =>
+        createAction(ActionTypes.ADD_POST, { post }),
+    deletePost: (post: Post) =>
+        createAction(ActionTypes.DELETE_POST, { post }),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
     addDraft: (draft: Post) =>
@@ -62,8 +71,8 @@ export const AsyncActions = {
     },
     loadLocalPosts: () => {
         return async (dispatch, getState: () => AppState) => {
-            await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTick());
+            const posts = await LocalPostManager.loadPosts();
+            dispatch(Actions.localPostsLoaded(posts));
         };
     },
     addPost: (post: Post) => {
@@ -72,15 +81,14 @@ export const AsyncActions = {
                 await LocalPostManager.deleteDraft();
             }
             await LocalPostManager.saveAndSyncPost(post);
-            dispatch(Actions.timeTick());
+            dispatch(Actions.addPost(post));
             Debug.log('Post saved and synced, ', post._id);
         };
     },
     removePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
             await LocalPostManager.deletePost(post);
-            await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTick());
+            dispatch(Actions.deletePost(post));
         };
     },
 };
