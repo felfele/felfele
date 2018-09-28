@@ -14,6 +14,7 @@ import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { Storage } from '../Storage';
+import { SimpleTextInput } from './SimpleTextInput';
 
 interface EditFeedNavigationActions {
     back?: () => void;
@@ -135,13 +136,14 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     public render() {
         return (
             <View style={styles.container}>
-                <TextInput
-                    value={this.state.url}
+                <SimpleTextInput
+                    defaultValue={this.state.url}
                     style={styles.linkInput}
                     onChangeText={(text) => this.setState({ url: text })}
                     placeholder='Link of the feed'
                     autoCapitalize='none'
                     autoFocus={true}
+                    autoCorrect={false}
                 />
                 { this.state.checked
                   ?

@@ -1,5 +1,6 @@
 import { HtmlUtils } from './HtmlUtils';
 
+// tslint:disable-next-line:class-name
 class _FaviconCache {
     private favicons: Map<string, string> = new Map();
 

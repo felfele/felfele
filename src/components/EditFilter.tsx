@@ -12,6 +12,7 @@ import {
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { Colors } from '../styles';
 import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
+import { SimpleTextInput } from './SimpleTextInput';
 
 interface EditFilterNavigationActions {
     back?: () => void;
@@ -84,13 +85,14 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
         const sliderText = 'Filter until: ' + sliderValueToText(this.state.filterSliderValue);
         return (
             <View style={styles.container}>
-                <TextInput
-                    value={this.state.filterText}
+                <SimpleTextInput
+                    defaultValue={this.state.filterText}
                     style={styles.linkInput}
                     onChangeText={(text) => this.setState({ filterText: text })}
                     placeholder='Text to be filtered'
                     autoCapitalize='none'
                     autoFocus={true}
+                    autoCorrect={false}
                 />
                 <View style={styles.sliderContainer}>
                     <Text style={styles.sliderText}>{sliderText}</Text>

@@ -18,9 +18,7 @@ import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import StateTracker from '../StateTracker';
 import { Config } from '../Config';
-import { PostManager } from '../PostManager';
 import { Post, ImageData } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
@@ -29,20 +27,22 @@ import { Utils } from '../Utils';
 
 const WindowWidth = Dimensions.get('window').width;
 
-export interface DispatchProps { }
+export interface DispatchProps {
+    onRefreshPosts: () => void;
+    onDeletePost: (post: Post) => void;
+    onSavePost: (post: Post) => void;
+}
 
 export interface StateProps {
     navigation: any;
-    postManager: PostManager;
+    posts: Post[];
 }
 
 interface YourFeedState {
-    version: number;
     selectedPost: Post | null;
     isRefreshing: boolean;
     isOnline: boolean;
     currentTime: number;
-    posts: Post[];
 }
 
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
@@ -51,12 +51,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     constructor(props) {
         super(props);
         this.state = {
-            version: StateTracker.version,
             selectedPost: null,
             isRefreshing: false,
             isOnline: NetworkStatus.isConnected(),
             currentTime: Date.now(),
-            posts: [],
         };
 
         this.containerStyle = {
@@ -74,16 +72,21 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             this.onConnectionStateChange(result);
         });
 
-        StateTracker.listen((oldVersion, newVersion) => {
-            this.updateVersion(newVersion);
-        });
-
         const refreshInterval = 60 * 1000;
         setInterval(() => {
                 this.setState({currentTime: Date.now()});
             },
             refreshInterval
         );
+    }
+
+    public componentDidUpdate(prevProps) {
+        if (this.props.posts !== prevProps.posts) {
+            console.log('YourFeed.componentDidUpdate');
+            this.setState({
+                isRefreshing: false,
+            });
+        }
     }
 
     public render() {
@@ -104,7 +107,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     <FlatList
                         ListHeaderComponent={this.renderListHeader}
                         ListFooterComponent={this.renderListFooter}
-                        data={this.state.posts}
+                        data={this.props.posts}
                         renderItem={(obj) => this.renderCard(obj.item)}
                         keyExtractor={(item) => '' + item._id}
                         extraData={this.state}
@@ -123,23 +126,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
-    public componentDidMount() {
-        this.props.postManager.loadPosts().then(() => {
-            this.setState({
-                posts: this.props.postManager.getAllPosts(),
-            });
-        });
-    }
-
-    private updateVersion(newVersion) {
-        if (newVersion !== this.state.version) {
-            this.setState({
-                version: newVersion,
-                posts: this.props.postManager.getAllPosts(),
-            });
-        }
-    }
-
     private onConnectionStateChange(connected) {
         this.setState({
             isOnline: connected,
@@ -150,25 +136,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.setState({
             isRefreshing: true,
         });
-        try {
-            await this.props.postManager.syncPosts();
-            this.setState({
-                posts: this.props.postManager.getAllPosts(),
-                isRefreshing: false,
-            });
-        } catch (e) {
-            this.setState({
-                isRefreshing: false,
-            });
-            Alert.alert(
-                'Error',
-                'No connection to the server, try again later!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK pressed')},
-                ]
-            );
-        }
-
+        this.props.onRefreshPosts();
     }
 
     private getImageUri(image: ImageData) {
@@ -202,14 +170,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             undefined,
             [
                 { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'OK', onPress: async () => await this.props.postManager.deletePost(post) },
+                { text: 'OK', onPress: async () => await this.props.onDeletePost(post) },
             ],
             { cancelable: false }
         );
-    }
-
-    private onEditPost(post: Post) {
-        this.props.navigation.navigate('Post', {post: post});
     }
 
     private renderButtonsIfSelected(post: Post) {
@@ -218,11 +182,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    { post.author == null &&
-                        <TouchableOpacity style={styles.edit} onPress={() => this.onEditPost(post)}>
-                            <Icon name='ios-create-outline' size={iconSize} color='black' />
-                        </TouchableOpacity>
-                    }
                     <TouchableOpacity style={styles.like}>
                         {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
                     </TouchableOpacity>
@@ -365,7 +324,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         return (
             <FeedHeader
                 navigation={this.props.navigation}
-                postManager={this.props.postManager} />
+                onSavePost={this.props.onSavePost} />
         );
     }
 

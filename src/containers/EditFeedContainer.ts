@@ -14,10 +14,10 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onAddFeed: (feed: Feed) => {
-            dispatch(Actions.addFeedAction(feed));
+            dispatch(Actions.addFeed(feed));
         },
         onRemoveFeed: (feed: Feed) => {
-            dispatch(Actions.removeFeedAction(feed));
+            dispatch(Actions.removeFeed(feed));
         },
     };
 };

@@ -1,37 +1,37 @@
 import { NetInfo } from 'react-native';
 
-type Listener = (boolean) => void;
+type Listener = (x: boolean) => void;
 
+// tslint:disable-next-line:class-name
 class _NetworkStatus {
-    connectionState: boolean | null = null;
-    listeners: Listener[] = [];
+    public static getConnectionState(connectionInfo): boolean {
+        if (connectionInfo.type === 'none' || connectionInfo.type === 'unknown') {
+            return false;
+        }
+        return true;
+    }
+
+    private connectionState: boolean | null = null;
+    private listeners: Listener[] = [];
 
     constructor() {
         NetInfo.addEventListener('connectionChange', (connectionInfo) => this.onConnectionChange(connectionInfo));
-        // (<any>NetInfo).getConnectionInfo().then((connectionInfo) => this.onConnectionChange(connectionInfo));
     }
 
-    isConnected(): boolean {
+    public isConnected(): boolean {
         if (this.connectionState == null) {
             return false;
         }
         return this.connectionState;
     }
 
-    static getConnectionState(connectionInfo): boolean {
-        if (connectionInfo.type == 'none' || connectionInfo.type == 'unknown') {
-            return false;
-        }
-        return true;
-    }
-
-    onConnectionChange(connectionInfo) {
-        this.connectionState = _NetworkStatus.getConnectionState(connectionInfo);
-        this.listeners.map(listener => listener(this.connectionState));
-    }
-
-    addConnectionStateChangeListener(listener: (result: boolean) => void) {
+    public addConnectionStateChangeListener(listener: (result: boolean) => void) {
         this.listeners.push(listener);
+    }
+
+    private onConnectionChange(connectionInfo) {
+        this.connectionState = _NetworkStatus.getConnectionState(connectionInfo);
+        this.listeners.map(listener => listener(this.connectionState != null && this.connectionState));
     }
 }
 

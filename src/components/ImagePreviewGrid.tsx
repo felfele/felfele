@@ -1,48 +1,51 @@
 import * as React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
-import { Row, Grid } from 'react-native-easy-grid';
 
-export class ImagePreviewGrid extends React.Component<any, any> {
+import { ImageData } from '../models/Post';
+import { TouchableView } from './TouchableView';
+
+export interface StateProps {
+    columns: number;
+    images: ImageData[];
+    height: number;
+}
+
+export interface DispatchProps {
+    onRemoveImage?: (image: ImageData) => void;
+}
+
+type Props = StateProps & DispatchProps;
+
+export class ImagePreviewGrid extends React.Component<Props, any> {
     private width = 0;
-    private height = 0;
 
     public render() {
-        const columns = this.props.columns;
+        const columns = Math.max(this.props.columns, this.props.images.length);
         const maxWidth = Math.floor(this.width / columns);
-        const maxHeight = Math.floor(this.max(this.height, maxWidth));
+        const maxHeight = this.notGreaterThan(maxWidth, this.props.height);
 
         const images = this.props.images.map((image) =>
-            <Image source={{uri: image.uri}}
-                style={{width: this.max(image.width, maxWidth),
-                        height: this.max(image.height, maxHeight),
-                        borderWidth: 1,
-                        borderColor: 'white'}}
-                    key={image.uri}
-            />
+            <TouchableView
+                onLongPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
+            >
+                <Image source={{uri: image.uri}}
+                    style={{width: this.notGreaterThan(image.width, maxWidth),
+                            height: this.notGreaterThan(image.height, maxHeight),
+                            borderWidth: 1,
+                            borderColor: 'white'}}
+                        key={image.uri}
+                />
+            </TouchableView>
         );
-
-        const rows: JSX.Element[] = [];
-        for (let i = 0; i < Math.floor(images.length / columns) + 1; i++) {
-            const rowImages: string[] = [];
-            for (let j = i * columns; j < this.max(i * columns + columns, images.length); j++) {
-                rowImages.push(images[j]);
-            }
-            const rowKey = `imageview-grid-row-${i}`;
-            rows.push(
-                <Row size={1} key={rowKey}>
-                    {rowImages}
-                </Row>
-            );
-        }
 
         return (
             <View
                 onLayout={(event) => this.onLayout(event)}
-                style={styles.gridContainer}
+                style={[styles.gridContainer, {height: maxHeight}]}
             >
-                <Grid>
-                    {rows}
-                </Grid>
+                <View style={{flexDirection: 'row', width: '100%'}}>
+                    {images}
+                </View>
             </View>
         );
     }
@@ -50,10 +53,9 @@ export class ImagePreviewGrid extends React.Component<any, any> {
     private onLayout(event) {
         const {x, y, height, width} = event.nativeEvent.layout;
         this.width = width;
-        this.height = height;
     }
 
-    private max(value, maxValue) {
+    private notGreaterThan(value, maxValue) {
         return value > maxValue ? maxValue : value;
     }
 }
@@ -64,9 +66,8 @@ const styles = StyleSheet.create({
         borderColor: 'magenta',
     },
     gridContainer: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         padding: 0,
         width: '100%',
-        height: '20%',
     },
 });

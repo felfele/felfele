@@ -1,16 +1,13 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
-import { RSSPostManager } from '../RSSPostManager';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { LocalPostManager } from '../LocalPostManager';
 import { Post } from '../models/Post';
+import { Actions, AsyncActions } from '../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const posts = state.rssPosts.toArray();
+    const posts = LocalPostManager.getAllPosts();
     const filteredPosts = posts;
-
-    RSSPostManager.feedManager.setFeeds(state.feeds.toArray());
-    RSSPostManager.setContentFilters(state.contentFilters.toArray());
 
     return {
         navigation: ownProps.navigation,
@@ -21,18 +18,19 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: () => {
-            dispatch(AsyncActions.downloadRssPosts());
+            // workaround to finish refresh
+            dispatch(Actions.timeTick());
         },
         onDeletePost: (post: Post) => {
-            // do nothing
+            dispatch(AsyncActions.removePost(post));
         },
         onSavePost: (post: Post) => {
-            // do nothing
+            dispatch(AsyncActions.addPost(post));
         },
     };
 };
 
-export const NewsFeedContainer = connect<StateProps, DispatchProps, {}>(
+export const YourFeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
 )(YourFeed);

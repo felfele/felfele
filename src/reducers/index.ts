@@ -8,19 +8,21 @@ import {
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist';
-import * as immutableTransform from 'redux-persist-transform-immutable';
 
+import { immutableTransform } from './immutableTransform';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { SECOND, HOUR } from '../DateUtils';
+import { Post } from '../models/Post';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
     currentTimestamp: number;
+    rssPosts: List<Post>;
+    draft: Post | null;
 }
 
 const defaultSettings: Settings = {
@@ -34,6 +36,8 @@ const defaultState: AppState = {
     feeds: List<Feed>(),
     settings: defaultSettings,
     currentTimestamp: defaultCurrentTimestamp,
+    rssPosts: List<Post>(),
+    draft: null,
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -84,9 +88,30 @@ const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, act
     return currentTimestamp;
 };
 
+const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'UPDATE-RSS-POSTS': {
+            return List<Post>(action.payload.posts);
+        }
+    }
+    return rssPosts;
+};
+
+const draftReducer = (draft: Post | null = null, action: Actions): Post | null => {
+    switch (action.type) {
+        case 'ADD-DRAFT': {
+            return action.payload.draft;
+        }
+        case 'REMOVE-DRAFT': {
+            return null;
+        }
+    }
+    return draft;
+};
+
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds'],
+        whitelist: ['contentFilters', 'feeds', 'rssPosts'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -98,6 +123,8 @@ export const reducer = combineReducers<AppState>({
     feeds: feedsReducer,
     settings: settingsReducer,
     currentTimestamp: currentTimestampReducer,
+    rssPosts: rssPostsReducer,
+    draft: draftReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -109,10 +136,14 @@ export const store = createStore(
         applyMiddleware(thunkMiddleware),
     ),
 );
-export const persistor = persistStore(store);
+
+const initStore = () => {
+    console.log('initStore: ', store.getState());
+    store.dispatch(AsyncActions.loadLocalPosts());
+    store.dispatch(AsyncActions.cleanupContentFilters());
+};
+
+export const persistor = persistStore(store, {}, initStore);
 
 console.log('store: ', store.getState());
 store.subscribe(() => console.log('store updated: ', store.getState()));
-
-store.dispatch(AsyncActions.cleanupContentFiltersAction());
-setInterval(() => store.dispatch(AsyncActions.cleanupContentFiltersAction()), HOUR);
