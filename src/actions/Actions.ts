@@ -69,7 +69,7 @@ export const AsyncActions = {
     addPost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
             if (post._id == null) {
-                await LocalPostManager.deleteDraft();
+                dispatch(Actions.removeDraft());
             }
             await LocalPostManager.saveAndSyncPost(post);
             dispatch(Actions.timeTick());
