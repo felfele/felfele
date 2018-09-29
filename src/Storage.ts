@@ -456,5 +456,4 @@ export class AsyncStorageWrapper {
 
 export const Storage = {
     post: new StorageWithAutoIds<Post>('post'),
-    draft: new StorageWithAutoIds<Post>('draft'),
 };
