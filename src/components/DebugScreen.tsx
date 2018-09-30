@@ -4,9 +4,8 @@ import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Communications from 'react-native-communications';
 
-import { AsyncStorageWrapper, Storage } from '../Storage';
+import { AsyncStorageWrapper } from '../Storage';
 import { Version } from '../Version';
-import { Post, ImageData } from '../models/Post';
 import { Config } from '../Config';
 
 const styles = StyleSheet.create({

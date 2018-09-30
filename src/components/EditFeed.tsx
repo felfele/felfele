@@ -13,7 +13,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
-import { Storage } from '../Storage';
 import { SimpleTextInput } from './SimpleTextInput';
 
 interface EditFeedNavigationActions {

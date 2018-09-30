@@ -4,7 +4,6 @@ import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
-import { Storage } from './Storage';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 
@@ -297,6 +296,10 @@ class _RSSPostManager implements PostManager {
     }
     public async deletePost(post: Post) {
         // do nothing
+    }
+
+    public async syncPosts() {
+        await this.loadPosts();
     }
 
     public async loadPosts() {
