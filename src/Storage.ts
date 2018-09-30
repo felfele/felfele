@@ -3,10 +3,6 @@ import { Model } from './models/Model';
 import { Post } from './models/Post';
 import { Debug } from './Debug';
 
-interface Metadata {
-    highestSeenId: number;
-}
-
 export type QueryOrder = 'asc' | 'desc';
 
 type UnaryConditionType = 'null' | 'notnull';
@@ -52,8 +48,7 @@ class BinaryCondition<T extends Model> {
 }
 
 export interface Queryable<T extends Model> {
-    getNumItems(start: number, num: number, queryOrder: QueryOrder, conditions: Condition<T>[]);
-    getHighestSeenId(): Promise<number>;
+    getNumItems(start: number, num: number, queryOrder: QueryOrder, conditions: Condition<T>[], highestSeenId: number);
 }
 
 export class Query<T extends Model> {
@@ -64,8 +59,7 @@ export class Query<T extends Model> {
     constructor(private storage: Queryable<T>) {
     }
 
-    public async execute() {
-        const highestSeenId = await this.storage.getHighestSeenId();
+    public async execute(highestSeenId: number) {
         if (this.limitResults === 0 && this.queryOrder === 'asc') {
             this.limitResults = highestSeenId;
         }
@@ -74,7 +68,7 @@ export class Query<T extends Model> {
             start = highestSeenId;
         }
 
-        return this.storage.getNumItems(start, this.limitResults, this.queryOrder, this.conditions);
+        return this.storage.getNumItems(start, this.limitResults, this.queryOrder, this.conditions, highestSeenId);
     }
 
     public limit(limit) {
@@ -223,7 +217,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         }
     }
 
-    private metadata: Metadata | null = null;
     private isMetadataUpdated: boolean = false;
     private storage: StorageWithStringKey<T>;
 
@@ -233,23 +226,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
 
     public clear() {
         this.isMetadataUpdated = false;
-        this.metadata = null;
-    }
-
-    public async set(t: T) {
-        if (t._id == null) {
-            const generatedId = await this.generateId(t);
-            t._id = generatedId;
-        }
-
-        await this.storage.set('' + t._id, t);
-        if (this.isMetadataUpdated) {
-            const metaValue = JSON.stringify(this.metadata);
-            await AsyncStorageWrapper.setItem(this.storage.getName(), metaValue);
-            this.isMetadataUpdated = false;
-        }
-
-        return t._id;
     }
 
     public async get(id: number) {
@@ -260,9 +236,8 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         this.storage.delete('' + id);
     }
 
-    public async getNumItems(start, num, order: QueryOrder, conditions: Condition<T>[] = []): Promise<T[]> {
-        const metadata = await this.tryLoadMetadata();
-        if (metadata.highestSeenId === 0) {
+    public async getNumItems(start, num, order: QueryOrder, conditions: Condition<T>[] = [], highestSeenId): Promise<T[]> {
+        if (highestSeenId === 0) {
             return [];
         }
         let startIndex = parseInt(start, 10);
@@ -276,8 +251,8 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
             if (min < 0) {
                 min = 0;
             }
-            if (max > metadata.highestSeenId) {
-                max = metadata.highestSeenId;
+            if (max > highestSeenId) {
+                max = highestSeenId;
             }
 
             const ids = StorageWithAutoIds.generateIds(min, max, order);
@@ -324,28 +299,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         return stringKeys.map((key) => parseInt(key, 10));
     }
 
-    public async getAllValues(): Promise<T[]> {
-        const metadata = await this.tryLoadMetadata();
-
-        if (metadata.highestSeenId === 0) {
-            return [];
-        }
-
-        const keys = this.generateKeys(1, metadata.highestSeenId);
-        const keyValues = await AsyncStorage.multiGet(keys);
-
-        return keyValues
-            .filter(elem => elem[1] != null)
-            .map((elem) => {
-                return JSON.parse(elem[1]);
-            });
-    }
-
-    public async getHighestSeenId() {
-        const metadata = await this.tryLoadMetadata();
-        return metadata.highestSeenId;
-    }
-
     public query(): Query<T> {
         return new Query<T>(this);
     }
@@ -360,28 +313,6 @@ export class StorageWithAutoIds<T extends Model> implements Queryable<T> {
         }
 
         return keys;
-    }
-
-    private async tryLoadMetadata(): Promise<Metadata> {
-        if (this.metadata === null) {
-            const value = await AsyncStorageWrapper.getItem(this.storage.getName());
-            if (value == null) {
-                this.metadata = {
-                    highestSeenId: 0,
-                };
-                await AsyncStorageWrapper.setItem(this.storage.getName(), JSON.stringify(this.metadata));
-            } else {
-                this.metadata = JSON.parse(value) as Metadata;
-            }
-        }
-        return this.metadata;
-    }
-
-    private async generateId(t: T) {
-        const metadata = await this.tryLoadMetadata();
-        metadata.highestSeenId += 1;
-        this.isMetadataUpdated = true;
-        return metadata.highestSeenId;
     }
 }
 

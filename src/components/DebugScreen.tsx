@@ -5,7 +5,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Communications from 'react-native-communications';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
-import { LocalPostManager } from '../LocalPostManager';
 import { Version } from '../Version';
 import { Post, ImageData } from '../models/Post';
 import { Config } from '../Config';
@@ -130,20 +129,20 @@ export class DebugScreen extends React.Component<any, any> {
     }
 
     private async onListPosts() {
-        const posts = LocalPostManager.getAllPosts();
-        posts.map(post => {
-            const postCopy = {
-                ...post,
-                images: post.images.map(image => {
-                    return {
-                        ...image,
-                        data: undefined,
-                    };
-                }),
-            };
-            // tslint:disable-next-line:no-console
-            console.log(JSON.stringify(postCopy));
-        });
+        // const posts = LocalPostManager.getAllPosts();
+        // posts.map(post => {
+        //     const postCopy = {
+        //         ...post,
+        //         images: post.images.map(image => {
+        //             return {
+        //                 ...image,
+        //                 data: undefined,
+        //             };
+        //         }),
+        //     };
+        //     // tslint:disable-next-line:no-console
+        //     console.log(JSON.stringify(postCopy));
+        // });
     }
 
     private async onListDatabase() {
@@ -158,9 +157,9 @@ export class DebugScreen extends React.Component<any, any> {
     }
 
     private async onListCache() {
-        const posts = await LocalPostManager.getAllPosts();
-        // tslint:disable-next-line:no-console
-        posts.map(post => console.log('onListCache: ', post));
+        // const posts = await LocalPostManager.getAllPosts();
+        // // tslint:disable-next-line:no-console
+        // posts.map(post => console.log('onListCache: ', post));
     }
 
     private async onListSyncState() {
@@ -185,41 +184,41 @@ export class DebugScreen extends React.Component<any, any> {
     }
 
     private async onClearDatabase() {
-        await AsyncStorageWrapper.clear();
-        for (const key of Object.keys(Storage)) {
-            Storage[key].clear();
-        }
-        LocalPostManager.clearPosts();
-        Alert.alert('Database is cleared');
+      //  await AsyncStorageWrapper.clear();
+      //  for (const key of Object.keys(Storage)) {
+      //      Storage[key].clear();
+      // }
+      //  LocalPostManager.clearPosts();
+      //  Alert.alert('Database is cleared');
     }
 
     private async onSyncPosts() {
-        await LocalPostManager.syncPosts();
+      //  await LocalPostManager.syncPosts();
     }
 
     private async onClearPostImageData() {
-        const allPosts = await Storage.post.getAllValues();
-        console.log('onClearPostImageData: all posts ', allPosts.length);
-        const imageHasData = (image: ImageData) => image.data != null;
-        const postHasImageData = (post: Post) => post.images.filter(image => imageHasData(image)).length > 0;
-        const postsWithImageData = allPosts.filter(post => postHasImageData(post));
-        console.log('onClearPostImageData: posts with image data ', postsWithImageData.length);
+        // const allPosts = await Storage.post.getAllValues();
+        // console.log('onClearPostImageData: all posts ', allPosts.length);
+        // const imageHasData = (image: ImageData) => image.data != null;
+        // const postHasImageData = (post: Post) => post.images.filter(image => imageHasData(image)).length > 0;
+        // const postsWithImageData = allPosts.filter(post => postHasImageData(post));
+        // console.log('onClearPostImageData: posts with image data ', postsWithImageData.length);
 
-        let counter = 0;
-        for (const post of postsWithImageData) {
-            const updatedPost: Post = {
-                ...post,
-                images: post.images.map<ImageData>(image => {
-                    return {
-                        ...image,
-                        data: undefined,
-                    };
-                }),
-            };
-            Storage.post.set(updatedPost);
-            counter += 1;
-        }
-        console.log('onClearPostImageData: updated ', counter);
+        // let counter = 0;
+        // for (const post of postsWithImageData) {
+        //     const updatedPost: Post = {
+        //         ...post,
+        //         images: post.images.map<ImageData>(image => {
+        //             return {
+        //                 ...image,
+        //                 data: undefined,
+        //             };
+        //         }),
+        //     };
+        //     Storage.post.set(updatedPost);
+        //     counter += 1;
+        // }
+        // console.log('onClearPostImageData: updated ', counter);
     }
 
     private async onSendEmailOfDatabase() {

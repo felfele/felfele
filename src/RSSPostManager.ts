@@ -298,9 +298,6 @@ class _RSSPostManager implements PostManager {
     public async deletePost(post: Post) {
         // do nothing
     }
-    public async syncPosts() {
-        await this.loadPosts();
-    }
 
     public async loadPosts() {
         const startTime = Date.now();

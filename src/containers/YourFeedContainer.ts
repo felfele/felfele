@@ -24,7 +24,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.removePost(post));
         },
         onSavePost: (post: Post) => {
-            dispatch(AsyncActions.addPost(post));
+            dispatch(AsyncActions.createPost(post));
         },
     };
 };
