@@ -12,7 +12,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-node6": "^11.0.0",
-    "detox": "^8.1.6",
+    "detox": "^7.3.3",
     "eslint": "^4.19.1",
     "jest": "^23.5.0",
     "jest-fetch-mock": "^1.6.5",
@@ -60,7 +60,8 @@
       "\\.snap$",
       "<rootDir>/node_modules/",
       "<rootDir>/lib/",
-      "<rootDir>/build/"
+      "<rootDir>/build/",
+      "<rootDir>/e2e/"
     ],
     "cacheDirectory": ".jest/cache",
     "globals": {
