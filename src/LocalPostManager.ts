@@ -109,25 +109,6 @@ export class _LocalPostManager implements PostManager {
     public async uploadPost(post: Post): Promise<number | null> {
             return 0;
     }
-
-    public async saveDraft(draft: Post): Promise<number | null> {
-        // We only support one draft at the moment
-        const draftId = DefaultDraftId;
-        draft._id = draftId;
-        return await Storage.draft.set(draft);
-    }
-
-    public async loadDraft(): Promise<Post | null> {
-        const draft = await Storage.draft.get(DefaultDraftId);
-        if (draft != null) {
-            draft._id = undefined;
-        }
-        return draft;
-    }
-
-    public async deleteDraft(): Promise<void> {
-        await Storage.draft.delete(DefaultDraftId);
-    }
 }
 
 export const LocalPostManager = new _LocalPostManager();
