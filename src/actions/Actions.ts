@@ -72,7 +72,7 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             dispatch(Actions.removeDraft());
             const { metadata } = getState();
-            post._id = metadata.highestSeenId++;
+            post._id = metadata.highestSeenId + 1;
             dispatch(Actions.addPost(post));
             dispatch(Actions.updateHighestSeenId());
             Debug.log('Post saved and synced, ', post._id);
