@@ -12,9 +12,11 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-node6": "^11.0.0",
+    "detox": "^7.3.3",
     "eslint": "^4.19.1",
     "jest": "^23.5.0",
     "jest-fetch-mock": "^1.6.5",
+    "mocha": "^5.2.0",
     "mock-async-storage": "^1.0.3",
     "react-native-debugger-open": "^0.3.17",
     "react-native-typescript-transformer": "^1.2.10",
@@ -58,7 +60,8 @@
       "\\.snap$",
       "<rootDir>/node_modules/",
       "<rootDir>/lib/",
-      "<rootDir>/build/"
+      "<rootDir>/build/",
+      "<rootDir>/e2e/"
     ],
     "cacheDirectory": ".jest/cache",
     "globals": {
@@ -91,5 +94,16 @@
     "tslib": "^1.9.3",
     "url": "^0.11.0",
     "util": "^0.10.4"
+  },
+  "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/postmodern.app",
+        "build": "xcodebuild -project ios/postmodern.xcodeproj -scheme postmodern -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "name": "iPhone 7"
+      }
+    },
+    "test-runner": "mocha"
   }
 }
