@@ -5,7 +5,6 @@ import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post } from '../models/Post';
-import { LocalPostManager } from '../LocalPostManager';
 import { Debug } from '../Debug';
 
 export enum ActionTypes {
@@ -19,6 +18,9 @@ export enum ActionTypes {
     REMOVE_POST = 'REMOVE-POST',
     ADD_DRAFT = 'ADD-DRAFT',
     REMOVE_DRAFT = 'REMOVE-DRAFT',
+    ADD_POST = 'ADD-POST',
+    DELETE_POST = 'DELETE-POST',
+    UPDATE_HIGHEST_SEEN_ID = 'UPDATE-HIGHEST-SEEN-ID',
 }
 
 export const Actions = {
@@ -32,12 +34,18 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_FEED, { feed }),
     timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
+    addPost: (post: Post) =>
+        createAction(ActionTypes.ADD_POST, { post }),
+    deletePost: (post: Post) =>
+        createAction(ActionTypes.DELETE_POST, { post }),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
     addDraft: (draft: Post) =>
         createAction(ActionTypes.ADD_DRAFT, { draft }),
     removeDraft: () =>
         createAction(ActionTypes.REMOVE_DRAFT),
+    updateHighestSeenId: () =>
+        createAction(ActionTypes.UPDATE_HIGHEST_SEEN_ID),
 };
 
 export const AsyncActions = {
@@ -60,27 +68,19 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    loadLocalPosts: () => {
+    createPost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
-            await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTick());
-        };
-    },
-    addPost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
-            if (post._id == null) {
-                dispatch(Actions.removeDraft());
-            }
-            await LocalPostManager.saveAndSyncPost(post);
-            dispatch(Actions.timeTick());
+            dispatch(Actions.removeDraft());
+            const { metadata } = getState();
+            post._id = metadata.highestSeenId + 1;
+            dispatch(Actions.addPost(post));
+            dispatch(Actions.updateHighestSeenId());
             Debug.log('Post saved and synced, ', post._id);
         };
     },
     removePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
-            await LocalPostManager.deletePost(post);
-            await LocalPostManager.loadPosts();
-            dispatch(Actions.timeTick());
+            dispatch(Actions.deletePost(post));
         };
     },
 };

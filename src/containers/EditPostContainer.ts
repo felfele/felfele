@@ -16,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
    return {
        onPost: (post: Post) => {
-            dispatch(AsyncActions.addPost(post));
+            dispatch(AsyncActions.createPost(post));
        },
        onSaveDraft: (draft: Post) => {
            dispatch(Actions.addDraft(draft));

@@ -1,7 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { Model } from './models/Model';
 import { Post } from './models/Post';
-import { Debug } from './Debug';
 
 interface Metadata {
     highestSeenId: number;

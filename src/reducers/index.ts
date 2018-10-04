@@ -22,7 +22,13 @@ export interface AppState {
     settings: Settings;
     currentTimestamp: number;
     rssPosts: List<Post>;
+    localPosts: List<Post>;
     draft: Post | null;
+    metadata: Metadata;
+}
+
+interface Metadata {
+    highestSeenId: number;
 }
 
 const defaultSettings: Settings = {
@@ -37,7 +43,11 @@ const defaultState: AppState = {
     settings: defaultSettings,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
+    localPosts: List<Post>(),
     draft: null,
+    metadata: {
+        highestSeenId: 0,
+    },
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -97,6 +107,19 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
+const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'ADD-POST': {
+            return localPosts.insert(0, action.payload.post);
+        }
+        case 'DELETE-POST': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            return localPosts.remove(ind);
+        }
+    }
+    return localPosts;
+};
+
 const draftReducer = (draft: Post | null = null, action: Actions): Post | null => {
     switch (action.type) {
         case 'ADD-DRAFT': {
@@ -109,9 +132,23 @@ const draftReducer = (draft: Post | null = null, action: Actions): Post | null =
     return draft;
 };
 
+const metadataReducer = (metadata: Metadata = { highestSeenId: 0 }, action: Actions): Metadata => {
+    switch (action.type) {
+        case 'UPDATE-HIGHEST-SEEN-ID': {
+            return {
+                ...metadata,
+                highestSeenId: metadata.highestSeenId++,
+            };
+        }
+        default: {
+            return metadata;
+        }
+    }
+};
+
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'rssPosts'],
+        whitelist: ['contentFilters', 'feeds', 'rssPosts', 'localPosts'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -124,7 +161,9 @@ export const reducer = combineReducers<AppState>({
     settings: settingsReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
+    localPosts: localPostsReducer,
     draft: draftReducer,
+    metadata: metadataReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -139,7 +178,6 @@ export const store = createStore(
 
 const initStore = () => {
     console.log('initStore: ', store.getState());
-    store.dispatch(AsyncActions.loadLocalPosts());
     store.dispatch(AsyncActions.cleanupContentFilters());
 };
 
