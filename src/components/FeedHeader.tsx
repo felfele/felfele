@@ -50,7 +50,10 @@ export class FeedHeader extends React.PureComponent<Props> {
 
     public render() {
         return (
-            <View style={styles.headerContainer}>
+            <View
+                style={styles.headerContainer}
+                testID='welcome'
+            >
                 <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
                     <Icon
                         name='camera-alt'
@@ -65,6 +68,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={{
                         flex: 6,
                     }}
+                    testID='FeedHeader/TouchableHeaderText'
                 >
                     <Text style={styles.headerText}
                     >What's your story?</Text>
