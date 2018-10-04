@@ -20,8 +20,15 @@ export enum ActionTypes {
     REMOVE_DRAFT = 'REMOVE-DRAFT',
     ADD_POST = 'ADD-POST',
     DELETE_POST = 'DELETE-POST',
-    UPDATE_HIGHEST_SEEN_ID = 'UPDATE-HIGHEST-SEEN-ID',
+    INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
 }
+
+const InternalActions = {
+    addPost: (post: Post) =>
+        createAction(ActionTypes.ADD_POST, { post }),
+    increaseHighestSeenPostId: () =>
+        createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
+};
 
 export const Actions = {
     addContentFilter: (text: string, createdAt: number, validUntil: number) =>
@@ -34,8 +41,6 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_FEED, { feed }),
     timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
-    addPost: (post: Post) =>
-        createAction(ActionTypes.ADD_POST, { post }),
     deletePost: (post: Post) =>
         createAction(ActionTypes.DELETE_POST, { post }),
     updateRssPosts: (posts: Post[]) =>
@@ -44,8 +49,6 @@ export const Actions = {
         createAction(ActionTypes.ADD_DRAFT, { draft }),
     removeDraft: () =>
         createAction(ActionTypes.REMOVE_DRAFT),
-    updateHighestSeenId: () =>
-        createAction(ActionTypes.UPDATE_HIGHEST_SEEN_ID),
 };
 
 export const AsyncActions = {
@@ -72,9 +75,9 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             dispatch(Actions.removeDraft());
             const { metadata } = getState();
-            post._id = metadata.highestSeenId + 1;
-            dispatch(Actions.addPost(post));
-            dispatch(Actions.updateHighestSeenId());
+            post._id = metadata.highestSeenPostId + 1;
+            dispatch(InternalActions.addPost(post));
+            dispatch(InternalActions.increaseHighestSeenPostId());
             Debug.log('Post saved and synced, ', post._id);
         };
     },
@@ -85,4 +88,4 @@ export const AsyncActions = {
     },
 };
 
-export type Actions = ActionsUnion<typeof Actions>;
+export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;

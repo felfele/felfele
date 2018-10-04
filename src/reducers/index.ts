@@ -28,7 +28,7 @@ export interface AppState {
 }
 
 interface Metadata {
-    highestSeenId: number;
+    highestSeenPostId: number;
 }
 
 const defaultSettings: Settings = {
@@ -46,7 +46,7 @@ const defaultState: AppState = {
     localPosts: List<Post>(),
     draft: null,
     metadata: {
-        highestSeenId: 0,
+        highestSeenPostId: 0,
     },
 };
 
@@ -132,12 +132,12 @@ const draftReducer = (draft: Post | null = null, action: Actions): Post | null =
     return draft;
 };
 
-const metadataReducer = (metadata: Metadata = { highestSeenId: 0 }, action: Actions): Metadata => {
+const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: Actions): Metadata => {
     switch (action.type) {
-        case 'UPDATE-HIGHEST-SEEN-ID': {
+        case 'INCREASE-HIGHEST-SEEN-POST-ID': {
             return {
                 ...metadata,
-                highestSeenId: metadata.highestSeenId++,
+                highestSeenPostId: metadata.highestSeenPostId + 1,
             };
         }
         default: {
