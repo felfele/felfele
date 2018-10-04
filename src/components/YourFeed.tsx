@@ -243,6 +243,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     borderWidth: 0,
                 }}
                 key={'card-' + post._id}
+                testID={'YourFeed/Post' + post._id}
             >
                 <TouchableOpacity
                     onLongPress={ () => this.togglePostSelection(post) }
@@ -270,6 +271,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         borderWidth: 0,
                     }}
                     key={'card-' + post._id}
+                    testID={'YourFeed/Post' + post._id}
                 >
 
                     { this.renderCardTop(post) }

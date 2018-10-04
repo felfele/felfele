@@ -15,6 +15,7 @@ interface SimpleTextInputProps {
     multiline?: boolean;
     defaultValue?: string;
     underlineColorAndroid?: string;
+    testID?: string;
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -54,6 +55,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                     ? this.props.underlineColorAndroid
                     : 'transparent'
                 }
+                testID={this.props.testID}
             />
         );
     }
