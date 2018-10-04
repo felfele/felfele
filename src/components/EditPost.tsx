@@ -52,8 +52,8 @@ export class EditPost extends React.Component<Props, State> {
     public static navigationOptions = {
         header: undefined,
         title: 'Update status',
-        headerLeft: <Button title='Cancel' onPress={() => navigationActions.cancel!()} />,
-        headerRight: <Button title='Post' onPress={() => navigationActions.post!()} />,
+        headerLeft: <Button testID='EditPost/CancelButton' title='Cancel' onPress={() => navigationActions.cancel!()} />,
+        headerRight: <Button testID='EditPost/PostButton' title='Post' onPress={() => navigationActions.post!()} />,
     };
 
     public state: State;
@@ -157,6 +157,7 @@ export class EditPost extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
+                        testID='EditPost/TextInput'
                     />
                     <ImagePreviewGrid
                         columns={4}

@@ -68,6 +68,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={{
                         flex: 6,
                     }}
+                    testID='FeedHeader/TouchableHeaderText'
                 >
                     <Text style={styles.headerText}
                     >What's your story?</Text>
