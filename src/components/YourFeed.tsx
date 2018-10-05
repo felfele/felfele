@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Config } from '../Config';
 import { Post, ImageData } from '../models/Post';
@@ -24,6 +24,8 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
+import { Colors, IconSize } from '../styles';
+import { upload, getUrlFromHash } from '../Swarm';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -114,7 +116,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         refreshControl={
                             <RefreshControl
                                 refreshing={this.state.isRefreshing}
-                                onRefresh={async () => this.onRefresh() }
+                                onRefresh={() => this.onRefresh() }
                                 progressViewOffset={HeaderOffset}
                                 style={styles.refreshControl}
                             />
@@ -132,7 +134,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         });
     }
 
-    private async onRefresh() {
+    private onRefresh() {
         this.setState({
             isRefreshing: true,
         });
@@ -144,6 +146,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             return image.localPath;
         }
         return image.uri;
+    }
+
+    private async onSharePost(post: Post) {
+        const data = JSON.stringify(post);
+        const hash = await upload(data);
+        const link = getUrlFromHash(hash);
+        this.props.navigation.navigate('Share', {link});
     }
 
     private async openPost(post: Post) {
@@ -177,22 +186,26 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderButtonsIfSelected(post: Post) {
-        const iconSize = 24;
-        const isPostLiked = () => false;
+        const iconSize = 20;
+        const isPostLiked = () => post.liked === true;
+        const ActionIcon = (props) => <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    <TouchableOpacity style={styles.like}>
-                        {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
+                    <TouchableOpacity style={styles.like} onPress={() => post.liked = true}>
+                        {!isPostLiked() ? <ActionIcon name='heart-outline'/> : <ActionIcon name='heart'/>}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
-                        <Icon name='ios-chatbubbles-outline' size={iconSize} color='black' />
+                        <ActionIcon name='comment-multiple-outline'/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={() => this.props.navigation.navigate('Share', {link: 'http://192.168.1.49:2368#' + post._id})}>
-                        <Icon name='ios-redo-outline' size={iconSize} color='black' />
+                    <TouchableOpacity style={styles.share} onPress={async () => this.onSharePost(post)}>
+                        <ActionIcon name='share-variant'/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
-                        <Icon name='ios-trash-outline' size={iconSize} color='black' />
+                        <ActionIcon name='trash-can-outline'/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.share}>
+                        <ActionIcon name='playlist-edit'/>
                     </TouchableOpacity>
                 </View>
             );
@@ -349,7 +362,7 @@ const styles = StyleSheet.create({
     usernameContainer: {justifyContent: 'center', flexDirection: 'column'},
     location: {fontSize: 10, color: 'gray'},
     itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5},
-    like: {marginHorizontal: 5, marginVertical: 5, marginLeft: 5},
+    like: {marginHorizontal: 10, marginVertical: 5, marginLeft: 5},
     comment: {marginHorizontal: 10, marginVertical: 5},
     share: {marginHorizontal: 10, marginVertical: 5},
     edit: {marginHorizontal: 10, marginVertical: 5},

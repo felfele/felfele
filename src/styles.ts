@@ -34,3 +34,5 @@ export const Colors = {
     IOS_RED: '#FF3824',
     IOS_GRAY: '#8E8E93',
 };
+
+export const DefaultFont = 'Helvetica Neue';

@@ -28,4 +28,5 @@ export interface Post extends Model {
     deleted?: boolean;
     author?: Author;
     updatedAt?: number;
+    liked?: boolean;
 }
