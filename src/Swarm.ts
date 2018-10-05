@@ -3,7 +3,7 @@ import * as SwarmJS from 'swarm-js';
 const swarm = SwarmJS.at('http://swarm.helmethair.co:80');
 
 export const upload = async (data: string): Promise<string> => {
-    const hash = await swarm.upload('na vajon fel, aztán le?');
+    const hash = await swarm.upload(data);
     return hash;
 };
 
