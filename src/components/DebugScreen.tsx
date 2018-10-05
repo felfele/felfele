@@ -7,6 +7,7 @@ import * as Communications from 'react-native-communications';
 import { AsyncStorageWrapper } from '../Storage';
 import { Version } from '../Version';
 import { Config } from '../Config';
+import { upload, download } from '../Swarm';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -114,6 +115,13 @@ export class DebugScreen extends React.Component<any, any> {
                             onPress={async () => await this.onSendEmailOfDatabase()}
                         />
                         <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Upload to swarm'
+                            onPress={async () => await this.onUploadToSwarm()}
+                        />
+                        <SettingsList.Item
                             title={version}
                         />
 
@@ -193,6 +201,13 @@ export class DebugScreen extends React.Component<any, any> {
 
     private async onSyncPosts() {
       //  await LocalPostManager.syncPosts();
+    }
+
+    private async onUploadToSwarm() {
+        const hash = await upload('test');
+        console.log('Uploaded file. Address:', hash);
+        const data = await download(hash);
+        console.log('Downloaded file: ', data);
     }
 
     private async onClearPostImageData() {
