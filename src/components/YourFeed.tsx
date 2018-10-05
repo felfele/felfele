@@ -374,8 +374,8 @@ const styles = StyleSheet.create({
     seperator: {height: 1, alignSelf: 'stretch', marginHorizontal: 10, backgroundColor: 'rgba(0, 0, 0, 0.2)'},
     hashTag: {fontStyle: 'italic', color: 'blue'},
     footer: {marginVertical: 5, alignSelf: 'stretch', marginHorizontal: 20, flexDirection: 'column'},
-    username: {fontWeight: 'bold'},
-    text: {fontSize: 12, color: 'black'},
+    username: {fontWeight: 'bold', color: Colors.DARK_GRAY},
+    text: {fontSize: 12, color: Colors.DARK_GRAY},
     likedContainer: {backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center'},
     markdownStyle: {marginVertical: 10, marginHorizontal: 10},
     translucentBar: {
