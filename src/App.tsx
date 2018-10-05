@@ -20,6 +20,7 @@ import { FilterListEditorContainer } from './containers/FilterListEditorContaine
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
 import { EditPostContainer } from './containers/EditPostContainer';
+import { DebugScreenContainer } from './containers/DebugScreenContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -111,7 +112,7 @@ const Scenes: NavigationRouteConfigMap = {
         screen: EditPostContainer,
     },
     Debug: {
-        screen: DebugScreen,
+        screen: DebugScreenContainer,
     },
     Share: {
         screen: Share,

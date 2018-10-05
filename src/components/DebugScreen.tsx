@@ -4,10 +4,12 @@ import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Communications from 'react-native-communications';
 
-import { AsyncStorageWrapper } from '../Storage';
+import { AsyncStorageWrapper, Storage } from '../Storage';
 import { Version } from '../Version';
 import { Config } from '../Config';
 import { upload, download } from '../Swarm';
+import { AppState } from '../reducers';
+import { Post } from '../models/Post';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -30,7 +32,18 @@ const navigationActions: DebugScreenNavigationActions = {
     back: undefined,
 };
 
-export class DebugScreen extends React.Component<any, any> {
+export interface StateProps {
+    appState: AppState;
+    navigation: any;
+}
+
+export interface DispatchProps {
+    createPost: (post: Post) => void;
+}
+
+type Props = StateProps & DispatchProps;
+
+export class DebugScreen extends React.Component<Props, any> {
     public static navigationOptions = {
         header: undefined,
         title: 'Debug menu',
@@ -73,42 +86,6 @@ export class DebugScreen extends React.Component<any, any> {
                         />
                         <SettingsList.Item
                             icon={
-                                <Ionicons name='md-key' size={30} color='gray' />
-                            }
-                            title='List cache'
-                            onPress={async () => await this.onListCache()}
-                        />
-
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-key' size={30} color='gray' />
-                            }
-                            title='List sync state'
-                            onPress={async () => await this.onListSyncState()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-warning' size={30} color='gray' />
-                            }
-                            title='Clear database'
-                            onPress={async () => await this.onClearDatabase()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
-                            title='Sync posts'
-                            onPress={async () => await this.onSyncPosts()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
-                            title='Clean post image data'
-                            onPress={async () => await this.onClearPostImageData()}
-                        />
-                        <SettingsList.Item
-                            icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
                             title='Send the database in an email'
@@ -121,6 +98,14 @@ export class DebugScreen extends React.Component<any, any> {
                             title='Upload to swarm'
                             onPress={async () => await this.onUploadToSwarm()}
                         />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Migrate posts'
+                            onPress={async () => await this.onMigratePosts()}
+                        />
+
                         <SettingsList.Item
                             title={version}
                         />
@@ -136,20 +121,20 @@ export class DebugScreen extends React.Component<any, any> {
     }
 
     private async onListPosts() {
-        // const posts = LocalPostManager.getAllPosts();
-        // posts.map(post => {
-        //     const postCopy = {
-        //         ...post,
-        //         images: post.images.map(image => {
-        //             return {
-        //                 ...image,
-        //                 data: undefined,
-        //             };
-        //         }),
-        //     };
-        //     // tslint:disable-next-line:no-console
-        //     console.log(JSON.stringify(postCopy));
-        // });
+        const posts = this.props.appState.localPosts.toArray();
+        posts.map(post => {
+            const postCopy = {
+                ...post,
+                images: post.images.map(image => {
+                    return {
+                        ...image,
+                        data: undefined,
+                    };
+                }),
+            };
+            // tslint:disable-next-line:no-console
+            console.log(JSON.stringify(postCopy));
+        });
     }
 
     private async onListDatabase() {
@@ -163,44 +148,12 @@ export class DebugScreen extends React.Component<any, any> {
         }
     }
 
-    private async onListCache() {
-        // const posts = await LocalPostManager.getAllPosts();
-        // // tslint:disable-next-line:no-console
-        // posts.map(post => console.log('onListCache: ', post));
-    }
-
-    private async onListSyncState() {
-        const post = await AsyncStorageWrapper.getItem('post');
-        if (post) {
-            // tslint:disable-next-line:no-console
-            console.log('Post state: ', post);
-        }
-        const sync = await AsyncStorageWrapper.getItem('sync:default');
-        if (sync) {
-            // tslint:disable-next-line:no-console
-            console.log('Sync state: ', sync);
-        }
-    }
-
     private async onListDatabaseKeys() {
         const keys = await AsyncStorageWrapper.getAllKeys();
         if (keys) {
             // tslint:disable-next-line:no-console
             keys.map((key) => console.log('onListDatabaseKeys: ', key));
         }
-    }
-
-    private async onClearDatabase() {
-      //  await AsyncStorageWrapper.clear();
-      //  for (const key of Object.keys(Storage)) {
-      //      Storage[key].clear();
-      // }
-      //  LocalPostManager.clearPosts();
-      //  Alert.alert('Database is cleared');
-    }
-
-    private async onSyncPosts() {
-      //  await LocalPostManager.syncPosts();
     }
 
     private async onUploadToSwarm() {
@@ -210,35 +163,19 @@ export class DebugScreen extends React.Component<any, any> {
         console.log('Downloaded file: ', data);
     }
 
-    private async onClearPostImageData() {
-        // const allPosts = await Storage.post.getAllValues();
-        // console.log('onClearPostImageData: all posts ', allPosts.length);
-        // const imageHasData = (image: ImageData) => image.data != null;
-        // const postHasImageData = (post: Post) => post.images.filter(image => imageHasData(image)).length > 0;
-        // const postsWithImageData = allPosts.filter(post => postHasImageData(post));
-        // console.log('onClearPostImageData: posts with image data ', postsWithImageData.length);
-
-        // let counter = 0;
-        // for (const post of postsWithImageData) {
-        //     const updatedPost: Post = {
-        //         ...post,
-        //         images: post.images.map<ImageData>(image => {
-        //             return {
-        //                 ...image,
-        //                 data: undefined,
-        //             };
-        //         }),
-        //     };
-        //     Storage.post.set(updatedPost);
-        //     counter += 1;
-        // }
-        // console.log('onClearPostImageData: updated ', counter);
-    }
-
     private async onSendEmailOfDatabase() {
         const keyValues = await AsyncStorageWrapper.getAllKeyValues();
         const databaseDump = JSON.stringify(keyValues);
         const date = new Date(Date.now()).toJSON;
         Communications.email(Config.email, '', '', 'Postmodern database dump ' + date, databaseDump);
+    }
+
+    private async onMigratePosts() {
+        const asyncStoragePosts = await Storage.post.getAllValues();
+        const oldPosts = asyncStoragePosts.sort((a, b) => a.createdAt - b.createdAt);
+        for (const post of oldPosts) {
+            this.props.createPost(post);
+        }
+        console.log(oldPosts);
     }
 }
