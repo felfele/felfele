@@ -15,11 +15,13 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post } from '../models/Post';
+import { Identity } from '../models/Identity';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
+    identity: Identity;
     currentTimestamp: number;
     rssPosts: List<Post>;
     localPosts: List<Post>;
@@ -35,12 +37,18 @@ const defaultSettings: Settings = {
     saveToCameraRoll: true,
 };
 
+const defaultIdentity: Identity = {
+    name: '',
+    picturePath: '',
+};
+
 const defaultCurrentTimestamp = 0;
 
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
     settings: defaultSettings,
+    identity: defaultIdentity,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
     localPosts: List<Post>(),
@@ -87,6 +95,26 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
 
 const settingsReducer = (settings = defaultSettings): Settings => {
     return settings;
+};
+
+const identityReducer = (identity = defaultIdentity, action: Actions): Identity => {
+    switch (action.type) {
+        case 'UPDATE-AUTHOR-NAME': {
+            return {
+                ...identity,
+                name: action.payload.name,
+            };
+        }
+        case 'UPDATE-PICTURE-PATH': {
+            return {
+                ...identity,
+                picturePath: action.payload.path,
+            };
+        }
+        default: {
+            return identity;
+        }
+    }
 };
 
 const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, action: Actions): number => {
@@ -137,7 +165,7 @@ const metadataReducer = (metadata: Metadata = { highestSeenId: 0 }, action: Acti
         case 'UPDATE-HIGHEST-SEEN-ID': {
             return {
                 ...metadata,
-                highestSeenId: metadata.highestSeenId++,
+                highestSeenId: metadata.highestSeenId + 1,
             };
         }
         default: {
@@ -159,6 +187,7 @@ export const reducer = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     settings: settingsReducer,
+    identity: identityReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
     localPosts: localPostsReducer,

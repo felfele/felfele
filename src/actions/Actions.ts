@@ -21,6 +21,8 @@ export enum ActionTypes {
     ADD_POST = 'ADD-POST',
     DELETE_POST = 'DELETE-POST',
     UPDATE_HIGHEST_SEEN_ID = 'UPDATE-HIGHEST-SEEN-ID',
+    UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
+    UPDATE_PICTURE_PATH = 'UPDATE-PICTURE-PATH',
 }
 
 export const Actions = {
@@ -46,6 +48,10 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_DRAFT),
     updateHighestSeenId: () =>
         createAction(ActionTypes.UPDATE_HIGHEST_SEEN_ID),
+    updateAuthorName: (name: string) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
+    updatePicturePath: (path: string) =>
+        createAction(ActionTypes.UPDATE_PICTURE_PATH, { path }),
 };
 
 export const AsyncActions = {
