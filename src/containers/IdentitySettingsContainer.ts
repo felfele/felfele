@@ -5,7 +5,7 @@ import { StateProps, DispatchProps, IdentitySettings } from '../components/Ident
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
-        identity: state.identity,
+        author: state.author,
         navigation: ownProps.navigation,
    };
 };

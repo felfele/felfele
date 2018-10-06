@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { SimpleTextInput } from './SimpleTextInput';
 import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
-import { Identity } from '../models/Identity';
+import { Author } from '../models/Post';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -9,7 +9,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
-    identity: Identity;
+    author: Author;
     navigation: any;
 }
 
@@ -20,16 +20,22 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
             <Header onPressBack={() => { props.navigation.goBack(); }} />
-            <Text style={styles.nameTooltip}>{tooltip}</Text>
+            <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput
                 style={styles.row}
-                defaultValue={props.identity.name}
+                defaultValue={props.author.name}
                 onChangeText={props.onUpdateAuthor}
                 placeholder={namePlaceholder}
                 autoCapitalize='none'
-                autoFocus={props.identity.name === ''}
+                autoFocus={props.author.name === ''}
                 autoCorrect={false}
             />
+            <Text style={styles.tooltip}>Avatar</Text>
+            <TouchableOpacity
+                onPress={() => console.log('pick image')}
+            >
+                Pick Image
+            </TouchableOpacity>
         </KeyboardAvoidingView>
     );
 };
@@ -82,7 +88,7 @@ const styles = StyleSheet.create({
         color: 'gray',
         fontSize: 16,
     },
-    nameTooltip: {
+    tooltip: {
         paddingHorizontal: 8,
         paddingVertical: 4,
     },

@@ -14,14 +14,13 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { Post } from '../models/Post';
-import { Identity } from '../models/Identity';
+import { Post, Author } from '../models/Post';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
-    identity: Identity;
+    author: Author;
     currentTimestamp: number;
     rssPosts: List<Post>;
     localPosts: List<Post>;
@@ -37,9 +36,10 @@ const defaultSettings: Settings = {
     saveToCameraRoll: true,
 };
 
-const defaultIdentity: Identity = {
+const defaultAuthor: Author = {
     name: '',
-    picturePath: '',
+    uri: '',
+    faviconUri: '',
 };
 
 const defaultCurrentTimestamp = 0;
@@ -48,7 +48,7 @@ const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
     settings: defaultSettings,
-    identity: defaultIdentity,
+    author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
     localPosts: List<Post>(),
@@ -97,7 +97,7 @@ const settingsReducer = (settings = defaultSettings): Settings => {
     return settings;
 };
 
-const identityReducer = (identity = defaultIdentity, action: Actions): Identity => {
+const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
     switch (action.type) {
         case 'UPDATE-AUTHOR-NAME': {
             return {
@@ -108,7 +108,7 @@ const identityReducer = (identity = defaultIdentity, action: Actions): Identity 
         case 'UPDATE-PICTURE-PATH': {
             return {
                 ...identity,
-                picturePath: action.payload.path,
+                faviconUri: action.payload.path,
             };
         }
         default: {
@@ -187,7 +187,7 @@ export const reducer = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     settings: settingsReducer,
-    identity: identityReducer,
+    author: identityReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
     localPosts: localPostsReducer,

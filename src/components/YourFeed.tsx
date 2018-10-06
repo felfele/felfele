@@ -220,7 +220,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderCardTop(post: Post) {
         const printableTime = DateUtils.printableElapsedTime(post.createdAt) + ' ago';
-        const username = post.author ? post.author.name : 'Attila';
+        const username = post.author ? post.author.name : 'Space Cowboy';
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
