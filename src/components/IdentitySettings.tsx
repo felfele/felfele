@@ -1,7 +1,17 @@
 import * as React from 'react';
 import { SimpleTextInput } from './SimpleTextInput';
-import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import {
+    KeyboardAvoidingView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    Text,
+    Button,
+    Image,
+} from 'react-native';
 import { Author } from '../models/Post';
+import { AsyncImagePicker } from '../AsyncImagePicker';
+import DefaultStyle from './DefaultStyle';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -31,13 +41,25 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 autoCorrect={false}
             />
             <Text style={styles.tooltip}>Avatar</Text>
-            <TouchableOpacity
-                onPress={() => console.log('pick image')}
-            >
-                Pick Image
-            </TouchableOpacity>
+            <View style={styles.imagePicker}>
+                {props.author.faviconUri &&
+                <Image source={{uri: props.author.faviconUri}} style={DefaultStyle.favicon} />}
+                <Button
+                    title='Pick Image'
+                    onPress={async () => {
+                        await openImagePicker(props.onUpdatePicture);
+                    }}
+                />
+            </View>
         </KeyboardAvoidingView>
     );
+};
+
+const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
+    const imageData = await AsyncImagePicker.launchImageLibrary();
+    if (imageData != null) {
+        onUpdatePicture(imageData.uri);
+    }
 };
 
 const Header = (props: { onPressBack: () => void }): React.ReactElement<{}> => {
@@ -91,5 +113,9 @@ const styles = StyleSheet.create({
     tooltip: {
         paddingHorizontal: 8,
         paddingVertical: 4,
+    },
+    imagePicker: {
+        flexDirection: 'row',
+        paddingHorizontal: 8,
     },
 });

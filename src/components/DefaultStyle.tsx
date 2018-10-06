@@ -7,6 +7,13 @@ const DefaultStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    favicon: {
+        borderRadius : 3,
+        width: 32,
+        height: 32,
+        marginHorizontal: 4,
+        marginVertical: 3,
+    },
 });
 
 export default DefaultStyle;
