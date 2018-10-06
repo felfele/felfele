@@ -67,10 +67,7 @@ const Header = (props: { onPressBack: () => void }): React.ReactElement<{}> => {
         <View style={styles.headerContainer}>
             <View style={{ paddingLeft: 15 }}>
                 <TouchableOpacity
-                    onPress={() => {
-                        props.onPressBack();
-                        console.log('back pressed');
-                    }}
+                    onPress={props.onPressBack}
                     activeOpacity={1.0}
                     hitSlop={{
                         top: 10,
