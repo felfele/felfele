@@ -38,8 +38,9 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "postinstall": "npm run patch",
-    "patch": "npm run patchAndroidInstaller",
-    "patchAndroidInstaller": "./node_modules/.bin/replace \\'install\\',\\ pathToApk \\'install\\',\\ \\'-r\\',\\ pathToApk node_modules/react-native/local-cli/runAndroid/runAndroid.js -s"
+    "patch": "npm run patchAndroidInstaller && npm run deleteBabelrcFromNodeModules",
+    "patchAndroidInstaller": "./node_modules/.bin/replace \\'install\\',\\ pathToApk \\'install\\',\\ \\'-r\\',\\ pathToApk node_modules/react-native/local-cli/runAndroid/runAndroid.js -s",
+    "deleteBabelrcFromNodeModules": "rm -f ./node_modules/swarm-js/.babelrc && rm -f ./node_modules/eth-lib/.babelrc"
   },
   "jest": {
     "preset": "react-native",
@@ -73,9 +74,12 @@
   "dependencies": {
     "buffer": "^5.0.6",
     "immutable": "^3.8.2",
+    "node-libs-browser": "^2.1.0",
     "react": "16.3.1",
     "react-native": "^0.55.1",
     "react-native-communications": "^2.2.1",
+    "react-native-crypto": "^2.1.2",
+    "react-native-easy-grid": "^0.1.17",
     "react-native-easy-markdown": "^1.2.0",
     "react-native-gravatar": "^1.0.2",
     "react-native-image-picker": "^0.26.10",
@@ -90,7 +94,8 @@
     "redux": "^4.0.0",
     "redux-persist": "^5.10.0",
     "redux-persist-transform-immutable": "^5.0.0",
-    "redux-thunk": "^2.2.0",
+    "redux-thunk": "2.2.0",
+    "swarm-js": "https://git@github.com/MaiaVictor/swarm-js.git",
     "tslib": "^1.9.3",
     "url": "^0.11.0",
     "util": "^0.10.4"

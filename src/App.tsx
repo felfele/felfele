@@ -21,6 +21,7 @@ import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
 import { EditPostContainer } from './containers/EditPostContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
+import { DebugScreenContainer } from './containers/DebugScreenContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -112,7 +113,7 @@ const Scenes: NavigationRouteConfigMap = {
         screen: EditPostContainer,
     },
     Debug: {
-        screen: DebugScreen,
+        screen: DebugScreenContainer,
     },
     IdentitySettingsContainer: {
         screen: IdentitySettingsContainer,
