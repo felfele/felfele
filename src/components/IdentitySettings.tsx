@@ -3,7 +3,6 @@ import { SimpleTextInput } from './SimpleTextInput';
 import {
     KeyboardAvoidingView,
     StyleSheet,
-    TouchableOpacity,
     View,
     Text,
     Button,
@@ -12,6 +11,7 @@ import {
 import { Author } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import DefaultStyle from './DefaultStyle';
+import { Header } from './Header';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -62,39 +62,7 @@ const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
     }
 };
 
-const Header = (props: { onPressBack: () => void }): React.ReactElement<{}> => {
-    return (
-        <View style={styles.headerContainer}>
-            <View style={{ paddingLeft: 15 }}>
-                <TouchableOpacity
-                    onPress={props.onPressBack}
-                    activeOpacity={1.0}
-                    hitSlop={{
-                        top: 10,
-                        left: 10,
-                        bottom: 10,
-                        right: 10,
-                    }}
-                >
-                <Text style={{ color: '#007AFF' }}>
-                    Back
-                </Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
-};
-
 const styles = StyleSheet.create({
-    headerContainer: {
-        width: '100%',
-        height: 50,
-        top: 0,
-        left: 0,
-        padding: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
     row: {
         width: '100%',
         backgroundColor: 'white',
