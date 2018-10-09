@@ -11,7 +11,6 @@ import {
 import { Author } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
-import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
 
 export interface DispatchProps {
@@ -65,35 +64,7 @@ const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
     }
 };
 
-const Header = (props: { onPressBack: () => void }): React.ReactElement<{}> => {
-    return (
-        <View style={styles.headerContainer}>
-            <TouchableView onPress={props.onPressBack}>
-                <Text style={styles.headerBackButton}>
-                    Back
-                </Text>
-            </TouchableView>
-        </View>
-    );
-};
-
 const styles = StyleSheet.create({
-    headerContainer: {
-        width: '100%',
-        height: 50,
-        top: 0,
-        left: 0,
-        padding: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingLeft: 10,
-        paddingTop: 30,
-        marginBottom: 10,
-    },
-    headerBackButton: {
-        color: Colors.DEFAULT_ACTION_COLOR,
-        fontSize: 18,
-    },
     row: {
         width: '100%',
         backgroundColor: 'white',

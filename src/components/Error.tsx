@@ -11,6 +11,6 @@ export default class Error extends React.Component<any, any> {
                     onPress={() => this.props.navigation.goBack()}
                     title='Ok' />
             </View>
-        )
+        );
     }
 }
