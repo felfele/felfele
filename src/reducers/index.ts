@@ -14,12 +14,13 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { Post } from '../models/Post';
+import { Post, Author } from '../models/Post';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     settings: Settings;
+    author: Author;
     currentTimestamp: number;
     rssPosts: List<Post>;
     localPosts: List<Post>;
@@ -35,12 +36,19 @@ const defaultSettings: Settings = {
     saveToCameraRoll: true,
 };
 
+const defaultAuthor: Author = {
+    name: '',
+    uri: '',
+    faviconUri: '',
+};
+
 const defaultCurrentTimestamp = 0;
 
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
     settings: defaultSettings,
+    author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
     localPosts: List<Post>(),
@@ -87,6 +95,26 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
 
 const settingsReducer = (settings = defaultSettings): Settings => {
     return settings;
+};
+
+const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
+    switch (action.type) {
+        case 'UPDATE-AUTHOR-NAME': {
+            return {
+                ...identity,
+                name: action.payload.name,
+            };
+        }
+        case 'UPDATE-PICTURE-PATH': {
+            return {
+                ...identity,
+                faviconUri: action.payload.path,
+            };
+        }
+        default: {
+            return identity;
+        }
+    }
 };
 
 const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, action: Actions): number => {
@@ -159,6 +187,7 @@ export const reducer = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     settings: settingsReducer,
+    author: identityReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
     localPosts: localPostsReducer,

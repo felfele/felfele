@@ -16,16 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ImagePreviewGrid } from './ImagePreviewGrid';
 import { ImageData, Post } from '../models/Post';
 import { SimpleTextInput } from './SimpleTextInput';
-
-interface PostScreenNavigationActions {
-    cancel?: () => void;
-    post?: () => void;
-}
-
-const navigationActions: PostScreenNavigationActions = {
-    cancel: undefined,
-    post: undefined,
-};
+import { NavigationHeader } from './NavigationHeader';
 
 export interface StateProps {
     navigation: any;
@@ -49,13 +40,6 @@ interface State {
 }
 
 export class EditPost extends React.Component<Props, State> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Update status',
-        headerLeft: <Button testID='EditPost/CancelButton' title='Cancel' onPress={() => navigationActions.cancel!()} />,
-        headerRight: <Button testID='EditPost/PostButton' title='Post' onPress={() => navigationActions.post!()} />,
-    };
-
     public state: State;
 
     private keyboardDidShowListener;
@@ -71,8 +55,6 @@ export class EditPost extends React.Component<Props, State> {
             keyboardHeight: 0,
             post: this.getPostFromDraft(this.props.draft),
         };
-        navigationActions.cancel = this.onCancelConfirmation;
-        navigationActions.post = this.onPressSubmit;
     }
 
     public onKeyboardDidShow = (e) => {
@@ -139,6 +121,12 @@ export class EditPost extends React.Component<Props, State> {
             <View
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
+                <NavigationHeader
+                    leftButtonText='Cancel'
+                    onPressLeftButton={this.onCancelConfirmation}
+                    rightButtonText='Post'
+                    onPressRightButton={this.onPressSubmit}
+                />
                 <View style={{flex: 14, flexDirection: 'column'}}>
                     <SimpleTextInput
                         style={{

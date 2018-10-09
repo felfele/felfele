@@ -24,6 +24,7 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
+import { DefaultStyle } from '../styles';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -203,7 +204,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     private renderCardTopIcon(post: Post) {
         if (post.author) {
             return (
-                <Image source={{uri: post.author.faviconUri}} style={styles.image} />
+                <Image source={{uri: post.author.faviconUri}} style={DefaultStyle.favicon} />
             );
         } else {
             return (
@@ -212,7 +213,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     secure: true,
                     parameters: { size: '100', d: 'mm' },
                 }}
-                    style={styles.image}
+                    style={DefaultStyle.favicon}
                 />
             );
         }
@@ -220,7 +221,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderCardTop(post: Post) {
         const printableTime = DateUtils.printableElapsedTime(post.createdAt) + ' ago';
-        const username = post.author ? post.author.name : 'Attila';
+        const username = post.author ? post.author.name : 'Space Cowboy';
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
@@ -345,7 +346,6 @@ const TranslucentBarHeight = Platform.OS === 'ios' ? HeaderOffset : 0;
 const styles = StyleSheet.create({
     container: {backgroundColor: 'white', paddingTop: 5},
     infoContainer : {flexDirection: 'row', height: 38, alignSelf: 'stretch', marginBottom: 5, marginLeft: 5},
-    image: {borderRadius : 3, width: 32 , height: 32, marginHorizontal: 4 , marginVertical: 3 },
     usernameContainer: {justifyContent: 'center', flexDirection: 'column'},
     location: {fontSize: 10, color: 'gray'},
     itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5},

@@ -20,6 +20,8 @@ export enum ActionTypes {
     REMOVE_DRAFT = 'REMOVE-DRAFT',
     ADD_POST = 'ADD-POST',
     DELETE_POST = 'DELETE-POST',
+    UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
+    UPDATE_PICTURE_PATH = 'UPDATE-PICTURE-PATH',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
 }
 
@@ -49,6 +51,10 @@ export const Actions = {
         createAction(ActionTypes.ADD_DRAFT, { draft }),
     removeDraft: () =>
         createAction(ActionTypes.REMOVE_DRAFT),
+    updateAuthorName: (name: string) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
+    updatePicturePath: (path: string) =>
+        createAction(ActionTypes.UPDATE_PICTURE_PATH, { path }),
 };
 
 export const AsyncActions = {
@@ -74,8 +80,9 @@ export const AsyncActions = {
     createPost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
             dispatch(Actions.removeDraft());
-            const { metadata } = getState();
+            const { metadata, author } = getState();
             post._id = metadata.highestSeenPostId + 1;
+            post.author = author;
             dispatch(InternalActions.addPost(post));
             dispatch(InternalActions.increaseHighestSeenPostId());
             Debug.log('Post saved and synced, ', post._id);

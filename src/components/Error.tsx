@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Text, View, Button } from 'react-native';
-import DefaultStyle from './DefaultStyle';
+import { DefaultStyle } from '../styles';
 
 export default class Error extends React.Component<any, any> {
     public render() {
@@ -11,6 +11,6 @@ export default class Error extends React.Component<any, any> {
                     onPress={() => this.props.navigation.goBack()}
                     title='Ok' />
             </View>
-        )
+        );
     }
 }
