@@ -13,6 +13,7 @@ import {
     StatusBar,
     Platform,
     SafeAreaView,
+    LayoutAnimation,
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
@@ -166,6 +167,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private togglePostSelection(post: Post) {
+        LayoutAnimation.easeInEaseOut();
         if (this.isPostSelected(post)) {
             this.setState({ selectedPost: null });
         } else {
@@ -198,14 +200,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
                         <ActionIcon name='comment-multiple-outline'/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={async () => this.onSharePost(post)}>
-                        <ActionIcon name='share-variant'/>
+                    <TouchableOpacity style={styles.share}>
+                        <ActionIcon name='playlist-edit'/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
                         <ActionIcon name='trash-can-outline'/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.share}>
-                        <ActionIcon name='playlist-edit'/>
+                    <TouchableOpacity style={styles.share} onPress={async () => this.onSharePost(post)}>
+                        <ActionIcon name='share-variant'/>
                     </TouchableOpacity>
                 </View>
             );
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
     image: {borderRadius : 3, width: 32 , height: 32, marginHorizontal: 4 , marginVertical: 3 },
     usernameContainer: {justifyContent: 'center', flexDirection: 'column'},
     location: {fontSize: 10, color: 'gray'},
-    itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5, marginTop: 3},
+    itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5, marginTop: 5, justifyContent: 'space-evenly'},
     like: {marginHorizontal: 20, marginVertical: 5, marginLeft: 5},
     comment: {marginHorizontal: 20, marginVertical: 5},
     share: {marginHorizontal: 20, marginVertical: 5},
