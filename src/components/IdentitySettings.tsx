@@ -3,7 +3,6 @@ import { SimpleTextInput } from './SimpleTextInput';
 import {
     KeyboardAvoidingView,
     StyleSheet,
-    TouchableOpacity,
     View,
     Text,
     Button,
@@ -11,7 +10,9 @@ import {
 } from 'react-native';
 import { Author } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import DefaultStyle from './DefaultStyle';
+import { Colors, DefaultStyle } from '../styles';
+import { TouchableView } from './TouchableView';
+import { NavigationHeader } from './NavigationHeader';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -29,7 +30,9 @@ const namePlaceholder = 'Space Cowboy';
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
-            <Header onPressBack={() => { props.navigation.goBack(); }} />
+            <NavigationHeader
+                onPressLeftButton={() => { props.navigation.goBack(); }}
+            />
             <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput
                 style={styles.row}
@@ -65,22 +68,11 @@ const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
 const Header = (props: { onPressBack: () => void }): React.ReactElement<{}> => {
     return (
         <View style={styles.headerContainer}>
-            <View style={{ paddingLeft: 15 }}>
-                <TouchableOpacity
-                    onPress={props.onPressBack}
-                    activeOpacity={1.0}
-                    hitSlop={{
-                        top: 10,
-                        left: 10,
-                        bottom: 10,
-                        right: 10,
-                    }}
-                >
-                <Text style={{ color: '#007AFF' }}>
+            <TouchableView onPress={props.onPressBack}>
+                <Text style={styles.headerBackButton}>
                     Back
                 </Text>
-                </TouchableOpacity>
-            </View>
+            </TouchableView>
         </View>
     );
 };
@@ -94,6 +86,13 @@ const styles = StyleSheet.create({
         padding: 0,
         flexDirection: 'row',
         alignItems: 'center',
+        paddingLeft: 10,
+        paddingTop: 30,
+        marginBottom: 10,
+    },
+    headerBackButton: {
+        color: Colors.DEFAULT_ACTION_COLOR,
+        fontSize: 18,
     },
     row: {
         width: '100%',
@@ -104,12 +103,14 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         paddingHorizontal: 8,
         paddingVertical: 8,
-        color: 'gray',
+        color: Colors.DARK_GRAY,
         fontSize: 16,
     },
     tooltip: {
         paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingTop: 8,
+        paddingBottom: 2,
+        color: Colors.GRAY,
     },
     imagePicker: {
         flexDirection: 'row',

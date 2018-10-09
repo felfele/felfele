@@ -24,7 +24,7 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import DefaultStyle from './DefaultStyle';
+import { DefaultStyle } from '../styles';
 
 const WindowWidth = Dimensions.get('window').width;
 

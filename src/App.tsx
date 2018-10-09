@@ -137,7 +137,7 @@ const Scenes: NavigationRouteConfigMap = {
 
 const AppNavigator = StackNavigator(Scenes,
     {
-        mode: 'modal',
+        mode: 'card',
         navigationOptions: {
             header: null,
         },
