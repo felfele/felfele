@@ -1,3 +1,5 @@
+import { StyleSheet } from 'react-native';
+
 export const IconSize = {
     LARGE_LIST_ICON: 32,
     MEDIUM_LIST_ICON: 24,
@@ -36,3 +38,19 @@ export const Colors = {
 };
 
 export const DefaultFont = 'Helvetica Neue';
+
+export const DefaultStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    favicon: {
+        borderRadius : 3,
+        width: 32,
+        height: 32,
+        marginHorizontal: 4,
+        marginVertical: 3,
+    },
+});

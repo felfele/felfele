@@ -36,6 +36,10 @@ export class Settings extends React.Component<any, any> {
                             borderColor: 'grey',
                         }} />
                         <SettingsList.Item
+                            title='Identity'
+                            onPress={() => this.props.navigation.navigate('IdentitySettingsContainer')}
+                        />
+                        <SettingsList.Item
                             title='Feeds'
                             onPress={() => this.props.navigation.navigate('FeedListEditorContainer')}
                         />

@@ -20,6 +20,7 @@ import { FilterListEditorContainer } from './containers/FilterListEditorContaine
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
 import { EditPostContainer } from './containers/EditPostContainer';
+import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 
 Debug.setDebug(__DEV__);
@@ -114,6 +115,9 @@ const Scenes: NavigationRouteConfigMap = {
     Debug: {
         screen: DebugScreenContainer,
     },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
     Share: {
         screen: Share,
     },
@@ -133,7 +137,7 @@ const Scenes: NavigationRouteConfigMap = {
 
 const AppNavigator = StackNavigator(Scenes,
     {
-        mode: 'modal',
+        mode: 'card',
         navigationOptions: {
             header: null,
         },
