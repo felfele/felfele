@@ -267,7 +267,6 @@ export class RSSFeedManager {
 class _RSSPostManager {
     public readonly feedManager = new RSSFeedManager();
 
-    private posts: Post[] = [];
     private id = FirstId;
     private idCache = {};
     private contentFilters: ContentFilter[] = [];
@@ -329,10 +328,6 @@ class _RSSPostManager {
             return [firstPost, ...posts];
         }
         return posts;
-    }
-
-    public getAllPosts(): Post[] {
-        return this.posts.sort((a, b) => b.createdAt - a.createdAt);
     }
 
     public getNextId(): number {
