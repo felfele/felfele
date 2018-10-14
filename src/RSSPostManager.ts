@@ -1,4 +1,3 @@
-import { PostManager } from './PostManager';
 import { Post, ImageData } from './models/Post';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
@@ -262,24 +261,10 @@ export class RSSFeedManager {
 
         return null;
     }
-
-    private feeds: Feed[] = [];
-
-    public getFeeds(): Feed[] {
-        return this.feeds;
-    }
-
-    public setFeeds(feeds: Feed[]) {
-        this.feeds = feeds;
-    }
-
-    public getFeedUrls(): string[] {
-        return this.getFeeds().map(feed => feed.feedUrl);
-    }
 }
 
 // tslint:disable-next-line:class-name
-class _RSSPostManager implements PostManager {
+class _RSSPostManager {
     public readonly feedManager = new RSSFeedManager();
 
     private posts: Post[] = [];
@@ -298,16 +283,11 @@ class _RSSPostManager implements PostManager {
         // do nothing
     }
 
-    public async syncPosts() {
-        await this.loadPosts();
-    }
-
-    public async loadPosts() {
+    public async loadPosts(storedFeeds: Feed[]): Promise<Post[]> {
         const startTime = Date.now();
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
 
-        const storedFeeds = this.feedManager.getFeeds();
         const feedMap = {};
         for (const feed of storedFeeds) {
             feedMap[feed.feedUrl] = feed.name;
@@ -331,10 +311,8 @@ class _RSSPostManager implements PostManager {
         }
         // Don't update when there are no new posts, e.g. when the network is down
         if (!firstLoad && posts.length === 0) {
-            return;
+            return [];
         }
-
-        this.posts = posts;
 
         if (__DEV__) {
             const stats = metrics
@@ -348,8 +326,9 @@ class _RSSPostManager implements PostManager {
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
             };
-            this.posts.push(firstPost);
+            return [firstPost, ...posts];
         }
+        return posts;
     }
 
     public getAllPosts(): Post[] {

@@ -35,6 +35,7 @@ export interface DispatchProps {
     onRefreshPosts: () => void;
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
+    onSharePost: (post: Post) => void;
 }
 
 export interface StateProps {
@@ -190,13 +191,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderButtonsIfSelected(post: Post) {
         const iconSize = 20;
-        const isPostLiked = () => post.liked === true;
+        const likeIconName = post.liked === true ? 'heart' : 'heart-outline';
+        const shareIconName = post.link != null ? 'share' : 'share-outline';
         const ActionIcon = (props) => <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
                     <TouchableView style={styles.like} onPress={() => post.liked = true}>
-                        {!isPostLiked() ? <ActionIcon name='heart-outline'/> : <ActionIcon name='heart'/>}
+                        <ActionIcon name={likeIconName}/>
                     </TouchableView>
                     <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
                         <ActionIcon name='comment-multiple-outline'/>
@@ -207,8 +209,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     <TouchableView style={styles.share}>
                         <ActionIcon name='playlist-edit'/>
                     </TouchableView>
-                    <TouchableView style={styles.share} onPress={async () => this.onSharePost(post)}>
-                        <ActionIcon name='share-variant'/>
+                    <TouchableView style={styles.share} onPress={() => this.props.onSharePost(post)}>
+                        <ActionIcon name={shareIconName}/>
                     </TouchableView>
                 </View>
             );

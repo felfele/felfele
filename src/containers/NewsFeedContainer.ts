@@ -9,7 +9,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.rssPosts.toArray();
     const filteredPosts = posts;
 
-    RSSPostManager.feedManager.setFeeds(state.feeds.toArray());
     RSSPostManager.setContentFilters(state.contentFilters.toArray());
 
     return {
@@ -27,6 +26,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // do nothing
         },
         onSavePost: (post: Post) => {
+            // do nothing
+        },
+        onSharePost: (post: Post) => {
             // do nothing
         },
     };

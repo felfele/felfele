@@ -39,6 +39,7 @@ export interface StateProps {
 
 export interface DispatchProps {
     createPost: (post: Post) => void;
+    onAppStateReset: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -104,6 +105,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             }
                             title='Migrate posts'
                             onPress={async () => await this.onMigratePosts()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='App state reset'
+                            onPress={this.props.onAppStateReset}
                         />
 
                         <SettingsList.Item

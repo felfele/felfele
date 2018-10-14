@@ -19,6 +19,7 @@ import { Post, Author } from '../models/Post';
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
+    ownFeeds: List<Feed>;
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -47,6 +48,7 @@ const defaultCurrentTimestamp = 0;
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
+    ownFeeds: List<Feed>(),
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
@@ -89,6 +91,17 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
         }
         default: {
             return feeds;
+        }
+    }
+};
+
+const ownFeedsReducer = (ownFeeds = List<Feed>(), action: Actions): List<Feed> => {
+    switch (action.type) {
+        case 'ADD-OWN-FEED': {
+            return ownFeeds.push(action.payload.feed);
+        }
+        default: {
+            return ownFeeds;
         }
     }
 };
@@ -144,6 +157,10 @@ const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Pos
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             return localPosts.remove(ind);
         }
+        case 'UPDATE-POST-LINK': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
+        }
     }
     return localPosts;
 };
@@ -174,18 +191,30 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
     }
 };
 
+const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+    switch (action.type) {
+        case 'APP-STATE-RESET': {
+            return defaultState;
+        }
+        default: {
+            return combinedReducers(state, action);
+        }
+    }
+};
+
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'rssPosts', 'localPosts'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
     storage: AsyncStorage,
 };
 
-export const reducer = combineReducers<AppState>({
+export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
+    ownFeeds: ownFeedsReducer,
     settings: settingsReducer,
     author: identityReducer,
     currentTimestamp: currentTimestampReducer,
@@ -195,7 +224,7 @@ export const reducer = combineReducers<AppState>({
     metadata: metadataReducer,
 });
 
-const persistedReducer = persistReducer(persistConfig, reducer);
+const persistedReducer = persistReducer(persistConfig, appStateReducer);
 
 export const store = createStore(
     persistedReducer,
