@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StackNavigator, TabNavigator, NavigationRouteConfigMap } from 'react-navigation';
+import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
@@ -8,7 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { Config } from './Config';
 import { Settings } from './components/Settings';
-import { DebugScreen } from './components/DebugScreen';
 import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
@@ -22,6 +21,7 @@ import { YourFeedContainer } from './containers/YourFeedContainer';
 import { EditPostContainer } from './containers/EditPostContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
+import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -144,12 +144,33 @@ const AppNavigator = StackNavigator(Scenes,
     },
 );
 
+const WelcomeNavigator = StackNavigator({
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
+}, {
+    mode: 'card',
+    navigationOptions: {
+        header: null,
+    },
+});
+
+const SwNavigator = SwitchNavigator({
+    Loading: LoadingScreenContainer,
+    App: AppNavigator,
+    Welcome: WelcomeNavigator,
+}, {
+    initialRouteName: 'Loading',
+    backBehavior: 'initialRoute',
+}
+);
+
 export default class App extends React.Component {
     public render() {
         return (
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <AppNavigator />
+                    <SwNavigator/>
                 </PersistGate>
             </Provider>
         );

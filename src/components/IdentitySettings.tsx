@@ -30,7 +30,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
-                onPressLeftButton={() => { props.navigation.goBack(); }}
+                onPressLeftButton={() => {
+                    // null is needed otherwise it does not work with switchnavigator backbehavior property
+                    props.navigation.goBack(null);
+                }}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput
