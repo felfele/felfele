@@ -27,6 +27,7 @@ import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
 import { upload, getUrlFromHash } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
+import { TouchableView } from './TouchableView';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -194,21 +195,21 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    <TouchableOpacity style={styles.like} onPress={() => post.liked = true}>
+                    <TouchableView style={styles.like} onPress={() => post.liked = true}>
                         {!isPostLiked() ? <ActionIcon name='heart-outline'/> : <ActionIcon name='heart'/>}
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
+                    </TouchableView>
+                    <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
                         <ActionIcon name='comment-multiple-outline'/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.share}>
-                        <ActionIcon name='playlist-edit'/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
+                    </TouchableView>
+                    <TouchableView style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
                         <ActionIcon name='trash-can-outline'/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={async () => this.onSharePost(post)}>
+                    </TouchableView>
+                    <TouchableView style={styles.share}>
+                        <ActionIcon name='playlist-edit'/>
+                    </TouchableView>
+                    <TouchableView style={styles.share} onPress={async () => this.onSharePost(post)}>
                         <ActionIcon name='share-variant'/>
-                    </TouchableOpacity>
+                    </TouchableView>
                 </View>
             );
         }
