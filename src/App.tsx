@@ -22,6 +22,8 @@ import { EditPostContainer } from './containers/EditPostContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
+import { Welcome } from './components/Welcome';
+import { WelcomeContainer } from './containers/WelcomeContainer';
 
 Debug.setDebug(__DEV__);
 
@@ -145,8 +147,8 @@ const AppNavigator = StackNavigator(Scenes,
 );
 
 const WelcomeNavigator = StackNavigator({
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
+    Welcome: {
+        screen: WelcomeContainer,
     },
 }, {
     mode: 'card',
@@ -155,7 +157,7 @@ const WelcomeNavigator = StackNavigator({
     },
 });
 
-const SwNavigator = SwitchNavigator({
+const InitialNavigator = SwitchNavigator({
     Loading: LoadingScreenContainer,
     App: AppNavigator,
     Welcome: WelcomeNavigator,
@@ -170,7 +172,7 @@ export default class App extends React.Component {
         return (
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <SwNavigator/>
+                    <InitialNavigator/>
                 </PersistGate>
             </Provider>
         );

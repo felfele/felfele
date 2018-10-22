@@ -83,6 +83,7 @@
     "react-native-easy-markdown": "^1.2.0",
     "react-native-gravatar": "^1.0.2",
     "react-native-image-picker": "^0.26.10",
+    "react-native-onboarding-swiper": "^0.7.1",
     "react-native-parse-html": "^2.2.6",
     "react-native-qrcode": "^0.2.4",
     "react-native-settings-list": "^1.8.0",
