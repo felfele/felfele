@@ -7,7 +7,7 @@ interface PostFeed extends Feed {
     posts: PublicPost[];
 }
 
-const SWARM_PREFIX = 'swarm:bzz/';
+const SWARM_PREFIX = Swarm.DefaultGateway + Swarm.DefaultUrlScheme;
 const HASH_SERVICE_URL = 'http://localhost:3000/feeds/';
 
 export const createPostFeed = async (name: string, favicon: string, firstPost: PublicPost): Promise<PostFeed> => {

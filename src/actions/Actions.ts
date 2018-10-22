@@ -4,9 +4,10 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
+import { Post, PublicPost, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
+import { isSwarmUrl, uploadPhoto } from '../Swarm';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -23,6 +24,7 @@ export enum ActionTypes {
     ADD_POST = 'ADD-POST',
     DELETE_POST = 'DELETE-POST',
     UPDATE_POST_LINK = 'UPDATE-POST-LINK',
+    UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
     UPDATE_PICTURE_PATH = 'UPDATE-PICTURE-PATH',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
@@ -53,6 +55,8 @@ export const Actions = {
         createAction(ActionTypes.DELETE_POST, { post }),
     updatePostLink: (post: Post, link?: string) =>
         createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
+    updatePostImages: (post: Post, images: ImageData[]) =>
+        createAction(ActionTypes.UPDATE_POST_IMAGES, {post, images}),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
     addDraft: (draft: Post) =>
@@ -122,6 +126,15 @@ export const AsyncActions = {
                     return;
                 }
 
+                if (post.images.length > 0 && !isSwarmUrl(post.images[0].uri)) {
+                    for (const image of post.images) {
+                        if (image.localPath != null) {
+                            const uri = await uploadPhoto(image.localPath);
+                            image.uri = uri;
+                        }
+                    }
+                }
+
                 const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
                     localPost.link === feed.url
                 );
@@ -144,6 +157,7 @@ export const AsyncActions = {
                 dispatch(InternalActions.addOwnFeed(feed));
                 dispatch(Actions.addFeed(feed));
                 dispatch(Actions.updatePostLink(post, feed.url));
+                dispatch(Actions.updatePostImages(post, post.images));
             }
 
         };

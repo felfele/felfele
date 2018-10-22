@@ -161,6 +161,10 @@ const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Pos
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
         }
+        case 'UPDATE-POST-IMAGES': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            return localPosts.update(ind, (post => ({...post, images: action.payload.images})));
+        }
     }
     return localPosts;
 };

@@ -7,7 +7,7 @@ import * as Communications from 'react-native-communications';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { Version } from '../Version';
 import { Config } from '../Config';
-import { upload, download } from '../Swarm';
+import { upload, download, uploadPhoto } from '../Swarm';
 import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 
@@ -113,6 +113,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             title='App state reset'
                             onPress={this.props.onAppStateReset}
                         />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Upload avatar image'
+                            onPress={this.onUploadAvatarImage}
+                        />
 
                         <SettingsList.Item
                             title={version}
@@ -185,5 +192,13 @@ export class DebugScreen extends React.Component<Props, any> {
             this.props.createPost(post);
         }
         console.log(oldPosts);
+    }
+
+    private onUploadAvatarImage = async () => {
+        const imageUri = this.props.appState.author.faviconUri;
+        console.log('onUploadAvatarImage: ', imageUri);
+        const url = await uploadPhoto(imageUri);
+
+        console.log('onUploadAvatarImage: ', url);
     }
 }
