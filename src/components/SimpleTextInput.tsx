@@ -2,11 +2,12 @@ import * as React from 'react';
 import {
     TextInput,
     TextStyle,
+    StyleProp,
 } from 'react-native';
 
 interface SimpleTextInputProps {
-    style: TextStyle;
-    placeholder: string;
+    style: StyleProp<TextStyle>;
+    placeholder?: string;
     placeholderTextColor?: string;
     autoFocus?: boolean;
     autoCapitalize?: 'none' | 'sentences' | 'words';
