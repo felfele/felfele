@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     },
     rightContainer: {
         flex: 1,
+        alignItems: 'flex-end',
     },
     titleText: {
         fontSize: 18,
