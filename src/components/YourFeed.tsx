@@ -203,8 +203,11 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderCardTopIcon(post: Post) {
         if (post.author) {
+            const imageSource = post.author.faviconUri === ''
+             ? require('../../images/user_circle.png')
+             : { uri: post.author.faviconUri };
             return (
-                <Image source={{uri: post.author.faviconUri}} style={DefaultStyle.favicon} />
+                <Image source={imageSource} style={DefaultStyle.favicon} />
             );
         } else {
             return (

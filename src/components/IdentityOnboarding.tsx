@@ -12,7 +12,7 @@ import { Author } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 // @ts-ignore
-const image = require('../../images/user_circle.png');
+import image = require('../../images/user_circle.png');
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;

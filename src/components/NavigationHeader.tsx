@@ -24,17 +24,17 @@ export class NavigationHeader extends React.Component<Props, State> {
     public render() {
         return (
             <View style={styles.headerContainer}>
-                <TouchableView onPress={this.props.onPressLeftButton}>
+                <TouchableView onPress={this.props.onPressLeftButton} style={styles.leftContainer}>
                     <Text style={styles.headerLeftButtonText}>
                         {this.props.leftButtonText ? this.props.leftButtonText : 'Back'}
                     </Text>
                 </TouchableView>
-                <View style={styles.titleContainer}>
+                <View style={styles.middleContainer}>
                     <Text style={styles.titleText}>
                         {this.props.title ? this.props.title : ''}
                     </Text>
                 </View>
-                <TouchableView onPress={this.props.onPressRightButton}>
+                <TouchableView onPress={this.props.onPressRightButton} style={styles.rightContainer}>
                     <Text style={styles.headerRightButtonText}>
                         {this.props.rightButtonText ? this.props.rightButtonText : ''}
                     </Text>
@@ -66,12 +66,20 @@ const styles = StyleSheet.create({
         color: Colors.DEFAULT_ACTION_COLOR,
         fontSize: 18,
     },
-    titleContainer: {
+    leftContainer: {
+        flex: 1,
+    },
+    middleContainer: {
+        flex: 1,
+    },
+    rightContainer: {
+        flex: 1,
     },
     titleText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: Colors.DARK_GRAY,
+        textAlign: 'center',
     },
     headerRightButtonText: {
         color: Colors.DEFAULT_ACTION_COLOR,
