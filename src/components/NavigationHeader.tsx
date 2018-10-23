@@ -34,7 +34,11 @@ export class NavigationHeader extends React.Component<Props, State> {
                         {this.props.title ? this.props.title : ''}
                     </Text>
                 </View>
-                <TouchableView onPress={this.props.onPressRightButton} style={styles.rightContainer}>
+                <TouchableView
+                    onPress={this.props.onPressRightButton}
+                    style={styles.rightContainer}
+                    testId={'NavigationHeader/RightButton'}
+                >
                     <Text style={styles.headerRightButtonText}>
                         {this.props.rightButtonText ? this.props.rightButtonText : ''}
                     </Text>

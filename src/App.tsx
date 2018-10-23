@@ -22,7 +22,6 @@ import { EditPostContainer } from './containers/EditPostContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
-import { Welcome } from './components/Welcome';
 import { WelcomeContainer } from './containers/WelcomeContainer';
 
 Debug.setDebug(__DEV__);

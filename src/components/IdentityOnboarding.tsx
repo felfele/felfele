@@ -34,14 +34,17 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
             <Text style={styles.tooltip}>{tooltip}</Text>
-            <SimpleTextInput
-                style={styles.row}
-                defaultValue={props.author.name === '' ? namePlaceholder : props.author.name}
-                onChangeText={props.onUpdateAuthor}
-                autoCapitalize='none'
-                autoFocus={false}
-                autoCorrect={false}
-            />
+            <View style={styles.textInputContainer}>
+                <SimpleTextInput
+                    style={styles.textInput}
+                    defaultValue={props.author.name === '' ? namePlaceholder : props.author.name}
+                    onChangeText={props.onUpdateAuthor}
+                    autoCapitalize='none'
+                    autoFocus={false}
+                    autoCorrect={false}
+                    selectTextOnFocus={true}
+                />
+            </View>
             <Text style={styles.tooltip}>Avatar</Text>
             <View style={styles.imagePicker}>
                 <TouchableOpacity
@@ -70,12 +73,17 @@ const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
 };
 
 const styles = StyleSheet.create({
-    row: {
+    textInput: {
         paddingHorizontal: 8,
         paddingVertical: 8,
         color: Colors.LIGHT_GRAY,
         fontSize: 16,
         alignItems: 'center',
+    },
+    textInputContainer: {
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: 'darkgrey',
+        borderRadius: 20,
     },
     tooltip: {
         paddingHorizontal: 8,
