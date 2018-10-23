@@ -5,13 +5,15 @@ import {
     StyleSheet,
     View,
     Text,
-    Button,
     Image,
+    TouchableOpacity,
 } from 'react-native';
 import { Author } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
+// @ts-ignore
+import image = require('../../images/user_circle.png');
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -25,12 +27,17 @@ export interface StateProps {
 
 const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
+const title = 'Identity';
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
-                onPressLeftButton={() => { props.navigation.goBack(); }}
+                onPressLeftButton={() => {
+                    // null is needed otherwise it does not work with switchnavigator backbehavior property
+                    props.navigation.goBack(null);
+                }}
+                title={title}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput
@@ -43,16 +50,20 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 autoCorrect={false}
             />
             <Text style={styles.tooltip}>Avatar</Text>
-            <View style={styles.imagePicker}>
-                {props.author.faviconUri &&
-                <Image source={{uri: props.author.faviconUri}} style={DefaultStyle.favicon} />}
-                <Button
-                    title='Pick Image'
-                    onPress={async () => {
-                        await openImagePicker(props.onUpdatePicture);
-                    }}
+            <TouchableOpacity
+                onPress={async () => {
+                    await openImagePicker(props.onUpdatePicture);
+                }}
+                style={styles.imagePickerContainer}
+            >
+                <Image
+                    source={props.author.faviconUri === ''
+                    ? image
+                    : { uri: props.author.faviconUri }
+                    }
+                    style={styles.imagePicker}
                 />
-            </View>
+            </TouchableOpacity>
         </KeyboardAvoidingView>
     );
 };
@@ -83,8 +94,14 @@ const styles = StyleSheet.create({
         paddingBottom: 2,
         color: Colors.GRAY,
     },
-    imagePicker: {
+    imagePickerContainer: {
         flexDirection: 'row',
         paddingHorizontal: 8,
+    },
+    imagePicker: {
+        borderRadius : 6,
+        width: 64,
+        height: 64,
+        marginVertical: 10,
     },
 });

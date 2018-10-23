@@ -2,15 +2,17 @@ import * as React from 'react';
 import {
     TextInput,
     TextStyle,
+    StyleProp,
 } from 'react-native';
 
 interface SimpleTextInputProps {
-    style: TextStyle;
-    placeholder: string;
+    style: StyleProp<TextStyle>;
+    placeholder?: string;
     placeholderTextColor?: string;
     autoFocus?: boolean;
     autoCapitalize?: 'none' | 'sentences' | 'words';
     autoCorrect?: boolean;
+    selectTextOnFocus?: boolean;
     numberOfLines?: number;
     multiline?: boolean;
     defaultValue?: string;
@@ -42,6 +44,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                     }
                     this.setState({ text: '' });
                 }}
+                selectTextOnFocus={this.props.selectTextOnFocus}
                 value={this.state.text}
                 placeholder={this.props.placeholder}
                 placeholderTextColor={this.props.placeholderTextColor}

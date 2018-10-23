@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/index';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
+import { IdentityOnboarding } from '../components/IdentityOnboarding';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
@@ -25,3 +26,8 @@ export const IdentitySettingsContainer = connect<StateProps, DispatchProps, {}>(
    mapStateToProps,
    mapDispatchToProps,
 )(IdentitySettings);
+
+export const IdentityOnboardingContainer = connect<StateProps, DispatchProps, {}>(
+    mapStateToProps,
+    mapDispatchToProps,
+ )(IdentityOnboarding);
