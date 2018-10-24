@@ -84,6 +84,7 @@ export class AsyncImagePicker {
             uri: response.uri,
             width: response.width,
             height: response.height,
+            localPath: response.uri,
         };
         return imageData;
 

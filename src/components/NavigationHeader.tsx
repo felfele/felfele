@@ -51,7 +51,7 @@ export class NavigationHeader extends React.Component<Props, State> {
 const styles = StyleSheet.create({
     headerContainer: {
         width: '100%',
-        height: 80,
+        height: 70,
         top: 0,
         left: 0,
         padding: 0,
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     headerRightButtonText: {
-        color: Colors.DEFAULT_ACTION_COLOR,
         fontSize: 18,
+        color: Colors.DEFAULT_ACTION_COLOR,
     },
 });

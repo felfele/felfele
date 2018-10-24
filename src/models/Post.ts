@@ -19,13 +19,17 @@ export interface Author {
     faviconUri: string;
 }
 
-export interface Post extends Model {
+export interface PublicPost extends Model {
     images: ImageData[];
     text: string;
     createdAt: number;
+}
+
+export interface Post extends PublicPost {
     link?: string;
     location?: Location;
     deleted?: boolean;
     author?: Author;
     updatedAt?: number;
+    liked?: boolean;
 }

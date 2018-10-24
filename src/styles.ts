@@ -37,6 +37,8 @@ export const Colors = {
     IOS_GRAY: '#8E8E93',
 };
 
+export const DefaultFont = 'Helvetica Neue';
+
 export const DefaultStyle = StyleSheet.create({
     container: {
         flex: 1,

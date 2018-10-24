@@ -13,10 +13,11 @@ import {
     StatusBar,
     Platform,
     SafeAreaView,
+    LayoutAnimation,
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Config } from '../Config';
 import { Post, ImageData } from '../models/Post';
@@ -24,7 +25,9 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { DefaultStyle } from '../styles';
+import { upload, getUrlFromHash } from '../Swarm';
+import { Colors, DefaultStyle } from '../styles';
+import { TouchableView } from './TouchableView';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -32,6 +35,7 @@ export interface DispatchProps {
     onRefreshPosts: () => void;
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
+    onSharePost: (post: Post) => void;
 }
 
 export interface StateProps {
@@ -115,7 +119,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         refreshControl={
                             <RefreshControl
                                 refreshing={this.state.isRefreshing}
-                                onRefresh={async () => this.onRefresh() }
+                                onRefresh={() => this.onRefresh() }
                                 progressViewOffset={HeaderOffset}
                                 style={styles.refreshControl}
                             />
@@ -133,7 +137,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         });
     }
 
-    private async onRefresh() {
+    private onRefresh() {
         this.setState({
             isRefreshing: true,
         });
@@ -147,6 +151,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         return image.uri;
     }
 
+    private async onSharePost(post: Post) {
+        const data = JSON.stringify(post);
+        const hash = await upload(data);
+        const link = getUrlFromHash(hash);
+        this.props.navigation.navigate('Share', {link});
+    }
+
     private async openPost(post: Post) {
         if (post.link) {
             await Linking.openURL(post.link);
@@ -158,6 +169,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private togglePostSelection(post: Post) {
+        LayoutAnimation.easeInEaseOut();
         if (this.isPostSelected(post)) {
             this.setState({ selectedPost: null });
         } else {
@@ -178,23 +190,28 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderButtonsIfSelected(post: Post) {
-        const iconSize = 24;
-        const isPostLiked = () => false;
+        const iconSize = 20;
+        const likeIconName = post.liked === true ? 'heart' : 'heart-outline';
+        const shareIconName = post.link != null ? 'share' : 'share-outline';
+        const ActionIcon = (props) => <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
         if (this.isPostSelected(post)) {
             return (
                 <View style={styles.itemImageContainer}>
-                    <TouchableOpacity style={styles.like}>
-                        {!isPostLiked() ? <Icon name='ios-heart-outline' size={iconSize} color='black' /> : <Icon name='ios-heart' size={30} color='red' />}
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.comment} onPress={() => alert('go comment!')}>
-                        <Icon name='ios-chatbubbles-outline' size={iconSize} color='black' />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={() => this.props.navigation.navigate('Share', {link: 'http://192.168.1.49:2368#' + post._id})}>
-                        <Icon name='ios-redo-outline' size={iconSize} color='black' />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
-                        <Icon name='ios-trash-outline' size={iconSize} color='black' />
-                    </TouchableOpacity>
+                    <TouchableView style={styles.like} onPress={() => post.liked = true}>
+                        <ActionIcon name={likeIconName}/>
+                    </TouchableView>
+                    <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
+                        <ActionIcon name='comment-multiple-outline'/>
+                    </TouchableView>
+                    <TouchableView style={styles.share} onPress={() => this.onDeleteConfirmation(post)}>
+                        <ActionIcon name='trash-can-outline'/>
+                    </TouchableView>
+                    <TouchableView style={styles.share}>
+                        <ActionIcon name='playlist-edit'/>
+                    </TouchableView>
+                    <TouchableView style={styles.share} onPress={() => this.props.onSharePost(post)}>
+                        <ActionIcon name={shareIconName}/>
+                    </TouchableView>
                 </View>
             );
         }
@@ -351,11 +368,11 @@ const styles = StyleSheet.create({
     infoContainer : {flexDirection: 'row', height: 38, alignSelf: 'stretch', marginBottom: 5, marginLeft: 5},
     usernameContainer: {justifyContent: 'center', flexDirection: 'column'},
     location: {fontSize: 10, color: 'gray'},
-    itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5},
-    like: {marginHorizontal: 5, marginVertical: 5, marginLeft: 5},
-    comment: {marginHorizontal: 10, marginVertical: 5},
-    share: {marginHorizontal: 10, marginVertical: 5},
-    edit: {marginHorizontal: 10, marginVertical: 5},
+    itemImageContainer: {flexDirection: 'row', height: 40, alignSelf: 'stretch', marginLeft: 5, marginTop: 5, justifyContent: 'space-evenly'},
+    like: {marginHorizontal: 20, marginVertical: 5, marginLeft: 5},
+    comment: {marginHorizontal: 20, marginVertical: 5},
+    share: {marginHorizontal: 20, marginVertical: 5},
+    edit: {marginHorizontal: 20, marginVertical: 5},
     likeCount: {flexDirection: 'row', alignItems: 'center', marginLeft: 2},
     commentItem: {fontSize: 10 , color: 'rgba(0, 0, 0, 0.5)', marginTop: 5},
     captionContainer: {marginTop: 2 , flexDirection: 'row', alignItems: 'center'},
@@ -364,8 +381,8 @@ const styles = StyleSheet.create({
     seperator: {height: 1, alignSelf: 'stretch', marginHorizontal: 10, backgroundColor: 'rgba(0, 0, 0, 0.2)'},
     hashTag: {fontStyle: 'italic', color: 'blue'},
     footer: {marginVertical: 5, alignSelf: 'stretch', marginHorizontal: 20, flexDirection: 'column'},
-    username: {fontWeight: 'bold'},
-    text: {fontSize: 12, color: 'black'},
+    username: {fontWeight: 'bold', color: Colors.DARK_GRAY},
+    text: {fontSize: 12, color: Colors.DARK_GRAY},
     likedContainer: {backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center'},
     markdownStyle: {marginVertical: 10, marginHorizontal: 10},
     translucentBar: {

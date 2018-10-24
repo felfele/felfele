@@ -5,4 +5,5 @@ export interface Feed extends Model {
     url: string;
     feedUrl: string;
     favicon: string;
+    contentHash?: string;
 }

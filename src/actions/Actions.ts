@@ -4,8 +4,10 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post } from '../models/Post';
+import { Post, PublicPost, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
+import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
+import { isSwarmUrl, uploadPhoto } from '../Swarm';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -13,6 +15,7 @@ export enum ActionTypes {
     CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
     ADD_FEED = 'ADD-FEED',
     REMOVE_FEED = 'REMOVE-FEED',
+    ADD_OWN_FEED = 'ADD-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
     REMOVE_POST = 'REMOVE-POST',
@@ -20,9 +23,12 @@ export enum ActionTypes {
     REMOVE_DRAFT = 'REMOVE-DRAFT',
     ADD_POST = 'ADD-POST',
     DELETE_POST = 'DELETE-POST',
+    UPDATE_POST_LINK = 'UPDATE-POST-LINK',
+    UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
     UPDATE_PICTURE_PATH = 'UPDATE-PICTURE-PATH',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
+    APP_STATE_RESET = 'APP-STATE-RESET',
 }
 
 const InternalActions = {
@@ -30,6 +36,8 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
+    addOwnFeed: (feed: Feed) =>
+        createAction(ActionTypes.ADD_OWN_FEED, { feed }),
 };
 
 export const Actions = {
@@ -45,6 +53,10 @@ export const Actions = {
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>
         createAction(ActionTypes.DELETE_POST, { post }),
+    updatePostLink: (post: Post, link?: string) =>
+        createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
+    updatePostImages: (post: Post, images: ImageData[]) =>
+        createAction(ActionTypes.UPDATE_POST_IMAGES, {post, images}),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
     addDraft: (draft: Post) =>
@@ -55,6 +67,8 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
     updatePicturePath: (path: string) =>
         createAction(ActionTypes.UPDATE_PICTURE_PATH, { path }),
+    appStateReset: () =>
+        createAction(ActionTypes.APP_STATE_RESET),
 };
 
 export const AsyncActions = {
@@ -72,8 +86,18 @@ export const AsyncActions = {
     },
     downloadRssPosts: () => {
         return async (dispatch, getState: () => AppState) => {
-            await RSSPostManager.loadPosts();
-            const posts = RSSPostManager.getAllPosts();
+            const feeds = getState().feeds.toArray();
+
+            const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
+            const rssPosts = await RSSPostManager.loadPosts(rssFeeds);
+
+            const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
+            const postFeedPosts = await loadPosts(postFeeds);
+
+            const allPosts = (rssPosts as PublicPost[]).concat(postFeedPosts);
+            const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
+            const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
+
             dispatch(Actions.updateRssPosts(posts));
         };
     },
@@ -93,6 +117,73 @@ export const AsyncActions = {
             dispatch(Actions.deletePost(post));
         };
     },
+    sharePost: (post: Post) => {
+        return async (dispatch, getState: () => AppState) => {
+            const ownFeeds = getState().ownFeeds.toArray();
+            if (ownFeeds.length > 0) {
+                const feed = ownFeeds[0];
+                if (post.link === feed.url) {
+                    return;
+                }
+
+                if (post.images.length > 0 && !isSwarmUrl(post.images[0].uri)) {
+                    for (const image of post.images) {
+                        if (image.localPath != null) {
+                            const uri = await uploadPhoto(image.localPath);
+                            image.uri = uri;
+                        }
+                    }
+                }
+
+                const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
+                    localPost.link === feed.url
+                );
+                const feedPosts = [...localFeedPosts, post];
+                const posts = feedPosts
+                    .sort((a, b) => b.createdAt - a.createdAt)
+                    .slice(0, 20);
+
+                const postFeed = {
+                    ...feed,
+                    posts,
+                };
+                await updatePostFeed(postFeed);
+                dispatch(Actions.updatePostLink(post, feed.url));
+            } else {
+                const author = getState().author.name;
+                const favicon = getState().author.faviconUri;
+                const feed = await createPostFeed(author, favicon, post);
+
+                dispatch(InternalActions.addOwnFeed(feed));
+                dispatch(Actions.addFeed(feed));
+                dispatch(Actions.updatePostLink(post, feed.url));
+                dispatch(Actions.updatePostImages(post, post.images));
+            }
+
+        };
+    },
+    chainActions: (thunks: ThunkTypes[], callback?: () => void) => {
+        return async (dispatch, getState: () => AppState) => {
+            for (const thunk of thunks) {
+                if (isActionTypes(thunk)) {
+                    dispatch(thunk);
+                } else {
+                    await thunk(dispatch, getState);
+                }
+            }
+            if (callback != null) {
+                callback();
+            }
+        };
+    },
+
+};
+
+type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
+type ThunkTypes = Thunk | Actions;
+
+const isActionTypes = (t: ThunkTypes): t is Actions => {
+    return (t as Actions).type !== undefined;
 };
 
 export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;

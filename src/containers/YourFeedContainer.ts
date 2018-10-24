@@ -26,6 +26,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onSavePost: (post: Post) => {
             dispatch(AsyncActions.createPost(post));
         },
+        onSharePost: (post: Post) => {
+            dispatch(AsyncActions.sharePost(post));
+        },
     };
 };
 
