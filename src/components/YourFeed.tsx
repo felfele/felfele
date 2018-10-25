@@ -95,7 +95,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     public render() {
-        const isStatusBarHidden = Platform.OS === 'android' ? true : false;
+        const isStatusBarHidden = false;
         return (
             <SafeAreaView
                 style={{
@@ -106,7 +106,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     opacity: 0.96,
             }
             }>
-                <StatusBar hidden={isStatusBarHidden} translucent={false} />
+                <StatusBar backgroundColor={Colors.BACKGROUND_COLOR} hidden={isStatusBarHidden} translucent={false} barStyle='dark-content'/>
                 <View>
                     { this.renderOfflineHeader() }
                     <FlatList

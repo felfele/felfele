@@ -161,6 +161,7 @@ export class EditPost extends React.Component<Props, State> {
                     padding: 5,
                     margin: 0,
                     height: 30,
+                    maxHeight: 30,
                 }}>
                     {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
                 </View>
@@ -320,7 +321,14 @@ export class EditPost extends React.Component<Props, State> {
         const justifyContent = showText ? 'center' : 'space-around';
         return (
             <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-                <View style={{flex: 1, flexDirection: 'row', margin: 0, padding: 0, alignItems: 'center', justifyContent: justifyContent}}>
+                <View style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    margin: 0,
+                    padding: 0,
+                    alignItems: 'center',
+                    justifyContent: justifyContent,
+                }}>
                     <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
                     { showText &&
                         <Text style={{fontSize: 14, flex: 10}}>{text}</Text>

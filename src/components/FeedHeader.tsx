@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
-import { TouchableView } from './TouchableView';
+import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 
 export interface StateProps {
     navigation: any;
@@ -70,6 +70,10 @@ export class FeedHeader extends React.PureComponent<Props> {
                         this.props.navigation.navigate('Post')
                     }
                     style={styles.headerTextContainer}
+                    hitSlop={{
+                        ...TouchableViewDefaultHitSlop,
+                        left: 0,
+                    }}
                     testID='FeedHeader/TouchableHeaderText'
                 >
                     <Text style={styles.headerText}
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     },
     cameraIconContainer: {
         alignItems: 'center',
-        paddingLeft: 10,
+        paddingHorizontal: 10,
     },
     headerTextContainer: {
         alignItems: 'center',
@@ -100,8 +104,8 @@ const styles = StyleSheet.create({
     headerText: {
         color: 'gray',
         fontSize: 14,
-        paddingLeft: 15,
-        marginLeft: 0,
+        paddingLeft: 10,
+        paddingRight: 100,
         marginRight: 15,
         paddingTop: 5,
     },
