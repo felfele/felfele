@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
+import { TouchableView } from './TouchableView';
 
 export interface StateProps {
     navigation: any;
@@ -54,25 +55,26 @@ export class FeedHeader extends React.PureComponent<Props> {
                 style={styles.headerContainer}
                 testID='welcome'
             >
-                <TouchableOpacity onPress={this.openImagePicker} style={{ flex: 1 }}>
+                <TouchableView
+                    onPress={this.openImagePicker}
+                    style={styles.cameraIconContainer}
+                >
                     <Icon
                         name='camera-alt'
                         size={30}
                         color='gray'
                     />
-                </TouchableOpacity>
-                <TouchableOpacity
+                </TouchableView>
+                <TouchableView
                     onPress={() =>
                         this.props.navigation.navigate('Post')
                     }
-                    style={{
-                        flex: 6,
-                    }}
+                    style={styles.headerTextContainer}
                     testID='FeedHeader/TouchableHeaderText'
                 >
                     <Text style={styles.headerText}
                     >What's your story?</Text>
-                </TouchableOpacity>
+                </TouchableView>
             </View>
         );
     }
@@ -81,30 +83,26 @@ export class FeedHeader extends React.PureComponent<Props> {
 const HeaderContainerPaddingTop = Platform.OS === 'ios' ? 20 : 0;
 const styles = StyleSheet.create({
     headerContainer: {
-        flex: -1,
+        flex: 1,
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderBottomColor: 'lightgray',
-        alignContent: 'stretch',
-        marginTop: HeaderContainerPaddingTop,
+        alignContent: 'center',
+        paddingVertical: 6,
     },
-    cameraIcon: {
-        paddingTop: 4,
+    cameraIconContainer: {
+        alignItems: 'center',
         paddingLeft: 10,
-        margin: 0,
+    },
+    headerTextContainer: {
+        alignItems: 'center',
     },
     headerText: {
-        height: 30,
         color: 'gray',
         fontSize: 14,
         paddingLeft: 15,
-        paddingTop: 6,
         marginLeft: 0,
         marginRight: 15,
-        marginVertical: 3,
-        marginBottom: 15,
-        alignSelf: 'stretch',
-        flex: 5,
-        flexGrow: 10,
+        paddingTop: 5,
     },
 });
