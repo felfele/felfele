@@ -44,7 +44,6 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                     if (this.props.onSubmitEditing != null) {
                         this.props.onSubmitEditing(this.state.text.trim());
                     }
-                    this.setState({ text: '' });
                 }}
                 selectTextOnFocus={this.props.selectTextOnFocus}
                 value={this.state.text}
