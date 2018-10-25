@@ -8,7 +8,7 @@ interface PostFeed extends Feed {
 }
 
 const SWARM_PREFIX = Swarm.DefaultGateway + Swarm.DefaultUrlScheme;
-const HASH_SERVICE_URL = 'http://localhost:3000/feeds/';
+const HASH_SERVICE_URL = 'http://feeds.helmethair.co/feeds/';
 
 export const createPostFeed = async (name: string, favicon: string, firstPost: PublicPost): Promise<PostFeed> => {
     const randomHash = generateUnsecureRandomString(32);
@@ -35,12 +35,17 @@ const hashFromUrl = (url: string): string => {
 };
 
 export const updatePostFeed = async (postFeed: PostFeed): Promise<PostFeed> => {
-    const postFeedJson = JSON.stringify(postFeed);
-    const contentHash = await Swarm.upload(postFeedJson);
-    const databaseId = await updateHash(hashFromUrl(postFeed.url), contentHash);
-    return {
-        ...postFeed,
-    };
+    try {
+        const postFeedJson = JSON.stringify(postFeed);
+        const contentHash = await Swarm.upload(postFeedJson);
+        const databaseId = await updateHash(hashFromUrl(postFeed.url), contentHash);
+        return {
+            ...postFeed,
+        };
+    } catch (e) {
+        console.log('updatePostFeed failed, ', e);
+        return postFeed;
+    }
 };
 
 const updateHash = async (locationHash: string, contentHash: string): Promise<string> => {
@@ -67,10 +72,15 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
     const hash = hashFromUrl(url);
     const contentHash = await downloadHash(hash);
     console.log('downloadPostFeed: contentHash: ', contentHash);
-    const content = await Swarm.download(contentHash);
-    console.log('downloadPostFeed: content: ', content);
-    const postFeed = JSON.parse(content);
-    return postFeed;
+    try {
+        const content = await Swarm.downloadData(contentHash);
+        console.log('downloadPostFeed: content: ', content);
+        const postFeed = JSON.parse(content);
+        return postFeed;
+    } catch (e) {
+        console.log('downloadPostFeed failed: ', e);
+        return {posts: [], name: '', url: '', feedUrl: '', favicon: ''};
+    }
 };
 
 export const loadPosts = async (postFeeds: Feed[]): Promise<PublicPost[]> => {

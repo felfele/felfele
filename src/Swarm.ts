@@ -1,18 +1,20 @@
-import * as SwarmJS from 'swarm-js';
-
-export const DefaultGateway = 'http://swarm.helmethair.co:80';
+export const DefaultGateway = 'http://swarm.helmethair.co';
 export const DefaultUrlScheme = '/bzz-raw:/';
 
-const swarm = SwarmJS.at(DefaultGateway);
-
-export const upload = async (data: string | FormData): Promise<string> => {
-    const hash = await swarm.upload(data);
-    return hash;
+export const upload = async (data: string): Promise<string> => {
+    console.log('upload to Swarm: ', data);
+    try {
+        const hash = await uploadData(data);
+        console.log('hash is ', hash);
+        return hash;
+    } catch (e) {
+        console.log('upload to Swarm failed: ', JSON.stringify(e));
+        return '';
+    }
 };
 
 export const download = async (hash: string): Promise<string> => {
-    const array = await swarm.download(hash);
-    return swarm.toString(array);
+    return await downloadData(hash);
 };
 
 export const getUrlFromHash = (hash: string): string => {
@@ -49,4 +51,25 @@ export const uploadPhoto = async (localPath: string): Promise<string> => {
 
     const hash = await uploadForm(data);
     return DefaultGateway + '/bzz:/' + hash + '/' + name;
+};
+
+export const uploadData = async (data: string): Promise<string> => {
+    const url = DefaultGateway + '/bzz:/';
+    const options: RequestInit = {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        method: 'POST',
+    };
+    options.body = data;
+    const response = await fetch(url, options);
+    const text = await response.text();
+    return text;
+};
+
+export const downloadData = async (hash: string): Promise<string> => {
+    const url = DefaultGateway + '/bzz:/' + hash;
+    const response = await fetch(url);
+    const text = await response.text();
+    return text;
 };
