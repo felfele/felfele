@@ -43,13 +43,13 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             <SimpleTextInput
                 style={styles.row}
                 defaultValue={props.author.name}
-                onChangeText={props.onUpdateAuthor}
                 placeholder={namePlaceholder}
                 autoCapitalize='none'
                 autoFocus={props.author.name === ''}
                 autoCorrect={false}
                 selectTextOnFocus={true}
                 returnKeyType={'done'}
+                onSubmitEditing={props.onUpdateAuthor}
                 />
             <Text style={styles.tooltip}>Avatar</Text>
             <TouchableOpacity

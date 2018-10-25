@@ -38,12 +38,12 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                 <SimpleTextInput
                     style={styles.textInput}
                     defaultValue={props.author.name === '' ? namePlaceholder : props.author.name}
-                    onChangeText={props.onUpdateAuthor}
                     autoCapitalize='none'
                     autoFocus={false}
                     autoCorrect={false}
                     selectTextOnFocus={true}
                     returnKeyType={'done'}
+                    onSubmitEditing={props.onUpdateAuthor}
                 />
             </View>
             <Text style={styles.tooltip}>Avatar</Text>
