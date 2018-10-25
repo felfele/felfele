@@ -60,10 +60,6 @@ export class EditPost extends React.Component<Props, State> {
     public onKeyboardDidShow = (e) => {
         console.log('onKeyboardDidShow', this.state.keyboardHeight);
 
-        if (Platform.OS === 'android') {
-            this.onKeyboardWillShow(e);
-        }
-
         this.setState({
             isKeyboardVisible: true,
         });
