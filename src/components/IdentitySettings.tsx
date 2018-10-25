@@ -48,7 +48,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 autoCapitalize='none'
                 autoFocus={props.author.name === ''}
                 autoCorrect={false}
-            />
+                selectTextOnFocus={true}
+                returnKeyType={'done'}
+                />
             <Text style={styles.tooltip}>Avatar</Text>
             <TouchableOpacity
                 onPress={async () => {

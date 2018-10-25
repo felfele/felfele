@@ -43,6 +43,7 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                     autoFocus={false}
                     autoCorrect={false}
                     selectTextOnFocus={true}
+                    returnKeyType={'done'}
                 />
             </View>
             <Text style={styles.tooltip}>Avatar</Text>

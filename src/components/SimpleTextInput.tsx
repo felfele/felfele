@@ -3,6 +3,7 @@ import {
     TextInput,
     TextStyle,
     StyleProp,
+    ReturnKeyTypeOptions,
 } from 'react-native';
 
 interface SimpleTextInputProps {
@@ -18,6 +19,7 @@ interface SimpleTextInputProps {
     defaultValue?: string;
     underlineColorAndroid?: string;
     testID?: string;
+    returnKeyType?: ReturnKeyTypeOptions;
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -58,6 +60,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                     ? this.props.underlineColorAndroid
                     : 'transparent'
                 }
+                returnKeyType={this.props.returnKeyType}
                 testID={this.props.testID}
             />
         );
