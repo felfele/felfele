@@ -25,12 +25,17 @@
 Make sure the generated images does not contain transparency for iOS.
 
 ```bash
-$ mogrify -alpha off ios/lucid/Images.xcassets/AppIcon.appiconset/*.png
+$ mogrify -alpha off ios/postmodern/Images.xcassets/AppIcon.appiconset/*.png
 ```
+
+## Build android release version
+
+`cd android`
+`./gradlew assembleRelease`
 
 ## Sign the android release with debug key
 
-`jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/.android/debug.keystore -storepass android -keypass android android/app/build/outputs/apk/app-release-unsigned.apk androiddebugkey`
+`jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/.android/debug.keystore -storepass android -keypass android android/app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey`
 
 ## Running with the debugger
 
