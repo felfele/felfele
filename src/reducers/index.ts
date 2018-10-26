@@ -198,6 +198,7 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     switch (action.type) {
         case 'APP-STATE-RESET': {
+            console.log('App state reset');
             return defaultState;
         }
         default: {

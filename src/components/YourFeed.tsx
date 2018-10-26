@@ -25,7 +25,7 @@ import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash } from '../Swarm';
+import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 
@@ -160,7 +160,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private async openPost(post: Post) {
         if (post.link) {
-            await Linking.openURL(post.link);
+            if (!isSwarmLink(post.link)) {
+                await Linking.openURL(post.link);
+            }
         }
     }
 

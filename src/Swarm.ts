@@ -1,5 +1,6 @@
 export const DefaultGateway = 'http://swarm.helmethair.co';
 export const DefaultUrlScheme = '/bzz-raw:/';
+export const DefaultPrefix = 'swarm:';
 
 export const upload = async (data: string): Promise<string> => {
     console.log('upload to Swarm: ', data);
@@ -35,8 +36,8 @@ export const uploadForm = async (data: FormData): Promise<string> => {
     return text;
 };
 
-export const isSwarmUrl = (url: string): boolean => {
-    return url.startsWith(DefaultGateway);
+export const isSwarmLink = (link: string): boolean => {
+    return link.startsWith(DefaultPrefix);
 };
 
 export const uploadPhoto = async (localPath: string): Promise<string> => {

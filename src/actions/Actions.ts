@@ -7,7 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, ImageData } from '../models/Post';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { isSwarmUrl, uploadPhoto } from '../Swarm';
+import { isSwarmLink, uploadPhoto } from '../Swarm';
+import { uploadImages, uploadPost } from '../PostUpload';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -126,19 +127,12 @@ export const AsyncActions = {
                     return;
                 }
 
-                if (post.images.length > 0 && !isSwarmUrl(post.images[0].uri)) {
-                    for (const image of post.images) {
-                        if (image.localPath != null) {
-                            const uri = await uploadPhoto(image.localPath);
-                            image.uri = uri;
-                        }
-                    }
-                }
+                const uploadedPost = await uploadPost(post);
 
                 const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
                     localPost.link === feed.url
                 );
-                const feedPosts = [...localFeedPosts, post];
+                const feedPosts = [...localFeedPosts, uploadedPost];
                 const posts = feedPosts
                     .sort((a, b) => b.createdAt - a.createdAt)
                     .slice(0, 20);
@@ -152,7 +146,8 @@ export const AsyncActions = {
             } else {
                 const author = getState().author.name;
                 const favicon = getState().author.faviconUri;
-                const feed = await createPostFeed(author, favicon, post);
+                const uploadedPost = await uploadPost(post);
+                const feed = await createPostFeed(author, favicon, uploadedPost);
 
                 dispatch(InternalActions.addOwnFeed(feed));
                 dispatch(Actions.addFeed(feed));
