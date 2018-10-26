@@ -45,6 +45,11 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                         this.props.onSubmitEditing(this.state.text.trim());
                     }
                 }}
+                onBlur={() => {
+                    if (this.props.onSubmitEditing != null) {
+                        this.props.onSubmitEditing(this.state.text.trim());
+                    }
+                }}
                 selectTextOnFocus={this.props.selectTextOnFocus}
                 value={this.state.text}
                 placeholder={this.props.placeholder}
