@@ -324,6 +324,11 @@ class _RSSPostManager {
                 images: [],
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
+                author: {
+                    name: 'Postmodern',
+                    uri: '',
+                    faviconUri: '',
+                },
             };
             return [firstPost, ...posts];
         }
