@@ -1,5 +1,5 @@
 import { Feed } from './models/Feed';
-import { PublicPost } from './models/Post';
+import { PublicPost, ImageData } from './models/Post';
 import { generateUnsecureRandomString } from './random';
 import * as Swarm from './Swarm';
 
@@ -7,7 +7,7 @@ interface PostFeed extends Feed {
     posts: PublicPost[];
 }
 
-const SWARM_PREFIX = 'swarm:' + Swarm.DefaultUrlScheme;
+const SWARM_PREFIX = Swarm.DefaultPrefix;
 const HASH_SERVICE_URL = 'http://feeds.helmethair.co/feeds/';
 
 export const createPostFeed = async (name: string, favicon: string, firstPost: PublicPost): Promise<PostFeed> => {
@@ -75,8 +75,18 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
     try {
         const content = await Swarm.downloadData(contentHash);
         console.log('downloadPostFeed: content: ', content);
-        const postFeed = JSON.parse(content);
-        return postFeed;
+        const postFeed = JSON.parse(content) as PostFeed;
+        const postFeedWithGatewayImageLinks = {
+            ...postFeed,
+            posts: postFeed.posts.map(post => ({
+                ...post,
+                images: post.images.map(image => ({
+                    ...image,
+                    uri: Swarm.getSwarmGatewayUrl(image.uri),
+                })),
+            })),
+        };
+        return postFeedWithGatewayImageLinks;
     } catch (e) {
         console.log('downloadPostFeed failed: ', e);
         return {posts: [], name: '', url: '', feedUrl: '', favicon: ''};
