@@ -73,7 +73,7 @@ const defaultPost2: Post = {
 };
 
 const defaultPost3: Post = {
-    _id: 3,
+    _id: 2,
     createdAt: 0,
     images: [],
     text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
@@ -95,7 +95,7 @@ const defaultState: AppState = {
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: {
-        highestSeenPostId: 0,
+        highestSeenPostId: 2,
     },
 };
 
