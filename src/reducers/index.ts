@@ -43,6 +43,45 @@ const defaultAuthor: Author = {
     faviconUri: '',
 };
 
+const onboardingAuthor = {
+    faviconUri: '',
+    name: 'Felfele Assistant',
+    uri: '',
+};
+
+const defaultPost1: Post = {
+    _id: 0,
+    createdAt: 0,
+    images: [],
+    text: `Basic features:.
+
+Post text and images privately, and later add the posts to your public feed.
+
+Follow the public feed of others, or add your favorite RSS/Atom feeds.
+
+If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
+    author: onboardingAuthor,
+};
+const defaultPost2: Post = {
+    _id: 1,
+    createdAt: 0,
+    images: [{
+        uri: '../../images/addrss.gif',
+    }],
+    text: `Adding an RSS feed`,
+    author: onboardingAuthor,
+};
+
+const defaultPost3: Post = {
+    _id: 3,
+    createdAt: 0,
+    images: [],
+    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    author: onboardingAuthor,
+};
+
+const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
+
 const defaultCurrentTimestamp = 0;
 
 const defaultState: AppState = {
@@ -53,7 +92,7 @@ const defaultState: AppState = {
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
-    localPosts: List<Post>(),
+    localPosts: defaultLocalPosts,
     draft: null,
     metadata: {
         highestSeenPostId: 0,
@@ -148,7 +187,7 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
-const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Post> => {
+const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
     switch (action.type) {
         case 'ADD-POST': {
             return localPosts.insert(0, action.payload.post);

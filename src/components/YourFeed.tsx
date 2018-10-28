@@ -307,17 +307,33 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                             marginTop: 0,
                         }}
                     >
-                        {post.images.map((image, index) =>
-                            <Image
-                                key={image.uri + index}
-                                source={{
-                                    uri: this.getImageUri(image),
-                                }}
-                                style={{
-                                    width: WindowWidth,
-                                    height: WindowWidth,
-                                }}
-                            />
+                        {post.images.map((image, index) => {
+                            if (image.uri.startsWith('../../images/addrss.gif')) {
+                                return (
+                                    <Image
+                                        key={image.uri + index}
+                                        source={require('../../images/addrss.gif')}
+                                        style={{
+                                            maxWidth: 320,
+                                            height: 568,
+                                        }}
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <Image
+                                        key={image.uri + index}
+                                        source={{
+                                            uri: this.getImageUri(image),
+                                        }}
+                                        style={{
+                                            width: WindowWidth,
+                                            height: WindowWidth,
+                                        }}
+                                    />
+                                );
+                            }
+                        }
                         )}
                         { post.text === '' ||
                             <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
