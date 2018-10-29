@@ -3,7 +3,6 @@ import { SimpleTextInput } from './SimpleTextInput';
 import {
     KeyboardAvoidingView,
     StyleSheet,
-    View,
     Text,
     Image,
     TouchableOpacity,
