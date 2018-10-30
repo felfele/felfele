@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
-import * as SettingsList from 'react-native-settings-list';
+import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Config } from '../Config';

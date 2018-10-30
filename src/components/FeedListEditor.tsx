@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Button, Image } from 'react-native';
-import * as SettingsList from 'react-native-settings-list';
+import SettingsList from 'react-native-settings-list';
 import { Feed } from '../models/Feed';
 import { IconSize, Colors } from '../styles';
 

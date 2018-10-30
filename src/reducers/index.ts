@@ -9,7 +9,7 @@ import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist';
 
-import { immutableTransform } from './immutableTransform';
+import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
