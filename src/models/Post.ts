@@ -13,10 +13,21 @@ export interface ImageData {
     localPath?: string;
 }
 
+export interface PublicIdentity {
+    publicKey: string;
+    address: string;
+}
+
+export interface PrivateIdentity extends PublicIdentity {
+    privateKey: string;
+}
+
 export interface Author {
     name: string;
     uri: string;
     faviconUri: string;
+    image: ImageData;
+    identity?: PrivateIdentity;
 }
 
 export interface PublicPost extends Model {
@@ -33,3 +44,13 @@ export interface Post extends PublicPost {
     updatedAt?: number;
     liked?: boolean;
 }
+
+export const getAuthorImageUri = (author: Author): string => {
+    if (author.image != null) {
+        if (author.image.localPath != null) {
+            return author.image.localPath;
+        }
+        return author.image.uri;
+    }
+    return author.faviconUri;
+};

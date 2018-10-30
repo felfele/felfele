@@ -41,6 +41,15 @@ const defaultAuthor: Author = {
     name: '',
     uri: '',
     faviconUri: '',
+    image: {
+        uri: '',
+    },
+    identity: {
+        publicKey: '',
+        privateKey: '0x0bb80d052b3d85656b3f082c24fb6c211d7935163fab6c605358886e56d17a93',
+        // address: '0xADc9b12480cE9880D6Bed1Ef91Cdc279D671Cf0d',
+        address: '0x377820b4e6913dd322a24e2af10e1c51c5f1e709',
+    },
 };
 
 const defaultCurrentTimestamp = 0;
@@ -72,6 +81,9 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
         }
         case 'REMOVE-CONTENT-FILTER': {
             const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.text === filter.text);
+            if (ind === -1) {
+                return contentFilters;
+            }
             return contentFilters.remove(ind);
         }
         default: {
@@ -87,6 +99,9 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
             return feeds.remove(ind);
         }
         default: {
@@ -122,6 +137,11 @@ const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
             return {
                 ...identity,
                 faviconUri: action.payload.path,
+                image: {
+                    ...identity.image,
+                    localPath: action.payload.path,
+                    uri: action.payload.path,
+                },
             };
         }
         default: {
@@ -155,14 +175,23 @@ const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Pos
         }
         case 'DELETE-POST': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.remove(ind);
         }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
         }
         case 'UPDATE-POST-IMAGES': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.update(ind, (post => ({...post, images: action.payload.images})));
         }
     }

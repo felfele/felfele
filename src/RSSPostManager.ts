@@ -328,6 +328,9 @@ class _RSSPostManager {
                     name: 'Postmodern',
                     uri: '',
                     faviconUri: '',
+                    image: {
+                        uri: '',
+                    },
                 },
             };
             return [firstPost, ...posts];
@@ -449,6 +452,9 @@ class _RSSPostManager {
                     name: feedName,
                     uri: rssFeed.url,
                     faviconUri: strippedFaviconUri,
+                    image: {
+                        uri: strippedFaviconUri,
+                    },
                 },
             };
             return post;
