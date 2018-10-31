@@ -153,7 +153,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private convertLegacyAbsolutePath(path: string): string {
-        if (path.startsWith('~') === false) {
+        if (path.startsWith('~') === false && Platform.OS === 'ios') {
             const [_, second] = path.split('/Documents/');
             return `~/Documents/${second}`;
         }
