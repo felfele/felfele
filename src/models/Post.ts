@@ -6,7 +6,7 @@ interface Location {
 }
 
 export interface ImageData {
-    uri: string;
+    uri?: string;
     width?: number;
     height?: number;
     data?: string;
@@ -50,7 +50,9 @@ export const getAuthorImageUri = (author: Author): string => {
         if (author.image.localPath != null) {
             return author.image.localPath;
         }
-        return author.image.uri;
+        if (author.image.uri != null) {
+            return author.image.uri;
+        }
     }
     return author.faviconUri;
 };

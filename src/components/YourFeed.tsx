@@ -144,11 +144,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.props.onRefreshPosts();
     }
 
-    private getImageUri(image: ImageData) {
+    private getImageUri(image: ImageData): string {
         if (image.localPath) {
             return image.localPath;
         }
-        return getSwarmGatewayUrl(image.uri);
+        if (image.uri != null) {
+            return getSwarmGatewayUrl(image.uri);
+        }
+        return '';
     }
 
     private async onSharePost(post: Post) {
@@ -312,7 +315,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     >
                         {post.images.map((image, index) =>
                             <Image
-                                key={image.uri + index}
+                                key={this.getImageUri(image) + index}
                                 source={{
                                     uri: this.getImageUri(image),
                                 }}

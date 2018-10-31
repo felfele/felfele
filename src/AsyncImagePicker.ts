@@ -1,5 +1,6 @@
 import { Config } from './Config';
 import { ImageData } from './models/Post';
+import { Platform } from 'react-native';
 
 // tslint:disable-next-line:no-var-requires
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
@@ -59,6 +60,7 @@ const defaultImagePickerOtions: Options = {
     noData: true,
     storageOptions: {
         cameraRoll: Config.saveToCameraRoll,
+        waitUntilSaved: true,
     },
 };
 
@@ -80,11 +82,13 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
+        const uri = response.uri;
+        console.log('laungPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
-            uri: response.uri,
+            uri: undefined,
             width: response.width,
             height: response.height,
-            localPath: response.uri,
+            localPath: uri,
         };
         return imageData;
 

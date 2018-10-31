@@ -82,7 +82,7 @@ export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string)
                 ...post,
                 images: post.images.map(image => ({
                     ...image,
-                    uri: Swarm.getSwarmGatewayUrl(image.uri),
+                    uri: Swarm.getSwarmGatewayUrl(image.uri!),
                 })),
             })),
         };

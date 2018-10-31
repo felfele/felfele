@@ -271,6 +271,7 @@ export const store = createStore(
 const initStore = () => {
     console.log('initStore: ', store.getState());
     store.dispatch(AsyncActions.cleanupContentFilters());
+    patchState();
 };
 
 const patchState = () => {
