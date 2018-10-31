@@ -2,7 +2,8 @@ import { ImageData, Post, Author } from './models/Post';
 import { uploadPhoto, isSwarmLink } from './Swarm';
 
 const uploadImage = async (image: ImageData): Promise<ImageData> => {
-    if (image.localPath != null && !isSwarmLink(image.uri)) {
+    if (image.localPath != null && image.localPath !== '' && !isSwarmLink(image.uri)) {
+        console.log('uploadImage: ', image.localPath, `z${image.localPath}z`);
         const uri = await uploadPhoto(image.localPath);
         return {
             ...image,

@@ -3,7 +3,7 @@ import { ec } from 'elliptic';
 
 import { PublicIdentity, PrivateIdentity } from './models/Post';
 
-export const DefaultGateway = 'http://localhost:8500';
+export const DefaultGateway = 'http://swarm.helmethair.co';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const HashLength = 64;
@@ -29,6 +29,7 @@ export const getUrlFromHash = (hash: string): string => {
 };
 
 export const uploadForm = async (data: FormData): Promise<string> => {
+    console.log('uploadForm: ', data);
     const url = DefaultGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -37,8 +38,10 @@ export const uploadForm = async (data: FormData): Promise<string> => {
         method: 'POST',
     };
     options.body = data;
+    console.log('uploadForm: ', url, options);
     const response = await fetch(url, options);
     const text = await response.text();
+    console.log('uploadForm: response: ', text);
     return text;
 };
 
@@ -57,6 +60,7 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
 };
 
 export const uploadPhoto = async (localPath: string): Promise<string> => {
+    console.log('uploadPhoto: ', localPath);
     const data = new FormData();
     const name = 'photo.jpeg';
     data.append('photo', {

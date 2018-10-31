@@ -7,8 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, ImageData, getAuthorImageUri } from '../models/Post';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { isSwarmLink, uploadPhoto, makeFeedApi } from '../Swarm';
-import { uploadImages, uploadPost, uploadPosts } from '../PostUpload';
+import { makeFeedApi } from '../Swarm';
+import { uploadPost, uploadPosts } from '../PostUpload';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -131,6 +131,7 @@ export const AsyncActions = {
                 }
 
                 const uploadedPost = await uploadPost(post);
+                console.log('sharePost: after uploadedPost');
 
                 const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
                     localPost.link === feed.url
