@@ -9,11 +9,14 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+// import QRCode from 'react-native-qrcode-svg';
+// import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
+import { Colors } from '../styles';
 
 interface EditFeedNavigationActions {
     back?: () => void;
@@ -25,46 +28,10 @@ const navigationActions: EditFeedNavigationActions = {
     add: undefined,
 };
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#EFEFF4',
-        flex: 1,
-        flexDirection: 'column',
-    },
-    titleInfo: {
-        fontSize: 14,
-        color: '#8e8e93',
-    },
-    linkInput: {
-        width: '100%',
-        backgroundColor: 'white',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 1,
-        borderTopColor: 'lightgray',
-        borderTopWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        color: 'gray',
-        fontSize: 16,
-    },
-    deleteButtonContainer: {
-        backgroundColor: 'white',
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
-    centerIcon: {
-        width: '100%',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        height: 40,
-        backgroundColor: '#EFEFF4',
-        paddingTop: 10,
-    },
-});
+const QRCodeWidth = 160;
+const QRCodeHeight = QRCodeWidth;
+const QRCameraWidth = 200;
+const QRCameraHeight = QRCameraWidth;
 
 interface EditFeedState {
     url: string;
@@ -155,17 +122,56 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                             <ActivityIndicator size='large' color='grey' />
                         </View>
                     : this.props.feed.feedUrl.length > 0
-                        ? <Button
-                            title='Delete'
-                            onPress={async () => this.onDelete()}
-                            disabled={this.state.loading}
-                        />
-                        : <Button
-                            title='Fetch'
-                            onPress={async () => await this.fetchFeed()}
-                            disabled={this.state.loading}
-                        />
+                        ? <this.ExistingItemView />
+                        : <this.NewItemView />
                 }
+            </View>
+        );
+    }
+
+    private NewItemView = (props) => {
+        return (
+            <View>
+                <Button
+                    title='Fetch'
+                    onPress={async () => await this.fetchFeed()}
+                    disabled={this.state.loading}
+                />
+                {/* <View style={styles.qrCameraContainer}>
+                    <QRCodeScanner
+                        onRead={this.onScanSuccess}
+                        containerStyle={{
+                            width: QRCameraWidth,
+                            height: QRCameraHeight,
+                        }}
+                        cameraStyle={{
+                            width: QRCameraWidth,
+                            height: QRCameraHeight,
+                        }}
+                        fadeIn={false}
+                    />
+                </View> */}
+            </View>
+        );
+    }
+
+    private ExistingItemView = (props) => {
+        const qrCodeValue = JSON.stringify(this.props.feed);
+        return (
+            <View>
+                <Button
+                    title='Delete'
+                    onPress={async () => this.onDelete()}
+                    disabled={this.state.loading}
+                />
+                <View style={styles.qrCodeContainer}>
+                    {/* <QRCode
+                        value={qrCodeValue}
+                        size={QRCodeWidth}
+                        color={Colors.DARK_GRAY}
+                        backgroundColor={Colors.BACKGROUND_COLOR}
+                    /> */}
+                </View>
             </View>
         );
     }
@@ -214,4 +220,68 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         this.props.onRemoveFeed(this.props.feed);
         this.goBack();
     }
+
+    private onScanSuccess = (event) => {
+        try {
+            console.log(event);
+            const feed = JSON.parse(event.data) as Feed;
+            this.onAdd(feed);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#EFEFF4',
+        flex: 1,
+        flexDirection: 'column',
+    },
+    titleInfo: {
+        fontSize: 14,
+        color: '#8e8e93',
+    },
+    linkInput: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 1,
+        borderTopColor: 'lightgray',
+        borderTopWidth: 1,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        color: 'gray',
+        fontSize: 16,
+    },
+    deleteButtonContainer: {
+        backgroundColor: 'white',
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+    },
+    centerIcon: {
+        width: '100%',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        height: 40,
+        backgroundColor: '#EFEFF4',
+        paddingTop: 10,
+    },
+    qrCodeContainer: {
+        marginTop: 10,
+        width: QRCodeWidth,
+        height: QRCodeHeight,
+        padding: 0,
+        alignSelf: 'center',
+    },
+    qrCameraContainer: {
+        width: 200,
+        height: 200,
+        padding: 0,
+        alignSelf: 'center',
+    },
+});

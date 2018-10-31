@@ -3,6 +3,7 @@ import { SimpleTextInput } from './SimpleTextInput';
 import {
     KeyboardAvoidingView,
     StyleSheet,
+    View,
     Text,
     Image,
     TouchableOpacity,
@@ -13,6 +14,8 @@ import { Colors, DefaultStyle } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
 import image = require('../../images/user_circle.png');
+import { Feed } from '../models/Feed';
+// import QRCode from 'react-native-qrcode-svg';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -21,6 +24,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     author: Author;
+    ownFeed?: Feed;
     navigation: any;
 }
 
@@ -28,7 +32,22 @@ const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const title = 'Identity';
 
+const QRCodeWidth = 200;
+
+const generateQRCodeValue = (feed?: Feed): string => {
+    if (feed == null) {
+        return '';
+    }
+    const feedWithoutPosts = {
+        ...feed,
+        posts: [],
+    };
+    return JSON.stringify(feedWithoutPosts);
+};
+
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
+    const qrCodeValue = generateQRCodeValue(props.ownFeed);
+    console.log(qrCodeValue);
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
@@ -58,13 +77,23 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 style={styles.imagePickerContainer}
             >
                 <Image
-                    source={props.author.faviconUri === ''
+                    source={props.author.image.uri === ''
                     ? image
-                    : { uri: props.author.faviconUri }
+                    : { uri: props.author.image.uri }
                     }
                     style={styles.imagePicker}
                 />
             </TouchableOpacity>
+            { props.ownFeed &&
+                <View style={styles.qrCodeContainer}>
+                    {/* <QRCode
+                        value={qrCodeValue}
+                        size={QRCodeWidth}
+                        color={Colors.DARK_GRAY}
+                        backgroundColor={Colors.BACKGROUND_COLOR}
+                    /> */}
+                </View>
+            }
         </KeyboardAvoidingView>
     );
 };
@@ -104,5 +133,12 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         marginVertical: 10,
+    },
+    qrCodeContainer: {
+        marginTop: 10,
+        width: QRCodeWidth,
+        height: QRCodeWidth,
+        padding: 0,
+        alignSelf: 'center',
     },
 });

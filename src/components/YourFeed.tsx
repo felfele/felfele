@@ -20,12 +20,12 @@ import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Config } from '../Config';
-import { Post, ImageData } from '../models/Post';
+import { Post, ImageData, getAuthorImageUri } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
+import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 
@@ -148,7 +148,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         if (image.localPath) {
             return image.localPath;
         }
-        return image.uri;
+        return getSwarmGatewayUrl(image.uri);
     }
 
     private async onSharePost(post: Post) {
@@ -222,9 +222,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderCardTopIcon(post: Post) {
         if (post.author) {
-            const imageSource = post.author.faviconUri === ''
+            const imageUri = getAuthorImageUri(post.author);
+            const imageSource = imageUri === ''
              ? require('../../images/user_circle.png')
-             : { uri: post.author.faviconUri };
+             : { uri: imageUri };
             return (
                 <Image source={imageSource} style={DefaultStyle.favicon} />
             );

@@ -5,9 +5,13 @@ import { StateProps, DispatchProps, IdentitySettings } from '../components/Ident
 import { IdentityOnboarding } from '../components/IdentityOnboarding';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
+    const ownFeed = state.ownFeeds.toArray().length > 0
+        ? state.ownFeeds.toArray()[0]
+        : undefined;
     return {
         author: state.author,
         navigation: ownProps.navigation,
+        ownFeed,
    };
 };
 

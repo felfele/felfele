@@ -7,7 +7,7 @@ import * as Communications from 'react-native-communications';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { Version } from '../Version';
 import { Config } from '../Config';
-import { upload, download, uploadPhoto } from '../Swarm';
+import { upload, download, downloadUserFeed, downloadUserFeedTemplate, updateUserFeed } from '../Swarm';
 import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 
@@ -117,8 +117,8 @@ export class DebugScreen extends React.Component<Props, any> {
                             icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
-                            title='Upload avatar image'
-                            onPress={this.onUploadAvatarImage}
+                            title='Test feed update'
+                            onPress={async () => await this.onTestFeedUpdate()}
                         />
 
                         <SettingsList.Item
@@ -194,11 +194,12 @@ export class DebugScreen extends React.Component<Props, any> {
         console.log(oldPosts);
     }
 
-    private onUploadAvatarImage = async () => {
-        const imageUri = this.props.appState.author.faviconUri;
-        console.log('onUploadAvatarImage: ', imageUri);
-        const url = await uploadPhoto(imageUri);
-
-        console.log('onUploadAvatarImage: ', url);
+    private onTestFeedUpdate = async () => {
+        const identity = this.props.appState.author.identity!;
+        const feedTemplate = await downloadUserFeedTemplate(identity);
+        const data = 'hello';
+        const text = await updateUserFeed(feedTemplate, identity, data);
+        const latestData = await downloadUserFeed(identity);
+        console.log('onTestFeedUpdate: ', latestData);
     }
 }

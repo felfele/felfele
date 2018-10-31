@@ -13,7 +13,7 @@
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-node6": "^11.0.0",
     "eslint": "^4.19.1",
-    "jest": "^23.5.0",
+    "jest": "^23.6.0",
     "jest-fetch-mock": "^1.6.5",
     "mocha": "^5.2.0",
     "mock-async-storage": "^1.0.3",
@@ -72,8 +72,11 @@
   },
   "dependencies": {
     "buffer": "^5.0.6",
+    "elliptic": "^6.4.1",
     "immutable": "^3.8.2",
+    "js-sha3": "^0.8.0",
     "node-libs-browser": "^2.1.0",
+    "node-libs-react-native": "^1.0.3",
     "react": "16.3.1",
     "react-native": "^0.55.1",
     "react-native-communications": "^2.2.1",
@@ -95,9 +98,11 @@
     "redux-persist": "^5.10.0",
     "redux-persist-transform-immutable": "^5.0.0",
     "redux-thunk": "2.2.0",
+    "stream-browserify": "^2.0.1",
     "tslib": "^1.9.3",
     "url": "^0.11.0",
-    "util": "^0.10.4"
+    "util": "^0.10.4",
+    "vm-browserify": "^1.1.0"
   },
   "detox": {
     "configurations": {

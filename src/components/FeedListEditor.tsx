@@ -28,15 +28,17 @@ const Favicon = (props) => (
         paddingVertical: 16,
         paddingLeft: 5,
     }}>
-        <Image
-            source={{
-                uri: props.uri,
-            }}
-            style={{
-                width: IconSize.LARGE_LIST_ICON,
-                height: IconSize.LARGE_LIST_ICON,
-            }}
-        />
+        { props.uri != null && props.uri !== '' &&
+            <Image
+                source={{
+                    uri: props.uri,
+                }}
+                style={{
+                    width: IconSize.LARGE_LIST_ICON,
+                    height: IconSize.LARGE_LIST_ICON,
+                }}
+            />
+        }
     </View>
 );
 
