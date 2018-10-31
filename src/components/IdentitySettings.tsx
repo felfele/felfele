@@ -8,12 +8,12 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { Author } from '../models/Post';
+import { Author, getAuthorImageUri } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
-import image = require('../../images/user_circle.png');
+import defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 // import QRCode from 'react-native-qrcode-svg';
 
@@ -47,6 +47,7 @@ const generateQRCodeValue = (feed?: Feed): string => {
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
+    const authorImageUri = getAuthorImageUri(props.author);
     console.log(qrCodeValue);
     return (
         <KeyboardAvoidingView>
@@ -77,9 +78,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 style={styles.imagePickerContainer}
             >
                 <Image
-                    source={props.author.image.uri === ''
-                    ? image
-                    : { uri: props.author.image.uri }
+                    source={authorImageUri === ''
+                    ? defaultUserImage
+                    : { uri: authorImageUri }
                     }
                     style={styles.imagePicker}
                 />

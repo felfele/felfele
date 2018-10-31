@@ -273,6 +273,13 @@ const initStore = () => {
     store.dispatch(AsyncActions.cleanupContentFilters());
 };
 
+const patchState = () => {
+    const author = store.getState().author;
+    if (author.image == null) {
+        store.dispatch(Actions.updatePicturePath(''));
+    }
+};
+
 export const persistor = persistStore(store, {}, initStore);
 
 console.log('store: ', store.getState());
