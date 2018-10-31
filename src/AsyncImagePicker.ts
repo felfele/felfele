@@ -59,6 +59,7 @@ const defaultImagePickerOtions: Options = {
     noData: true,
     storageOptions: {
         cameraRoll: Config.saveToCameraRoll,
+        waitUntilSaved: true,
     },
 };
 

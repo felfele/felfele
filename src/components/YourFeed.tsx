@@ -146,9 +146,18 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private getImageUri(image: ImageData) {
         if (image.localPath) {
-            return image.localPath;
+            return this.convertLegacyAbsolutePath(image.localPath);
+        } else {
+            return this.convertLegacyAbsolutePath(image.uri);
         }
-        return image.uri;
+    }
+
+    private convertLegacyAbsolutePath(path: string): string {
+        if (path.startsWith('~') === false) {
+            const [_, second] = path.split('/Documents/');
+            return `~/Documents/${second}`;
+        }
+        return path;
     }
 
     private async onSharePost(post: Post) {
