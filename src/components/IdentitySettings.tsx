@@ -15,7 +15,7 @@ import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
 import defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
-import QRCode from 'react-native-qrcode-svg';
+// import QRCode from 'react-native-qrcode-svg';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -87,12 +87,12 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             </TouchableOpacity>
             { props.ownFeed &&
                 <View style={styles.qrCodeContainer}>
-                    <QRCode
+                    {/* <QRCode
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
                         backgroundColor={Colors.BACKGROUND_COLOR}
-                    />
+                    /> */}
                 </View>
             }
         </KeyboardAvoidingView>

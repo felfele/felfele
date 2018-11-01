@@ -9,7 +9,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import QRCode from 'react-native-qrcode-svg';
+// import QRCode from 'react-native-qrcode-svg';
 // import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
@@ -165,12 +165,12 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     disabled={this.state.loading}
                 />
                 <View style={styles.qrCodeContainer}>
-                    <QRCode
+                    {/* <QRCode
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
                         backgroundColor={Colors.BACKGROUND_COLOR}
-                    />
+                    /> */}
                 </View>
             </View>
         );
