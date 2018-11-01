@@ -18,9 +18,12 @@ import {
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// tslint:disable-next-line:no-var-requires
+const RNFS = require('react-native-fs');
 
 import { Config } from '../Config';
-import { Post, ImageData, getAuthorImageUri } from '../models/Post';
+import { Post, getAuthorImageUri } from '../models/Post';
+import { ImageData} from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
@@ -28,6 +31,7 @@ import { Utils } from '../Utils';
 import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
+import { ImageView } from './ImageView';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -142,16 +146,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             isRefreshing: true,
         });
         this.props.onRefreshPosts();
-    }
-
-    private getImageUri(image: ImageData): string {
-        if (image.localPath) {
-            return image.localPath;
-        }
-        if (image.uri != null) {
-            return getSwarmGatewayUrl(image.uri);
-        }
-        return '';
     }
 
     private async onSharePost(post: Post) {
@@ -314,11 +308,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         }}
                     >
                         {post.images.map((image, index) =>
-                            <Image
-                                key={this.getImageUri(image) + index}
-                                source={{
-                                    uri: this.getImageUri(image),
-                                }}
+                            <ImageView
+                                key={image.uri || '' + index}
+                                source={image}
                                 style={{
                                     width: WindowWidth,
                                     height: WindowWidth,

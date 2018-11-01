@@ -140,7 +140,7 @@ const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
                 image: {
                     ...identity.image,
                     localPath: action.payload.path,
-                    uri: action.payload.path,
+                    uri: undefined,
                 },
             };
         }

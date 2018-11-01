@@ -1,9 +1,11 @@
 import { Config } from './Config';
-import { ImageData } from './models/Post';
+import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
 
 // tslint:disable-next-line:no-var-requires
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
+// tslint:disable-next-line:no-var-requires
+const RNFS = require('react-native-fs');
 
 interface Response {
     customButton: string;
@@ -64,6 +66,16 @@ const defaultImagePickerOtions: Options = {
     },
 };
 
+const removePathPrefix = (path: string): string => {
+    if (Platform.OS === 'ios') {
+        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
+        if (path.startsWith(documentPath)) {
+            return path.substring(documentPath.length);
+        }
+    }
+    return path;
+};
+
 export class AsyncImagePicker {
     public static async launchImageLibrary(): Promise<ImageData | null> {
         return this.launchPicker(this.launchImageLibraryWithPromise);
@@ -82,7 +94,8 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
-        const uri = response.uri;
+        const uri = removePathPrefix(response.uri);
+        console.log('laungPicker: ', RNFS);
         console.log('laungPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,

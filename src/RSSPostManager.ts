@@ -1,4 +1,5 @@
-import { Post, ImageData } from './models/Post';
+import { Post } from './models/Post';
+import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';

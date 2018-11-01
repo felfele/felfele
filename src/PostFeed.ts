@@ -1,5 +1,5 @@
 import { Feed } from './models/Feed';
-import { PublicPost, ImageData } from './models/Post';
+import { PublicPost } from './models/Post';
 import * as Swarm from './Swarm';
 import { uploadPost } from './PostUpload';
 

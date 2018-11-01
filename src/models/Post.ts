@@ -1,16 +1,9 @@
 import { Model } from './Model';
+import { ImageData, getLocalPath } from './ImageData';
 
 interface Location {
     latitude: number;
     longitude: number;
-}
-
-export interface ImageData {
-    uri?: string;
-    width?: number;
-    height?: number;
-    data?: string;
-    localPath?: string;
 }
 
 export interface PublicIdentity {
@@ -48,7 +41,7 @@ export interface Post extends PublicPost {
 export const getAuthorImageUri = (author: Author): string => {
     if (author.image != null) {
         if (author.image.localPath != null) {
-            return author.image.localPath;
+            return getLocalPath(author.image.localPath);
         }
         if (author.image.uri != null) {
             return author.image.uri;
