@@ -1,4 +1,6 @@
-const extraNodeModules = require('node-libs-browser');
+const nodelibs = require('node-libs-react-native');
+nodelibs.vm  = require.resolve('vm-browserify');
+nodelibs.stream = require.resolve('stream-browserify');
 
 module.exports = {
   getTransformModulePath() {
@@ -7,5 +9,5 @@ module.exports = {
   getSourceExts() {
     return ['ts', 'tsx'];
   },
-  extraNodeModules,
+  extraNodeModules: nodelibs
 }

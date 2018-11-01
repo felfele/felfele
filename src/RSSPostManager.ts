@@ -1,4 +1,5 @@
-import { Post, ImageData } from './models/Post';
+import { Post } from './models/Post';
+import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
@@ -324,6 +325,14 @@ class _RSSPostManager {
                 images: [],
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
+                author: {
+                    name: 'Postmodern',
+                    uri: '',
+                    faviconUri: '',
+                    image: {
+                        uri: '',
+                    },
+                },
             };
             return [firstPost, ...posts];
         }
@@ -444,6 +453,9 @@ class _RSSPostManager {
                     name: feedName,
                     uri: rssFeed.url,
                     faviconUri: strippedFaviconUri,
+                    image: {
+                        uri: strippedFaviconUri,
+                    },
                 },
             };
             return post;

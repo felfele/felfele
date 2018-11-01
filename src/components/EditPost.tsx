@@ -14,7 +14,8 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
-import { ImageData, Post } from '../models/Post';
+import { Post } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 

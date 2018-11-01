@@ -4,10 +4,12 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost, ImageData } from '../models/Post';
+import { Post, PublicPost, getAuthorImageUri } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { isSwarmUrl, uploadPhoto } from '../Swarm';
+import { makeFeedApi } from '../Swarm';
+import { uploadPost, uploadPosts } from '../PostUpload';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -91,8 +93,9 @@ export const AsyncActions = {
             const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
             const rssPosts = await RSSPostManager.loadPosts(rssFeeds);
 
+            const swarmFeedApi = makeFeedApi(getState().author.identity!);
             const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-            const postFeedPosts = await loadPosts(postFeeds);
+            const postFeedPosts = await loadPosts(swarmFeedApi, postFeeds);
 
             const allPosts = (rssPosts as PublicPost[]).concat(postFeedPosts);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
@@ -119,47 +122,45 @@ export const AsyncActions = {
     },
     sharePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
+            console.log('sharePost: ', post);
             const ownFeeds = getState().ownFeeds.toArray();
+            const swarmFeedApi = makeFeedApi(getState().author.identity!);
             if (ownFeeds.length > 0) {
                 const feed = ownFeeds[0];
                 if (post.link === feed.url) {
                     return;
                 }
 
-                if (post.images.length > 0 && !isSwarmUrl(post.images[0].uri)) {
-                    for (const image of post.images) {
-                        if (image.localPath != null) {
-                            const uri = await uploadPhoto(image.localPath);
-                            image.uri = uri;
-                        }
-                    }
-                }
+                const uploadedPost = await uploadPost(post);
+                console.log('sharePost: after uploadedPost');
 
                 const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
                     localPost.link === feed.url
                 );
-                const feedPosts = [...localFeedPosts, post];
+                const feedPosts = [...localFeedPosts, uploadedPost];
                 const posts = feedPosts
                     .sort((a, b) => b.createdAt - a.createdAt)
-                    .slice(0, 20);
+                    .slice(0, 20)
+                    ;
 
+                const uploadedPosts = await uploadPosts(posts);
                 const postFeed = {
                     ...feed,
-                    posts,
+                    posts: uploadedPosts,
                 };
-                await updatePostFeed(postFeed);
+                await updatePostFeed(swarmFeedApi, postFeed);
                 dispatch(Actions.updatePostLink(post, feed.url));
+                dispatch(Actions.updatePostImages(post, uploadedPost.images));
             } else {
                 const author = getState().author.name;
-                const favicon = getState().author.faviconUri;
-                const feed = await createPostFeed(author, favicon, post);
+                const favicon = getAuthorImageUri(getState().author);
+                const uploadedPost = await uploadPost(post);
+                const feed = await createPostFeed(swarmFeedApi, author, favicon, uploadedPost);
 
                 dispatch(InternalActions.addOwnFeed(feed));
-                dispatch(Actions.addFeed(feed));
                 dispatch(Actions.updatePostLink(post, feed.url));
-                dispatch(Actions.updatePostImages(post, post.images));
+                dispatch(Actions.updatePostImages(post, uploadedPost.images));
             }
-
         };
     },
     chainActions: (thunks: ThunkTypes[], callback?: () => void) => {

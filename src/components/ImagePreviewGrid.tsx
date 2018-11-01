@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
 
-import { ImageData } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
 
 export interface StateProps {
