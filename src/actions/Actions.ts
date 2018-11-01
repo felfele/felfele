@@ -150,7 +150,9 @@ export const AsyncActions = {
                 };
                 await updatePostFeed(swarmFeedApi, postFeed);
                 dispatch(Actions.updatePostLink(post, feed.url));
-                dispatch(Actions.updatePostImages(post, uploadedPost.images));
+
+                const mergedImages = mergeImages(post.images, uploadedPost.images);
+                dispatch(Actions.updatePostImages(post, mergedImages));
             } else {
                 const author = getState().author.name;
                 const favicon = getAuthorImageUri(getState().author);
@@ -159,7 +161,9 @@ export const AsyncActions = {
 
                 dispatch(InternalActions.addOwnFeed(feed));
                 dispatch(Actions.updatePostLink(post, feed.url));
-                dispatch(Actions.updatePostImages(post, uploadedPost.images));
+
+                const mergedImages = mergeImages(post.images, uploadedPost.images);
+                dispatch(Actions.updatePostImages(post, mergedImages));
             }
         };
     },
@@ -188,3 +192,15 @@ const isActionTypes = (t: ThunkTypes): t is Actions => {
 };
 
 export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;
+
+const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): ImageData[] => {
+    const mergedImages: ImageData[] = [];
+    for (let i = 0; i < localImages.length; i++) {
+        const mergedImage: ImageData = {
+            ...localImages[i],
+            uri: uploadedImages[i].uri,
+        };
+        mergedImages.push(mergedImage);
+    }
+    return mergedImages;
+};
