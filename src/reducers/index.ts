@@ -320,8 +320,6 @@ const initStore = () => {
 
 const patchState = () => {
     // placeholder to put patches to fix state
-    // store.dispatch(AsyncActions.fixPostImageLocalPaths());
-    store.dispatch(AsyncActions.cleanupUploadedPosts());
 };
 
 export const persistor = persistStore(store, {}, initStore);

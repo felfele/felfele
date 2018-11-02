@@ -205,38 +205,6 @@ export const AsyncActions = {
             }
         };
     },
-    fixPostImageLocalPaths: () => {
-        return async (dispatch, getState: () => AppState) => {
-            for (const post of getState().localPosts.toArray()) {
-                const fixedImages = post.images.map(image => ({
-                    ...image,
-                    localPath: image.localPath ? fixPathPrefix(image.localPath) : undefined,
-                }));
-                dispatch(Actions.updatePostImages(post, fixedImages));
-            }
-        };
-    },
-    cleanupUploadedPosts: () => {
-        return async (dispatch, getState: () => AppState) => {
-            for (const post of getState().localPosts.toArray()) {
-                const postWithoutLink = {
-                    ...post,
-                    link: undefined,
-                };
-                dispatch(Actions.updatePostLink(post, undefined));
-            }
-        };
-    },
-};
-
-export const fixPathPrefix = (path: string): string => {
-    if (Platform.OS === 'ios') {
-        const parts = path.split('/Documents/');
-        if (parts.length > 0) {
-            return parts[parts.length - 1];
-        }
-    }
-    return path;
 };
 
 type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
