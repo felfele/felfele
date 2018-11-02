@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { Debug } from '../Debug';
 
 export interface StateProps {
     navigation: any;
@@ -43,7 +44,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                 'Error',
                 'Posting failed, try again later!',
                 [
-                    { text: 'OK', onPress: () => {console.log('OK pressed'); } },
+                    { text: 'OK', onPress: () => {Debug.log('OK pressed'); } },
                 ]
             );
         }

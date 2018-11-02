@@ -1,3 +1,5 @@
+type Logger = (s: string) => void;
+
 export class Debug {
     public static setDebug(isDebug: boolean) {
         Debug.isDebug = isDebug;
@@ -8,6 +10,7 @@ export class Debug {
     }
 
     public static log(...args: any[]) {
+        console.log.apply(console, args);
         const maxLengthArgs = args.map((value) => {
             const stringValue = JSON.stringify(value);
             if (stringValue && stringValue.length > Debug.maxLength) {
@@ -18,32 +21,20 @@ export class Debug {
         Debug.fullLog.apply(Debug, maxLengthArgs);
     }
 
+    public static addLogger(logger: Logger) {
+        Debug.loggers.push(logger);
+    }
+
     private static isDebug = false;
-    private static withCaller = true;
-    private static prefix = '';
     private static maxLength = 1000;
+    private static loggers: Logger[] = [];
 
     private static fullLog(...args: any[]) {
         if (Debug.isDebug) {
-            if (Debug.withCaller) {
-                args.unshift(Debug.getCallerNameOf(4) + ':');
+            const logLine = args.map(arg => '' + arg).join(' ');
+            for (const logger of Debug.loggers) {
+                logger(logLine);
             }
-            if (Debug.prefix !== '') {
-                args.unshift(Debug.prefix);
-            }
-            console.log.apply(console, args);
         }
-    }
-
-    private static getCallerNameOf(depth: number) {
-        const error = new Error();
-        if (error && error.stack) {
-            const caller = error.stack.split('\n')[depth]
-                                        .replace(/.*at ([\w\d.<>]+).*/, '$1')
-                                        .replace(/(@http.*)/, '');
-            return caller;
-        }
-
-        return '';
     }
 }

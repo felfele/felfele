@@ -3,6 +3,7 @@ import { AppState } from '../reducers/index';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { IdentityOnboarding } from '../components/IdentityOnboarding';
+import { ImageData} from '../models/ImageData';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const ownFeed = state.ownFeeds.toArray().length > 0
@@ -20,8 +21,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onUpdateAuthor: (text: string) => {
             dispatch(Actions.updateAuthorName(text));
         },
-        onUpdatePicture: (path: string) => {
-            dispatch(Actions.updatePicturePath(path));
+        onUpdatePicture: (image: ImageData) => {
+            dispatch(Actions.updateAuthorPicturePath(image));
         },
     };
 };

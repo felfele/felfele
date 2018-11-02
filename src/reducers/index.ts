@@ -15,6 +15,8 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
+import { Debug } from '../Debug';
+import { getImageUri } from '../models/ImageData';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
@@ -172,15 +174,11 @@ const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
                 name: action.payload.name,
             };
         }
-        case 'UPDATE-PICTURE-PATH': {
+        case 'UPDATE-AUTHOR-PICTURE-PATH': {
             return {
                 ...identity,
-                faviconUri: action.payload.path,
-                image: {
-                    ...identity.image,
-                    localPath: action.payload.path,
-                    uri: undefined,
-                },
+                faviconUri: getImageUri(action.payload.image),
+                image: action.payload.image,
             };
         }
         default: {
@@ -226,6 +224,13 @@ const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Lis
             }
             return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
         }
+        case 'UPDATE-POST-IS-UPLOADING': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
+            return localPosts.update(ind, (post => ({...post, isUploading: action.payload.isUploading})));
+        }
         case 'UPDATE-POST-IMAGES': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
@@ -266,7 +271,7 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     switch (action.type) {
         case 'APP-STATE-RESET': {
-            console.log('App state reset');
+            Debug.log('App state reset');
             return defaultState;
         }
         default: {
@@ -308,19 +313,18 @@ export const store = createStore(
 );
 
 const initStore = () => {
-    console.log('initStore: ', store.getState());
+    Debug.log('initStore: ', store.getState());
     store.dispatch(AsyncActions.cleanupContentFilters());
     patchState();
 };
 
 const patchState = () => {
-    const author = store.getState().author;
-    if (author.image == null) {
-        store.dispatch(Actions.updatePicturePath(''));
-    }
+    // placeholder to put patches to fix state
+    // store.dispatch(AsyncActions.fixPostImageLocalPaths());
+    store.dispatch(AsyncActions.cleanupUploadedPosts());
 };
 
 export const persistor = persistStore(store, {}, initStore);
 
-console.log('store: ', store.getState());
-store.subscribe(() => console.log('store updated: ', store.getState()));
+Debug.log('store: ', store.getState());
+store.subscribe(() => Debug.log('store updated: ', store.getState()));

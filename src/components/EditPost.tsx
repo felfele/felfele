@@ -18,6 +18,7 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
+import { Debug } from '../Debug';
 
 export interface StateProps {
     navigation: any;
@@ -59,7 +60,7 @@ export class EditPost extends React.Component<Props, State> {
     }
 
     public onKeyboardDidShow = (e) => {
-        console.log('onKeyboardDidShow', this.state.keyboardHeight);
+        Debug.log('onKeyboardDidShow', this.state.keyboardHeight);
 
         this.setState({
             isKeyboardVisible: true,
@@ -73,11 +74,11 @@ export class EditPost extends React.Component<Props, State> {
             keyboardHeight: baseKeyboardHeight + extraKeyboardHeight,
         });
 
-        console.log('onKeyboardWillShow', this.state.keyboardHeight);
+        Debug.log('onKeyboardWillShow', this.state.keyboardHeight);
     }
 
     public onKeyboardDidHide = () => {
-        console.log('onKeyboardDidHide');
+        Debug.log('onKeyboardDidHide');
         this.setState({
             isKeyboardVisible: false,
             keyboardHeight: 0,
@@ -209,7 +210,7 @@ export class EditPost extends React.Component<Props, State> {
            isLoading: true,
         });
 
-        console.log(this.state.post);
+        Debug.log(this.state.post);
 
         this.props.onSaveDraft(this.state.post);
         this.onCancel();
@@ -234,7 +235,7 @@ export class EditPost extends React.Component<Props, State> {
         const options: any[] = [
             { text: 'Save', onPress: () => this.onSave() },
             { text: 'Discard', onPress: () => this.onDiscard() },
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
         if (Platform.OS === 'ios') {
@@ -254,9 +255,9 @@ export class EditPost extends React.Component<Props, State> {
     }
 
     private onCancelConfirmation = () => {
-        console.log('onCancelConfirmation', this.state.isKeyboardVisible);
+        Debug.log('onCancelConfirmation', this.state.isKeyboardVisible);
         this.hideKeyboard();
-        console.log('Cancel');
+        Debug.log('Cancel');
         if (this.state.post.text !== '' || this.state.post.images.length > 0) {
             this.showCancelConfirmation();
         } else {
@@ -292,7 +293,7 @@ export class EditPost extends React.Component<Props, State> {
            isLoading: true,
         });
 
-        console.log(this.state.post);
+        Debug.log(this.state.post);
         this.props.onPost(this.state.post);
     }
 

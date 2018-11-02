@@ -10,6 +10,7 @@ import { Config } from '../Config';
 import { upload, download, downloadUserFeed, downloadUserFeedTemplate, updateUserFeed } from '../Swarm';
 import { AppState } from '../reducers';
 import { Post } from '../models/Post';
+import { Debug } from '../Debug';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -120,6 +121,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             title='Test feed update'
                             onPress={async () => await this.onTestFeedUpdate()}
                         />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Logs'
+                            onPress={() => this.props.navigation.navigate('LogViewer')}
+                        />
 
                         <SettingsList.Item
                             title={version}
@@ -148,7 +156,7 @@ export class DebugScreen extends React.Component<Props, any> {
                 }),
             };
             // tslint:disable-next-line:no-console
-            console.log(JSON.stringify(postCopy));
+            Debug.log(JSON.stringify(postCopy));
         });
     }
 
@@ -158,7 +166,7 @@ export class DebugScreen extends React.Component<Props, any> {
             keyValues.map((keyValue) => {
                 const [key, value] = keyValue;
                 // tslint:disable-next-line:no-console
-                console.log('onListDatabase: ', key, value);
+                Debug.log('onListDatabase: ', key, value);
             });
         }
     }
@@ -167,15 +175,15 @@ export class DebugScreen extends React.Component<Props, any> {
         const keys = await AsyncStorageWrapper.getAllKeys();
         if (keys) {
             // tslint:disable-next-line:no-console
-            keys.map((key) => console.log('onListDatabaseKeys: ', key));
+            keys.map((key) => Debug.log('onListDatabaseKeys: ', key));
         }
     }
 
     private async onUploadToSwarm() {
         const hash = await upload('test');
-        console.log('Uploaded file. Address:', hash);
+        Debug.log('Uploaded file. Address:', hash);
         const data = await download(hash);
-        console.log('Downloaded file: ', data);
+        Debug.log('Downloaded file: ', data);
     }
 
     private async onSendEmailOfDatabase() {
@@ -191,7 +199,7 @@ export class DebugScreen extends React.Component<Props, any> {
         for (const post of oldPosts) {
             this.props.createPost(post);
         }
-        console.log(oldPosts);
+        Debug.log(oldPosts);
     }
 
     private onTestFeedUpdate = async () => {
@@ -200,6 +208,6 @@ export class DebugScreen extends React.Component<Props, any> {
         const data = 'hello';
         const text = await updateUserFeed(feedTemplate, identity, data);
         const latestData = await downloadUserFeed(identity);
-        console.log('onTestFeedUpdate: ', latestData);
+        Debug.log('onTestFeedUpdate: ', latestData);
     }
 }

@@ -16,7 +16,7 @@ import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Colors } from '../styles';
+import { Debug } from '../Debug';
 
 interface EditFeedNavigationActions {
     back?: () => void;
@@ -84,9 +84,9 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         });
 
         const url = Utils.getCanonicalUrl(this.state.url);
-        console.log('fetchFeed: url: ', url);
+        Debug.log('fetchFeed: url: ', url);
         const feed = await this.fetchFeedFromUrl(url);
-        console.log('fetchFeed: feed: ', feed);
+        Debug.log('fetchFeed: feed: ', feed);
 
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
@@ -179,10 +179,10 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
             const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-            console.log('fetchFeedFromUrl: feed: ', feed);
+            Debug.log('fetchFeedFromUrl: feed: ', feed);
             return feed;
         } catch (e) {
-            console.log(e);
+            Debug.log(e);
             return null;
         }
     }
@@ -190,7 +190,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     private onDelete = () => {
         const options: any[] = [
             { text: 'Yes', onPress: async () => await this.deleteFeedAndGoBack() },
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
         Alert.alert('Are you sure you want to delete the feed?',
@@ -202,7 +202,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
 
     private onFailedFeedLoad = () => {
         const options: any[] = [
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
         Alert.alert('Failed to load feed!',
@@ -223,11 +223,11 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
 
     private onScanSuccess = (event) => {
         try {
-            console.log(event);
+            Debug.log(event);
             const feed = JSON.parse(event.data) as Feed;
             this.onAdd(feed);
         } catch (e) {
-            console.log(e);
+            Debug.log(e);
         }
     }
 }

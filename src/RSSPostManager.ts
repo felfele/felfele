@@ -6,6 +6,7 @@ import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
+import { Debug } from './Debug';
 
 interface RSSEnclosure {
     url: string;
@@ -128,7 +129,7 @@ export class RSSFeedManager {
     public static async fetchContentWithMimeType(url): Promise<ContentWithMimeType | null> {
         const response = await fetch(url);
         if (response.status !== 200) {
-            console.log('fetch failed: ', response);
+            Debug.log('fetch failed: ', response);
             return null;
         }
 
@@ -208,13 +209,13 @@ export class RSSFeedManager {
             return null;
         }
 
-        console.log('fetchFeedFromUrl contentWithMimeType: ', contentWithMimeType);
+        Debug.log('fetchFeedFromUrl contentWithMimeType: ', contentWithMimeType);
 
         if (contentWithMimeType.mimeType === 'text/html') {
             const baseUrl = Utils.getBaseUrl(url);
-            console.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
-            console.log('fetchFeedFromUrl feed: ', feed);
+            Debug.log('fetchFeedFromUrl feed: ', feed);
             if (feed.feedUrl !== '') {
                 return feed;
             }
@@ -236,9 +237,9 @@ export class RSSFeedManager {
         // It looks like there is a valid feed on the url
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
             const rssFeed = await Feed.load(url, contentWithMimeType.content);
-            console.log('fetchFeedFromUrl rssFeed: ', rssFeed);
+            Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
             const baseUrl = Utils.getBaseUrl(url);
-            console.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
                 url: baseUrl,
@@ -302,7 +303,7 @@ class _RSSPostManager {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
                 const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
-                console.log('RSSPostManager: ', rssFeed, favicon);
+                Debug.log('RSSPostManager: ', rssFeed, favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon);
                 posts.push.apply(posts, convertedPosts);
@@ -417,7 +418,7 @@ class _RSSPostManager {
             const rss = await Feed.fetch(feedUrl);
             return rss;
         } catch (e) {
-            console.log(e, feedUrl);
+            Debug.log(e, feedUrl);
             return null;
         }
     }
@@ -430,7 +431,7 @@ class _RSSPostManager {
     }
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
-        console.log('RSS items: ', rssFeed.items);
+        Debug.log('RSS items: ', rssFeed.items);
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
@@ -478,7 +479,7 @@ class _RSSPostManager {
             return true;
         });
 
-        console.log('RSS items posts: ', posts);
+        Debug.log('RSS items posts: ', posts);
         return posts;
     }
 

@@ -3,6 +3,7 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
+import { isPostFeedUrl } from '../PostFeed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.localPosts.toArray();
@@ -27,6 +28,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.createPost(post));
         },
         onSharePost: (post: Post) => {
+            if (post.link != null) {
+                return;
+            }
             dispatch(AsyncActions.sharePost(post));
         },
     };

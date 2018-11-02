@@ -14,6 +14,7 @@ import {
     Platform,
     SafeAreaView,
     LayoutAnimation,
+    ActivityIndicator,
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
@@ -23,7 +24,6 @@ const RNFS = require('react-native-fs');
 
 import { Config } from '../Config';
 import { Post, getAuthorImageUri } from '../models/Post';
-import { ImageData} from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
@@ -32,6 +32,7 @@ import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swar
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
+import { Debug } from '../Debug';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -91,7 +92,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     public componentDidUpdate(prevProps) {
         if (this.props.posts !== prevProps.posts) {
-            console.log('YourFeed.componentDidUpdate');
             this.setState({
                 isRefreshing: false,
             });
@@ -181,7 +181,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             'Are you sure you want to delete?',
             undefined,
             [
-                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
                 { text: 'OK', onPress: async () => await this.props.onDeletePost(post) },
             ],
             { cancelable: false }
@@ -206,10 +206,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         <ActionIcon name='trash-can-outline'/>
                     </TouchableView>
                     <TouchableView style={styles.share}>
-                        <ActionIcon name='playlist-edit'/>
+                        {/* <ActionIcon name='playlist-edit'/> */}
                     </TouchableView>
                     <TouchableView style={styles.share} onPress={() => this.props.onSharePost(post)}>
-                        <ActionIcon name={shareIconName}/>
+                        { post.isUploading === true
+                            ? <ActivityIndicator color={Colors.DARK_GRAY} />
+                            : <ActionIcon name={shareIconName}/>
+                        }
                     </TouchableView>
                 </View>
             );

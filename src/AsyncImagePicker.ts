@@ -1,6 +1,7 @@
 import { Config } from './Config';
 import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
+import { Debug } from './Debug';
 
 // tslint:disable-next-line:no-var-requires
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
@@ -66,7 +67,7 @@ const defaultImagePickerOtions: Options = {
     },
 };
 
-const removePathPrefix = (path: string): string => {
+export const removePathPrefix = (path: string): string => {
     if (Platform.OS === 'ios') {
         const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
         if (path.startsWith(documentPath)) {
@@ -95,8 +96,7 @@ export class AsyncImagePicker {
             return null;
         }
         const uri = removePathPrefix(response.uri);
-        console.log('laungPicker: ', RNFS);
-        console.log('laungPicker: ', uri, response.uri, response.fileName);
+        Debug.log('launchPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,
             width: response.width,

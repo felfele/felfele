@@ -9,17 +9,20 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { Author, getAuthorImageUri } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
 import defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
+import { Debug } from '../Debug';
+
 // import QRCode from 'react-native-qrcode-svg';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
-    onUpdatePicture: (path: string) => void;
+    onUpdatePicture: (image: ImageData) => void;
 }
 
 export interface StateProps {
@@ -48,7 +51,7 @@ const generateQRCodeValue = (feed?: Feed): string => {
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const authorImageUri = getAuthorImageUri(props.author);
-    console.log(qrCodeValue);
+    Debug.log(qrCodeValue);
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
@@ -99,10 +102,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
+const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
-    if (imageData != null && imageData.localPath) {
-        onUpdatePicture(imageData.localPath);
+    if (imageData != null) {
+        onUpdatePicture(imageData);
     }
 };
 

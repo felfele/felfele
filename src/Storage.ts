@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
 import { Model } from './models/Model';
 import { Post } from './models/Post';
+import { Debug } from './Debug';
 
 interface Metadata {
     highestSeenId: number;
@@ -389,7 +390,7 @@ export class AsyncStorageWrapper {
         try {
             return AsyncStorage.setItem(key, value);
         } catch (e) {
-            console.log('setItem error: ', e);
+            Debug.log('setItem error: ', e);
             return null;
         }
     }
@@ -398,7 +399,7 @@ export class AsyncStorageWrapper {
         try {
             return AsyncStorage.mergeItem(key, value);
         } catch (e) {
-            console.log('mergeItem error: ', e);
+            Debug.log('mergeItem error: ', e);
             return null;
         }
     }
@@ -408,7 +409,7 @@ export class AsyncStorageWrapper {
             const value = AsyncStorage.getItem(key);
             return value;
         } catch (e) {
-            console.log('getItem error: ', e);
+            Debug.log('getItem error: ', e);
             return null;
         }
     }
@@ -417,7 +418,7 @@ export class AsyncStorageWrapper {
         try {
             return AsyncStorage.removeItem(key);
         } catch (e) {
-            console.log('removeItem error: ', e);
+            Debug.log('removeItem error: ', e);
             return null;
         }
     }
@@ -426,7 +427,7 @@ export class AsyncStorageWrapper {
         try {
             return AsyncStorage.getAllKeys();
         } catch (e) {
-            console.log('getAllKeys error: ', e);
+            Debug.log('getAllKeys error: ', e);
             return null;
         }
     }
@@ -437,7 +438,7 @@ export class AsyncStorageWrapper {
             const keyValues = await AsyncStorage.multiGet(keys);
             return keyValues;
         } catch (e) {
-            console.log('getAllValues error: ', e);
+            Debug.log('getAllValues error: ', e);
             return null;
         }
 
@@ -447,7 +448,7 @@ export class AsyncStorageWrapper {
         try {
             return AsyncStorage.clear();
         } catch (e) {
-            console.log('clear error: ', e);
+            Debug.log('clear error: ', e);
             return null;
         }
     }

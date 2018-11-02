@@ -1,6 +1,7 @@
 import { Post, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
 import { uploadPhoto, isSwarmLink } from './Swarm';
+import { Debug } from './Debug';
 // tslint:disable-next-line:no-var-requires
 const RNFS = require('react-native-fs');
 
@@ -13,12 +14,14 @@ const isImageUploaded = (image: ImageData): boolean => {
 
 const uploadImage = async (image: ImageData): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
-        if (image.localPath == null || image.localPath === '') {
+        if (image.localPath == null && image.localPath !== '') {
             return image;
         }
-        console.log('uploadImage: ', image.localPath, `z${image.localPath}z`);
+        Debug.log('uploadImage: ', image.localPath, `z${image.localPath}z`);
         const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
         const path = documentPath + image.localPath;
+        // const statResult = await RNFS.stat(RNFS.DocumentDirectoryPath + '/' + image.localPath);
+        // Debug.log('uploadImage: ', statResult);
         const uri = await uploadPhoto(path);
         return {
             ...image,
@@ -52,6 +55,9 @@ export const uploadAuthor = async (author?: Author): Promise<Author | undefined>
 };
 
 export const uploadPost = async (post: Post): Promise<Post> => {
+    if (post.link != null && isSwarmLink(post.link)) {
+        return post;
+    }
     const uploadedImages = await uploadImages(post.images);
     const uploadedAuthor = await uploadAuthor(post.author);
     const uploadedPost = {

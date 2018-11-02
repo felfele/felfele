@@ -3,6 +3,7 @@ import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react
 import * as RNFS from 'react-native-fs';
 
 import { ImageData, getImageUri } from '../models/ImageData';
+import { Debug } from '../Debug';
 
 export interface StateProps extends ImageProperties {
     source: ImageData;
@@ -29,7 +30,6 @@ export const ImageView = (props: Props) => {
             ? StyleSheet.flatten(props.style).height
             : props.source.height
         : props.source.height;
-    console.log('ImageView.render: ', imageUri, props.source);
     return (
         <Image
             source={{

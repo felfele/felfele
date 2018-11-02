@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Text } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -54,7 +54,6 @@ export class Settings extends React.Component<any, any> {
                             hasSwitch={true}
                             title='Save to Camera Roll'
                         />
-                        { __DEV__ &&
                          <SettingsList.Item
                             icon={
                                 <this.SettingsIcon>
@@ -64,7 +63,6 @@ export class Settings extends React.Component<any, any> {
                             title='Debug menu'
                             onPress={() => this.props.navigation.navigate('Debug')}
                         />
-                        }
                     </SettingsList>
                 </View>
             </SafeAreaView>

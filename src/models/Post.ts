@@ -36,6 +36,7 @@ export interface Post extends PublicPost {
     author?: Author;
     updatedAt?: number;
     liked?: boolean;
+    isUploading?: boolean;
 }
 
 export const getAuthorImageUri = (author: Author): string => {

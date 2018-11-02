@@ -2,6 +2,7 @@ import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
 
 import { PublicIdentity, PrivateIdentity } from './models/Post';
+import { Debug } from './Debug';
 
 export const DefaultGateway = 'http://swarm.helmethair.co';
 export const DefaultUrlScheme = '/bzz-raw:/';
@@ -9,13 +10,13 @@ export const DefaultPrefix = 'bzz://';
 export const HashLength = 64;
 
 export const upload = async (data: string): Promise<string> => {
-    console.log('upload to Swarm: ', data);
+    Debug.log('upload to Swarm: ', data);
     try {
         const hash = await uploadData(data);
-        console.log('hash is ', hash);
+        Debug.log('hash is ', hash);
         return hash;
     } catch (e) {
-        console.log('upload to Swarm failed: ', JSON.stringify(e));
+        Debug.log('upload to Swarm failed: ', JSON.stringify(e));
         return '';
     }
 };
@@ -29,7 +30,7 @@ export const getUrlFromHash = (hash: string): string => {
 };
 
 export const uploadForm = async (data: FormData): Promise<string> => {
-    console.log('uploadForm: ', data);
+    Debug.log('uploadForm: ', data);
     const url = DefaultGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -38,10 +39,10 @@ export const uploadForm = async (data: FormData): Promise<string> => {
         method: 'POST',
     };
     options.body = data;
-    console.log('uploadForm: ', url, options);
+    Debug.log('uploadForm: ', url, options);
     const response = await fetch(url, options);
     const text = await response.text();
-    console.log('uploadForm: response: ', text);
+    Debug.log('uploadForm: response: ', text);
     return text;
 };
 
@@ -60,7 +61,7 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
 };
 
 export const uploadPhoto = async (localPath: string): Promise<string> => {
-    console.log('uploadPhoto: ', localPath);
+    Debug.log('uploadPhoto: ', localPath);
     const data = new FormData();
     const name = 'photo.jpeg';
     data.append('photo', {
@@ -75,7 +76,7 @@ export const uploadPhoto = async (localPath: string): Promise<string> => {
 };
 
 export const uploadData = async (data: string): Promise<string> => {
-    console.log('uploadData: ', data);
+    Debug.log('uploadData: ', data);
     const url = DefaultGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -110,31 +111,30 @@ interface FeedTemplate {
 
 export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promise<FeedTemplate> => {
     const url = DefaultGateway + `/bzz-feed:/?user=${identity.address}&meta=1`;
-    console.log('downloadFeedTemplate: ', url);
+    Debug.log('downloadFeedTemplate: ', url);
     const response = await fetch(url);
     const feedUpdateResponse = await response.json() as FeedTemplate;
-    console.log('downloadFeedTemplate: ', feedUpdateResponse);
+    Debug.log('downloadFeedTemplate: ', feedUpdateResponse);
     return feedUpdateResponse;
 };
 
 export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string) => {
     const hexData = stringToHex(data);
     const digest = feedUpdateDigest(feedTemplate, hexData);
-    console.log('digest: ', digest);
 
     if (digest == null) {
         throw new Error('digest is null');
     }
     const signature = signDigest(digest, identity);
     const url = DefaultGateway + `/bzz-feed:/?topic=${feedTemplate.feed.topic}&user=${identity.address}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
-    console.log('updateFeed: ', url);
+    Debug.log('updateFeed: ', url);
     const options: RequestInit = {
         method: 'POST',
         body: data,
     };
     const response = await fetch(url, options);
     const text = await response.text();
-    console.log('updateFeed: ', text);
+    Debug.log('updateFeed: ', text);
 
     return '';
 };
@@ -145,7 +145,7 @@ export const downloadUserFeed = async (identity: PublicIdentity): Promise<string
 
 export const downloadFeed = async (feedUri: string): Promise<string> => {
     const url = DefaultGateway + '/' + feedUri;
-    console.log('downloadFeed: ', url);
+    Debug.log('downloadFeed: ', url);
     const response = await fetch(url);
     const text = await response.text();
     return text;
@@ -288,9 +288,6 @@ function feedUpdateDigestData(feedTemplate: FeedTemplate, data: string): number[
     const numArray = new Array<number>();
     new Uint8Array(buf).forEach((v) => numArray.push(v));
 
-    const hexData = byteArrayToHex(numArray);
-    console.log('data: ', hexData);
-
     return numArray;
 }
 
@@ -318,9 +315,6 @@ function publicKeyToAddress(pubKey) {
 const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
     const keyPair = curve.keyFromPrivate(identity.privateKey.substring(2));
-    const address = publicKeyToAddress(keyPair.getPublic());
-    console.log('signDigest: ', 'address: ', address, 'identity.address: ', identity.address);
-
     const privateKey = keyPair.getPrivate();
     const sigRaw = curve.sign(digest, privateKey, { canonical: true });
     const signature = sigRaw.r.toArray().concat(sigRaw.s.toArray()).concat(sigRaw.recoveryParam);

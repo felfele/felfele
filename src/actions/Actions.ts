@@ -10,6 +10,8 @@ import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
 import { makeFeedApi } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
+import { removePathPrefix } from '../AsyncImagePicker';
+import { Platform } from 'react-native';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -27,8 +29,9 @@ export enum ActionTypes {
     DELETE_POST = 'DELETE-POST',
     UPDATE_POST_LINK = 'UPDATE-POST-LINK',
     UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
+    UPDATE_POST_IS_UPLOADING = 'UPDATE-POST-IS-UPLOADING',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
-    UPDATE_PICTURE_PATH = 'UPDATE-PICTURE-PATH',
+    UPDATE_AUTHOR_PICTURE_PATH = 'UPDATE-AUTHOR-PICTURE-PATH',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
 }
@@ -57,6 +60,8 @@ export const Actions = {
         createAction(ActionTypes.DELETE_POST, { post }),
     updatePostLink: (post: Post, link?: string) =>
         createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
+    updatePostIsUploading: (post: Post, isUploading?: boolean) =>
+        createAction(ActionTypes.UPDATE_POST_IS_UPLOADING, { post, isUploading }),
     updatePostImages: (post: Post, images: ImageData[]) =>
         createAction(ActionTypes.UPDATE_POST_IMAGES, {post, images}),
     updateRssPosts: (posts: Post[]) =>
@@ -67,8 +72,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_DRAFT),
     updateAuthorName: (name: string) =>
         createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
-    updatePicturePath: (path: string) =>
-        createAction(ActionTypes.UPDATE_PICTURE_PATH, { path }),
+    updateAuthorPicturePath: (image: ImageData) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_PICTURE_PATH, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
 };
@@ -122,48 +127,67 @@ export const AsyncActions = {
     },
     sharePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
-            console.log('sharePost: ', post);
-            const ownFeeds = getState().ownFeeds.toArray();
-            const swarmFeedApi = makeFeedApi(getState().author.identity!);
-            if (ownFeeds.length > 0) {
-                const feed = ownFeeds[0];
-                if (post.link === feed.url) {
-                    return;
+            try {
+
+                Debug.log('sharePost: ', post);
+                const ownFeeds = getState().ownFeeds.toArray();
+                const swarmFeedApi = makeFeedApi(getState().author.identity!);
+                if (ownFeeds.length > 0) {
+                    const feed = ownFeeds[0];
+                    if (post.link === feed.url) {
+                        return;
+                    }
+
+                    dispatch(Actions.updatePostIsUploading(post, true));
+
+                    const uploadedPost = await uploadPost(post);
+                    Debug.log('sharePost: after uploadedPost');
+
+                    const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
+                        localPost.link === feed.url
+                    );
+                    const feedPosts = [...localFeedPosts, uploadedPost];
+                    const posts = feedPosts
+                        .sort((a, b) => b.createdAt - a.createdAt)
+                        .slice(0, 20)
+                        ;
+
+                    const uploadedPosts = await uploadPosts(posts);
+                    const postFeed = {
+                        ...feed,
+                        posts: uploadedPosts,
+                        authorImage: {
+                            localPath: '',
+                        },
+                    };
+                    Debug.log('sharePost: after uploadPosts');
+
+                    await updatePostFeed(swarmFeedApi, postFeed);
+                    Debug.log('sharePost: after uploadPostFeed');
+
+                    dispatch(Actions.updatePostLink(post, feed.url));
+                    dispatch(Actions.updatePostIsUploading(post, undefined));
+
+                    const mergedImages = mergeImages(post.images, uploadedPost.images);
+                    dispatch(Actions.updatePostImages(post, mergedImages));
+                } else {
+                    Debug.log('sharePost: create feed');
+
+                    const author = getState().author;
+                    dispatch(Actions.updatePostIsUploading(post, true));
+
+                    const uploadedPost = await uploadPost(post);
+                    const feed = await createPostFeed(swarmFeedApi, author, uploadedPost);
+
+                    dispatch(InternalActions.addOwnFeed(feed));
+                    dispatch(Actions.updatePostLink(post, feed.url));
+                    dispatch(Actions.updatePostIsUploading(post, undefined));
+
+                    const mergedImages = mergeImages(post.images, uploadedPost.images);
+                    dispatch(Actions.updatePostImages(post, mergedImages));
                 }
-
-                const uploadedPost = await uploadPost(post);
-                console.log('sharePost: after uploadedPost');
-
-                const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
-                    localPost.link === feed.url
-                );
-                const feedPosts = [...localFeedPosts, uploadedPost];
-                const posts = feedPosts
-                    .sort((a, b) => b.createdAt - a.createdAt)
-                    .slice(0, 20)
-                    ;
-
-                const uploadedPosts = await uploadPosts(posts);
-                const postFeed = {
-                    ...feed,
-                    posts: uploadedPosts,
-                };
-                await updatePostFeed(swarmFeedApi, postFeed);
-                dispatch(Actions.updatePostLink(post, feed.url));
-
-                const mergedImages = mergeImages(post.images, uploadedPost.images);
-                dispatch(Actions.updatePostImages(post, mergedImages));
-            } else {
-                const author = getState().author.name;
-                const favicon = getAuthorImageUri(getState().author);
-                const uploadedPost = await uploadPost(post);
-                const feed = await createPostFeed(swarmFeedApi, author, favicon, uploadedPost);
-
-                dispatch(InternalActions.addOwnFeed(feed));
-                dispatch(Actions.updatePostLink(post, feed.url));
-
-                const mergedImages = mergeImages(post.images, uploadedPost.images);
-                dispatch(Actions.updatePostImages(post, mergedImages));
+            } catch (e) {
+                Debug.log('sharePost: ', e);
             }
         };
     },
@@ -181,7 +205,38 @@ export const AsyncActions = {
             }
         };
     },
+    fixPostImageLocalPaths: () => {
+        return async (dispatch, getState: () => AppState) => {
+            for (const post of getState().localPosts.toArray()) {
+                const fixedImages = post.images.map(image => ({
+                    ...image,
+                    localPath: image.localPath ? fixPathPrefix(image.localPath) : undefined,
+                }));
+                dispatch(Actions.updatePostImages(post, fixedImages));
+            }
+        };
+    },
+    cleanupUploadedPosts: () => {
+        return async (dispatch, getState: () => AppState) => {
+            for (const post of getState().localPosts.toArray()) {
+                const postWithoutLink = {
+                    ...post,
+                    link: undefined,
+                };
+                dispatch(Actions.updatePostLink(post, undefined));
+            }
+        };
+    },
+};
 
+export const fixPathPrefix = (path: string): string => {
+    if (Platform.OS === 'ios') {
+        const parts = path.split('/Documents/');
+        if (parts.length > 0) {
+            return parts[parts.length - 1];
+        }
+    }
+    return path;
 };
 
 type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
