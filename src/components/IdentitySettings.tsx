@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SimpleTextInput } from './SimpleTextInput';
+import QRCode from 'react-native-qrcode-svg';
 import {
     KeyboardAvoidingView,
     StyleSheet,
@@ -7,7 +7,10 @@ import {
     Text,
     Image,
     TouchableOpacity,
+    Dimensions,
 } from 'react-native';
+
+import { SimpleTextInput } from './SimpleTextInput';
 import { Author, getAuthorImageUri } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
@@ -17,8 +20,6 @@ import { NavigationHeader } from './NavigationHeader';
 import defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
-
-// import QRCode from 'react-native-qrcode-svg';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -35,7 +36,7 @@ const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const title = 'Identity';
 
-const QRCodeWidth = 200;
+const QRCodeWidth = Dimensions.get('window').width * 0.8;
 
 const generateQRCodeValue = (feed?: Feed): string => {
     if (feed == null) {
@@ -90,12 +91,12 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             </TouchableOpacity>
             { props.ownFeed &&
                 <View style={styles.qrCodeContainer}>
-                    {/* <QRCode
+                    <QRCode
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
                         backgroundColor={Colors.BACKGROUND_COLOR}
-                    /> */}
+                    />
                 </View>
             }
         </KeyboardAvoidingView>

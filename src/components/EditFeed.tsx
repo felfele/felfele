@@ -7,16 +7,18 @@ import {
     View,
     Text,
     ActivityIndicator,
+    Dimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-// import QRCode from 'react-native-qrcode-svg';
-// import QRCodeScanner from 'react-native-qrcode-scanner';
+import QRCode from 'react-native-qrcode-svg';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
+import { Colors } from '../styles';
 
 interface EditFeedNavigationActions {
     back?: () => void;
@@ -28,9 +30,9 @@ const navigationActions: EditFeedNavigationActions = {
     add: undefined,
 };
 
-const QRCodeWidth = 160;
+const QRCodeWidth = Dimensions.get('window').width * 0.75;
 const QRCodeHeight = QRCodeWidth;
-const QRCameraWidth = 200;
+const QRCameraWidth = Dimensions.get('window').width * 0.75;
 const QRCameraHeight = QRCameraWidth;
 
 interface EditFeedState {
@@ -48,6 +50,8 @@ export interface StateProps {
     feed: Feed;
     navigation: any;
 }
+
+console.log('EditFeed: ', QRCodeScanner);
 
 export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public static navigationOptions = {
@@ -138,7 +142,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     disabled={this.state.loading}
                 />
                 <View style={styles.qrCameraContainer}>
-                    {/* <QRCodeScanner
+                    <QRCodeScanner
                         onRead={this.onScanSuccess}
                         containerStyle={{
                             width: QRCameraWidth,
@@ -149,8 +153,9 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                             height: QRCameraHeight,
                         }}
                         fadeIn={false}
-                    /> */}
+                    />
                 </View>
+                <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
             </View>
         );
     }
@@ -165,12 +170,12 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     disabled={this.state.loading}
                 />
                 <View style={styles.qrCodeContainer}>
-                    {/* <QRCode
+                    <QRCode
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
                         backgroundColor={Colors.BACKGROUND_COLOR}
-                    /> */}
+                    />
                 </View>
             </View>
         );
@@ -279,9 +284,16 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     qrCameraContainer: {
-        width: 200,
-        height: 200,
+        width: QRCameraWidth,
+        height: QRCameraHeight,
         padding: 0,
+        alignSelf: 'center',
+        flexDirection: 'column',
+    },
+    qrCameraText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: Colors.GRAY,
         alignSelf: 'center',
     },
 });
