@@ -15,10 +15,10 @@ const HASH_SERVICE_URL = 'http://feeds.helmethair.co/feeds/';
 
 export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
-    const uploadedImages = await uploadImages([author.image]);
+    const uploadedImages = await uploadImages([author.image!]);
     const uploadedPost = await uploadPost(firstPost);
     const postFeed: PostFeed = {
-        name,
+        name: author.name,
         url,
         feedUrl: url,
         favicon: uploadedImages[0].localPath!,

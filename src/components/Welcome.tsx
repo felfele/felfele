@@ -5,7 +5,9 @@ import {
 } from 'react-native';
 import { IdentityOnboardingContainer } from '../containers/IdentitySettingsContainer';
 
-export interface DispatchProps { }
+export interface DispatchProps {
+    onCreateIdentity: () => void;
+}
 
 export interface StateProps {
     navigation: any;
@@ -29,7 +31,10 @@ export const Welcome = (props: DispatchProps & StateProps) => {
                 subtitle: 'Pick a name and an avatar',
             },
             ]}
-            onDone={() => props.navigation.navigate('Loading')}
+            onDone={() => {
+                props.onCreateIdentity();
+                props.navigation.navigate('Loading');
+            }}
         />
     );
 };

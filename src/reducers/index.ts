@@ -46,12 +46,7 @@ const defaultAuthor: Author = {
     image: {
         uri: '',
     },
-    identity: {
-        publicKey: '',
-        privateKey: '0x0bb80d052b3d85656b3f082c24fb6c211d7935163fab6c605358886e56d17a93',
-        // address: '0xADc9b12480cE9880D6Bed1Ef91Cdc279D671Cf0d',
-        address: '0x377820b4e6913dd322a24e2af10e1c51c5f1e709',
-    },
+    identity: undefined,
 };
 
 const onboardingAuthor: Author = {
@@ -166,23 +161,29 @@ const settingsReducer = (settings = defaultSettings): Settings => {
     return settings;
 };
 
-const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
+const authorReducer = (author = defaultAuthor, action: Actions): Author => {
     switch (action.type) {
         case 'UPDATE-AUTHOR-NAME': {
             return {
-                ...identity,
+                ...author,
                 name: action.payload.name,
             };
         }
         case 'UPDATE-AUTHOR-PICTURE-PATH': {
             return {
-                ...identity,
+                ...author,
                 faviconUri: getImageUri(action.payload.image),
                 image: action.payload.image,
             };
         }
+        case 'UPDATE-AUTHOR-IDENTITY': {
+            return {
+                ...author,
+                identity: action.payload.privateIdentity,
+            };
+        }
         default: {
-            return identity;
+            return author;
         }
     }
 };
@@ -294,7 +295,7 @@ export const combinedReducers = combineReducers<AppState>({
     feeds: feedsReducer,
     ownFeeds: ownFeedsReducer,
     settings: settingsReducer,
-    author: identityReducer,
+    author: authorReducer,
     currentTimestamp: currentTimestampReducer,
     rssPosts: rssPostsReducer,
     localPosts: localPostsReducer,

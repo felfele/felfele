@@ -45,7 +45,7 @@ export const uploadAuthor = async (author?: Author): Promise<Author | undefined>
     if (author == null) {
         return undefined;
     }
-    const uploadedImage = await uploadImage(author.image);
+    const uploadedImage = await uploadImage(author.image!);
     return {
         ...author,
         faviconUri: '',
