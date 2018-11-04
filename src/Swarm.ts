@@ -1,7 +1,8 @@
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
+import { generateSecureRandom } from 'react-native-securerandom';
 
-import { PublicIdentity, PrivateIdentity } from './models/Post';
+import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
 
 export const DefaultGateway = 'http://swarm.helmethair.co';
@@ -319,4 +320,23 @@ const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const sigRaw = curve.sign(digest, privateKey, { canonical: true });
     const signature = sigRaw.r.toArray().concat(sigRaw.s.toArray()).concat(sigRaw.recoveryParam);
     return '0x' + byteArrayToHex(signature);
+};
+
+export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
+    const secureRandomUint8Array = await generateSecureRandom(32);
+    const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
+    const curve = new ec('secp256k1');
+    const keyPair = await curve.genKeyPair({
+        entropy: secureRandom,
+        entropyEnc: 'hex',
+    });
+    Debug.log('generateSecureIdentity: ', keyPair, secureRandom);
+    const privateKey = '0x' + keyPair.getPrivate('hex');
+    const publicKey = '0x' + keyPair.getPublic('hex');
+    const address = byteArrayToHex(publicKeyToAddress(keyPair.getPublic()));
+    return {
+        privateKey,
+        publicKey,
+        address,
+    };
 };

@@ -44,7 +44,7 @@ const generateQRCodeValue = (feed?: Feed): string => {
     }
     const feedWithoutPosts = {
         ...feed,
-        posts: [],
+        posts: undefined,
     };
     return JSON.stringify(feedWithoutPosts);
 };

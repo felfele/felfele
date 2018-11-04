@@ -164,6 +164,7 @@ const WelcomeNavigator = StackNavigator({
 
 const InitialNavigator = SwitchNavigator({
     Loading: LoadingScreenContainer,
+    // Loading: DebugScreenContainer,
     App: AppNavigator,
     Welcome: WelcomeNavigator,
 }, {

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import { StateProps, DispatchProps, Welcome } from '../components/Welcome';
 import { AppState } from '../reducers';
+import { AsyncActions } from '../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
@@ -9,7 +10,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
-    return { };
+    return {
+        onCreateIdentity: () => {
+            dispatch(AsyncActions.createUserIdentity());
+        },
+    };
 };
 
 export const WelcomeContainer = connect<StateProps, DispatchProps, {}>(

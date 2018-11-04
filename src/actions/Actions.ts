@@ -4,14 +4,13 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost, getAuthorImageUri } from '../models/Post';
+import { Post, PublicPost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { makeFeedApi } from '../Swarm';
+import { makeFeedApi, generateSecureIdentity } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
-import { removePathPrefix } from '../AsyncImagePicker';
-import { Platform } from 'react-native';
+import { PrivateIdentity } from '../models/Identity';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -32,6 +31,7 @@ export enum ActionTypes {
     UPDATE_POST_IS_UPLOADING = 'UPDATE-POST-IS-UPLOADING',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
     UPDATE_AUTHOR_PICTURE_PATH = 'UPDATE-AUTHOR-PICTURE-PATH',
+    UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
 }
@@ -43,6 +43,8 @@ const InternalActions = {
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
     addOwnFeed: (feed: Feed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
+    updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
 };
 
 export const Actions = {
@@ -203,6 +205,12 @@ export const AsyncActions = {
             if (callback != null) {
                 callback();
             }
+        };
+    },
+    createUserIdentity: () => {
+        return async (dispatch, getState: () => AppState) => {
+            const privateIdentity = await generateSecureIdentity();
+            dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
 };
