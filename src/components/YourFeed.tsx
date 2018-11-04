@@ -14,20 +14,25 @@ import {
     Platform,
     SafeAreaView,
     LayoutAnimation,
+    ActivityIndicator,
 } from 'react-native';
 import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// tslint:disable-next-line:no-var-requires
+const RNFS = require('react-native-fs');
 
 import { Config } from '../Config';
-import { Post, ImageData } from '../models/Post';
+import { Post, getAuthorImageUri } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash } from '../Swarm';
+import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
+import { ImageView } from './ImageView';
+import { Debug } from '../Debug';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -87,7 +92,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     public componentDidUpdate(prevProps) {
         if (this.props.posts !== prevProps.posts) {
-            console.log('YourFeed.componentDidUpdate');
             this.setState({
                 isRefreshing: false,
             });
@@ -144,13 +148,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.props.onRefreshPosts();
     }
 
-    private getImageUri(image: ImageData) {
-        if (image.localPath) {
-            return image.localPath;
-        }
-        return image.uri;
-    }
-
     private async onSharePost(post: Post) {
         const data = JSON.stringify(post);
         const hash = await upload(data);
@@ -160,7 +157,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private async openPost(post: Post) {
         if (post.link) {
-            await Linking.openURL(post.link);
+            if (!isSwarmLink(post.link)) {
+                await Linking.openURL(post.link);
+            }
         }
     }
 
@@ -182,7 +181,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             'Are you sure you want to delete?',
             undefined,
             [
-                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
                 { text: 'OK', onPress: async () => await this.props.onDeletePost(post) },
             ],
             { cancelable: false }
@@ -207,10 +206,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         <ActionIcon name='trash-can-outline'/>
                     </TouchableView>
                     <TouchableView style={styles.share}>
-                        <ActionIcon name='playlist-edit'/>
+                        {/* <ActionIcon name='playlist-edit'/> */}
                     </TouchableView>
                     <TouchableView style={styles.share} onPress={() => this.props.onSharePost(post)}>
-                        <ActionIcon name={shareIconName}/>
+                        { post.isUploading === true
+                            ? <ActivityIndicator color={Colors.DARK_GRAY} />
+                            : <ActionIcon name={shareIconName}/>
+                        }
                     </TouchableView>
                 </View>
             );
@@ -220,9 +222,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     private renderCardTopIcon(post: Post) {
         if (post.author) {
-            const imageSource = post.author.faviconUri === ''
+            const imageUri = getAuthorImageUri(post.author);
+            const imageSource = imageUri === ''
              ? require('../../images/user_circle.png')
-             : { uri: post.author.faviconUri };
+             : { uri: imageUri };
             return (
                 <Image source={imageSource} style={DefaultStyle.favicon} />
             );
@@ -307,18 +310,32 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                             marginTop: 0,
                         }}
                     >
-                        {post.images.map((image, index) =>
-                            <Image
-                                key={image.uri + index}
-                                source={{
-                                    uri: this.getImageUri(image),
-                                }}
-                                style={{
-                                    width: WindowWidth,
-                                    height: WindowWidth,
-                                }}
-                            />
-                        )}
+                        {post.images.map((image, index) => {
+                            if (image.uri && image.uri.startsWith('../../images/addrss.gif')) {
+                                return (
+                                    <Image
+                                        key={image.uri || '' + index}
+                                        source={require('../../images/addrss.gif')}
+                                        style={{
+                                            maxWidth: 320,
+                                            height: 568,
+                                            marginLeft: 10,
+                                        }}
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <ImageView
+                                        key={image.uri || '' + index}
+                                        source={image}
+                                        style={{
+                                            width: WindowWidth,
+                                            height: WindowWidth,
+                                        }}
+                                    />
+                                );
+                            }
+                        })}
                         { post.text === '' ||
                             <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
                         }

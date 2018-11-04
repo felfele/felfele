@@ -1,26 +1,34 @@
 import * as React from 'react';
-import { SimpleTextInput } from './SimpleTextInput';
+import QRCode from 'react-native-qrcode-svg';
 import {
     KeyboardAvoidingView,
     StyleSheet,
+    View,
     Text,
     Image,
     TouchableOpacity,
+    Dimensions,
 } from 'react-native';
-import { Author } from '../models/Post';
+
+import { SimpleTextInput } from './SimpleTextInput';
+import { Author, getAuthorImageUri } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
-const image = require('../../images/user_circle.png');
+import defaultUserImage = require('../../images/user_circle.png');
+import { Feed } from '../models/Feed';
+import { Debug } from '../Debug';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
-    onUpdatePicture: (path: string) => void;
+    onUpdatePicture: (image: ImageData) => void;
 }
 
 export interface StateProps {
     author: Author;
+    ownFeed?: Feed;
     navigation: any;
 }
 
@@ -28,7 +36,23 @@ const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const title = 'Identity';
 
+const QRCodeWidth = Dimensions.get('window').width * 0.8;
+
+const generateQRCodeValue = (feed?: Feed): string => {
+    if (feed == null) {
+        return '';
+    }
+    const feedWithoutPosts = {
+        ...feed,
+        posts: [],
+    };
+    return JSON.stringify(feedWithoutPosts);
+};
+
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
+    const qrCodeValue = generateQRCodeValue(props.ownFeed);
+    const authorImageUri = getAuthorImageUri(props.author);
+    Debug.log(qrCodeValue);
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
@@ -58,21 +82,31 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 style={styles.imagePickerContainer}
             >
                 <Image
-                    source={props.author.faviconUri === ''
-                    ? image
-                    : { uri: props.author.faviconUri }
+                    source={authorImageUri === ''
+                    ? defaultUserImage
+                    : { uri: authorImageUri }
                     }
                     style={styles.imagePicker}
                 />
             </TouchableOpacity>
+            { props.ownFeed &&
+                <View style={styles.qrCodeContainer}>
+                    <QRCode
+                        value={qrCodeValue}
+                        size={QRCodeWidth}
+                        color={Colors.DARK_GRAY}
+                        backgroundColor={Colors.BACKGROUND_COLOR}
+                    />
+                </View>
+            }
         </KeyboardAvoidingView>
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
+const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
     if (imageData != null) {
-        onUpdatePicture(imageData.uri);
+        onUpdatePicture(imageData);
     }
 };
 
@@ -104,5 +138,12 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         marginVertical: 10,
+    },
+    qrCodeContainer: {
+        marginTop: 10,
+        width: QRCodeWidth,
+        height: QRCodeWidth,
+        padding: 0,
+        alignSelf: 'center',
     },
 });

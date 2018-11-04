@@ -23,8 +23,11 @@ import { IdentitySettingsContainer } from './containers/IdentitySettingsContaine
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { WelcomeContainer } from './containers/WelcomeContainer';
+import { appendToLog } from './components/LogViewer';
+import { LogViewerContainer } from './containers/LogViewerContainer';
 
-Debug.setDebug(__DEV__);
+Debug.setDebug(true);
+Debug.addLogger(appendToLog);
 
 const Root = TabNavigator(
     {
@@ -133,6 +136,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     EditFilter: {
         screen: EditFilterContainer,
+    },
+    LogViewer: {
+        screen: LogViewerContainer,
     },
 };
 

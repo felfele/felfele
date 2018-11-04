@@ -8,7 +8,7 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { Author } from '../models/Post';
+import { Author, getAuthorImageUri } from '../models/Post';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors, DefaultStyle } from '../styles';
 // @ts-ignore
@@ -31,6 +31,7 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     if (props.author.name === '') {
         props.onUpdateAuthor(namePlaceholder);
     }
+    const authorImageUri = getAuthorImageUri(props.author);
     return (
         <KeyboardAvoidingView>
             <Text style={styles.tooltip}>{tooltip}</Text>
@@ -54,9 +55,9 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                     }}
                 >
                     <Image
-                        source={props.author.faviconUri === ''
+                        source={authorImageUri === ''
                         ? image
-                        : { uri: props.author.faviconUri }
+                        : { uri: authorImageUri }
                         }
                         style={styles.faviconPicker}
                     />
@@ -68,8 +69,8 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
 
 const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
-    if (imageData != null) {
-        onUpdatePicture(imageData.uri);
+    if (imageData != null && imageData.localPath) {
+        onUpdatePicture(imageData.localPath);
     }
 };
 

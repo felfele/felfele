@@ -1,4 +1,5 @@
 import { HtmlUtils } from './HtmlUtils';
+import { Debug } from './Debug';
 
 // tslint:disable-next-line:class-name
 class _FaviconCache {
@@ -11,11 +12,11 @@ class _FaviconCache {
         const baseUrl = this.getBaseUrl(url);
         try {
             const favicon = await this.downloadIndexAndParseFavicon(baseUrl);
-            console.log('getFavicon: ', favicon);
+            Debug.log('getFavicon: ', favicon);
             this.favicons.set(url, favicon);
             return favicon;
         } catch (e) {
-            console.log(e);
+            Debug.log(e);
             return '';
         }
     }

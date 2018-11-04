@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, Share as ReactShare, StyleSheet, Button} from 'react-native';
-import * as QRCode from 'react-native-qrcode';
 import { Colors } from '../styles';
+import QRCode from 'react-native-qrcode-svg';
 
 export class Share extends React.PureComponent<any, any> {
     public render() {
@@ -12,8 +12,8 @@ export class Share extends React.PureComponent<any, any> {
                 <QRCode
                     value={link}
                     size={300}
-                    bgColor={Colors.DARK_GRAY}
-                    fgColor='white'
+                    backgroundColor={Colors.DARK_GRAY}
+                    color='white'
                     />
                 <Button
                     onPress={async () => await ReactShare.share({

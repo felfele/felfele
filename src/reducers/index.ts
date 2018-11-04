@@ -15,6 +15,8 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
+import { Debug } from '../Debug';
+import { getImageUri } from '../models/ImageData';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
@@ -41,7 +43,55 @@ const defaultAuthor: Author = {
     name: '',
     uri: '',
     faviconUri: '',
+    image: {
+        uri: '',
+    },
+    identity: {
+        publicKey: '',
+        privateKey: '0x0bb80d052b3d85656b3f082c24fb6c211d7935163fab6c605358886e56d17a93',
+        // address: '0xADc9b12480cE9880D6Bed1Ef91Cdc279D671Cf0d',
+        address: '0x377820b4e6913dd322a24e2af10e1c51c5f1e709',
+    },
 };
+
+const onboardingAuthor: Author = {
+    faviconUri: '',
+    name: 'Felfele Assistant',
+    uri: '',
+};
+
+const defaultPost1: Post = {
+    _id: 0,
+    createdAt: 0,
+    images: [],
+    text: `Basic features:.
+
+Post text and images privately, and later add the posts to your public feed.
+
+Follow the public feed of others, or add your favorite RSS/Atom feeds.
+
+If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
+    author: onboardingAuthor,
+};
+const defaultPost2: Post = {
+    _id: 1,
+    createdAt: 0,
+    images: [{
+        uri: '../../images/addrss.gif',
+    }],
+    text: `Adding an RSS feed`,
+    author: onboardingAuthor,
+};
+
+const defaultPost3: Post = {
+    _id: 2,
+    createdAt: 0,
+    images: [],
+    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    author: onboardingAuthor,
+};
+
+const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
 
 const defaultCurrentTimestamp = 0;
 
@@ -53,10 +103,10 @@ const defaultState: AppState = {
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
-    localPosts: List<Post>(),
+    localPosts: defaultLocalPosts,
     draft: null,
     metadata: {
-        highestSeenPostId: 0,
+        highestSeenPostId: 2,
     },
 };
 
@@ -72,6 +122,9 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
         }
         case 'REMOVE-CONTENT-FILTER': {
             const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.text === filter.text);
+            if (ind === -1) {
+                return contentFilters;
+            }
             return contentFilters.remove(ind);
         }
         default: {
@@ -87,6 +140,9 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
             return feeds.remove(ind);
         }
         default: {
@@ -118,10 +174,11 @@ const identityReducer = (identity = defaultAuthor, action: Actions): Author => {
                 name: action.payload.name,
             };
         }
-        case 'UPDATE-PICTURE-PATH': {
+        case 'UPDATE-AUTHOR-PICTURE-PATH': {
             return {
                 ...identity,
-                faviconUri: action.payload.path,
+                faviconUri: getImageUri(action.payload.image),
+                image: action.payload.image,
             };
         }
         default: {
@@ -148,21 +205,37 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
-const localPostsReducer = (localPosts = List<Post>(), action: Actions): List<Post> => {
+const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
     switch (action.type) {
         case 'ADD-POST': {
             return localPosts.insert(0, action.payload.post);
         }
         case 'DELETE-POST': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.remove(ind);
         }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
+        }
+        case 'UPDATE-POST-IS-UPLOADING': {
+            const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
+            return localPosts.update(ind, (post => ({...post, isUploading: action.payload.isUploading})));
         }
         case 'UPDATE-POST-IMAGES': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return localPosts;
+            }
             return localPosts.update(ind, (post => ({...post, images: action.payload.images})));
         }
     }
@@ -198,6 +271,7 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     switch (action.type) {
         case 'APP-STATE-RESET': {
+            Debug.log('App state reset');
             return defaultState;
         }
         default: {
@@ -239,11 +313,16 @@ export const store = createStore(
 );
 
 const initStore = () => {
-    console.log('initStore: ', store.getState());
+    Debug.log('initStore: ', store.getState());
     store.dispatch(AsyncActions.cleanupContentFilters());
+    patchState();
+};
+
+const patchState = () => {
+    // placeholder to put patches to fix state
 };
 
 export const persistor = persistStore(store, {}, initStore);
 
-console.log('store: ', store.getState());
-store.subscribe(() => console.log('store updated: ', store.getState()));
+Debug.log('store: ', store.getState());
+store.subscribe(() => Debug.log('store updated: ', store.getState()));

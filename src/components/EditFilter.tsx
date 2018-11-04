@@ -12,6 +12,7 @@ import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { Colors } from '../styles';
 import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
 import { SimpleTextInput } from './SimpleTextInput';
+import { Debug } from '../Debug';
 
 interface EditFilterNavigationActions {
     back?: () => void;
@@ -135,7 +136,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
     private onDeleteFilter = () => {
         const options: any[] = [
             { text: 'Yes', onPress: async () => this.deleteFilterAndGoBack() },
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
         Alert.alert('Are you sure you want to delete the filter?',

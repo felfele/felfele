@@ -3,9 +3,10 @@ import { AppState } from '../reducers/index';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
 import { Post } from '../models/Post';
+import { Debug } from '../Debug';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    console.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
+    Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {
        navigation: ownProps.navigation,
