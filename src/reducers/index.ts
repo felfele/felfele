@@ -315,6 +315,7 @@ export const store = createStore(
 
 const initStore = () => {
     Debug.log('initStore: ', store.getState());
+    // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     patchState();
 };
