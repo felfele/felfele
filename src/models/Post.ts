@@ -1,18 +1,10 @@
 import { Model } from './Model';
 import { ImageData, getLocalPath } from './ImageData';
+import { PrivateIdentity } from './Identity';
 
 interface Location {
     latitude: number;
     longitude: number;
-}
-
-export interface PublicIdentity {
-    publicKey: string;
-    address: string;
-}
-
-export interface PrivateIdentity extends PublicIdentity {
-    privateKey: string;
 }
 
 export interface Author {

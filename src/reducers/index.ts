@@ -270,6 +270,7 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+    Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -327,4 +328,3 @@ const patchState = () => {
 export const persistor = persistStore(store, {}, initStore);
 
 Debug.log('store: ', store.getState());
-store.subscribe(() => Debug.log('store updated: ', store.getState()));

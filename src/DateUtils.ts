@@ -13,8 +13,11 @@ export class DateUtils {
         return Date.parse(dateString);
     }
 
-    public static timestampToDateString(timestamp: number): string {
+    public static timestampToDateString(timestamp: number, withTimezone: boolean = false): string {
         const date = new Date(timestamp);
+        if (withTimezone) {
+            date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+        }
         const prefix = (s, p) => ('' + p + s).substring(('' + s).length);
         const prefix2 = (s) => prefix(s, '00');
         const prefix3 = (s) => prefix(s, '000');

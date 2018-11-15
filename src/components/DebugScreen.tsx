@@ -13,11 +13,11 @@ import {
     downloadUserFeed,
     downloadUserFeedTemplate,
     updateUserFeed,
-    generateSecureIdentity,
 } from '../Swarm';
 import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
+import { NavigationHeader } from './NavigationHeader';
 
 const styles = StyleSheet.create({
     imageStyle: {
@@ -32,14 +32,6 @@ const styles = StyleSheet.create({
     },
 });
 
-interface DebugScreenNavigationActions {
-    back: any;
-}
-
-const navigationActions: DebugScreenNavigationActions = {
-    back: undefined,
-};
-
 export interface StateProps {
     appState: AppState;
     navigation: any;
@@ -48,28 +40,27 @@ export interface StateProps {
 export interface DispatchProps {
     createPost: (post: Post) => void;
     onAppStateReset: () => void;
+    onCreateIdentity: () => void;
 }
 
 type Props = StateProps & DispatchProps;
 
 export class DebugScreen extends React.Component<Props, any> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Debug menu',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-    };
-
     constructor(props) {
         super(props);
         this.onValueChange = this.onValueChange.bind(this);
         this.state = { switchValue: false };
-        navigationActions.back = this.props.navigation.goBack;
     }
 
     public render() {
         const version = Version;
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+                <NavigationHeader
+                    leftButtonText='Back'
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                    title='Debug menu'
+                />
                 <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                     <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
                          <SettingsList.Item
@@ -212,7 +203,6 @@ export class DebugScreen extends React.Component<Props, any> {
     }
 
     private onCreateIdentity = async () => {
-        const identity = await generateSecureIdentity();
-        Debug.log('onCreateIdentity: ', identity);
+        this.props.onCreateIdentity();
     }
 }

@@ -190,6 +190,7 @@ export const AsyncActions = {
                 }
             } catch (e) {
                 Debug.log('sharePost: ', e);
+                dispatch(Actions.updatePostIsUploading(post, undefined));
             }
         };
     },

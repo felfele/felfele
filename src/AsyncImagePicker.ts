@@ -7,6 +7,8 @@ import { Debug } from './Debug';
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
 // tslint:disable-next-line:no-var-requires
 const RNFS = require('react-native-fs');
+// tslint:disable-next-line:no-var-requires
+const RNGRP = require('react-native-get-real-path');
 
 interface Response {
     customButton: string;
@@ -61,20 +63,26 @@ interface StorageOptions {
 const defaultImagePickerOtions: Options = {
     allowsEditing: false,
     noData: true,
+    mediaType: 'mixed',
+    rotation: 360,
     storageOptions: {
         cameraRoll: Config.saveToCameraRoll,
         waitUntilSaved: true,
     },
 };
 
-export const removePathPrefix = (path: string): string => {
+const removePathPrefix = async (response: Response): Promise<string> => {
     if (Platform.OS === 'ios') {
         const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
+        const path = response.uri;
         if (path.startsWith(documentPath)) {
             return path.substring(documentPath.length);
         }
+    } else if (Platform.OS === 'android') {
+        const filePath = await RNGRP.getRealPathFromURI(response.uri);
+        return 'file://' + filePath;
     }
-    return path;
+    return response.uri;
 };
 
 export class AsyncImagePicker {
@@ -95,7 +103,7 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
-        const uri = removePathPrefix(response.uri);
+        const uri = await removePathPrefix(response);
         Debug.log('launchPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,
