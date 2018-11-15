@@ -1,9 +1,7 @@
 import { Post, Author } from './models/Post';
-import { ImageData } from './models/ImageData';
+import { ImageData, getLocalPath } from './models/ImageData';
 import { uploadPhoto, isSwarmLink } from './Swarm';
 import { Debug } from './Debug';
-// tslint:disable-next-line:no-var-requires
-const RNFS = require('react-native-fs');
 
 const isImageUploaded = (image: ImageData): boolean => {
     if (image.uri != null && isSwarmLink(image.uri)) {
@@ -14,14 +12,10 @@ const isImageUploaded = (image: ImageData): boolean => {
 
 const uploadImage = async (image: ImageData): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
-        if (image.localPath == null && image.localPath !== '') {
+        if (image.localPath == null || image.localPath === '') {
             return image;
         }
-        Debug.log('uploadImage: ', image.localPath, `z${image.localPath}z`);
-        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
-        const path = documentPath + image.localPath;
-        // const statResult = await RNFS.stat(RNFS.DocumentDirectoryPath + '/' + image.localPath);
-        // Debug.log('uploadImage: ', statResult);
+        const path = getLocalPath(image.localPath);
         const uri = await uploadPhoto(path);
         return {
             ...image,
