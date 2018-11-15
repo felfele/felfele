@@ -7,7 +7,14 @@ import * as Communications from 'react-native-communications';
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { Version } from '../Version';
 import { Config } from '../Config';
-import { upload, download, downloadUserFeed, downloadUserFeedTemplate, updateUserFeed } from '../Swarm';
+import {
+    upload,
+    download,
+    downloadUserFeed,
+    downloadUserFeedTemplate,
+    updateUserFeed,
+    generateSecureIdentity,
+} from '../Swarm';
 import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
@@ -41,6 +48,7 @@ export interface StateProps {
 export interface DispatchProps {
     createPost: (post: Post) => void;
     onAppStateReset: () => void;
+    onCreateIdentity: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -97,20 +105,6 @@ export class DebugScreen extends React.Component<Props, any> {
                             icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
-                            title='Upload to swarm'
-                            onPress={async () => await this.onUploadToSwarm()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
-                            title='Migrate posts'
-                            onPress={async () => await this.onMigratePosts()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
                             title='App state reset'
                             onPress={this.props.onAppStateReset}
                         />
@@ -120,6 +114,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             }
                             title='Test feed update'
                             onPress={async () => await this.onTestFeedUpdate()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Test identity creation'
+                            onPress={async () => await this.onCreateIdentity()}
                         />
                         <SettingsList.Item
                             icon={
@@ -209,5 +210,9 @@ export class DebugScreen extends React.Component<Props, any> {
         const text = await updateUserFeed(feedTemplate, identity, data);
         const latestData = await downloadUserFeed(identity);
         Debug.log('onTestFeedUpdate: ', latestData);
+    }
+
+    private onCreateIdentity = async () => {
+        this.props.onCreateIdentity();
     }
 }
