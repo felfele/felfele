@@ -120,8 +120,7 @@ export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promis
 };
 
 export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string) => {
-    const hexData = stringToHex(data);
-    const digest = feedUpdateDigest(feedTemplate, hexData);
+    const digest = feedUpdateDigest(feedTemplate, data);
 
     if (digest == null) {
         throw new Error('digest is null');
@@ -187,7 +186,7 @@ export const hexToString = (hex: string): string => {
     }
 };
 
-const stringToHex = (s: string) => '0x' + byteArrayToHex(stringToByteArray(s));
+const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 
 // cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
 export const byteArrayToHex = (byteArray: number[]): string => {
@@ -236,6 +235,7 @@ const isHexStrict = (s: string): boolean => {
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
+    Debug.log('updateUserFeed', 'digest', byteArrayToHex(digestData));
     return keccak256.array(digestData);
 }
 
@@ -302,12 +302,6 @@ const calculateRecovery = (rec: string): string => {
     throw new Error('invalid recovery: ' + rec);
 };
 
-const sign = (hexDigest: string, privateKey: string) => {
-    return {
-        signature: '',
-    };
-};
-
 function publicKeyToAddress(pubKey) {
     const pubBytes = pubKey.encode();
     return keccak256.array(pubBytes.slice(1)).slice(12);
@@ -319,7 +313,7 @@ const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const privateKey = keyPair.getPrivate();
     const sigRaw = curve.sign(digest, privateKey, { canonical: true });
     const signature = sigRaw.r.toArray().concat(sigRaw.s.toArray()).concat(sigRaw.recoveryParam);
-    return '0x' + byteArrayToHex(signature);
+    return byteArrayToHex(signature);
 };
 
 export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
