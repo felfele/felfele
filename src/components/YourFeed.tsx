@@ -100,6 +100,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
 
     public render() {
         const isStatusBarHidden = false;
+        const barStyle = this.state.isOnline ? 'dark-content' : 'light-content';
         return (
             <SafeAreaView
                 style={{
@@ -110,9 +111,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     opacity: 0.96,
             }
             }>
-                <StatusBar backgroundColor={Colors.BACKGROUND_COLOR} hidden={isStatusBarHidden} translucent={false} barStyle='dark-content'/>
+                <StatusBar backgroundColor={Colors.BACKGROUND_COLOR} hidden={isStatusBarHidden} translucent={false} barStyle={barStyle}/>
                 <View>
-                    { this.renderOfflineHeader() }
                     <FlatList
                         ListHeaderComponent={this.renderListHeader}
                         ListFooterComponent={this.renderListFooter}
@@ -344,20 +344,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 </View>
             );
         }
-    }
-
-    private renderOfflineHeader() {
-        if (NetworkStatus.isConnected()) {
-            return [];
-        }
-        return (
-            <View style={{
-                height: HeaderOffset,
-                backgroundColor: 'black',
-            }}
-            >
-            </View>
-        );
     }
 
     private renderListHeader = () => {
