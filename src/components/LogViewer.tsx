@@ -20,7 +20,7 @@ type LogItem = [string, string];
 const logData: LogItem[] = [];
 
 export const appendToLog = (logLine: string) => {
-    const dateString = DateUtils.timestampToDateString(Date.now()).replace('T', ' ').replace('Z', '');
+    const dateString = DateUtils.timestampToDateString(Date.now(), true).replace('T', ' ').replace('Z', '');
     logData.splice(0, 0, [dateString, logLine]);
 };
 
