@@ -61,20 +61,25 @@ interface StorageOptions {
 const defaultImagePickerOtions: Options = {
     allowsEditing: false,
     noData: true,
+    mediaType: 'mixed',
+    rotation: 360,
     storageOptions: {
         cameraRoll: Config.saveToCameraRoll,
         waitUntilSaved: true,
     },
 };
 
-export const removePathPrefix = (path: string): string => {
+export const removePathPrefix = (response: Response): string => {
     if (Platform.OS === 'ios') {
         const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
+        const path = response.uri;
         if (path.startsWith(documentPath)) {
             return path.substring(documentPath.length);
         }
+    } else if (Platform.OS === 'android') {
+        return response.fileName != null ? response.fileName : response.uri;
     }
-    return path;
+    return response.uri;
 };
 
 export class AsyncImagePicker {
@@ -95,7 +100,7 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
-        const uri = removePathPrefix(response.uri);
+        const uri = removePathPrefix(response);
         Debug.log('launchPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,
