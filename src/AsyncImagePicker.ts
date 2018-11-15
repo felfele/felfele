@@ -7,6 +7,8 @@ import { Debug } from './Debug';
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
 // tslint:disable-next-line:no-var-requires
 const RNFS = require('react-native-fs');
+// tslint:disable-next-line:no-var-requires
+const RNGRP = require('react-native-get-real-path');
 
 interface Response {
     customButton: string;
@@ -69,7 +71,7 @@ const defaultImagePickerOtions: Options = {
     },
 };
 
-export const removePathPrefix = (response: Response): string => {
+const removePathPrefix = async (response: Response): Promise<string> => {
     if (Platform.OS === 'ios') {
         const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
         const path = response.uri;
@@ -77,7 +79,8 @@ export const removePathPrefix = (response: Response): string => {
             return path.substring(documentPath.length);
         }
     } else if (Platform.OS === 'android') {
-        return response.fileName != null ? response.fileName : response.uri;
+        const filePath = await RNGRP.getRealPathFromURI(response.uri);
+        return 'file://' + filePath;
     }
     return response.uri;
 };
@@ -100,7 +103,7 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
-        const uri = removePathPrefix(response);
+        const uri = await removePathPrefix(response);
         Debug.log('launchPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,

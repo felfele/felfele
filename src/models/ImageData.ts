@@ -10,6 +10,9 @@ export interface ImageData {
 }
 
 export const getLocalPath = (localPath: string): string => {
+    if (localPath.startsWith('file://')) {
+        return localPath;
+    }
     const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
     return documentPath + localPath;
 };

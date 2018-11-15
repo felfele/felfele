@@ -85,6 +85,7 @@
     "react-native-easy-grid": "^0.1.17",
     "react-native-easy-markdown": "^1.2.0",
     "react-native-fs": "^2.12.1",
+    "react-native-get-real-path": "git+https://github.com/Wraptime/react-native-get-real-path.git",
     "react-native-gravatar": "^1.0.2",
     "react-native-image-picker": "^0.26.10",
     "react-native-onboarding-swiper": "^0.7.1",
