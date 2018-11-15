@@ -56,3 +56,5 @@ fastlane/screenshots
 .vscode
 .jest
 ios/build
+
+android/app/src/main/assets/index.android.bundle*
