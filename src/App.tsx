@@ -25,6 +25,7 @@ import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { WelcomeContainer } from './containers/WelcomeContainer';
 import { appendToLog } from './components/LogViewer';
 import { LogViewerContainer } from './containers/LogViewerContainer';
+import { Colors } from './styles';
 
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
@@ -101,9 +102,14 @@ const Root = TabNavigator(
                 }
             :
                 {
-                    showLabel: true,
+                    showLabel: false,
+                    showIcon: true,
+                    activeTintColor: 'gray',
+                    inactiveTintColor: 'lightgray',
+                    activeBackgroundColor: 'gray',
                     style: {
-                        backgroundColor: 'black',
+                        backgroundColor: Colors.BACKGROUND_COLOR,
+                        opacity: 0.96,
                     },
                 },
     },
