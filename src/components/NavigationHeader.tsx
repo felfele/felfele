@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 30,
-        marginBottom: 10,
+        marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
         backgroundColor: Colors.VERY_LIGHT_GRAY,
