@@ -48,6 +48,7 @@ export interface StateProps {
 export interface DispatchProps {
     createPost: (post: Post) => void;
     onAppStateReset: () => void;
+    onCreateIdentity: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -212,7 +213,6 @@ export class DebugScreen extends React.Component<Props, any> {
     }
 
     private onCreateIdentity = async () => {
-        const identity = await generateSecureIdentity();
-        Debug.log('onCreateIdentity: ', identity);
+        this.props.onCreateIdentity();
     }
 }
