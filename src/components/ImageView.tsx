@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react-native';
-import * as RNFS from 'react-native-fs';
 
 import { ImageData, getImageUri } from '../models/ImageData';
-import { Debug } from '../Debug';
 
 export interface StateProps extends ImageProperties {
     source: ImageData;
