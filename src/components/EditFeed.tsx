@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-import { RSSFeedManager, RSSPostManager } from '../RSSPostManager';
+import { RSSFeedManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
@@ -50,8 +50,6 @@ export interface StateProps {
     feed: Feed;
     navigation: any;
 }
-
-console.log('EditFeed: ', QRCodeScanner);
 
 export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public static navigationOptions = {
