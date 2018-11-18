@@ -287,7 +287,10 @@ function feedUpdateDigestData(feedTemplate: FeedTemplate, data: string): number[
     });
 
     const numArray = new Array<number>();
-    new Uint8Array(buf).forEach((v) => numArray.push(v));
+    const uint8Array = new Uint8Array(buf);
+    for (let i = 0; i < uint8Array.byteLength; i++) {
+        numArray.push(uint8Array[i]);
+    }
 
     return numArray;
 }
