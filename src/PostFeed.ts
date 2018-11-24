@@ -10,9 +10,6 @@ interface PostFeed extends Feed {
     authorImage: ImageData;
 }
 
-const SWARM_PREFIX = Swarm.DefaultPrefix;
-const HASH_SERVICE_URL = 'http://feeds.helmethair.co/feeds/';
-
 export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
     const uploadedImages = await uploadImages([author.image!]);
@@ -29,14 +26,7 @@ export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author
 };
 
 export const isPostFeedUrl = (url: string): boolean => {
-    return url.startsWith(SWARM_PREFIX);
-};
-
-const hashFromUrl = (url: string): string => {
-    if (isPostFeedUrl(url)) {
-        return url.slice(SWARM_PREFIX.length);
-    }
-    return url;
+    return url.startsWith(Swarm.DefaultFeedPrefix);
 };
 
 export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: PostFeed): Promise<PostFeed> => {
@@ -60,10 +50,20 @@ export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string)
         const content = await Swarm.downloadData(contentHash);
         Debug.log('downloadPostFeed: content: ', content);
         const postFeed = JSON.parse(content) as PostFeed;
+        const authorImage = {
+            uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+        };
+        const author: Author = {
+            name: postFeed.name,
+            uri: postFeed.url,
+            faviconUri: '',
+            image: authorImage,
+        };
         const postFeedWithGatewayImageLinks = {
             ...postFeed,
             posts: postFeed.posts.map(post => ({
                 ...post,
+                author,
                 images: post.images.map(image => ({
                     ...image,
                     uri: Swarm.getSwarmGatewayUrl(image.uri!),
