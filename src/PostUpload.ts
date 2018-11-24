@@ -53,11 +53,10 @@ export const uploadPost = async (post: Post): Promise<Post> => {
         return post;
     }
     const uploadedImages = await uploadImages(post.images);
-    const uploadedAuthor = await uploadAuthor(post.author);
     const uploadedPost = {
         ...post,
         images: uploadedImages,
-        author: uploadedAuthor,
+        author: undefined,
     };
 
     // TODO upload post

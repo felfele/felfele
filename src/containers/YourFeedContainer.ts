@@ -3,7 +3,6 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
-import { isPostFeedUrl } from '../PostFeed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.localPosts.toArray();
