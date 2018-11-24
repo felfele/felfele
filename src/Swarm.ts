@@ -8,6 +8,7 @@ import { Debug } from './Debug';
 export const DefaultGateway = 'http://swarm.helmethair.co';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
+export const DefaultFeedPrefix = 'bzz-feed:/';
 export const HashLength = 64;
 
 export const upload = async (data: string): Promise<string> => {
