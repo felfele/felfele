@@ -63,7 +63,7 @@ interface StorageOptions {
 const defaultImagePickerOtions: Options = {
     allowsEditing: false,
     noData: true,
-    mediaType: 'mixed',
+    mediaType: 'photo',
     rotation: 360,
     storageOptions: {
         cameraRoll: Config.saveToCameraRoll,
