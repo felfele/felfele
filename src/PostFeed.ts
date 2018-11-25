@@ -34,8 +34,11 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
         const postFeedJson = JSON.stringify(postFeed);
         const contentHash = await Swarm.upload(postFeedJson);
         await swarmFeedApi.update(contentHash);
+        const url = swarmFeedApi.getUri();
         return {
             ...postFeed,
+            url,
+            feedUrl: url,
         };
     } catch (e) {
         Debug.log('updatePostFeed failed, ', e);
