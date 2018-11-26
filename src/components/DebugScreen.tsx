@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { View, Alert, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Communications from 'react-native-communications';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import { Version } from '../Version';
-import { Config } from '../Config';
 import {
     upload,
     download,
@@ -18,19 +17,6 @@ import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
-
-const styles = StyleSheet.create({
-    imageStyle: {
-        marginLeft: 15,
-        alignSelf: 'center',
-        height: 30,
-        width: 30,
-    },
-    titleInfoStyle: {
-        fontSize: 16,
-        color: '#8e8e93',
-    },
-});
 
 export interface StateProps {
     appState: AppState;
@@ -83,13 +69,6 @@ export class DebugScreen extends React.Component<Props, any> {
                             }
                             title='List database keys'
                             onPress={async () => await this.onListDatabaseKeys()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
-                            title='Send the database in an email'
-                            onPress={async () => await this.onSendEmailOfDatabase()}
                         />
                         <SettingsList.Item
                             icon={
@@ -175,13 +154,6 @@ export class DebugScreen extends React.Component<Props, any> {
         Debug.log('Uploaded file. Address:', hash);
         const data = await download(hash);
         Debug.log('Downloaded file: ', data);
-    }
-
-    private async onSendEmailOfDatabase() {
-        const keyValues = await AsyncStorageWrapper.getAllKeyValues();
-        const databaseDump = JSON.stringify(keyValues);
-        const date = new Date(Date.now()).toJSON;
-        Communications.email(Config.email, '', '', 'Postmodern database dump ' + date, databaseDump);
     }
 
     private async onMigratePosts() {
