@@ -85,7 +85,6 @@ export class FeedHeader extends React.PureComponent<Props> {
     }
 }
 
-const HeaderContainerPaddingTop = Platform.OS === 'ios' ? 20 : 0;
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,

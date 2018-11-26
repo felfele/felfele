@@ -33,6 +33,7 @@ import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
+import { StatusBarView } from './StatusBarView';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -99,7 +100,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     public render() {
-        const isStatusBarHidden = false;
         const barStyle = this.state.isOnline ? 'dark-content' : 'light-content';
         return (
             <SafeAreaView
@@ -111,26 +111,29 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     opacity: 0.96,
             }
             }>
-                <StatusBar backgroundColor={Colors.BACKGROUND_COLOR} hidden={isStatusBarHidden} translucent={false} barStyle={barStyle}/>
-                <View>
-                    <FlatList
-                        ListHeaderComponent={this.renderListHeader}
-                        ListFooterComponent={this.renderListFooter}
-                        data={this.props.posts}
-                        renderItem={(obj) => this.renderCard(obj.item)}
-                        keyExtractor={(item) => '' + item._id}
-                        extraData={this.state}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={this.state.isRefreshing}
-                                onRefresh={() => this.onRefresh() }
-                                progressViewOffset={HeaderOffset}
-                                style={styles.refreshControl}
-                            />
-                        }
-                    />
-                </View>
-                <View style={styles.translucentBar} ></View>
+                <StatusBarView
+                    backgroundColor={Colors.BACKGROUND_COLOR}
+                    hidden={false}
+                    translucent={false}
+                    barStyle={barStyle}
+                    networkActivityIndicatorVisible={true}
+                />
+                <FlatList
+                    ListHeaderComponent={this.renderListHeader}
+                    ListFooterComponent={this.renderListFooter}
+                    data={this.props.posts}
+                    renderItem={(obj) => this.renderCard(obj.item)}
+                    keyExtractor={(item) => '' + item._id}
+                    extraData={this.state}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.isRefreshing}
+                            onRefresh={() => this.onRefresh() }
+                            progressViewOffset={HeaderOffset}
+                            style={styles.refreshControl}
+                        />
+                    }
+                />
             </SafeAreaView>
         );
     }
