@@ -1,4 +1,6 @@
-export const Config = {
+import { Settings } from './models/Settings';
+
+export const Config: Settings = {
     saveToCameraRoll: true,
-    email: 'agazso@gmail.com',
+    showSquareImages: true,
 };

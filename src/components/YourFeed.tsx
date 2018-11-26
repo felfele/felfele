@@ -10,30 +10,27 @@ import {
     Image,
     RefreshControl,
     StyleSheet,
-    StatusBar,
     Platform,
     SafeAreaView,
     LayoutAnimation,
     ActivityIndicator,
 } from 'react-native';
-import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// tslint:disable-next-line:no-var-requires
-const RNFS = require('react-native-fs');
 
-import { Config } from '../Config';
 import { Post, getAuthorImageUri } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swarm';
+import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
+import { Settings } from '../models/Settings';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -47,6 +44,7 @@ export interface DispatchProps {
 export interface StateProps {
     navigation: any;
     posts: Post[];
+    settings: Settings;
 }
 
 interface YourFeedState {
@@ -233,15 +231,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 <Image source={imageSource} style={DefaultStyle.favicon} />
             );
         } else {
-            return (
-                <Gravatar options={{
-                    email: Config.email,
-                    secure: true,
-                    parameters: { size: '100', d: 'mm' },
-                }}
-                    style={DefaultStyle.favicon}
-                />
-            );
+            return null;
         }
     }
 
@@ -327,13 +317,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                                     />
                                 );
                             } else {
+                                const [width, height] = this.calculateImageDimensions(image, WindowWidth);
                                 return (
                                     <ImageView
                                         key={image.uri || '' + index}
                                         source={image}
                                         style={{
-                                            width: WindowWidth,
-                                            height: WindowWidth,
+                                            width: width,
+                                            height: height,
                                         }}
                                     />
                                 );
@@ -347,6 +338,18 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 </View>
             );
         }
+    }
+
+    private calculateImageDimensions = (image: ImageData, maxWidth: number): number[] => {
+        if (image.width == null || image.height == null) {
+            return [maxWidth, maxWidth];
+        }
+        if (this.props.settings.showSquareImages) {
+            return [maxWidth, maxWidth];
+        }
+        const ratio = image.width / maxWidth;
+        const height = image.height / ratio;
+        return [maxWidth, height];
     }
 
     private renderListHeader = () => {

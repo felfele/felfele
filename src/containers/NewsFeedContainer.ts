@@ -14,6 +14,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: filteredPosts,
+        settings: state.settings,
     };
 };
 

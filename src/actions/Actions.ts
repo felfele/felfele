@@ -34,6 +34,8 @@ export enum ActionTypes {
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
+    CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
+    CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
 }
 
 const InternalActions = {
@@ -78,6 +80,10 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_AUTHOR_PICTURE_PATH, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
+    changeSettingSaveToCameraRoll: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SAVE_TO_CAMERA_ROLL, { value }),
+    changeSettingShowSquareImages: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SHOW_SQUARE_IMAGES, { value }),
 };
 
 export const AsyncActions = {
