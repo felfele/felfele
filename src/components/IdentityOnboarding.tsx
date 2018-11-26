@@ -8,21 +8,13 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { Author, getAuthorImageUri } from '../models/Post';
+import { getAuthorImageUri } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Colors, DefaultStyle } from '../styles';
+import { Colors } from '../styles';
+import { StateProps, DispatchProps } from './IdentitySettings';
 // @ts-ignore
-import image = require('../../images/user_circle.png');
-
-export interface DispatchProps {
-    onUpdateAuthor: (text: string) => void;
-    onUpdatePicture: (path: string) => void;
-}
-
-export interface StateProps {
-    author: Author;
-    navigation: any;
-}
+import defaultUserImage = require('../../images/user_circle.png');
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
@@ -56,7 +48,7 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                 >
                     <Image
                         source={authorImageUri === ''
-                        ? image
+                        ? defaultUserImage
                         : { uri: authorImageUri }
                         }
                         style={styles.faviconPicker}
@@ -67,10 +59,10 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
+const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
-    if (imageData != null && imageData.localPath) {
-        onUpdatePicture(imageData.localPath);
+    if (imageData != null) {
+        onUpdatePicture(imageData);
     }
 };
 

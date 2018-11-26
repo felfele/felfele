@@ -35,6 +35,7 @@ export const Welcome = (props: DispatchProps & StateProps) => {
                 props.onCreateIdentity();
                 props.navigation.navigate('Loading');
             }}
+            showSkip={false}
         />
     );
 };
