@@ -29,6 +29,7 @@ export interface AppState {
     localPosts: List<Post>;
     draft: Post | null;
     metadata: Metadata;
+    postUploadQueue: List<Post>;
 }
 
 interface Metadata {
@@ -91,6 +92,10 @@ const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
 
 const defaultCurrentTimestamp = 0;
 
+const defaultMetadata = {
+    highestSeenPostId: 2,
+};
+
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
@@ -101,9 +106,8 @@ const defaultState: AppState = {
     rssPosts: List<Post>(),
     localPosts: defaultLocalPosts,
     draft: null,
-    metadata: {
-        highestSeenPostId: 2,
-    },
+    metadata: defaultMetadata,
+    postUploadQueue: List<Post>(),
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -270,7 +274,7 @@ const draftReducer = (draft: Post | null = null, action: Actions): Post | null =
     return draft;
 };
 
-const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: Actions): Metadata => {
+const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions): Metadata => {
     switch (action.type) {
         case 'INCREASE-HIGHEST-SEEN-POST-ID': {
             return {
@@ -282,6 +286,22 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
             return metadata;
         }
     }
+};
+
+const postUploadQueueReducer = (postUploadQueue = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'QUEUE-POST-FOR-UPLOAD': {
+            return postUploadQueue.push(action.payload.post);
+        }
+        case 'REMOVE-POST-FOR-UPLOAD': {
+            const ind = postUploadQueue.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return postUploadQueue;
+            }
+            return postUploadQueue.remove(ind);
+        }
+    }
+    return postUploadQueue;
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
@@ -299,7 +319,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -317,6 +337,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    postUploadQueue: postUploadQueueReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
@@ -332,6 +353,7 @@ export const store = createStore(
 const initStore = () => {
     Debug.log('initStore: ', store.getState());
     store.dispatch(AsyncActions.cleanupContentFilters());
+    store.dispatch(AsyncActions.uploadPostsFromQueue());
     patchState();
 };
 

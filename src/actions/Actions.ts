@@ -36,6 +36,8 @@ export enum ActionTypes {
     APP_STATE_RESET = 'APP-STATE-RESET',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
+    QUEUE_POST_FOR_UPLOAD = 'QUEUE-POST-FOR-UPLOAD',
+    REMOVE_POST_FOR_UPLOAD = 'REMOVE-POST-FOR-UPLOAD',
 }
 
 const InternalActions = {
@@ -47,6 +49,10 @@ const InternalActions = {
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
+    queuePostForUpload: (post: Post) =>
+        createAction(ActionTypes.QUEUE_POST_FOR_UPLOAD, { post }),
+    removePostForUpload: (post: Post) =>
+        createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
 };
 
 export const Actions = {
@@ -135,8 +141,26 @@ export const AsyncActions = {
     },
     sharePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
+            const isQueueEmtpy = getState().postUploadQueue.size === 0;
+            dispatch(InternalActions.queuePostForUpload(post));
+            dispatch(Actions.updatePostIsUploading(post, true));
+            if (isQueueEmtpy) {
+                dispatch(AsyncActions.uploadPostsFromQueue());
+            }
+        };
+    },
+    uploadPostsFromQueue: () => {
+        return async (dispatch, getState: () => AppState) => {
+            while (getState().postUploadQueue.size > 0) {
+                const post = getState().postUploadQueue.first();
+                await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
+                dispatch(InternalActions.removePostForUpload(post));
+            }
+        };
+    },
+    uploadPostFromQueue: (post: Post) => {
+        return async (dispatch, getState: () => AppState) => {
             try {
-
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds.toArray();
                 const swarmFeedApi = makeFeedApi(getState().author.identity!);
