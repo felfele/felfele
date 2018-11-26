@@ -158,6 +158,13 @@ export const AsyncActions = {
                     const posts = feedPosts
                         .sort((a, b) => b.createdAt - a.createdAt)
                         .slice(0, 20)
+                        .map(p => ({
+                            ...p,
+                            images: p.images.map(image => ({
+                                ...image,
+                                localPath: undefined,
+                            })),
+                        }))
                         ;
 
                     const uploadedPosts = await uploadPosts(posts);
