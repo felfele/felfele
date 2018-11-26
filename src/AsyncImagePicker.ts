@@ -1,4 +1,3 @@
-import { Config } from './Config';
 import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
 import { Debug } from './Debug';
@@ -66,7 +65,7 @@ const defaultImagePickerOtions: Options = {
     mediaType: 'photo',
     rotation: 360,
     storageOptions: {
-        cameraRoll: Config.saveToCameraRoll,
+        cameraRoll: true,
         waitUntilSaved: true,
     },
 };

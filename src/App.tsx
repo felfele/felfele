@@ -6,7 +6,6 @@ import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { Config } from './Config';
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Share } from './components/Share';
 import { Debug } from './Debug';
