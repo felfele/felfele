@@ -225,7 +225,7 @@ export const AsyncActions = {
                     dispatch(Actions.updatePostImages(post, mergedImages));
                 }
             } catch (e) {
-                Debug.log('sharePost: ', e);
+                Debug.log('sharePost: ', 'error', e);
                 dispatch(Actions.updatePostIsUploading(post, undefined));
             }
         };

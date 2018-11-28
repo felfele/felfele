@@ -25,13 +25,12 @@ const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
 };
 
 const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
-    Debug.log('ImageResizer: ', ImageResizer);
     if (isImageExceedMaximumDimensions(image)) {
         const [width, height] = calculateImageDimensions(image, MAX_UPLOADED_IMAGE_SIZE);
         const resizedImagePromise = ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
         const resizedImage = await resizedImagePromise;
         Debug.log('resizeImageIfNeeded: ', 'resizedImage', resizedImage);
-        return resizedImage.path;
+        return resizedImage.uri;
     }
     return path;
 };

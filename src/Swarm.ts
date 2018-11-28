@@ -62,13 +62,27 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
     return swarmUrl;
 };
 
+const imageMimeTypeFromPath = (path: string): string => {
+    if (path.endsWith('jpg')) {
+        return 'jpeg';
+    }
+    if (path.endsWith('jpeg')) {
+        return 'jpeg';
+    }
+    if (path.endsWith('png')) {
+        return 'png';
+    }
+    return 'unknown';
+};
+
 export const uploadPhoto = async (localPath: string): Promise<string> => {
     Debug.log('uploadPhoto: ', localPath);
     const data = new FormData();
-    const name = 'photo.jpeg';
+    const imageMimeType = imageMimeTypeFromPath(localPath);
+    const name = 'photo.' + imageMimeType;
     data.append('photo', {
         uri: localPath,
-        type: 'image/jpeg',
+        type: 'image/' + imageMimeType,
         name,
     } as any as Blob);
     data.append('title', 'photo');
