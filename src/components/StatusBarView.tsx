@@ -15,7 +15,7 @@ export const StatusBarView = ({ backgroundColor, ...props }) => (
 const majorVersionIOS = parseInt(Platform.Version as string, 10);
 const STATUSBAR_HEIGHT = Platform.OS === 'ios'
     ? majorVersionIOS < 11 ? 20 : 0
-    : StatusBar.currentHeight;
+    : 0;
 
 const styles = StyleSheet.create({
     statusBar: {
