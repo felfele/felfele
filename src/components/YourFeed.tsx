@@ -19,7 +19,7 @@ import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Post, getAuthorImageUri } from '../models/Post';
-import { ImageData } from '../models/ImageData';
+import { ImageData, calculateImageDimensions } from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
@@ -341,15 +341,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private calculateImageDimensions = (image: ImageData, maxWidth: number): number[] => {
-        if (image.width == null || image.height == null) {
-            return [maxWidth, maxWidth];
-        }
         if (this.props.settings.showSquareImages) {
             return [maxWidth, maxWidth];
         }
-        const ratio = image.width / maxWidth;
-        const height = image.height / ratio;
-        return [maxWidth, height];
+        return calculateImageDimensions(image, maxWidth);
     }
 
     private renderListHeader = () => {

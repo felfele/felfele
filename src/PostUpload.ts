@@ -1,7 +1,11 @@
+import ImageResizer from 'react-native-image-resizer';
+
 import { Post, Author } from './models/Post';
-import { ImageData, getLocalPath } from './models/ImageData';
+import { ImageData, getLocalPath, calculateImageDimensions } from './models/ImageData';
 import { uploadPhoto, isSwarmLink } from './Swarm';
 import { Debug } from './Debug';
+
+const MAX_UPLOADED_IMAGE_SIZE = 400;
 
 const isImageUploaded = (image: ImageData): boolean => {
     if (image.uri != null && isSwarmLink(image.uri)) {
@@ -10,13 +14,36 @@ const isImageUploaded = (image: ImageData): boolean => {
     return false;
 };
 
+const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
+    if (image.width != null && image.width >= MAX_UPLOADED_IMAGE_SIZE) {
+        return true;
+    }
+    if (image.height != null && image.height >= MAX_UPLOADED_IMAGE_SIZE) {
+        return true;
+    }
+    return false;
+};
+
+const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
+    Debug.log('ImageResizer: ', ImageResizer);
+    if (isImageExceedMaximumDimensions(image)) {
+        const [width, height] = calculateImageDimensions(image, MAX_UPLOADED_IMAGE_SIZE);
+        const resizedImagePromise = ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
+        const resizedImage = await resizedImagePromise;
+        Debug.log('resizeImageIfNeeded: ', 'resizedImage', resizedImage);
+        return resizedImage.path;
+    }
+    return path;
+};
+
 const uploadImage = async (image: ImageData): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
         if (image.localPath == null || image.localPath === '') {
             return image;
         }
         const path = getLocalPath(image.localPath);
-        const uri = await uploadPhoto(path);
+        const resizedImagePath = await resizeImageIfNeeded(image, path);
+        const uri = await uploadPhoto(resizedImagePath);
         return {
             ...image,
             localPath: undefined,

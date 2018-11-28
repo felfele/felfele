@@ -46,8 +46,8 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
     }
 };
 
-export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string): Promise<PostFeed> => {
-    const contentHash = await swarmFeedApi.downloadFeed(url);
+export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
+    const contentHash = await Swarm.downloadFeed(url);
     Debug.log('downloadPostFeed: contentHash: ', contentHash);
     try {
         const content = await Swarm.downloadData(contentHash);
@@ -89,8 +89,8 @@ export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string)
     }
 };
 
-export const loadPosts = async (swarmFeedApi: Swarm.FeedApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
-    const loadFeedPromises = postFeeds.map(feed => downloadPostFeed(swarmFeedApi, feed.feedUrl));
+export const loadPosts = async (postFeeds: Feed[]): Promise<PublicPost[]> => {
+    const loadFeedPromises = postFeeds.map(feed => downloadPostFeed(feed.feedUrl));
     const feeds = await Promise.all(loadFeedPromises);
     let posts: PublicPost[] = [];
     for (const feed of feeds) {

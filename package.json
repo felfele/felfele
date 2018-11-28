@@ -88,6 +88,7 @@
     "react-native-get-real-path": "git+https://github.com/Wraptime/react-native-get-real-path.git",
     "react-native-gravatar": "^1.0.2",
     "react-native-image-picker": "^0.26.10",
+    "react-native-image-resizer": "^1.0.0",
     "react-native-onboarding-swiper": "^0.7.1",
     "react-native-parse-html": "^2.2.6",
     "react-native-qrcode-scanner": "^1.1.0",

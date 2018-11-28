@@ -112,9 +112,8 @@ export const AsyncActions = {
             const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
             const rssPosts = await RSSPostManager.loadPosts(rssFeeds);
 
-            const swarmFeedApi = makeFeedApi(getState().author.identity!);
             const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-            const postFeedPosts = await loadPosts(swarmFeedApi, postFeeds);
+            const postFeedPosts = await loadPosts(postFeeds);
 
             const allPosts = (rssPosts as PublicPost[]).concat(postFeedPosts);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);

@@ -19,6 +19,8 @@ import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors } from '../styles';
+import * as Swarm from '../Swarm';
+import { downloadPostFeed } from '../PostFeed';
 
 interface EditFeedNavigationActions {
     back?: () => void;
@@ -85,11 +87,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
             loading: true,
         });
 
-        const url = Utils.getCanonicalUrl(this.state.url);
-        Debug.log('fetchFeed: url: ', url);
-        const feed = await this.fetchFeedFromUrl(url);
-        Debug.log('fetchFeed: feed: ', feed);
-
+        const feed = await this.fetchFeedFromUrl(this.state.url);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
                 checked: true,
@@ -180,6 +178,19 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     }
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
+        if (url.startsWith(Swarm.DefaultFeedPrefix)) {
+            const feed: Feed = await downloadPostFeed(url);
+            return feed;
+        } else {
+            const canonicalUrl = Utils.getCanonicalUrl(this.state.url);
+            Debug.log('fetchFeed: url: ', canonicalUrl);
+            const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
+            Debug.log('fetchFeed: feed: ', feed);
+            return feed;
+        }
+    }
+
+    private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
             const feed = await RSSFeedManager.fetchFeedFromUrl(url);
             Debug.log('fetchFeedFromUrl: feed: ', feed);
