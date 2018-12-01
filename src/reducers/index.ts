@@ -136,7 +136,10 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
 const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
-            return feeds.push(action.payload.feed);
+            if (!feeds.find(feed => feed != null && feed.feedUrl === action.payload.feed.feedUrl)) {
+                return feeds.push(action.payload.feed);
+            }
+            return feeds;
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
