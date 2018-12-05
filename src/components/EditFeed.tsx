@@ -75,7 +75,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
 
     public async onAdd(feed: Feed) {
         this.props.onAddFeed(feed);
-        this.goBack();
+        this.props.navigation.navigate('NewsTab');
     }
 
     public goBack() {

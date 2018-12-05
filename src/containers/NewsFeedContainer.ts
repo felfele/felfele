@@ -21,7 +21,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: () => {
-            dispatch(AsyncActions.downloadRssPosts());
+            dispatch(AsyncActions.downloadPosts());
         },
         onDeletePost: (post: Post) => {
             // do nothing
