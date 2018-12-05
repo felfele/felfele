@@ -27,6 +27,7 @@ export interface DispatchProps {
     createPost: (post: Post) => void;
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
+    onFixFeedFavicons: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -90,6 +91,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             }
                             title='Test identity creation'
                             onPress={async () => await this.onCreateIdentity()}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
+                            title='Fix feed favicons'
+                            onPress={this.props.onFixFeedFavicons}
                         />
                         <SettingsList.Item
                             icon={

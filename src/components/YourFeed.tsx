@@ -98,7 +98,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     public render() {
-        const barStyle = this.state.isOnline ? 'dark-content' : 'light-content';
         return (
             <SafeAreaView
                 style={{
@@ -113,7 +112,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     backgroundColor={Colors.BACKGROUND_COLOR}
                     hidden={false}
                     translucent={false}
-                    barStyle={barStyle}
+                    barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
                 <FlatList
@@ -131,6 +130,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                             style={styles.refreshControl}
                         />
                     }
+                    style={{
+                        backgroundColor: Colors.BACKGROUND_COLOR,
+                    }}
                 />
             </SafeAreaView>
         );

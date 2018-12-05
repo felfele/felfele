@@ -40,11 +40,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                         this.props.onChangeText(text);
                     }
                 }}
-                onSubmitEditing={(event) => {
-                    if (this.props.onSubmitEditing != null) {
-                        this.props.onSubmitEditing(this.state.text.trim());
-                    }
-                }}
+                onSubmitEditing={this.onSubmitEditing}
                 selectTextOnFocus={this.props.selectTextOnFocus}
                 value={this.state.text}
                 placeholder={this.props.placeholder}
@@ -61,7 +57,14 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 }
                 returnKeyType={this.props.returnKeyType}
                 testID={this.props.testID}
+                onEndEditing={this.onSubmitEditing}
             />
         );
+    }
+
+    private onSubmitEditing = () => {
+        if (this.props.onSubmitEditing != null) {
+            this.props.onSubmitEditing(this.state.text.trim());
+        }
     }
 }

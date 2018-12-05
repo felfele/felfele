@@ -2,17 +2,18 @@ import { Feed } from './models/Feed';
 import { PublicPost, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
 import * as Swarm from './Swarm';
-import { uploadPost, uploadImages } from './PostUpload';
+import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
 
-interface PostFeed extends Feed {
+export interface PostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
 }
 
 export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
-    const uploadedImages = await uploadImages([author.image!]);
+    Debug.log('createPostFeed: ', author);
+    const uploadedImages = await uploadImage(author.image!);
     const uploadedPost = await uploadPost(firstPost);
     const postFeed: PostFeed = {
         name: author.name,
@@ -47,11 +48,13 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
 };
 
 export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
-    const contentHash = await Swarm.downloadFeed(url);
-    Debug.log('downloadPostFeed: contentHash: ', contentHash);
     try {
+        const contentHash = await Swarm.downloadFeed(url);
+        Debug.log('downloadPostFeed: contentHash: ', contentHash);
+
         const content = await Swarm.downloadData(contentHash);
         Debug.log('downloadPostFeed: content: ', content);
+
         const postFeed = JSON.parse(content) as PostFeed;
         const authorImage = {
             uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
@@ -59,7 +62,7 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
         const author: Author = {
             name: postFeed.name,
             uri: postFeed.url,
-            faviconUri: '',
+            faviconUri: authorImage.uri,
             image: authorImage,
         };
         const postFeedWithGatewayImageLinks = {

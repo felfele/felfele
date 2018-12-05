@@ -17,11 +17,12 @@ import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
+import { PostFeed } from '../PostFeed';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
-    ownFeeds: List<Feed>;
+    ownFeeds: List<PostFeed>;
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -99,7 +100,7 @@ const defaultMetadata = {
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
-    ownFeeds: List<Feed>(),
+    ownFeeds: List<PostFeed>(),
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
@@ -148,13 +149,23 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
             }
             return feeds.remove(ind);
         }
+        case 'UPDATE-FEED-FAVICON': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
+            return feeds.update(ind, (feed) => ({
+                ...feed,
+                favicon: action.payload.favicon,
+            }));
+        }
         default: {
             return feeds;
         }
     }
 };
 
-const ownFeedsReducer = (ownFeeds = List<Feed>(), action: Actions): List<Feed> => {
+const ownFeedsReducer = (ownFeeds = List<PostFeed>(), action: Actions): List<PostFeed> => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
             return ownFeeds.push(action.payload.feed);

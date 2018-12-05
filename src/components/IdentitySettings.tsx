@@ -8,6 +8,7 @@ import {
     Image,
     TouchableOpacity,
     Dimensions,
+    Share,
 } from 'react-native';
 
 import { SimpleTextInput } from './SimpleTextInput';
@@ -60,6 +61,11 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     // null is needed otherwise it does not work with switchnavigator backbehavior property
                     props.navigation.goBack(null);
                 }}
+                rightButtonText='Share'
+                onPressRightButton={async () => await Share.share({
+                    url: props.ownFeed != null ? props.ownFeed.url : '',
+                    title: 'Share your feed',
+                }, {})}
                 title={title}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>
