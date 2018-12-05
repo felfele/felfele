@@ -7,8 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity } from '../Swarm';
+import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
+import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 
@@ -18,6 +18,7 @@ export enum ActionTypes {
     CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
     ADD_FEED = 'ADD-FEED',
     REMOVE_FEED = 'REMOVE-FEED',
+    UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
@@ -45,7 +46,7 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
-    addOwnFeed: (feed: Feed) =>
+    addOwnFeed: (feed: PostFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
@@ -53,6 +54,8 @@ const InternalActions = {
         createAction(ActionTypes.QUEUE_POST_FOR_UPLOAD, { post }),
     removePostForUpload: (post: Post) =>
         createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
+    updateFeedFavicon: (feed: Feed, favicon: string) =>
+        createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
 };
 
 export const Actions = {
@@ -195,6 +198,7 @@ export const AsyncActions = {
                         ...feed,
                         posts: uploadedPosts,
                         authorImage: {
+                            ...feed.authorImage,
                             localPath: '',
                         },
                     };
@@ -248,6 +252,19 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             const privateIdentity = await generateSecureIdentity();
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
+        };
+    },
+    fixFeedFavicons: () => {
+        return async (dispatch, getState: () => AppState) => {
+            const feeds = getState().feeds.toArray().filter(feed => isPostFeedUrl(feed.url));
+            for (const feed of feeds) {
+                if (feed.favicon == null || feed.favicon === '') {
+                    const downloadedFeed = await downloadPostFeed(feed.url);
+                    if (downloadedFeed.favicon !== '') {
+                        dispatch(InternalActions.updateFeedFavicon(feed, downloadedFeed.favicon));
+                    }
+                }
+            }
         };
     },
 };
