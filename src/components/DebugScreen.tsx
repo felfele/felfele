@@ -15,6 +15,7 @@ import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
+import * as AreYouSureDialog from './AreYouSureDialog';
 
 export interface StateProps {
     appState: AppState;
@@ -73,7 +74,7 @@ export class DebugScreen extends React.Component<Props, any> {
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
                             title='App state reset'
-                            onPress={this.props.onAppStateReset}
+                            onPress={async () => await this.onAppStateReset()}
                         />
                         <SettingsList.Item
                             icon={
@@ -176,5 +177,14 @@ export class DebugScreen extends React.Component<Props, any> {
 
     private onCreateIdentity = async () => {
         this.props.onCreateIdentity();
+    }
+
+    private onAppStateReset = async () => {
+        const confirmed = await AreYouSureDialog.show('Are you sure you want to reset the app state?');
+        Debug.log('onAppStateReset: ', confirmed);
+        if (confirmed) {
+            this.props.onAppStateReset();
+            this.props.navigation.navigate('Welcome');
+        }
     }
 }
