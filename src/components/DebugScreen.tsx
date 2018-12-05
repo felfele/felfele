@@ -184,7 +184,6 @@ export class DebugScreen extends React.Component<Props, any> {
         Debug.log('onAppStateReset: ', confirmed);
         if (confirmed) {
             this.props.onAppStateReset();
-            this.props.navigation.navigate('Welcome');
         }
     }
 }
