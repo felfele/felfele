@@ -61,7 +61,7 @@ const onboardingAuthor: Author = {
 
 const defaultPost1: Post = {
     _id: 0,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [],
     text: `Basic features:.
 
@@ -74,7 +74,7 @@ If you feel overwhelmed by the news, you can define your own filters in the Sett
 };
 const defaultPost2: Post = {
     _id: 1,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [{
         uri: '../../images/addrss.gif',
     }],
@@ -84,7 +84,7 @@ const defaultPost2: Post = {
 
 const defaultPost3: Post = {
     _id: 2,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [],
     text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
     author: onboardingAuthor,
@@ -95,7 +95,7 @@ const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
 const defaultCurrentTimestamp = 0;
 
 const defaultMetadata = {
-    highestSeenPostId: 2,
+    highestSeenPostId: defaultLocalPosts.size - 1,
 };
 
 const defaultState: AppState = {
