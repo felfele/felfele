@@ -63,7 +63,6 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
                     {this.props.feeds.map(feed => (
                         <SettingsList.Item
                             title={feed.name}
-                            titleInfo={feed.url}
                             icon={<Favicon uri={feed.favicon} />}
                             key={feed.url}
                             onPress={() => {
