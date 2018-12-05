@@ -8,22 +8,26 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { getAuthorImageUri } from '../models/Post';
+import { getAuthorImageUri, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
-import { StateProps, DispatchProps } from './IdentitySettings';
+import { DispatchProps } from './IdentitySettings';
 // @ts-ignore
 import defaultUserImage = require('../../images/user_circle.png');
+import { Debug } from '../Debug';
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
 
+export { DispatchProps };
+export interface StateProps {
+    author: Author;
+}
+
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
-    if (props.author.name === '') {
-        props.onUpdateAuthor(namePlaceholder);
-    }
     const authorImageUri = getAuthorImageUri(props.author);
+    Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
         <KeyboardAvoidingView>
             <Text style={styles.tooltip}>{tooltip}</Text>

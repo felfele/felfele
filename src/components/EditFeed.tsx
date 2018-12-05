@@ -32,9 +32,9 @@ const navigationActions: EditFeedNavigationActions = {
     add: undefined,
 };
 
-const QRCodeWidth = Dimensions.get('window').width * 0.75;
+const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
-const QRCameraWidth = Dimensions.get('window').width * 0.75;
+const QRCameraWidth = Dimensions.get('window').width * 0.6;
 const QRCameraHeight = QRCameraWidth;
 
 interface EditFeedState {
@@ -139,7 +139,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                 />
                 <View style={styles.qrCameraContainer}>
                     <QRCodeScanner
-                        onRead={this.onScanSuccess}
+                        onRead={async (event) => await this.onScanSuccess(event)}
                         containerStyle={{
                             width: QRCameraWidth,
                             height: QRCameraHeight,
@@ -157,7 +157,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     }
 
     private ExistingItemView = (props) => {
-        const qrCodeValue = JSON.stringify(this.props.feed);
+        const qrCodeValue = this.props.feed.url;
         return (
             <View>
                 <Button
@@ -235,10 +235,11 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         this.goBack();
     }
 
-    private onScanSuccess = (event) => {
+    private onScanSuccess = async (event) => {
         try {
             Debug.log(event);
-            const feed = JSON.parse(event.data) as Feed;
+            const feedUri = event.data;
+            const feed = await downloadPostFeed(feedUri);
             this.onAdd(feed);
         } catch (e) {
             Debug.log(e);

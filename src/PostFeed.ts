@@ -13,15 +13,15 @@ export interface PostFeed extends Feed {
 export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
     Debug.log('createPostFeed: ', author);
-    const uploadedImages = await uploadImage(author.image!);
+    const uploadedImage = await uploadImage(author.image);
     const uploadedPost = await uploadPost(firstPost);
     const postFeed: PostFeed = {
         name: author.name,
         url,
         feedUrl: url,
-        favicon: uploadedImages[0].localPath!,
+        favicon: uploadedImage.localPath || '',
         posts: [uploadedPost],
-        authorImage: uploadedImages[0],
+        authorImage: uploadedImage,
     };
     return await updatePostFeed(swarmFeedApi, postFeed);
 };
@@ -75,6 +75,7 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
                     uri: Swarm.getSwarmGatewayUrl(image.uri!),
                 })),
             })),
+            favicon: authorImage.uri,
         };
         return postFeedWithGatewayImageLinks;
     } catch (e) {

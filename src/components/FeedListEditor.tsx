@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, Button, Image } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import { Feed } from '../models/Feed';
-import { IconSize, Colors } from '../styles';
+import { IconSize, Colors, DefaultStyle } from '../styles';
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
@@ -33,10 +33,7 @@ const Favicon = (props) => (
                 source={{
                     uri: props.uri,
                 }}
-                style={{
-                    width: IconSize.LARGE_LIST_ICON,
-                    height: IconSize.LARGE_LIST_ICON,
-                }}
+                style={DefaultStyle.favicon}
             />
         }
     </View>

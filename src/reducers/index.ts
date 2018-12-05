@@ -57,6 +57,7 @@ const onboardingAuthor: Author = {
     faviconUri: '',
     name: 'Felfele Assistant',
     uri: '',
+    image: {},
 };
 
 const defaultPost1: Post = {

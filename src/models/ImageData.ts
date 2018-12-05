@@ -17,7 +17,7 @@ export const getLocalPath = (localPath: string): string => {
     return documentPath + localPath;
 };
 
-export const getImageUri = (image: ImageData): string => {
+export const getImageUri = (image: ImageData): string | any => {
     if (image.localPath != null) {
         return getLocalPath(image.localPath);
     }

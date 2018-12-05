@@ -37,23 +37,19 @@ const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const title = 'Identity';
 
-const QRCodeWidth = Dimensions.get('window').width * 0.8;
+const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
 const generateQRCodeValue = (feed?: Feed): string => {
     if (feed == null) {
         return '';
     }
-    const feedWithoutPosts = {
-        ...feed,
-        posts: undefined,
-    };
-    return JSON.stringify(feedWithoutPosts);
+    return feed.url;
 };
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const authorImageUri = getAuthorImageUri(props.author);
-    Debug.log(qrCodeValue);
+    Debug.log('IdentitySettings: ', qrCodeValue);
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
