@@ -4,8 +4,9 @@ import { generateSecureRandom } from 'react-native-securerandom';
 
 import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
+import { safeFetch } from './Network';
 
-export const DefaultGateway = 'http://swarm.helmethair.co';
+export const DefaultGateway = 'http://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
@@ -42,7 +43,7 @@ export const uploadForm = async (data: FormData): Promise<string> => {
     };
     options.body = data;
     Debug.log('uploadForm: ', url, options);
-    const response = await fetch(url, options);
+    const response = await safeFetch(url, options);
     const text = await response.text();
     Debug.log('uploadForm: response: ', text);
     return text;
@@ -101,14 +102,14 @@ export const uploadData = async (data: string): Promise<string> => {
         method: 'POST',
     };
     options.body = data;
-    const response = await fetch(url, options);
+    const response = await safeFetch(url, options);
     const text = await response.text();
     return text;
 };
 
 export const downloadData = async (hash: string): Promise<string> => {
-    const url = DefaultGateway + '/bzz:/' + hash;
-    const response = await fetch(url);
+    const url = DefaultGateway + '/bzz:/' + hash + '/';
+    const response = await safeFetch(url);
     const text = await response.text();
     return text;
 };
@@ -128,7 +129,7 @@ interface FeedTemplate {
 export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promise<FeedTemplate> => {
     const url = DefaultGateway + `/bzz-feed:/?user=${identity.address}&meta=1`;
     Debug.log('downloadFeedTemplate: ', url);
-    const response = await fetch(url);
+    const response = await safeFetch(url);
     const feedUpdateResponse = await response.json() as FeedTemplate;
     Debug.log('downloadFeedTemplate: ', feedUpdateResponse);
     return feedUpdateResponse;
@@ -147,7 +148,7 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
         method: 'POST',
         body: data,
     };
-    const response = await fetch(url, options);
+    const response = await safeFetch(url, options);
     const text = await response.text();
     Debug.log('updateFeed: ', text);
 
@@ -161,10 +162,7 @@ export const downloadUserFeed = async (identity: PublicIdentity): Promise<string
 export const downloadFeed = async (feedUri: string): Promise<string> => {
     const url = DefaultGateway + '/' + feedUri;
     Debug.log('downloadFeed: ', url);
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network error: ' + response.status);
-    }
+    const response = await safeFetch(url);
     const text = await response.text();
     return text;
 };

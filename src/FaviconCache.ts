@@ -1,5 +1,6 @@
 import { HtmlUtils } from './HtmlUtils';
 import { Debug } from './Debug';
+import { safeFetch } from './Network';
 
 // tslint:disable-next-line:class-name
 class _FaviconCache {
@@ -30,11 +31,7 @@ class _FaviconCache {
     }
 
     private async fetchHtml(url): Promise<string> {
-        const response = await fetch(url);
-        if (response.status !== 200) {
-            throw new Error('failed to download html');
-        }
-
+        const response = await safeFetch(url);
         const html = await response.text();
         return html;
 
