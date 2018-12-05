@@ -35,7 +35,7 @@ const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<stri
     return path;
 };
 
-const uploadImage = async (image: ImageData): Promise<ImageData> => {
+export const uploadImage = async (image: ImageData): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
         if (image.localPath == null || image.localPath === '') {
             return image;
