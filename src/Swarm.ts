@@ -162,6 +162,9 @@ export const downloadFeed = async (feedUri: string): Promise<string> => {
     const url = DefaultGateway + '/' + feedUri;
     Debug.log('downloadFeed: ', url);
     const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Network error: ' + response.status);
+    }
     const text = await response.text();
     return text;
 };
