@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import * as Communications from 'react-native-communications';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
-import { Version } from '../Version';
 import {
     upload,
     download,
@@ -40,7 +38,6 @@ export class DebugScreen extends React.Component<Props, any> {
     }
 
     public render() {
-        const version = Version;
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <NavigationHeader
@@ -106,11 +103,6 @@ export class DebugScreen extends React.Component<Props, any> {
                             title='Logs'
                             onPress={() => this.props.navigation.navigate('LogViewer')}
                         />
-
-                        <SettingsList.Item
-                            title={version}
-                        />
-
                     </SettingsList>
                 </View>
             </View>

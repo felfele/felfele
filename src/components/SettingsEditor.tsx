@@ -4,6 +4,8 @@ import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
+import { Version } from '../Version';
+import { Colors } from '../styles';
 
 export interface StateProps {
     navigation: any;
@@ -13,11 +15,13 @@ export interface StateProps {
 export interface DispatchProps {
     onSaveToCameraRollValueChange: (value: boolean) => void;
     onShowSquareImagesValueChange: (value: boolean) => void;
+    onShowDebugMenuValueChange: (value: boolean) => void;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const SettingsEditor = (props: Props) => {
+    const version = 'Version: ' + Version;
     return (
         <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
@@ -52,7 +56,16 @@ export const SettingsEditor = (props: Props) => {
                         hasSwitch={true}
                         title='Show square images'
                     />
-                        <SettingsList.Item
+                    <SettingsList.Item
+                        hasNavArrow={false}
+                        title={version}
+                        onLongPress={() => props.onShowDebugMenuValueChange(true)}
+                        style={{
+                            color: Colors.GRAY,
+                        }}
+                    />
+                    { props.settings.showDebugMenu &&
+                    <SettingsList.Item
                         icon={
                             <SettingsIcon>
                                 <Ionicons name='md-bug' size={24} color='gray' />
@@ -61,6 +74,7 @@ export const SettingsEditor = (props: Props) => {
                         title='Debug menu'
                         onPress={() => props.navigation.navigate('Debug')}
                     />
+                    }
                 </SettingsList>
             </View>
         </SafeAreaView>

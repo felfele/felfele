@@ -18,6 +18,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onShowSquareImagesValueChange: (value: boolean) => {
             dispatch(Actions.changeSettingShowSquareImages(value));
         },
+        onShowDebugMenuValueChange: (value: boolean) => {
+            dispatch(Actions.changeSettingShowDebugMenu(value));
+        },
     };
 };
 

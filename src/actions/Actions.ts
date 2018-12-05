@@ -37,6 +37,7 @@ export enum ActionTypes {
     APP_STATE_RESET = 'APP-STATE-RESET',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
+    CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
     QUEUE_POST_FOR_UPLOAD = 'QUEUE-POST-FOR-UPLOAD',
     REMOVE_POST_FOR_UPLOAD = 'REMOVE-POST-FOR-UPLOAD',
 }
@@ -93,6 +94,8 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SAVE_TO_CAMERA_ROLL, { value }),
     changeSettingShowSquareImages: (value: boolean) =>
         createAction(ActionTypes.CHANGE_SETTING_SHOW_SQUARE_IMAGES, { value }),
+    changeSettingShowDebugMenu: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
 };
 
 export const AsyncActions = {

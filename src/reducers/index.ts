@@ -40,6 +40,7 @@ interface Metadata {
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
     showSquareImages: true,
+    showDebugMenu: false,
 };
 
 const defaultAuthor: Author = {
@@ -188,6 +189,12 @@ const settingsReducer = (settings = defaultSettings, action: Actions): Settings 
             return {
                 ...settings,
                 showSquareImages: action.payload.value,
+            };
+        }
+        case 'CHANGE-SETTING-SHOW-DEBUG-MENU': {
+            return {
+                ...settings,
+                showDebugMenu: action.payload.value,
             };
         }
     }
