@@ -108,7 +108,7 @@ export const AsyncActions = {
             });
         };
     },
-    downloadRssPosts: () => {
+    downloadPosts: () => {
         return async (dispatch, getState: () => AppState) => {
             const feeds = getState().feeds.toArray();
 
