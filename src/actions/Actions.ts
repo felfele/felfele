@@ -116,12 +116,14 @@ export const AsyncActions = {
             const feeds = getState().feeds.toArray();
 
             const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
-            const rssPosts = await RSSPostManager.loadPosts(rssFeeds);
-
             const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-            const postFeedPosts = await loadPosts(postFeeds);
 
-            const allPosts = (rssPosts as PublicPost[]).concat(postFeedPosts);
+            const allPostsCombined = await Promise.all([
+                RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
+                loadPosts(postFeeds),
+            ]);
+
+            const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
             const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
 
