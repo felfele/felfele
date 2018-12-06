@@ -49,8 +49,8 @@ export const DefaultStyle = StyleSheet.create({
     },
     favicon: {
         borderRadius : 3,
-        width: 32,
-        height: 32,
+        width: IconSize.LARGE_LIST_ICON,
+        height: IconSize.LARGE_LIST_ICON,
         marginHorizontal: 4,
         marginVertical: 3,
     },
