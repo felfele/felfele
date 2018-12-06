@@ -3,6 +3,7 @@ import { View, Text, Button, Image, FlatList } from 'react-native';
 import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
+import { Icon } from 'react-native-vector-icons/Icon';
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
@@ -24,15 +25,24 @@ export interface StateProps {
 }
 
 const FAVICON_PADDING_LEFT = 5;
+const FAVICON_PADDING_VERTICAL = 20;
+const FAVICON_WIDTH = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_LEFT;
+const FAVICON_HEIGHT = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_VERTICAL;
+
 const Favicon = (props) => (
     <View style={{
-        paddingVertical: 10,
+        paddingVertical: FAVICON_PADDING_VERTICAL,
         paddingLeft: FAVICON_PADDING_LEFT,
+        width: FAVICON_WIDTH,
+        height: FAVICON_HEIGHT,
+        margin: 0,
     }}>
         { props.uri != null && props.uri !== '' &&
             <Image
                 source={{
                     uri: props.uri,
+                    width: IconSize.LARGE_LIST_ICON,
+                    height: IconSize.LARGE_LIST_ICON,
                 }}
                 style={DefaultStyle.favicon}
             />
@@ -61,6 +71,9 @@ const FeedListItem = (props) => (
             <Text
                 numberOfLines={1}
                 ellipsizeMode='tail'
+                style={{
+                    fontSize: 16,
+                }}
             >{props.feed.name}</Text>
         </View>
     </TouchableView>
