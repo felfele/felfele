@@ -6,7 +6,7 @@ import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
 import { safeFetch } from './Network';
 
-export const DefaultGateway = 'http://swarm.felfele.com';
+export const DefaultGateway = 'https://swarm-gateways.net';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
