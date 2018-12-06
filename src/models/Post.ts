@@ -32,6 +32,11 @@ export interface Post extends PublicPost {
 }
 
 export const getAuthorImageUri = (author: Author): string => {
+    // this is here for compatibility with previous version where
+    // image was optional
+    if (author.image == null) {
+        return author.faviconUri;
+    }
     if (author.image.localPath != null) {
         return getLocalPath(author.image.localPath);
     }
