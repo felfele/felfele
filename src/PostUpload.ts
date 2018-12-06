@@ -5,7 +5,8 @@ import { ImageData, getLocalPath, calculateImageDimensions } from './models/Imag
 import { uploadPhoto, isSwarmLink } from './Swarm';
 import { Debug } from './Debug';
 
-const MAX_UPLOADED_IMAGE_SIZE = 400;
+const MAX_UPLOADED_IMAGE_DIMENSION = 400;
+const MAX_UPLOADED_IMAGE_SIZE = 500 * 1024;
 
 const isImageUploaded = (image: ImageData): boolean => {
     if (image.uri != null && isSwarmLink(image.uri)) {
@@ -15,10 +16,10 @@ const isImageUploaded = (image: ImageData): boolean => {
 };
 
 const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
-    if (image.width != null && image.width >= MAX_UPLOADED_IMAGE_SIZE) {
+    if (image.width != null && image.width >= MAX_UPLOADED_IMAGE_DIMENSION) {
         return true;
     }
-    if (image.height != null && image.height >= MAX_UPLOADED_IMAGE_SIZE) {
+    if (image.height != null && image.height >= MAX_UPLOADED_IMAGE_DIMENSION) {
         return true;
     }
     return false;
@@ -26,11 +27,15 @@ const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
 
 const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
     if (isImageExceedMaximumDimensions(image)) {
-        const [width, height] = calculateImageDimensions(image, MAX_UPLOADED_IMAGE_SIZE);
-        const resizedImagePromise = ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
-        const resizedImage = await resizedImagePromise;
-        Debug.log('resizeImageIfNeeded: ', 'resizedImage', resizedImage);
-        return resizedImage.uri;
+        const [width, height] = calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
+        const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
+        Debug.log('resizeImageIfNeeded: ', 'resizedImagePNG', resizedImagePNG);
+        if (resizedImagePNG.size != null && resizedImagePNG.size < MAX_UPLOADED_IMAGE_SIZE) {
+            return resizedImagePNG.uri;
+        }
+        const resizedImageJPEG = await ImageResizer.createResizedImage(path, width, height, 'JPEG', 100);
+        Debug.log('resizeImageIfNeeded: ', 'resizedImageJPEG', resizedImageJPEG);
+        return resizedImageJPEG.uri;
     }
     return path;
 };
