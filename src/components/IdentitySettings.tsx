@@ -11,6 +11,7 @@ import {
     Share,
     ShareContent,
     ShareOptions,
+    Platform,
 } from 'react-native';
 
 import { SimpleTextInput } from './SimpleTextInput';
@@ -51,10 +52,11 @@ const generateQRCodeValue = (feed?: Feed): string => {
 const showShareDialog = async (feed?: Feed) => {
     const url = feed != null ? feed.url : '';
     const title = 'Share your feed';
+    const message = Platform.OS === 'android' ? url : undefined;
     const content: ShareContent = {
         url,
         title,
-        message: url,
+        message,
     };
     const options: ShareOptions = {
     };
