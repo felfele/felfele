@@ -84,17 +84,13 @@ const FeedListItemSeparator = (props) => (
         style={{
             width: '100%',
             height: 1,
+            maxHeight: 1,
             flexDirection: 'row',
             backgroundColor: Colors.LIGHTER_GRAY,
+            marginLeft: IconSize.LARGE_LIST_ICON + FAVICON_PADDING_LEFT * 3,
+            padding: 0,
         }}
     >
-        <View
-            style={{
-                backgroundColor: Colors.WHITE,
-                width: IconSize.LARGE_LIST_ICON + FAVICON_PADDING_LEFT * 3,
-            }}
-        >
-        </View>
     </View>
 );
 
@@ -127,6 +123,9 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
                     keyExtractor={(item) => item.url}
                     style={{
                         backgroundColor: Colors.LIGHTER_GRAY,
+                    }}
+                    contentContainerStyle={{
+                        backgroundColor: Colors.WHITE,
                     }}
                 />
             </View>
