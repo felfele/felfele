@@ -1,4 +1,4 @@
-import { Post } from './models/Post';
+import { Post, PublicPost } from './models/Post';
 import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
@@ -284,7 +284,7 @@ class _RSSPostManager {
         // do nothing
     }
 
-    public async loadPosts(storedFeeds: Feed[]): Promise<Post[]> {
+    public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
         const startTime = Date.now();
         const posts = [];
         const metrics: FeedWithMetrics[] = [];
@@ -431,7 +431,6 @@ class _RSSPostManager {
     }
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
-        Debug.log('RSS items: ', rssFeed.items);
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
@@ -479,7 +478,6 @@ class _RSSPostManager {
             return true;
         });
 
-        Debug.log('RSS items posts: ', posts);
         return posts;
     }
 

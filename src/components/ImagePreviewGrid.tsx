@@ -3,6 +3,7 @@ import { Image, View, StyleSheet } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
+import { ImageView } from './ImageView';
 
 export interface StateProps {
     columns: number;
@@ -27,13 +28,16 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
         const images = this.props.images.map((image) =>
             <TouchableView
                 onLongPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
+                key={image.localPath}
             >
-                <Image source={{uri: image.uri}}
-                    style={{width: this.notGreaterThan(image.width, maxWidth),
-                            height: this.notGreaterThan(image.height, maxHeight),
-                            borderWidth: 1,
-                            borderColor: 'white'}}
-                        key={image.uri}
+                <ImageView
+                    source={image}
+                    style={{
+                        width: this.notGreaterThan(image.width, maxWidth),
+                        height: this.notGreaterThan(image.height, maxHeight),
+                        borderWidth: 1,
+                        borderColor: 'white',
+                    }}
                 />
             </TouchableView>
         );

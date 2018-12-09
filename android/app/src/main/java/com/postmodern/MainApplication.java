@@ -3,8 +3,9 @@ package com.postmodern;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
+import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.horcrux.svg.SvgPackage;
+import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
 import com.rnfs.RNFSPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.imagepicker.ImagePickerPackage;
@@ -30,8 +31,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNSecureRandomPackage(),
+            new ImageResizerPackage(),
             new SvgPackage(),
+            new RNSecureRandomPackage(),
             new RNFSPackage(),
             new RNCameraPackage(),
             new ImagePickerPackage(),

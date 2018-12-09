@@ -2,10 +2,9 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/index';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
-import { IdentityOnboarding } from '../components/IdentityOnboarding';
 import { ImageData} from '../models/ImageData';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const ownFeed = state.ownFeeds.toArray().length > 0
         ? state.ownFeeds.toArray()[0]
         : undefined;
@@ -31,8 +30,3 @@ export const IdentitySettingsContainer = connect<StateProps, DispatchProps, {}>(
    mapStateToProps,
    mapDispatchToProps,
 )(IdentitySettings);
-
-export const IdentityOnboardingContainer = connect<StateProps, DispatchProps, {}>(
-    mapStateToProps,
-    mapDispatchToProps,
- )(IdentityOnboarding);

@@ -14,13 +14,14 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: filteredPosts,
+        settings: state.settings,
     };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: () => {
-            dispatch(AsyncActions.downloadRssPosts());
+            dispatch(AsyncActions.downloadPosts());
         },
         onDeletePost: (post: Post) => {
             // do nothing

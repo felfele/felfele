@@ -7,8 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity } from '../Swarm';
+import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
+import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 
@@ -18,6 +18,7 @@ export enum ActionTypes {
     CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
     ADD_FEED = 'ADD-FEED',
     REMOVE_FEED = 'REMOVE-FEED',
+    UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
@@ -34,6 +35,11 @@ export enum ActionTypes {
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
+    CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
+    CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
+    CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
+    QUEUE_POST_FOR_UPLOAD = 'QUEUE-POST-FOR-UPLOAD',
+    REMOVE_POST_FOR_UPLOAD = 'REMOVE-POST-FOR-UPLOAD',
 }
 
 const InternalActions = {
@@ -41,10 +47,16 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
-    addOwnFeed: (feed: Feed) =>
+    addOwnFeed: (feed: PostFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
+    queuePostForUpload: (post: Post) =>
+        createAction(ActionTypes.QUEUE_POST_FOR_UPLOAD, { post }),
+    removePostForUpload: (post: Post) =>
+        createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
+    updateFeedFavicon: (feed: Feed, favicon: string) =>
+        createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
 };
 
 export const Actions = {
@@ -78,6 +90,12 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_AUTHOR_PICTURE_PATH, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
+    changeSettingSaveToCameraRoll: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SAVE_TO_CAMERA_ROLL, { value }),
+    changeSettingShowSquareImages: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SHOW_SQUARE_IMAGES, { value }),
+    changeSettingShowDebugMenu: (value: boolean) =>
+        createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
 };
 
 export const AsyncActions = {
@@ -93,18 +111,19 @@ export const AsyncActions = {
             });
         };
     },
-    downloadRssPosts: () => {
+    downloadPosts: () => {
         return async (dispatch, getState: () => AppState) => {
             const feeds = getState().feeds.toArray();
 
             const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
-            const rssPosts = await RSSPostManager.loadPosts(rssFeeds);
-
-            const swarmFeedApi = makeFeedApi(getState().author.identity!);
             const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-            const postFeedPosts = await loadPosts(swarmFeedApi, postFeeds);
 
-            const allPosts = (rssPosts as PublicPost[]).concat(postFeedPosts);
+            const allPostsCombined = await Promise.all([
+                RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
+                loadPosts(postFeeds),
+            ]);
+
+            const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
             const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
 
@@ -129,8 +148,26 @@ export const AsyncActions = {
     },
     sharePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
+            const isQueueEmtpy = getState().postUploadQueue.size === 0;
+            dispatch(InternalActions.queuePostForUpload(post));
+            dispatch(Actions.updatePostIsUploading(post, true));
+            if (isQueueEmtpy) {
+                dispatch(AsyncActions.uploadPostsFromQueue());
+            }
+        };
+    },
+    uploadPostsFromQueue: () => {
+        return async (dispatch, getState: () => AppState) => {
+            while (getState().postUploadQueue.size > 0) {
+                const post = getState().postUploadQueue.first();
+                await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
+                dispatch(InternalActions.removePostForUpload(post));
+            }
+        };
+    },
+    uploadPostFromQueue: (post: Post) => {
+        return async (dispatch, getState: () => AppState) => {
             try {
-
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds.toArray();
                 const swarmFeedApi = makeFeedApi(getState().author.identity!);
@@ -152,6 +189,13 @@ export const AsyncActions = {
                     const posts = feedPosts
                         .sort((a, b) => b.createdAt - a.createdAt)
                         .slice(0, 20)
+                        .map(p => ({
+                            ...p,
+                            images: p.images.map(image => ({
+                                ...image,
+                                localPath: undefined,
+                            })),
+                        }))
                         ;
 
                     const uploadedPosts = await uploadPosts(posts);
@@ -159,6 +203,7 @@ export const AsyncActions = {
                         ...feed,
                         posts: uploadedPosts,
                         authorImage: {
+                            ...feed.authorImage,
                             localPath: '',
                         },
                     };
@@ -189,7 +234,7 @@ export const AsyncActions = {
                     dispatch(Actions.updatePostImages(post, mergedImages));
                 }
             } catch (e) {
-                Debug.log('sharePost: ', e);
+                Debug.log('sharePost: ', 'error', e);
                 dispatch(Actions.updatePostIsUploading(post, undefined));
             }
         };
@@ -212,6 +257,19 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             const privateIdentity = await generateSecureIdentity();
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
+        };
+    },
+    fixFeedFavicons: () => {
+        return async (dispatch, getState: () => AppState) => {
+            const feeds = getState().feeds.toArray().filter(feed => isPostFeedUrl(feed.url));
+            for (const feed of feeds) {
+                if (feed.favicon == null || feed.favicon === '') {
+                    const downloadedFeed = await downloadPostFeed(feed.url);
+                    if (downloadedFeed.favicon !== '') {
+                        dispatch(InternalActions.updateFeedFavicon(feed, downloadedFeed.favicon));
+                    }
+                }
+            }
         };
     },
 };

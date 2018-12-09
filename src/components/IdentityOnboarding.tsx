@@ -8,30 +8,27 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { Author, getAuthorImageUri } from '../models/Post';
+import { getAuthorImageUri, Author } from '../models/Post';
+import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Colors, DefaultStyle } from '../styles';
-// @ts-ignore
-const image = require('../../images/user_circle.png');
+import { Colors } from '../styles';
+import { DispatchProps } from './IdentitySettings';
 
-export interface DispatchProps {
-    onUpdateAuthor: (text: string) => void;
-    onUpdatePicture: (path: string) => void;
-}
-
-export interface StateProps {
-    author: Author;
-    navigation: any;
-}
+// tslint:disable-next-line:no-var-requires
+const defaultUserImage = require('../../images/user_circle.png');
+import { Debug } from '../Debug';
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
 
+export { DispatchProps };
+export interface StateProps {
+    author: Author;
+}
+
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
-    if (props.author.name === '') {
-        props.onUpdateAuthor(namePlaceholder);
-    }
     const authorImageUri = getAuthorImageUri(props.author);
+    Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
         <KeyboardAvoidingView>
             <Text style={styles.tooltip}>{tooltip}</Text>
@@ -56,7 +53,7 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                 >
                     <Image
                         source={authorImageUri === ''
-                        ? image
+                        ? defaultUserImage
                         : { uri: authorImageUri }
                         }
                         style={styles.faviconPicker}
@@ -67,10 +64,10 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (path: string) => void) => {
+const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
-    if (imageData != null && imageData.localPath) {
-        onUpdatePicture(imageData.localPath);
+    if (imageData != null) {
+        onUpdatePicture(imageData);
     }
 };
 

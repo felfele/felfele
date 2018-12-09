@@ -11,7 +11,7 @@ export interface Author {
     name: string;
     uri: string;
     faviconUri: string;
-    image?: ImageData;
+    image: ImageData;
     identity?: PrivateIdentity;
 }
 
@@ -32,13 +32,16 @@ export interface Post extends PublicPost {
 }
 
 export const getAuthorImageUri = (author: Author): string => {
-    if (author.image != null) {
-        if (author.image.localPath != null) {
-            return getLocalPath(author.image.localPath);
-        }
-        if (author.image.uri != null) {
-            return author.image.uri;
-        }
+    // this is here for compatibility with previous version where
+    // image was optional
+    if (author.image == null) {
+        return author.faviconUri;
+    }
+    if (author.image.localPath != null) {
+        return getLocalPath(author.image.localPath);
+    }
+    if (author.image.uri != null) {
+        return author.image.uri;
     }
     return author.faviconUri;
 };

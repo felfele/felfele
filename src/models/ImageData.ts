@@ -17,7 +17,7 @@ export const getLocalPath = (localPath: string): string => {
     return documentPath + localPath;
 };
 
-export const getImageUri = (image: ImageData): string => {
+export const getImageUri = (image: ImageData): string | any => {
     if (image.localPath != null) {
         return getLocalPath(image.localPath);
     }
@@ -25,4 +25,13 @@ export const getImageUri = (image: ImageData): string => {
         return getSwarmGatewayUrl(image.uri);
     }
     return '';
+};
+
+export const calculateImageDimensions = (image: ImageData, maxWidth: number): number[] => {
+    if (image.width == null || image.height == null) {
+        return [maxWidth, maxWidth];
+    }
+    const ratio = image.width / maxWidth;
+    const height = image.height / ratio;
+    return [maxWidth, height];
 };

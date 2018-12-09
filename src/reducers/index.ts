@@ -17,11 +17,12 @@ import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
+import { PostFeed } from '../PostFeed';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
-    ownFeeds: List<Feed>;
+    ownFeeds: List<PostFeed>;
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -29,6 +30,7 @@ export interface AppState {
     localPosts: List<Post>;
     draft: Post | null;
     metadata: Metadata;
+    postUploadQueue: List<Post>;
 }
 
 interface Metadata {
@@ -37,6 +39,8 @@ interface Metadata {
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
+    showSquareImages: true,
+    showDebugMenu: false,
 };
 
 const defaultAuthor: Author = {
@@ -53,11 +57,12 @@ const onboardingAuthor: Author = {
     faviconUri: '',
     name: 'Felfele Assistant',
     uri: '',
+    image: {},
 };
 
 const defaultPost1: Post = {
     _id: 0,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [],
     text: `Basic features:.
 
@@ -70,7 +75,7 @@ If you feel overwhelmed by the news, you can define your own filters in the Sett
 };
 const defaultPost2: Post = {
     _id: 1,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [{
         uri: '../../images/addrss.gif',
     }],
@@ -80,7 +85,7 @@ const defaultPost2: Post = {
 
 const defaultPost3: Post = {
     _id: 2,
-    createdAt: 0,
+    createdAt: Date.now(),
     images: [],
     text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
     author: onboardingAuthor,
@@ -90,19 +95,22 @@ const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
 
 const defaultCurrentTimestamp = 0;
 
+const defaultMetadata = {
+    highestSeenPostId: defaultLocalPosts.size - 1,
+};
+
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(),
-    ownFeeds: List<Feed>(),
+    ownFeeds: List<PostFeed>(),
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: List<Post>(),
     localPosts: defaultLocalPosts,
     draft: null,
-    metadata: {
-        highestSeenPostId: 2,
-    },
+    metadata: defaultMetadata,
+    postUploadQueue: List<Post>(),
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -131,7 +139,10 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
 const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
-            return feeds.push(action.payload.feed);
+            if (!feeds.find(feed => feed != null && feed.feedUrl === action.payload.feed.feedUrl)) {
+                return feeds.push(action.payload.feed);
+            }
+            return feeds;
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
@@ -140,13 +151,23 @@ const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
             }
             return feeds.remove(ind);
         }
+        case 'UPDATE-FEED-FAVICON': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
+            return feeds.update(ind, (feed) => ({
+                ...feed,
+                favicon: action.payload.favicon,
+            }));
+        }
         default: {
             return feeds;
         }
     }
 };
 
-const ownFeedsReducer = (ownFeeds = List<Feed>(), action: Actions): List<Feed> => {
+const ownFeedsReducer = (ownFeeds = List<PostFeed>(), action: Actions): List<PostFeed> => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
             return ownFeeds.push(action.payload.feed);
@@ -157,7 +178,27 @@ const ownFeedsReducer = (ownFeeds = List<Feed>(), action: Actions): List<Feed> =
     }
 };
 
-const settingsReducer = (settings = defaultSettings): Settings => {
+const settingsReducer = (settings = defaultSettings, action: Actions): Settings => {
+    switch (action.type) {
+        case 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL': {
+            return {
+                ...settings,
+                saveToCameraRoll: action.payload.value,
+            };
+        }
+        case 'CHANGE-SETTING-SHOW-SQUARE-IMAGES': {
+            return {
+                ...settings,
+                showSquareImages: action.payload.value,
+            };
+        }
+        case 'CHANGE-SETTING-SHOW-DEBUG-MENU': {
+            return {
+                ...settings,
+                showDebugMenu: action.payload.value,
+            };
+        }
+    }
     return settings;
 };
 
@@ -255,7 +296,7 @@ const draftReducer = (draft: Post | null = null, action: Actions): Post | null =
     return draft;
 };
 
-const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: Actions): Metadata => {
+const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions): Metadata => {
     switch (action.type) {
         case 'INCREASE-HIGHEST-SEEN-POST-ID': {
             return {
@@ -267,6 +308,22 @@ const metadataReducer = (metadata: Metadata = { highestSeenPostId: 0 }, action: 
             return metadata;
         }
     }
+};
+
+const postUploadQueueReducer = (postUploadQueue = List<Post>(), action: Actions): List<Post> => {
+    switch (action.type) {
+        case 'QUEUE-POST-FOR-UPLOAD': {
+            return postUploadQueue.push(action.payload.post);
+        }
+        case 'REMOVE-POST-FOR-UPLOAD': {
+            const ind = postUploadQueue.findIndex(post => post != null && action.payload.post._id === post._id);
+            if (ind === -1) {
+                return postUploadQueue;
+            }
+            return postUploadQueue.remove(ind);
+        }
+    }
+    return postUploadQueue;
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
@@ -284,7 +341,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -302,6 +359,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    postUploadQueue: postUploadQueueReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
@@ -318,6 +376,7 @@ const initStore = () => {
     Debug.log('initStore: ', store.getState());
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
+    store.dispatch(AsyncActions.uploadPostsFromQueue());
     patchState();
 };
 

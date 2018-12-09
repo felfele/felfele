@@ -22,6 +22,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onCreateIdentity: () => {
             dispatch(AsyncActions.createUserIdentity());
         },
+        onFixFeedFavicons: () => {
+            dispatch(AsyncActions.fixFeedFavicons());
+        },
    };
 };
 

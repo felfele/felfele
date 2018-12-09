@@ -1,12 +1,9 @@
 import * as React from 'react';
-import { View, Alert, StyleSheet, Button } from 'react-native';
+import { View } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import * as Communications from 'react-native-communications';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
-import { Version } from '../Version';
-import { Config } from '../Config';
 import {
     upload,
     download,
@@ -18,19 +15,7 @@ import { AppState } from '../reducers';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
-
-const styles = StyleSheet.create({
-    imageStyle: {
-        marginLeft: 15,
-        alignSelf: 'center',
-        height: 30,
-        width: 30,
-    },
-    titleInfoStyle: {
-        fontSize: 16,
-        color: '#8e8e93',
-    },
-});
+import * as AreYouSureDialog from './AreYouSureDialog';
 
 export interface StateProps {
     appState: AppState;
@@ -41,6 +26,7 @@ export interface DispatchProps {
     createPost: (post: Post) => void;
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
+    onFixFeedFavicons: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -53,7 +39,6 @@ export class DebugScreen extends React.Component<Props, any> {
     }
 
     public render() {
-        const version = Version;
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <NavigationHeader
@@ -88,15 +73,8 @@ export class DebugScreen extends React.Component<Props, any> {
                             icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
-                            title='Send the database in an email'
-                            onPress={async () => await this.onSendEmailOfDatabase()}
-                        />
-                        <SettingsList.Item
-                            icon={
-                                <Ionicons name='md-sync' size={30} color='gray' />
-                            }
                             title='App state reset'
-                            onPress={this.props.onAppStateReset}
+                            onPress={async () => await this.onAppStateReset()}
                         />
                         <SettingsList.Item
                             icon={
@@ -116,14 +94,16 @@ export class DebugScreen extends React.Component<Props, any> {
                             icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
+                            title='Fix feed favicons'
+                            onPress={this.props.onFixFeedFavicons}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
                             title='Logs'
                             onPress={() => this.props.navigation.navigate('LogViewer')}
                         />
-
-                        <SettingsList.Item
-                            title={version}
-                        />
-
                     </SettingsList>
                 </View>
             </View>
@@ -177,13 +157,6 @@ export class DebugScreen extends React.Component<Props, any> {
         Debug.log('Downloaded file: ', data);
     }
 
-    private async onSendEmailOfDatabase() {
-        const keyValues = await AsyncStorageWrapper.getAllKeyValues();
-        const databaseDump = JSON.stringify(keyValues);
-        const date = new Date(Date.now()).toJSON;
-        Communications.email(Config.email, '', '', 'Postmodern database dump ' + date, databaseDump);
-    }
-
     private async onMigratePosts() {
         const asyncStoragePosts = await Storage.post.getAllValues();
         const oldPosts = asyncStoragePosts.sort((a, b) => a.createdAt - b.createdAt);
@@ -204,5 +177,13 @@ export class DebugScreen extends React.Component<Props, any> {
 
     private onCreateIdentity = async () => {
         this.props.onCreateIdentity();
+    }
+
+    private onAppStateReset = async () => {
+        const confirmed = await AreYouSureDialog.show('Are you sure you want to reset the app state?');
+        Debug.log('onAppStateReset: ', confirmed);
+        if (confirmed) {
+            this.props.onAppStateReset();
+        }
     }
 }

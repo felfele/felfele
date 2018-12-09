@@ -6,8 +6,7 @@ import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { Config } from './Config';
-import { Settings } from './components/Settings';
+import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
@@ -67,7 +66,7 @@ const Root = TabNavigator(
             },
         },
         SettingsTab: {
-            screen: ({navigation}) => (<Settings config={Config} error='Error' navigation={navigation} />),
+            screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
             path: '/settings',
             navigationOptions: {
                 header: undefined,

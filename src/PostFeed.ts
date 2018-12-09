@@ -2,41 +2,32 @@ import { Feed } from './models/Feed';
 import { PublicPost, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
 import * as Swarm from './Swarm';
-import { uploadPost, uploadImages } from './PostUpload';
+import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
 
-interface PostFeed extends Feed {
+export interface PostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
 }
 
-const SWARM_PREFIX = Swarm.DefaultPrefix;
-const HASH_SERVICE_URL = 'http://feeds.helmethair.co/feeds/';
-
 export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
-    const uploadedImages = await uploadImages([author.image!]);
+    Debug.log('createPostFeed: ', author);
+    const uploadedImage = await uploadImage(author.image);
     const uploadedPost = await uploadPost(firstPost);
     const postFeed: PostFeed = {
         name: author.name,
         url,
         feedUrl: url,
-        favicon: uploadedImages[0].localPath!,
+        favicon: uploadedImage.localPath || '',
         posts: [uploadedPost],
-        authorImage: uploadedImages[0],
+        authorImage: uploadedImage,
     };
     return await updatePostFeed(swarmFeedApi, postFeed);
 };
 
 export const isPostFeedUrl = (url: string): boolean => {
-    return url.startsWith(SWARM_PREFIX);
-};
-
-const hashFromUrl = (url: string): string => {
-    if (isPostFeedUrl(url)) {
-        return url.slice(SWARM_PREFIX.length);
-    }
-    return url;
+    return url.startsWith(Swarm.DefaultFeedPrefix);
 };
 
 export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: PostFeed): Promise<PostFeed> => {
@@ -44,8 +35,11 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
         const postFeedJson = JSON.stringify(postFeed);
         const contentHash = await Swarm.upload(postFeedJson);
         await swarmFeedApi.update(contentHash);
+        const url = swarmFeedApi.getUri();
         return {
             ...postFeed,
+            url,
+            feedUrl: url,
         };
     } catch (e) {
         Debug.log('updatePostFeed failed, ', e);
@@ -53,42 +47,35 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
     }
 };
 
-const updateHashFromService = async (locationHash: string, contentHash: string): Promise<string> => {
-    const timestamp = Date.now();
-    const body = JSON.stringify({contentHash, locationHash, timestamp});
-    const rawResponse = await fetch(HASH_SERVICE_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body,
-    });
-    const response = await rawResponse.json();
-    Debug.log('updateHash: response: ', response, rawResponse.status, body);
-    return response.id;
-};
-
-const downloadHashFromService = async (locationHash: string): Promise<string> => {
-    const rawResponse = await fetch(HASH_SERVICE_URL + '?locationHash=' + locationHash + '&_sort=timestamp&_order=desc&_limit=1');
-    const response = await rawResponse.json();
-    Debug.log('downloadHash: response: ', response, response.contentHash, rawResponse.status);
-    return response[0].contentHash;
-};
-
-export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string): Promise<PostFeed> => {
-    const contentHash = await swarmFeedApi.downloadFeed(url);
-    Debug.log('downloadPostFeed: contentHash: ', contentHash);
+export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
     try {
+        const contentHash = await Swarm.downloadFeed(url);
+        Debug.log('downloadPostFeed: contentHash: ', contentHash);
+
         const content = await Swarm.downloadData(contentHash);
         Debug.log('downloadPostFeed: content: ', content);
+
         const postFeed = JSON.parse(content) as PostFeed;
+        const authorImage = {
+            uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+        };
+        const author: Author = {
+            name: postFeed.name,
+            uri: postFeed.url,
+            faviconUri: authorImage.uri,
+            image: authorImage,
+        };
         const postFeedWithGatewayImageLinks = {
             ...postFeed,
             posts: postFeed.posts.map(post => ({
                 ...post,
+                author,
                 images: post.images.map(image => ({
                     ...image,
                     uri: Swarm.getSwarmGatewayUrl(image.uri!),
                 })),
             })),
+            favicon: authorImage.uri,
         };
         return postFeedWithGatewayImageLinks;
     } catch (e) {
@@ -106,8 +93,8 @@ export const downloadPostFeed = async (swarmFeedApi: Swarm.FeedApi, url: string)
     }
 };
 
-export const loadPosts = async (swarmFeedApi: Swarm.FeedApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
-    const loadFeedPromises = postFeeds.map(feed => downloadPostFeed(swarmFeedApi, feed.feedUrl));
+export const loadPosts = async (postFeeds: Feed[]): Promise<PublicPost[]> => {
+    const loadFeedPromises = postFeeds.map(feed => downloadPostFeed(feed.feedUrl));
     const feeds = await Promise.all(loadFeedPromises);
     let posts: PublicPost[] = [];
     for (const feed of feeds) {

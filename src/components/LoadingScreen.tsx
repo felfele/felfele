@@ -1,8 +1,6 @@
 import * as React from 'react';
 import {
     View,
-    ActivityIndicator,
-    StatusBar,
 } from 'react-native';
 import { Author } from '../models/Post';
 

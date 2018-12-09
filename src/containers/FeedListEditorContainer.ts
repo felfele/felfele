@@ -7,7 +7,7 @@ import { getSwarmGatewayUrl } from '../Swarm';
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const feeds = state.feeds.toArray().map(feed => ({
         ...feed,
-        favicon: getSwarmGatewayUrl(feed.favicon),
+        favicon: getSwarmGatewayUrl(feed.favicon || ''),
     }));
     return {
         feeds,

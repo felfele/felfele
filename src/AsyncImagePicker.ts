@@ -1,4 +1,3 @@
-import { Config } from './Config';
 import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
 import { Debug } from './Debug';
@@ -63,10 +62,10 @@ interface StorageOptions {
 const defaultImagePickerOtions: Options = {
     allowsEditing: false,
     noData: true,
-    mediaType: 'mixed',
+    mediaType: 'photo',
     rotation: 360,
     storageOptions: {
-        cameraRoll: Config.saveToCameraRoll,
+        cameraRoll: true,
         waitUntilSaved: true,
     },
 };

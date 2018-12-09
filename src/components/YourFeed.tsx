@@ -10,29 +10,27 @@ import {
     Image,
     RefreshControl,
     StyleSheet,
-    StatusBar,
     Platform,
     SafeAreaView,
     LayoutAnimation,
     ActivityIndicator,
 } from 'react-native';
-import { Gravatar } from 'react-native-gravatar';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// tslint:disable-next-line:no-var-requires
-const RNFS = require('react-native-fs');
 
-import { Config } from '../Config';
 import { Post, getAuthorImageUri } from '../models/Post';
+import { ImageData, calculateImageDimensions } from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash, isSwarmLink, getSwarmGatewayUrl } from '../Swarm';
+import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
+import { StatusBarView } from './StatusBarView';
+import { Settings } from '../models/Settings';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -46,6 +44,7 @@ export interface DispatchProps {
 export interface StateProps {
     navigation: any;
     posts: Post[];
+    settings: Settings;
 }
 
 interface YourFeedState {
@@ -99,8 +98,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     public render() {
-        const isStatusBarHidden = false;
-        const barStyle = this.state.isOnline ? 'dark-content' : 'light-content';
         return (
             <SafeAreaView
                 style={{
@@ -111,26 +108,32 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     opacity: 0.96,
             }
             }>
-                <StatusBar backgroundColor={Colors.BACKGROUND_COLOR} hidden={isStatusBarHidden} translucent={false} barStyle={barStyle}/>
-                <View>
-                    <FlatList
-                        ListHeaderComponent={this.renderListHeader}
-                        ListFooterComponent={this.renderListFooter}
-                        data={this.props.posts}
-                        renderItem={(obj) => this.renderCard(obj.item)}
-                        keyExtractor={(item) => '' + item._id}
-                        extraData={this.state}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={this.state.isRefreshing}
-                                onRefresh={() => this.onRefresh() }
-                                progressViewOffset={HeaderOffset}
-                                style={styles.refreshControl}
-                            />
-                        }
-                    />
-                </View>
-                <View style={styles.translucentBar} ></View>
+                <StatusBarView
+                    backgroundColor={Colors.BACKGROUND_COLOR}
+                    hidden={false}
+                    translucent={false}
+                    barStyle='dark-content'
+                    networkActivityIndicatorVisible={true}
+                />
+                <FlatList
+                    ListHeaderComponent={this.renderListHeader}
+                    ListFooterComponent={this.renderListFooter}
+                    data={this.props.posts}
+                    renderItem={(obj) => this.renderCard(obj.item)}
+                    keyExtractor={(item) => '' + item._id}
+                    extraData={this.state}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.isRefreshing}
+                            onRefresh={() => this.onRefresh() }
+                            progressViewOffset={HeaderOffset}
+                            style={styles.refreshControl}
+                        />
+                    }
+                    style={{
+                        backgroundColor: Colors.BACKGROUND_COLOR,
+                    }}
+                />
             </SafeAreaView>
         );
     }
@@ -230,15 +233,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 <Image source={imageSource} style={DefaultStyle.favicon} />
             );
         } else {
-            return (
-                <Gravatar options={{
-                    email: Config.email,
-                    secure: true,
-                    parameters: { size: '100', d: 'mm' },
-                }}
-                    style={DefaultStyle.favicon}
-                />
-            );
+            return null;
         }
     }
 
@@ -324,13 +319,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                                     />
                                 );
                             } else {
+                                const [width, height] = this.calculateImageDimensions(image, WindowWidth);
                                 return (
                                     <ImageView
                                         key={image.uri || '' + index}
                                         source={image}
                                         style={{
-                                            width: WindowWidth,
-                                            height: WindowWidth,
+                                            width: width,
+                                            height: height,
                                         }}
                                     />
                                 );
@@ -344,6 +340,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 </View>
             );
         }
+    }
+
+    private calculateImageDimensions = (image: ImageData, maxWidth: number): number[] => {
+        if (this.props.settings.showSquareImages) {
+            return [maxWidth, maxWidth];
+        }
+        return calculateImageDimensions(image, maxWidth);
     }
 
     private renderListHeader = () => {

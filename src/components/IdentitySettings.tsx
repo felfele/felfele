@@ -8,13 +8,16 @@ import {
     Image,
     TouchableOpacity,
     Dimensions,
+    Share,
+    ShareContent,
+    ShareOptions,
 } from 'react-native';
 
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author, getAuthorImageUri } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Colors, DefaultStyle } from '../styles';
+import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
 const defaultUserImage = require('../../images/user_circle.png');
@@ -34,25 +37,34 @@ export interface StateProps {
 
 const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
-const title = 'Identity';
+const screenTitle = 'Identity';
 
-const QRCodeWidth = Dimensions.get('window').width * 0.8;
+const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
 const generateQRCodeValue = (feed?: Feed): string => {
     if (feed == null) {
         return '';
     }
-    const feedWithoutPosts = {
-        ...feed,
-        posts: undefined,
+    return feed.url;
+};
+
+const showShareDialog = async (feed?: Feed) => {
+    const url = feed != null ? feed.url : '';
+    const title = 'Share your feed';
+    const content: ShareContent = {
+        url,
+        title,
+        message: url,
     };
-    return JSON.stringify(feedWithoutPosts);
+    const options: ShareOptions = {
+    };
+    await Share.share(content, options);
 };
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const authorImageUri = getAuthorImageUri(props.author);
-    Debug.log(qrCodeValue);
+    Debug.log('IdentitySettings: ', qrCodeValue);
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
@@ -60,7 +72,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     // null is needed otherwise it does not work with switchnavigator backbehavior property
                     props.navigation.goBack(null);
                 }}
-                title={title}
+                rightButtonText={props.ownFeed != null ? 'Share' : undefined}
+                onPressRightButton={async () => showShareDialog(props.ownFeed)}
+                title={screenTitle}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput
