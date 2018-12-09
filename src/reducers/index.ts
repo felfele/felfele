@@ -376,6 +376,7 @@ const initStore = () => {
     Debug.log('initStore: ', store.getState());
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
+    // @ts-ignore
     store.dispatch(AsyncActions.uploadPostsFromQueue());
     patchState();
 };
