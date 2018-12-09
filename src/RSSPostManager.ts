@@ -286,7 +286,7 @@ class _RSSPostManager {
 
     public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
         const startTime = Date.now();
-        const posts = [];
+        const posts: Post[] = [];
         const metrics: FeedWithMetrics[] = [];
 
         const feedMap = {};

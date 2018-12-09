@@ -1,17 +1,23 @@
 import 'react-native';
-import { mock } from 'mock-async-storage';
+import MockAsyncStorage from 'mock-async-storage';
 import { AsyncStorage } from 'react-native';
 
 import { StorageWithAutoIds, StorageWithStringKey } from '../src/Storage';
 import { Post } from '../src/models/Post';
 
-mock();
+const mock = () => {
+    const mockImpl = new MockAsyncStorage();
+    jest.mock('AsyncStorage', () => mockImpl);
+};
+
+const release = () => jest.unmock('AsyncStorage');
 
 let storageWithAutoIds: StorageWithAutoIds<Post>;
 let storageWithStringKey: StorageWithStringKey<Post>;
 let post: Post;
 
 beforeEach(() => {
+    mock();
     storageWithAutoIds = new StorageWithAutoIds<Post>('test');
     storageWithStringKey = new StorageWithStringKey<Post>('test@');
 
@@ -24,6 +30,7 @@ beforeEach(() => {
 
 afterEach(() => {
     AsyncStorage.clear();
+    release();
 });
 
 test('List empty database successfully', async () => {
