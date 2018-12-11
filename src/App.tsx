@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { Platform } from 'react-native';
+import { Platform, YellowBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -26,6 +26,7 @@ import { appendToLog } from './components/LogViewer';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors } from './styles';
 
+YellowBox.ignoreWarnings(['Method `jumpToIndex` is deprecated.']);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
 
