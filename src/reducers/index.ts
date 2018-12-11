@@ -1,4 +1,4 @@
-import { List } from 'immutable';
+import { List, Iterable } from 'immutable';
 import {
     createStore,
     combineReducers,
@@ -18,6 +18,7 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
+import { Utils } from '../Utils';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
@@ -247,9 +248,24 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
+const removeItem = <T>(list: List<T>, predicate: (value?: T, index?: number, iter?: Iterable.Indexed<T>) => boolean): List<T> => {
+    const ind = list.findIndex(predicate);
+    if (ind >= 0) {
+        return list.remove(ind);
+    } else {
+        return list;
+    }
+};
+
 const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
     switch (action.type) {
         case 'ADD-POST': {
+            if (localPosts.findIndex(post => post != null && post._id === defaultPost1._id) >= 0) {
+                let list = removeItem(localPosts, post => post != null && post._id === defaultPost1._id);
+                list = removeItem(list, post => post != null && post._id === defaultPost2._id);
+                list = removeItem(list, post => post != null && post._id === defaultPost3._id);
+                return list.insert(0, action.payload.post);
+            }
             return localPosts.insert(0, action.payload.post);
         }
         case 'DELETE-POST': {
