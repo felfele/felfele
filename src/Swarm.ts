@@ -4,7 +4,7 @@ import { generateSecureRandom } from 'react-native-securerandom';
 
 import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
-import { safeFetch } from './Network';
+import { safeFetch, safeFetchWithTimeout } from './Network';
 
 export const DefaultGateway = 'https://swarm-gateways.net';
 export const DefaultUrlScheme = '/bzz-raw:/';
@@ -107,9 +107,9 @@ export const uploadData = async (data: string): Promise<string> => {
     return text;
 };
 
-export const downloadData = async (hash: string): Promise<string> => {
+export const downloadData = async (hash: string, timeout: number = 0): Promise<string> => {
     const url = DefaultGateway + '/bzz:/' + hash + '/';
-    const response = await safeFetch(url);
+    const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
 };
@@ -159,10 +159,10 @@ export const downloadUserFeed = async (identity: PublicIdentity): Promise<string
     return await downloadFeed(`bzz-feed:/?user=${identity.address}`);
 };
 
-export const downloadFeed = async (feedUri: string): Promise<string> => {
+export const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
     const url = DefaultGateway + '/' + feedUri;
     Debug.log('downloadFeed: ', url);
-    const response = await safeFetch(url);
+    const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
 };

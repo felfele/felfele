@@ -4,7 +4,9 @@ const Url = require('url');
 export class Utils {
     public static async timeout<T>(ms, promise: Promise<T>): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            setTimeout(() => reject(new Error('timeout')), ms);
+            if (ms > 0) {
+                setTimeout(() => reject(new Error('timeout')), ms);
+            }
             promise.then(resolve, reject);
         });
     }
