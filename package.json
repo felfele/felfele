@@ -33,35 +33,6 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build"
   },
-  "jest": {
-    "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "\\.(ts|tsx)$": "ts-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!react-native|react-navigation)/"
-    ],
-    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "testPathIgnorePatterns": [
-      "\\.snap$",
-      "<rootDir>/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/build/",
-      "<rootDir>/e2e/"
-    ],
-    "cacheDirectory": ".jest/cache",
-    "globals": {
-      "ts-jest": {
-        "skipBabel": true
-      }
-    }
-  },
   "dependencies": {
     "buffer": "^5.2.1",
     "elliptic": "^6.4.1",
