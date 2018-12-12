@@ -5,8 +5,8 @@ import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const posts = state.rssPosts
-        .filter(post => post != null && post.author != null && post.author.uri === state.currentFeed.)
+    const posts = state.rssPosts.concat(state.localPosts)
+        .filter(post => post != null && post.author != null && post.author.uri === ownProps.navigation.state.params.feedUrl)
         .toArray();
 
     return {

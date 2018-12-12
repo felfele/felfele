@@ -245,13 +245,16 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
-            <View style={styles.infoContainer}>
+            <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Feed', { feedUrl: post.author && post.author.uri })}
+                style={styles.infoContainer}
+            >
                 { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
                     <Text style={styles.username} numberOfLines={1}>{username}</Text>
                     <Text style={styles.location}>{printableTime}{hostnameText}</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
 

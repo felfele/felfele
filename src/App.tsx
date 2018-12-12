@@ -25,6 +25,7 @@ import { WelcomeContainer } from './containers/WelcomeContainer';
 import { appendToLog } from './components/LogViewer';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors } from './styles';
+import { FeedContainer } from './containers/FeedContainer';
 
 YellowBox.ignoreWarnings(['Method `jumpToIndex` is deprecated.']);
 Debug.setDebug(true);
@@ -121,6 +122,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
+    },
+    Feed: {
+        screen: FeedContainer,
     },
     Debug: {
         screen: DebugScreenContainer,

@@ -20,6 +20,7 @@ export enum ActionTypes {
     REMOVE_FEED = 'REMOVE-FEED',
     UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
+    OPEN_FEED = 'OPEN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
     REMOVE_POST = 'REMOVE-POST',
@@ -49,6 +50,8 @@ const InternalActions = {
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
     addOwnFeed: (feed: PostFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
+    openFeed: (feedUrl: string) =>
+        createAction(ActionTypes.OPEN_FEED, { feedUrl }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
     queuePostForUpload: (post: Post) =>
