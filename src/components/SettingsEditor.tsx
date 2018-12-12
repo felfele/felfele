@@ -59,7 +59,7 @@ export const SettingsEditor = (props: Props) => {
                     <SettingsList.Item
                         hasNavArrow={false}
                         title={version}
-                        onLongPress={() => props.onShowDebugMenuValueChange(true)}
+                        onLongPress={() => props.onShowDebugMenuValueChange(!props.settings.showDebugMenu)}
                         style={{
                             color: Colors.GRAY,
                         }}
