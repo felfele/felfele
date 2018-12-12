@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { RSSPostManager } from '../RSSPostManager';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
@@ -15,6 +15,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         settings: state.settings,
+        displayFeedHeader: true,
     };
 };
 

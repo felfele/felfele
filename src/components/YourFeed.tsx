@@ -31,6 +31,7 @@ import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
+import { NavigationHeader } from './NavigationHeader';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -45,6 +46,7 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     settings: Settings;
+    displayFeedHeader: boolean;
 }
 
 interface YourFeedState {
@@ -350,11 +352,21 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderListHeader = () => {
-        return (
-            <FeedHeader
-                navigation={this.props.navigation}
-                onSavePost={this.props.onSavePost} />
-        );
+        if (this.props.displayFeedHeader) {
+            return (
+                <FeedHeader
+                    navigation={this.props.navigation}
+                    onSavePost={this.props.onSavePost}
+                />
+            );
+        } else {
+            return (
+                <NavigationHeader
+                    leftButtonText='Back'
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                />
+            );
+        }
     }
 
     private renderListFooter = () => {
