@@ -305,7 +305,7 @@ class _RSSPostManager {
                 const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
                 Debug.log('RSSPostManager: ', rssFeed, favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }
@@ -430,7 +430,7 @@ class _RSSPostManager {
         return s;
     }
 
-    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
+    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
@@ -451,7 +451,7 @@ class _RSSPostManager {
                 link:  item.link,
                 author: {
                     name: feedName,
-                    uri: rssFeed.url,
+                    uri: feedUrl,
                     faviconUri: strippedFaviconUri,
                     image: {
                         uri: strippedFaviconUri,
