@@ -71,6 +71,7 @@
     }
   },
   "dependencies": {
+    "@erebos/swarm": "^0.5.2",
     "buffer": "^5.0.6",
     "elliptic": "^6.4.1",
     "immutable": "^3.8.2",

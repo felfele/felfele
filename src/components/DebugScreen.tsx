@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SwarmClient } from '@erebos/swarm';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import {
@@ -101,6 +102,13 @@ export class DebugScreen extends React.Component<Props, any> {
                             icon={
                                 <Ionicons name='md-sync' size={30} color='gray' />
                             }
+                            title='Test Erebos'
+                            onPress={this.testErebos}
+                        />
+                        <SettingsList.Item
+                            icon={
+                                <Ionicons name='md-sync' size={30} color='gray' />
+                            }
                             title='Logs'
                             onPress={() => this.props.navigation.navigate('LogViewer')}
                         />
@@ -185,5 +193,11 @@ export class DebugScreen extends React.Component<Props, any> {
         if (confirmed) {
             this.props.onAppStateReset();
         }
+    }
+
+    private testErebos = async () => {
+        const client = new SwarmClient('https://swarm-gateways.net');
+        const hash = await client.uploadFile('hello');
+        Debug.log('testErebos: ', hash);
     }
 }
