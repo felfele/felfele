@@ -7,8 +7,6 @@ import {
 import { IdentityOnboarding, DispatchProps as IdentityOnboardingDispatchProps  } from '../components/IdentityOnboarding';
 import { ImageData } from '../models/ImageData';
 import { Author } from '../models/Post';
-// @ts-ignore
-import defaultUserImage = require('../../images/user_circle.png');
 
 export interface DispatchProps extends IdentityOnboardingDispatchProps {
     onCreateIdentity: () => void;
