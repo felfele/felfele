@@ -3,7 +3,6 @@ import { View, Text, Button, Image, FlatList } from 'react-native';
 import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
-import { Icon } from 'react-native-vector-icons/Icon';
 
 interface FeedListEditorNavigationActions {
     back?: () => void;
