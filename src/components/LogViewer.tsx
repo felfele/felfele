@@ -41,11 +41,12 @@ export const LogViewer = (props: Props) => {
 
             <FlatList
                 data={logData}
-                renderItem={({item, index}) => <View key={'' + props.currentTimestamp + '/' + index} style={styles.logLineContainer}>
+                renderItem={({item, index}) => <View style={styles.logLineContainer}>
                         <Text style={styles.logTimeText}>{item[0]}</Text>
                         <Text style={styles.logText}>{item[1]}</Text>
                     </View>
                 }
+                keyExtractor={(item) => item[0]}
             />
         </View>
     );
