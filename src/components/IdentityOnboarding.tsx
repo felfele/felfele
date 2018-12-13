@@ -13,8 +13,9 @@ import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { DispatchProps } from './IdentitySettings';
-// @ts-ignore
-import defaultUserImage = require('../../images/user_circle.png');
+
+// tslint:disable-next-line:no-var-requires
+const defaultUserImage = require('../../images/user_circle.png');
 import { Debug } from '../Debug';
 
 const tooltip = 'Name';

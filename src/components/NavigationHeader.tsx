@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     middleContainer: {
-        flex: 1,
     },
     rightContainer: {
         flex: 1,

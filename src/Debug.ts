@@ -10,7 +10,7 @@ export class Debug {
     }
 
     public static log(...args: any[]) {
-        console.log.apply(console, args);
+        console.log.call(console, ...args);
         const maxLengthArgs = args.map((value) => {
             const stringValue = JSON.stringify(value);
             if (stringValue && stringValue.length > Debug.maxLength) {

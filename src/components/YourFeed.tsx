@@ -31,6 +31,7 @@ import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
+import { NavigationHeader } from './NavigationHeader';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -45,6 +46,7 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     settings: Settings;
+    displayFeedHeader: boolean;
 }
 
 interface YourFeedState {
@@ -106,8 +108,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     flex: 1,
                     height: '100%',
                     opacity: 0.96,
-            }
-            }>
+                }}
+            >
                 <StatusBarView
                     backgroundColor={Colors.BACKGROUND_COLOR}
                     hidden={false}
@@ -115,6 +117,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
+                {!this.props.displayFeedHeader &&
+                <NavigationHeader
+                    leftButtonText='Back'
+                    title={this.props.navigation.state.params.author.name}
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                />}
                 <FlatList
                     ListHeaderComponent={this.renderListHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -243,13 +251,16 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
-            <View style={styles.infoContainer}>
+            <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Feed', { author: post.author && post.author })}
+                style={styles.infoContainer}
+            >
                 { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
                     <Text style={styles.username} numberOfLines={1}>{username}</Text>
                     <Text style={styles.location}>{printableTime}{hostnameText}</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
 
@@ -350,11 +361,16 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderListHeader = () => {
-        return (
-            <FeedHeader
-                navigation={this.props.navigation}
-                onSavePost={this.props.onSavePost} />
-        );
+        if (this.props.displayFeedHeader) {
+            return (
+                <FeedHeader
+                    navigation={this.props.navigation}
+                    onSavePost={this.props.onSavePost}
+                />
+            );
+        } else {
+            return null;
+        }
     }
 
     private renderListFooter = () => {

@@ -21,7 +21,7 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 // @ts-ignore
-import defaultUserImage = require('../../images/user_circle.png');
+const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 

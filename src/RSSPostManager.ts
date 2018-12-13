@@ -236,7 +236,7 @@ export class RSSFeedManager {
 
         // It looks like there is a valid feed on the url
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
-            const rssFeed = await Feed.load(url, contentWithMimeType.content);
+            const rssFeed = await feedHelper.load(url, contentWithMimeType.content);
             Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
             const baseUrl = Utils.getBaseUrl(url);
             Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
@@ -286,7 +286,7 @@ class _RSSPostManager {
 
     public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
         const startTime = Date.now();
-        const posts = [];
+        const posts: Post[] = [];
         const metrics: FeedWithMetrics[] = [];
 
         const feedMap = {};
@@ -305,7 +305,7 @@ class _RSSPostManager {
                 const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
                 Debug.log('RSSPostManager: ', rssFeed, favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }
@@ -415,7 +415,7 @@ class _RSSPostManager {
 
     private async loadFeed(feedUrl: string): Promise<FeedWithMetrics | null> {
         try {
-            const rss = await Feed.fetch(feedUrl);
+            const rss = await feedHelper.fetch(feedUrl);
             return rss;
         } catch (e) {
             Debug.log(e, feedUrl);
@@ -430,7 +430,7 @@ class _RSSPostManager {
         return s;
     }
 
-    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string): Post[] {
+    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
@@ -451,7 +451,7 @@ class _RSSPostManager {
                 link:  item.link,
                 author: {
                     name: feedName,
-                    uri: rssFeed.url,
+                    uri: feedUrl,
                     faviconUri: strippedFaviconUri,
                     image: {
                         uri: strippedFaviconUri,
@@ -499,11 +499,20 @@ const util = require('react-native-util');
 // tslint:disable-next-line:no-var-requires
 const xml2js = require('react-native-xml2js');
 
-const Feed = {
+interface FeedHelper {
+    DefaultTimeout: number;
+    fetch: any;
+    load: any;
+    parser: any;
+    getDate: any;
+    parseAtom: any;
+    parseRSS: any;
+}
+const feedHelper: FeedHelper = {
     DefaultTimeout: 10000,
     fetch: async (url): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
-        const response = await Utils.timeout(Feed.DefaultTimeout, fetch(url, {
+        const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
                 'Accept': 'text/html,application/xhtml+xml',
@@ -512,7 +521,7 @@ const Feed = {
         const downloadTime = Date.now();
         if (response.status === 200) {
             const xml = await response.text();
-            return Feed.load(url, xml, startTime, downloadTime);
+            return feedHelper.load(url, xml, startTime, downloadTime);
         } else {
             throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
         }
@@ -531,7 +540,7 @@ const Feed = {
                     return;
                 }
                 const parseTime = Date.now();
-                const rss = Feed.parser(result);
+                const rss = feedHelper.parser(result);
                 const feedWithMetrics: FeedWithMetrics = {
                     feed: rss,
                     url: url,
@@ -547,9 +556,9 @@ const Feed = {
 
     parser: (json) => {
         if (json.feed) {
-            return Feed.parseAtom(json);
+            return feedHelper.parseAtom(json);
         } else if (json.rss) {
-            return Feed.parseRSS(json);
+            return feedHelper.parseRSS(json);
         }
     },
 
@@ -578,7 +587,7 @@ const Feed = {
         }
 
         rss.items = feed.entry.map(entry => {
-            const entryDate = Feed.getDate(entry);
+            const entryDate = feedHelper.getDate(entry);
             const item: RSSItem = {
                 title: entry.title ? entry.title[0] : '',
                 description: entry.content ? entry.content[0]._ : '',
