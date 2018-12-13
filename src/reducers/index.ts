@@ -260,11 +260,8 @@ const removeItem = <T>(list: List<T>, predicate: (value?: T, index?: number, ite
 const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
     switch (action.type) {
         case 'ADD-POST': {
-            if (localPosts.findIndex(post => post != null && post._id === defaultPost1._id) >= 0) {
-                let list = removeItem(localPosts, post => post != null && post._id === defaultPost1._id);
-                list = removeItem(list, post => post != null && post._id === defaultPost2._id);
-                list = removeItem(list, post => post != null && post._id === defaultPost3._id);
-                return list.insert(0, action.payload.post);
+            if (action.payload.post._id === defaultLocalPosts.size) {
+                return List.of(action.payload.post);
             }
             return localPosts.insert(0, action.payload.post);
         }
