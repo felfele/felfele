@@ -246,7 +246,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
             <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('Feed', { feedUrl: post.author && post.author.uri })}
+                onPress={() => this.props.navigation.navigate('Feed', { author: post.author && post.author })}
                 style={styles.infoContainer}
             >
                 { this.renderCardTopIcon(post) }
@@ -366,6 +366,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             return (
                 <NavigationHeader
                     leftButtonText='Back'
+                    title={this.props.navigation.state.params.author.name}
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
                 />
             );

@@ -6,7 +6,7 @@ import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.rssPosts.concat(state.localPosts)
-        .filter(post => post != null && post.author != null && post.author.uri === ownProps.navigation.state.params.feedUrl)
+        .filter(post => post != null && post.author != null && post.author.uri === ownProps.navigation.state.params.author.uri)
         .toArray();
 
     return {

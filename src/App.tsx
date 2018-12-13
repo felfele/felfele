@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator, NavigationScreenOptions, NavigationScreenRouteConfig } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform, YellowBox } from 'react-native';
@@ -31,12 +31,51 @@ YellowBox.ignoreWarnings(['Method `jumpToIndex` is deprecated.']);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
 
+const yourTabScenes: NavigationRouteConfigMap = {
+    YourTab: {
+        screen: ({navigation}) => (<YourFeedContainer
+                                    navigation={navigation}
+                                />),
+    },
+    Feed: {
+        screen: FeedContainer,
+    },
+};
+const YourFeedNavigator = StackNavigator(yourTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'YourTab',
+    },
+);
+
+const newsTabScenes: NavigationRouteConfigMap = {
+    NewsTab: {
+        screen: ({navigation}) => (<NewsFeedContainer
+                                    navigation={navigation}
+                                    postManager={RSSPostManager} />),
+    },
+    Feed: {
+        screen: FeedContainer,
+    },
+};
+
+const NewsFeedNavigator = StackNavigator(newsTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'NewsTab',
+    },
+);
+
 const Root = TabNavigator(
     {
         YourTab: {
-            screen: ({navigation}) => (<YourFeedContainer
-                                        navigation={navigation}
-                                    />),
+            screen: YourFeedNavigator,
             path: '/',
             navigationOptions: {
                 title: 'Your story',
@@ -51,9 +90,7 @@ const Root = TabNavigator(
             },
         },
         NewsTab: {
-            screen: ({navigation}) => (<NewsFeedContainer
-                                        navigation={navigation}
-                                        postManager={RSSPostManager} />),
+            screen: NewsFeedNavigator,
             path: '/',
             navigationOptions: {
                 title: 'New stories',
@@ -122,9 +159,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
-    },
-    Feed: {
-        screen: FeedContainer,
     },
     Debug: {
         screen: DebugScreenContainer,
