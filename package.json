@@ -19,7 +19,7 @@
     "mock-async-storage": "^2.0.3",
     "react-native-debugger-open": "^0.3.17",
     "react-native-typescript-transformer": "^1.2.10",
-    "react-test-renderer": "^16.6.1",
+    "react-test-renderer": "16.6.1",
     "typescript": "^3.2.2"
   },
   "scripts": {
