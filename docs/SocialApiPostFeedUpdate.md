@@ -27,6 +27,7 @@ After uploading the photo or photos to Swarm, we get the hash of the manifest. T
 ![2nd post with uploaded image](post2-with-uploaded-image.png)
 
 Now we can add the second post to the PostFeed and upload the new version, so that it returns a new PostFeedHash (117a26... ). Then we update the Swarm feed to store this hash.
+
 ![Swarm feed after update](swarm-feed2.png)
 
 On the image you can see the updated version of the Swarm feed, storing the new PostFeedHash on the right side.
