@@ -108,8 +108,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     flex: 1,
                     height: '100%',
                     opacity: 0.96,
-            }
-            }>
+                }}
+            >
                 <StatusBarView
                     backgroundColor={Colors.BACKGROUND_COLOR}
                     hidden={false}
@@ -117,6 +117,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
+                {!this.props.displayFeedHeader &&
+                <NavigationHeader
+                    leftButtonText='Back'
+                    title={this.props.navigation.state.params.author.name}
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                />}
                 <FlatList
                     ListHeaderComponent={this.renderListHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -363,13 +369,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 />
             );
         } else {
-            return (
-                <NavigationHeader
-                    leftButtonText='Back'
-                    title={this.props.navigation.state.params.author.name}
-                    onPressLeftButton={() => this.props.navigation.goBack(null)}
-                />
-            );
+            return null;
         }
     }
 
