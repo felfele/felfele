@@ -10,9 +10,9 @@ Then we put the latest 20 posts inside a PostFeed object and upload it to Swarm.
 
 ![Swarm feed update](swarm-feed1.png)
 
-In the example, after uploading the PostFeed object to Swarm, we get its hash back: 98f20e...
+In the example, after uploading the PostFeed object to Swarm, we get its hash back: 98f20e... . We will call this the PostFeedHash and is marked with a `#` on the picture above.
 
-After we set the user's Swarm feed to store this hash. This has the advantage, that we can store this hash locally and compare if it changes when looking up Swarm feed updates, so we can spare downloading the PostFeed objects if it's not changing.
+After we set the user's Swarm feed to store the PostFeedHash The Swarm feed is marked with a round circle (like a refresh button) on the image above. Storing the PostFeedHash has the advantage that we can store this hash locally and compare if it changes when looking up Swarm feed updates, so we can spare downloading the whole PostFeed object if it's not changing.
 
 Then let's say we create a new post, with the `text` ('Hello 2') and one photo:
 
@@ -30,3 +30,4 @@ Now we can add the second post to the PostFeed and upload the new version, so th
 
 ![Swarm feed after update](swarm-feed2.png)
 
+If you want to store posts separately on Swarm here is an [idea](SocialApiPostsOnSwarm.md).
