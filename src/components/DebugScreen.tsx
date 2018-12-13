@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import * as SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { SwarmClient } from '@erebos/swarm';
+import { SwarmClient } from '@erebos/swarm-browser';
 
 import { AsyncStorageWrapper, Storage } from '../Storage';
 import {
