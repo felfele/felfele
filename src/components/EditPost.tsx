@@ -19,6 +19,7 @@ import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
+import { markdownEscape, markdownUnescape } from '../markdown';
 
 export interface StateProps {
     navigation: any;
@@ -181,7 +182,7 @@ export class EditPost extends React.Component<Props, State> {
     private onChangeText = (text: string) => {
         const post: Post = {
             ...this.state.post,
-            text,
+            text: markdownEscape(text),
         };
         this.setState({
             post,
@@ -190,7 +191,10 @@ export class EditPost extends React.Component<Props, State> {
 
     private getPostFromDraft = (draft: Post | null): Post => {
         if (draft != null) {
-            return draft;
+            return {
+                ...draft,
+                text: markdownUnescape(draft.text),
+            };
         } else {
             return {
                 images: [],

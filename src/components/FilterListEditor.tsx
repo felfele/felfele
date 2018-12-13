@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, SafeAreaView, Button } from 'react-native';
-import * as SettingsList from 'react-native-settings-list';
+import SettingsList from 'react-native-settings-list';
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
 

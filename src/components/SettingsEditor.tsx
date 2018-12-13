@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, SafeAreaView } from 'react-native';
-import * as SettingsList from 'react-native-settings-list';
+import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -59,7 +59,7 @@ export const SettingsEditor = (props: Props) => {
                     <SettingsList.Item
                         hasNavArrow={false}
                         title={version}
-                        onLongPress={() => props.onShowDebugMenuValueChange(true)}
+                        onLongPress={() => props.onShowDebugMenuValueChange(!props.settings.showDebugMenu)}
                         style={{
                             color: Colors.GRAY,
                         }}

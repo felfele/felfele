@@ -24,7 +24,7 @@ import { downloadPostFeed } from '../PostFeed';
 
 interface EditFeedNavigationActions {
     back?: () => void;
-    add?: () => void;
+    add?: (feed: Feed) => void;
 }
 
 const navigationActions: EditFeedNavigationActions = {
