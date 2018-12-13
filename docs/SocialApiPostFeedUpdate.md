@@ -6,7 +6,7 @@ When you create a new post, it is represented like this:
 
 It stores the `text` ('Hello 1'), there are no `images` in it and we also so the time it was created in UTC milliseconds (`createdAt`). We store this object as JSON.
 
-Then we put the latest 20 posts inside a PostFeed object and upload it to Swarm. In our example we have only one post yet.
+We store the recent let's say 20 posts inside a PostFeed object and upload it to Swarm. In our example we have only one post yet.
 
 ![Swarm feed update](swarm-feed1.png)
 
@@ -26,8 +26,10 @@ After uploading the photo or photos to Swarm, we get the hash of the manifest. T
 
 ![2nd post with uploaded image](post2-with-uploaded-image.png)
 
-Now we can add the second post to the PostFeed and upload the new version, so that it returns a new hash (117a26... ). Then we update the Swarm feed to store this hash.
-
+Now we can add the second post to the PostFeed and upload the new version, so that it returns a new PostFeedHash (117a26... ). Then we update the Swarm feed to store this hash.
 ![Swarm feed after update](swarm-feed2.png)
+
+On the image you can see the updated version of the Swarm feed, storing the new PostFeedHash on the right side.
+On the left side is the old version of the PostFeed, which has only one post.
 
 If you want to store posts separately on Swarm here is an [idea](SocialApiPostsOnSwarm.md).
