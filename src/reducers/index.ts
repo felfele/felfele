@@ -18,7 +18,6 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
-import { Utils } from '../Utils';
 
 export interface AppState {
     contentFilters: List<ContentFilter>;
@@ -74,13 +73,12 @@ Follow the public feed of others, or add your favorite RSS/Atom feeds.
 If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
     author: onboardingAuthor,
 };
+
 const defaultPost2: Post = {
     _id: 1,
     createdAt: Date.now(),
-    images: [{
-        uri: '../../images/addrss.gif',
-    }],
-    text: `Adding an RSS feed`,
+    images: [],
+    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
     author: onboardingAuthor,
 };
 
@@ -88,7 +86,7 @@ const defaultPost3: Post = {
     _id: 2,
     createdAt: Date.now(),
     images: [],
-    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
     author: onboardingAuthor,
 };
 
@@ -100,9 +98,36 @@ const defaultMetadata = {
     highestSeenPostId: defaultLocalPosts.size - 1,
 };
 
+const defaultFeeds: Feed[] = [
+    {
+        name: 'The Verge',
+        url: 'https://theverge.com/',
+        feedUrl: 'https://www.theverge.com/rss/index.xml',
+        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395361/favicon-64x64.0.ico',
+    },
+    {
+        name: 'Wired Photos',
+        url: 'https://www.wired.com/',
+        feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
+        favicon: '',
+    },
+    {
+        name: '500px Blog',
+        url: 'https://iso.500px.com',
+        feedUrl: 'https://iso.500px.com/feed',
+        favicon: 'https://iso.500px.com/wp-content/themes/photoform/favicon.ico',
+    },
+    {
+        name: 'Favorite Places – Outdoor Photographer',
+        url: 'https://www.outdoorphotographer.com',
+        feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
+        favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
+    },
+];
+
 const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
-    feeds: List<Feed>(),
+    feeds: List<Feed>(defaultFeeds),
     ownFeeds: List<PostFeed>(),
     settings: defaultSettings,
     author: defaultAuthor,
@@ -137,7 +162,7 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
     }
 };
 
-const feedsReducer = (feeds = List<Feed>(), action: Actions): List<Feed> => {
+const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
             if (!feeds.find(feed => feed != null && feed.feedUrl === action.payload.feed.feedUrl)) {

@@ -14,6 +14,16 @@ interface RSSEnclosure {
     type: string;
 }
 
+interface RSSThumbnail {
+    height: number[];
+    width: number[];
+    url: string[];
+}
+
+interface RSSMedia {
+    thumbnail: RSSThumbnail[];
+}
+
 interface RSSItem {
     title: string;
     description: string;
@@ -21,6 +31,7 @@ interface RSSItem {
     url: string;
     created: number;
     enclosures?: RSSEnclosure[];
+    media?: RSSMedia;
 }
 
 interface RSSFeed {
@@ -238,7 +249,8 @@ export class RSSFeedManager {
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
             const rssFeed = await feedHelper.load(url, contentWithMimeType.content);
             Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
-            const baseUrl = Utils.getBaseUrl(url);
+            const feedUrl = (rssFeed.feed && rssFeed.feed.url) || undefined;
+            const baseUrl = Utils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
             Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
@@ -436,7 +448,12 @@ class _RSSPostManager {
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const description = this.formatDescription(item.description);
-            const [text, images] = this.extractTextAndImagesFromMarkdown(description, '');
+            const [text, markdownImages] = this.extractTextAndImagesFromMarkdown(description, '');
+            const mediaImages = this.extractImagesFromMedia(item.media);
+            const enclosureImages = this.extractImagesFromEnclosures(item.enclosures);
+            const images = markdownImages
+                            .concat(mediaImages)
+                            .concat(markdownImages.length === 0 ? enclosureImages : []);
             const title = this.isTitleSameAsText(item.title, text)
                 ? ''
                 : item.title === '(Untitled)'
@@ -447,7 +464,7 @@ class _RSSPostManager {
                 _id: this.getNextId(),
                 text: (title + text).trim() + '\n\n',
                 createdAt: item.created,
-                images: images,
+                images,
                 link:  item.link,
                 author: {
                     name: feedName,
@@ -479,6 +496,36 @@ class _RSSPostManager {
         });
 
         return posts;
+    }
+
+    private extractImagesFromMedia(media?: RSSMedia): ImageData[] {
+        if (media == null || media.thumbnail == null) {
+            return [];
+        }
+        const images = media.thumbnail.map(thumbnail => ({
+            uri: thumbnail.url[0],
+            width: thumbnail.width[0],
+            height: thumbnail.height[0],
+        } as ImageData));
+        return images;
+    }
+
+    private isSupportedImageType(type: string): boolean {
+        if (type === 'image/jpeg' || type === 'image/jpg' || type === 'image/png') {
+            return true;
+        }
+        return false;
+    }
+
+    private extractImagesFromEnclosures(enclosures?: RSSEnclosure[]): ImageData[] {
+        if (enclosures == null) {
+            return [];
+        }
+        const images = enclosures
+                        .filter(enclosure => this.isSupportedImageType(enclosure.type))
+                        .map(enclosure => ({uri: enclosure.url}))
+                        ;
+        return images;
     }
 
     private matchContentFilters(text: string): boolean {

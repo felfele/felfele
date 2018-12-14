@@ -22,6 +22,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onUpdatePicture: (image: ImageData) => {
             dispatch(Actions.updateAuthorPicturePath(image));
         },
+        onDownloadPosts: () => {
+            dispatch(AsyncActions.downloadPosts());
+        },
     };
 };
 

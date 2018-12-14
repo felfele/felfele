@@ -317,31 +317,17 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         }}
                     >
                         {post.images.map((image, index) => {
-                            if (image.uri && image.uri.startsWith('../../images/addrss.gif')) {
-                                return (
-                                    <Image
-                                        key={image.uri || '' + index}
-                                        source={require('../../images/addrss.gif')}
-                                        style={{
-                                            maxWidth: 320,
-                                            height: 568,
-                                            marginLeft: 10,
-                                        }}
-                                    />
-                                );
-                            } else {
-                                const [width, height] = this.calculateImageDimensions(image, WindowWidth);
-                                return (
-                                    <ImageView
-                                        key={image.uri || '' + index}
-                                        source={image}
-                                        style={{
-                                            width: width,
-                                            height: height,
-                                        }}
-                                    />
-                                );
-                            }
+                            const [width, height] = this.calculateImageDimensions(image, WindowWidth);
+                            return (
+                                <ImageView
+                                    key={image.uri || '' + index}
+                                    source={image}
+                                    style={{
+                                        width: width,
+                                        height: height,
+                                    }}
+                                />
+                            );
                         })}
                         { post.text === '' ||
                             <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
