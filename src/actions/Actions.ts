@@ -66,8 +66,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
     addFeed: (feed: Feed) =>
         createAction(ActionTypes.ADD_FEED, { feed }),
-    removeFeed: (feed: Feed) =>
-        createAction(ActionTypes.REMOVE_FEED, { feed }),
+    removeFeed: (feedUrl: string) =>
+        createAction(ActionTypes.REMOVE_FEED, { feedUrl }),
     timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>

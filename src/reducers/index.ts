@@ -171,7 +171,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             return feeds;
         }
         case 'REMOVE-FEED': {
-            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return feeds;
             }

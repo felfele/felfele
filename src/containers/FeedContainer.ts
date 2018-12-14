@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
-import { AsyncActions } from '../actions/Actions';
+import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
@@ -14,6 +14,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         posts: posts,
         settings: state.settings,
         displayFeedHeader: false,
+        showUnfollow: state.author.uri !== ownProps.navigation.state.params.author.uri,
     };
 };
 
@@ -30,6 +31,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         },
         onSharePost: (post: Post) => {
             // do nothing
+        },
+        onUnfollowFeed: (feedUrl: string) => {
+            dispatch(Actions.removeFeed(feedUrl));
+            dispatch(AsyncActions.downloadPosts());
         },
     };
 };

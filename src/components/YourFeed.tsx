@@ -18,13 +18,13 @@ import {
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Post, getAuthorImageUri } from '../models/Post';
+import { Post, getAuthorImageUri, Author } from '../models/Post';
 import { ImageData, calculateImageDimensions } from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
+import { isSwarmLink } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
@@ -32,6 +32,7 @@ import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
+import * as AreYouSureDialog from './AreYouSureDialog';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -40,6 +41,7 @@ export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
+    onUnfollowFeed: (feedUrl: string) => void;
 }
 
 export interface StateProps {
@@ -47,6 +49,7 @@ export interface StateProps {
     posts: Post[];
     settings: Settings;
     displayFeedHeader: boolean;
+    showUnfollow: boolean;
 }
 
 interface YourFeedState {
@@ -120,8 +123,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 {!this.props.displayFeedHeader &&
                 <NavigationHeader
                     leftButtonText='Back'
-                    title={this.props.navigation.state.params.author.name}
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
+                    rightButtonText={this.props.showUnfollow ? 'Unfollow' : undefined}
+                    onPressRightButton={async () => this.props.showUnfollow && await this.unfollowFeed(this.props.navigation.state.params.author)}
+                    title={this.props.navigation.state.params.author.name}
                 />}
                 <FlatList
                     ListHeaderComponent={this.renderListHeader}
@@ -159,11 +164,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.props.onRefreshPosts();
     }
 
-    private async onSharePost(post: Post) {
-        const data = JSON.stringify(post);
-        const hash = await upload(data);
-        const link = getUrlFromHash(hash);
-        this.props.navigation.navigate('Share', {link});
+    private async unfollowFeed(author: Author) {
+        const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
+        if (confirmUnfollow) {
+            this.props.onUnfollowFeed(author.uri);
+            this.props.navigation.goBack(null);
+        }
     }
 
     private async openPost(post: Post) {
