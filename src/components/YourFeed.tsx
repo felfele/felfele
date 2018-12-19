@@ -134,7 +134,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     ListFooterComponent={this.renderListFooter}
                     data={this.props.posts}
                     renderItem={(obj) => this.renderCard(obj.item)}
-                    keyExtractor={(item) => '' + (item.link != null ? item.link : item._id)}
+                    keyExtractor={(item) => '' + item._id}
                     extraData={this.state}
                     refreshControl={
                         <RefreshControl
