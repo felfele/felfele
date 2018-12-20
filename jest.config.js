@@ -10,7 +10,7 @@ module.exports = {
   "transformIgnorePatterns": [
     "node_modules/(?!react-native|react-navigation)/"
   ],
-  "testMatch": ["<rootDir>/test/**/*.ts"],
+  "testMatch": ["<rootDir>/test/**/*.ts*"],
   "testPathIgnorePatterns": [
     "\\.snap$",
     "<rootDir>/node_modules/",

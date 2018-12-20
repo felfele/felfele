@@ -12,6 +12,8 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         settings: state.settings,
+        displayFeedHeader: true,
+        showUnfollow: false,
     };
 };
 
@@ -32,6 +34,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
                 return;
             }
             dispatch(AsyncActions.sharePost(post));
+        },
+        onUnfollowFeed: (feedUrl: string) => {
+            // do nothing
         },
     };
 };

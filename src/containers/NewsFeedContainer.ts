@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { RSSPostManager } from '../RSSPostManager';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
@@ -15,6 +15,8 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         settings: state.settings,
+        displayFeedHeader: true,
+        showUnfollow: false,
     };
 };
 
@@ -30,6 +32,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // do nothing
         },
         onSharePost: (post: Post) => {
+            // do nothing
+        },
+        onUnfollowFeed: (feedUrl: string) => {
             // do nothing
         },
     };

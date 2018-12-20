@@ -14,23 +14,26 @@ import {
     SafeAreaView,
     LayoutAnimation,
     ActivityIndicator,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Post, getAuthorImageUri } from '../models/Post';
+import { Post, getAuthorImageUri, Author } from '../models/Post';
 import { ImageData, calculateImageDimensions } from '../models/ImageData';
 import { NetworkStatus } from '../NetworkStatus';
 import { DateUtils } from '../DateUtils';
 import { FeedHeader } from './FeedHeader';
 import { Utils } from '../Utils';
-import { upload, getUrlFromHash, isSwarmLink } from '../Swarm';
+import { isSwarmLink } from '../Swarm';
 import { Colors, DefaultStyle } from '../styles';
 import { TouchableView } from './TouchableView';
 import { ImageView } from './ImageView';
 import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
+import { NavigationHeader } from './NavigationHeader';
+import * as AreYouSureDialog from './AreYouSureDialog';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -39,12 +42,15 @@ export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
+    onUnfollowFeed: (feedUrl: string) => void;
 }
 
 export interface StateProps {
     navigation: any;
     posts: Post[];
     settings: Settings;
+    displayFeedHeader: boolean;
+    showUnfollow: boolean;
 }
 
 interface YourFeedState {
@@ -106,8 +112,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     flex: 1,
                     height: '100%',
                     opacity: 0.96,
-            }
-            }>
+                }}
+            >
                 <StatusBarView
                     backgroundColor={Colors.BACKGROUND_COLOR}
                     hidden={false}
@@ -115,6 +121,14 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
+                {!this.props.displayFeedHeader &&
+                <NavigationHeader
+                    leftButtonText='Back'
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                    rightButtonText={this.props.showUnfollow ? 'Unfollow' : undefined}
+                    onPressRightButton={async () => this.props.showUnfollow && await this.unfollowFeed(this.props.navigation.state.params.author)}
+                    title={this.props.navigation.state.params.author.name}
+                />}
                 <FlatList
                     ListHeaderComponent={this.renderListHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -151,11 +165,12 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.props.onRefreshPosts();
     }
 
-    private async onSharePost(post: Post) {
-        const data = JSON.stringify(post);
-        const hash = await upload(data);
-        const link = getUrlFromHash(hash);
-        this.props.navigation.navigate('Share', {link});
+    private async unfollowFeed(author: Author) {
+        const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
+        if (confirmUnfollow) {
+            this.props.onUnfollowFeed(author.uri);
+            this.props.navigation.goBack(null);
+        }
     }
 
     private async openPost(post: Post) {
@@ -243,13 +258,16 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         const url = post.link || '';
         const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
         return (
-            <View style={styles.infoContainer}>
+            <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Feed', { author: post.author && post.author })}
+                style={styles.infoContainer}
+            >
                 { this.renderCardTopIcon(post) }
                 <View style={styles.usernameContainer}>
                     <Text style={styles.username} numberOfLines={1}>{username}</Text>
                     <Text style={styles.location}>{printableTime}{hostnameText}</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
 
@@ -270,12 +288,28 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     activeOpacity={1}
                 >
                     { this.renderCardTop(post) }
-                    <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
+                    { post.text != null && <this.Markdown key={post._id} text={post.text}/>}
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </View>
         );
     }
+
+    private Markdown = (props) => (
+        <Markdown
+            style={styles.markdownStyle}
+            renderLink={(href, title, children) => {
+                return (
+                    <TouchableWithoutFeedback
+                        key={'linkWrapper_' + href + Date.now()}
+                        onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
+                    >
+                        <Text key={'linkWrapper_' + href + Date.now()} style={{textDecorationLine: 'underline'}}>{children}</Text>
+                    </TouchableWithoutFeedback>
+                );
+            }}
+        >{props.text}</Markdown>
+    )
 
     private renderCard(post: Post) {
         if (post.images.length === 0) {
@@ -306,34 +340,20 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         }}
                     >
                         {post.images.map((image, index) => {
-                            if (image.uri && image.uri.startsWith('../../images/addrss.gif')) {
-                                return (
-                                    <Image
-                                        key={image.uri || '' + index}
-                                        source={require('../../images/addrss.gif')}
-                                        style={{
-                                            maxWidth: 320,
-                                            height: 568,
-                                            marginLeft: 10,
-                                        }}
-                                    />
-                                );
-                            } else {
-                                const [width, height] = this.calculateImageDimensions(image, WindowWidth);
-                                return (
-                                    <ImageView
-                                        key={image.uri || '' + index}
-                                        source={image}
-                                        style={{
-                                            width: width,
-                                            height: height,
-                                        }}
-                                    />
-                                );
-                            }
+                            const [width, height] = this.calculateImageDimensions(image, WindowWidth);
+                            return (
+                                <ImageView
+                                    key={image.uri || '' + index}
+                                    source={image}
+                                    style={{
+                                        width: width,
+                                        height: height,
+                                    }}
+                                />
+                            );
                         })}
                         { post.text === '' ||
-                            <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
+                            <this.Markdown key={post._id} text={post.text}/>
                         }
                         { this.renderButtonsIfSelected(post) }
                     </TouchableOpacity>
@@ -350,11 +370,16 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderListHeader = () => {
-        return (
-            <FeedHeader
-                navigation={this.props.navigation}
-                onSavePost={this.props.onSavePost} />
-        );
+        if (this.props.displayFeedHeader) {
+            return (
+                <FeedHeader
+                    navigation={this.props.navigation}
+                    onSavePost={this.props.onSavePost}
+                />
+            );
+        } else {
+            return null;
+        }
     }
 
     private renderListFooter = () => {

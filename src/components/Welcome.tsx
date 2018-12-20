@@ -10,6 +10,7 @@ import { Author } from '../models/Post';
 
 export interface DispatchProps extends IdentityOnboardingDispatchProps {
     onCreateIdentity: () => void;
+    onDownloadPosts: () => void;
 }
 
 export interface StateProps {
@@ -68,6 +69,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                     this.props.onUpdateAuthor(this.state.authorName);
                     this.props.onUpdatePicture(this.state.authorImage);
                     this.props.onCreateIdentity();
+                    this.props.onDownloadPosts();
                     this.props.navigation.navigate('Loading');
                 }}
                 showSkip={false}
