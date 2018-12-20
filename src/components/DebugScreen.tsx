@@ -42,7 +42,6 @@ export class DebugScreen extends React.Component<Props, any> {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 <NavigationHeader
-                    leftButtonText='Back'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
                     title='Debug menu'
                 />
