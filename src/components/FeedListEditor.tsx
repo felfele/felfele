@@ -119,7 +119,7 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
                         />
                     )}
                     ItemSeparatorComponent={FeedListItemSeparator}
-                    keyExtractor={(item) => item.url}
+                    keyExtractor={(item) => item.feedUrl}
                     style={{
                         backgroundColor: Colors.LIGHTER_GRAY,
                     }}

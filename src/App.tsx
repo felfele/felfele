@@ -28,7 +28,10 @@ import { Colors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
 
-YellowBox.ignoreWarnings(['Method `jumpToIndex` is deprecated.']);
+YellowBox.ignoreWarnings([
+    'Method `jumpToIndex` is deprecated.',
+    'unknown call: "relay:check"',
+]);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
 

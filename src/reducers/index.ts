@@ -442,7 +442,7 @@ export const store = createStore(
 );
 
 const initStore = () => {
-    Debug.log('initStore: ', store.getState());
+    console.log('initStore: ', store.getState());
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     // @ts-ignore
@@ -455,5 +455,3 @@ const patchState = () => {
 };
 
 export const persistor = persistStore(store, {}, initStore);
-
-Debug.log('store: ', store.getState());

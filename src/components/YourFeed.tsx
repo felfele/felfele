@@ -14,6 +14,7 @@ import {
     SafeAreaView,
     LayoutAnimation,
     ActivityIndicator,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -159,8 +160,8 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             case 'favorite': {
                 return (
                     <NavigationHeader
-                    leftButtonText=''
-                    title={props.navigation.state.params ? props.navigation.state.params.author.name : 'Favorites'}
+                        leftButtonText=' '
+                        title={props.navigation.state.params ? props.navigation.state.params.author.name : 'Favorites'}
                     />
                 );
             }
@@ -169,7 +170,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     props.feeds.find(feed => feed.feedUrl === props.navigation.state.params.author.uri) != null;
                 return (
                     <NavigationHeader
-                        leftButtonText='Back'
                         onPressLeftButton={() => props.navigation.goBack(null)}
                         rightButtonText1={props.notOwnFeed ? <Icon
                             name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
@@ -344,12 +344,28 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     activeOpacity={1}
                 >
                     { this.renderCardTop(post) }
-                    <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
+                    { post.text != null && <this.Markdown key={post._id} text={post.text}/>}
                 </TouchableOpacity>
                 { this.renderButtonsIfSelected(post) }
             </View>
         );
     }
+
+    private Markdown = (props) => (
+        <Markdown
+            style={styles.markdownStyle}
+            renderLink={(href, title, children) => {
+                return (
+                    <TouchableWithoutFeedback
+                        key={'linkWrapper_' + href + Date.now()}
+                        onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
+                    >
+                        <Text key={'linkWrapper_' + href + Date.now()} style={{textDecorationLine: 'underline'}}>{children}</Text>
+                    </TouchableWithoutFeedback>
+                );
+            }}
+        >{props.text}</Markdown>
+    )
 
     private renderCard(post: Post) {
         if (post.images.length === 0) {
@@ -393,7 +409,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                             );
                         })}
                         { post.text === '' ||
-                            <Markdown style={styles.markdownStyle}>{post.text}</Markdown>
+                            <this.Markdown key={post._id} text={post.text}/>
                         }
                         { this.renderButtonsIfSelected(post) }
                     </TouchableOpacity>
