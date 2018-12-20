@@ -20,6 +20,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: posts,
         feeds: state.feeds.toArray(),
+        visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
         displayFeedHeader: false,
         notOwnFeed: false,
@@ -40,7 +41,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onSharePost: (post: Post) => {
             // do nothing
         },
-        onUnfollowFeed: (feedUrl: string) => {
+        onUnfollowFeed: (feed: Feed) => {
+            // do nothing
+        },
+        onAddFeed: (feed: Feed) => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {
