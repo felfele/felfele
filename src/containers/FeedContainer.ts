@@ -3,6 +3,7 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
+import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.rssPosts.concat(state.localPosts)
@@ -12,9 +13,10 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: posts,
+        feeds: state.feeds.toArray(),
         settings: state.settings,
         displayFeedHeader: false,
-        showUnfollow: state.author.uri !== ownProps.navigation.state.params.author.uri,
+        notOwnFeed: state.author.uri !== ownProps.navigation.state.params.author.uri,
     };
 };
 
@@ -34,7 +36,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         },
         onUnfollowFeed: (feedUrl: string) => {
             dispatch(Actions.removeFeed(feedUrl));
-            dispatch(AsyncActions.downloadPosts());
+        },
+        onToggleFavorite: (feedUrl: string) => {
+            dispatch(Actions.toggleFeedFavorite(feedUrl));
         },
     };
 };

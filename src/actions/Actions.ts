@@ -18,6 +18,7 @@ export enum ActionTypes {
     CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
     ADD_FEED = 'ADD-FEED',
     REMOVE_FEED = 'REMOVE-FEED',
+    TOGGLE_FEED_FAVORITE = 'TOGGLE-FEED-FAVORITE',
     UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
@@ -68,6 +69,8 @@ export const Actions = {
         createAction(ActionTypes.ADD_FEED, { feed }),
     removeFeed: (feedUrl: string) =>
         createAction(ActionTypes.REMOVE_FEED, { feedUrl }),
+    toggleFeedFavorite: (feedUrl: string) =>
+        createAction(ActionTypes.TOGGLE_FEED_FAVORITE, { feedUrl }),
     timeTick: () =>
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>

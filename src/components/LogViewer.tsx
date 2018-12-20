@@ -35,8 +35,8 @@ export const LogViewer = (props: Props) => {
             <NavigationHeader
                 leftButtonText='Back'
                 onPressLeftButton={() => props.navigation.goBack(null)}
-                rightButtonText='Clear'
-                onPressRightButton={() => clearLog(props)}
+                rightButtonText1='Clear'
+                onPressRightButton1={() => clearLog(props)}
             />
 
             <FlatList

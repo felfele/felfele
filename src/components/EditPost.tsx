@@ -123,8 +123,8 @@ export class EditPost extends React.Component<Props, State> {
                 <NavigationHeader
                     leftButtonText='Cancel'
                     onPressLeftButton={this.onCancelConfirmation}
-                    rightButtonText='Post'
-                    onPressRightButton={this.onPressSubmit}
+                    rightButtonText1='Post'
+                    onPressRightButton1={this.onPressSubmit}
                 />
                 <View style={{flex: 14, flexDirection: 'column'}}>
                     <SimpleTextInput

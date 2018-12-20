@@ -74,8 +74,8 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     // null is needed otherwise it does not work with switchnavigator backbehavior property
                     props.navigation.goBack(null);
                 }}
-                rightButtonText={props.ownFeed != null ? 'Share' : undefined}
-                onPressRightButton={async () => showShareDialog(props.ownFeed)}
+                rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
+                onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                 title={screenTitle}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>

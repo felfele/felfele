@@ -26,10 +26,31 @@ import { appendToLog } from './components/LogViewer';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
+import { FavoritesContainer } from './containers/FavoritesContainer';
 
 YellowBox.ignoreWarnings(['Method `jumpToIndex` is deprecated.']);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
+
+const favoriteTabScenes: NavigationRouteConfigMap = {
+    YourTab: {
+        screen: ({navigation}) => (<YourFeedContainer
+                                    navigation={navigation}
+                                />),
+    },
+    Favorites: {
+        screen: FavoritesContainer,
+    },
+};
+const FavoriteFeedNavigator = StackNavigator(favoriteTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'Favorites',
+    },
+);
 
 const yourTabScenes: NavigationRouteConfigMap = {
     YourTab: {
@@ -98,6 +119,21 @@ const Root = TabNavigator(
                 tabBarIcon: ({ tintColor, focused }) => (
                     <FontAwesomeIcon
                         name={focused ? 'newspaper-o' : 'newspaper-o'}
+                        size={20}
+                        color={tintColor}
+                    />
+                ),
+            },
+        },
+        FavoriteTab: {
+            screen: FavoriteFeedNavigator,
+            path: '/',
+            navigationOptions: {
+                title: 'Favorites',
+                tabBarLabel: 'Your story',
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialIcon
+                        name={focused ? 'favorite' : 'favorite'}
                         size={20}
                         color={tintColor}
                     />
