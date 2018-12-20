@@ -123,7 +123,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 />
                 {!this.props.displayFeedHeader &&
                 <NavigationHeader
-                    leftButtonText='Back'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
                     rightButtonText={this.props.showUnfollow ? 'Unfollow' : undefined}
                     onPressRightButton={async () => this.props.showUnfollow && await this.unfollowFeed(this.props.navigation.state.params.author)}
