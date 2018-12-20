@@ -3,6 +3,7 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
+import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.localPosts.toArray();
@@ -12,6 +13,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: state.feeds.toArray(),
+        visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
         displayFeedHeader: true,
         notOwnFeed: false,
@@ -36,7 +38,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             }
             dispatch(AsyncActions.sharePost(post));
         },
-        onUnfollowFeed: (feedUrl: string) => {
+        onUnfollowFeed: (feed: Feed) => {
+            // do nothing
+        },
+        onAddFeed: (feed: Feed) => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {

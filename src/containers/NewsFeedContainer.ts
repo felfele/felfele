@@ -4,6 +4,7 @@ import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
+import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.rssPosts.toArray();
@@ -15,6 +16,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: state.feeds.toArray(),
+        visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
         displayFeedHeader: true,
         notOwnFeed: false,
@@ -35,7 +37,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onSharePost: (post: Post) => {
             // do nothing
         },
-        onUnfollowFeed: (feedUrl: string) => {
+        onUnfollowFeed: (feed: Feed) => {
+            // do nothing
+        },
+        onAddFeed: (feed: Feed) => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {

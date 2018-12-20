@@ -34,7 +34,7 @@ import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { Feed, filterFeeds } from '../models/Feed';
+import { Feed } from '../models/Feed';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -43,7 +43,8 @@ export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
-    onUnfollowFeed: (feedUrl: string) => void;
+    onUnfollowFeed: (feed: Feed) => void;
+    onAddFeed: (feed: Feed) => void;
     onToggleFavorite: (feedUrl: string) => void;
 }
 
@@ -51,6 +52,7 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
+    visitedFeeds: Feed[];
     settings: Settings;
     displayFeedHeader: boolean;
     notOwnFeed: boolean;
@@ -107,6 +109,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     public render() {
+        const isFollowedFeed = this.props.navigation.state.params != null &&
+            this.props.feeds.find(feed => feed.feedUrl === this.props.navigation.state.params.author.uri) != null;
+        const displayRightButtons = this.props.notOwnFeed;
         return (
             <SafeAreaView
                 style={{
@@ -129,17 +134,17 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     leftButtonText='Back'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
                     rightButtonText1={this.props.notOwnFeed ? <Icon
-                        name={filterFeeds('feedUrl', this.props.navigation.state.params.author.uri, this.props.feeds).length > 0 ? 'link-variant-off' : 'link-variant'}
+                        name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
                         size={20}
                         color={Colors.LIGHT_GRAY}
                     /> : undefined}
-                    rightButtonText2={this.props.notOwnFeed && filterFeeds('feedUrl', this.props.navigation.state.params.author.uri, this.props.feeds).length > 0 ? <MaterialIcon
+                    rightButtonText2={this.props.notOwnFeed && isFollowedFeed ? <MaterialIcon
                         name={'favorite'}
                         size={20}
                         color={this.isFavorite() ? Colors.DEFAULT_ACTION_COLOR : Colors.LIGHTER_GRAY}
                     /> : undefined}
                     onPressRightButton1={async () => this.props.notOwnFeed && await this.onFollowPressed(this.props.navigation.state.params.author)}
-                    onPressRightButton2={async () => this.props.notOwnFeed && await this.props.onToggleFavorite(this.props.navigation.state.params.author.uri)}
+                    onPressRightButton2={async () => this.props.notOwnFeed && isFollowedFeed && await this.props.onToggleFavorite(this.props.navigation.state.params.author.uri)}
                     title={this.props.navigation.state.params ? this.props.navigation.state.params.author.name : 'Favorites'}
                 />}
                 <FlatList
@@ -166,7 +171,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private isFavorite(): boolean {
-        const feed = filterFeeds('feedUrl', this.props.navigation.state.params.author.uri, this.props.feeds)[0];
+        const feed = this.props.feeds.find(value => value.feedUrl === this.props.navigation.state.params.author.uri);
         return feed != null && !!feed.favorite;
     }
     private onConnectionStateChange(connected) {
@@ -183,13 +188,17 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private async onFollowPressed(author: Author) {
-        if (filterFeeds('feedUrl', author.uri, this.props.feeds).length > 0) {
+        const followedFeed = this.props.feeds.find(feed => feed.feedUrl === author.uri);
+        if (followedFeed != null) {
             const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
             if (confirmUnfollow) {
-                this.props.onUnfollowFeed(author.uri);
+                this.props.onUnfollowFeed(followedFeed);
             }
         } else {
-            console.log(author);
+            const visitedFeed = this.props.visitedFeeds.find(feed => feed.feedUrl === author.uri);
+            if (visitedFeed != null) {
+                this.props.onAddFeed(visitedFeed);
+            }
         }
     }
 

@@ -67,8 +67,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
     addFeed: (feed: Feed) =>
         createAction(ActionTypes.ADD_FEED, { feed }),
-    removeFeed: (feedUrl: string) =>
-        createAction(ActionTypes.REMOVE_FEED, { feedUrl }),
+    removeFeed: (feed: Feed) =>
+        createAction(ActionTypes.REMOVE_FEED, { feed }),
     toggleFeedFavorite: (feedUrl: string) =>
         createAction(ActionTypes.TOGGLE_FEED_FAVORITE, { feedUrl }),
     timeTick: () =>
