@@ -28,7 +28,7 @@ export class NavigationHeader extends React.Component<Props, State> {
             <View style={styles.headerContainer}>
                 <TouchableView onPress={this.props.onPressLeftButton} style={styles.leftContainer}>
                     <Text style={styles.headerLeftButtonText}>
-                        {this.props.leftButtonText ? this.props.leftButtonText : 'Back'}
+                        {this.props.leftButtonText != null ? this.props.leftButtonText : 'Back'}
                     </Text>
                 </TouchableView>
                 <View style={styles.middleContainer}>

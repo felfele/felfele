@@ -16,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         feeds: state.feeds.toArray(),
         visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
-        displayFeedHeader: false,
+        yourFeedVariant: 'feed',
         notOwnFeed: state.author.uri !== ownProps.navigation.state.params.author.uri,
     };
 };

@@ -7,8 +7,11 @@ import { Feed } from '../models/Feed';
 import { List } from 'immutable';
 
 const isPostFromFavoriteFeed = (post: Post, feeds: List<Feed>): boolean => {
-    const favoriteFeeds = feeds.filter(feed => feed != null && feed.favorite === true);
-    return favoriteFeeds.find(feed => feed != null &&  post.author != null && feed.feedUrl === post.author.uri) != null;
+    return feeds.find(feed => {
+        return feed != null && post.author != null &&
+            feed.feedUrl === post.author.uri &&
+            feed.favorite === true;
+    }) != null;
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
@@ -22,7 +25,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         feeds: state.feeds.toArray(),
         visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
-        displayFeedHeader: false,
+        yourFeedVariant: 'favorite',
         notOwnFeed: false,
     };
 };

@@ -15,7 +15,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         feeds: state.feeds.toArray(),
         visitedFeeds: state.visitedFeeds.toArray(),
         settings: state.settings,
-        displayFeedHeader: true,
+        yourFeedVariant: 'your',
         notOwnFeed: false,
     };
 };
