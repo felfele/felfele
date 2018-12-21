@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator, NavigationScreenOptions, NavigationScreenRouteConfig } from 'react-navigation';
+import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator, NavigationScreenOptions, NavigationScreenRouteConfig, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform, YellowBox } from 'react-native';
@@ -36,22 +36,22 @@ Debug.setDebug(true);
 Debug.addLogger(appendToLog);
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
-    YourTab: {
+    FavoriteTab: {
         screen: ({navigation}) => (<YourFeedContainer
                                     navigation={navigation}
                                 />),
     },
-    Favorites: {
+    Feeds: {
         screen: FavoritesContainer,
     },
 };
-const FavoriteFeedNavigator = StackNavigator(favoriteTabScenes,
+const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'Favorites',
+        initialRouteName: 'FavoriteTab',
     },
 );
 
@@ -65,7 +65,7 @@ const yourTabScenes: NavigationRouteConfigMap = {
         screen: FeedContainer,
     },
 };
-const YourFeedNavigator = StackNavigator(yourTabScenes,
+const YourFeedNavigator = createStackNavigator(yourTabScenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -86,7 +86,7 @@ const newsTabScenes: NavigationRouteConfigMap = {
     },
 };
 
-const NewsFeedNavigator = StackNavigator(newsTabScenes,
+const NewsFeedNavigator = createStackNavigator(newsTabScenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -96,7 +96,7 @@ const NewsFeedNavigator = StackNavigator(newsTabScenes,
     },
 );
 
-const Root = TabNavigator(
+const Root = createBottomTabNavigator(
     {
         YourTab: {
             screen: YourFeedNavigator,
@@ -225,7 +225,7 @@ const Scenes: NavigationRouteConfigMap = {
     },
 };
 
-const AppNavigator = StackNavigator(Scenes,
+const AppNavigator = createStackNavigator(Scenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -234,7 +234,7 @@ const AppNavigator = StackNavigator(Scenes,
     },
 );
 
-const WelcomeNavigator = StackNavigator({
+const WelcomeNavigator = createStackNavigator({
     Welcome: {
         screen: WelcomeContainer,
     },
@@ -245,7 +245,7 @@ const WelcomeNavigator = StackNavigator({
     },
 });
 
-const InitialNavigator = SwitchNavigator({
+const InitialNavigator = createSwitchNavigator({
     Loading: LoadingScreenContainer,
     App: AppNavigator,
     Welcome: WelcomeNavigator,
