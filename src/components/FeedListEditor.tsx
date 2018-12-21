@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { View, Text, Button, Image, FlatList } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+
 import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
@@ -61,6 +63,15 @@ const FeedListItem = (props) => (
         <View>
             <Favicon uri={props.feed.favicon} />
         </View>
+        {props.feed.favorite === true &&
+            <View style={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                paddingLeft: 5,
+            }}>
+                <MaterialIcon name='favorite' color={Colors.LIGHT_GRAY} size={20} />
+            </View>
+        }
         <View
             style={{
                 justifyContent: 'center',

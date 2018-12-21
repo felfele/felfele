@@ -174,13 +174,13 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                         rightButtonText1={props.notOwnFeed ? <Icon
                             name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
                             size={20}
-                            color={Colors.LIGHT_GRAY}
+                            color={Colors.DARK_GRAY}
                         /> : undefined}
                         rightButtonText2={props.notOwnFeed ? <MaterialIcon
                             name={'favorite'}
                             size={20}
                             color={isFollowedFeed
-                                ? props.isFavorite() ? Colors.DEFAULT_ACTION_COLOR : Colors.LIGHTER_GRAY
+                                ? props.isFavorite() ? Colors.BRAND_RED : Colors.DARK_GRAY
                                 : 'transparent'
                             }
                         /> : undefined}

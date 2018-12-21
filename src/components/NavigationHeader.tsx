@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Colors } from '../styles';
-import { TouchableView } from './TouchableView';
+import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { StatusBarView } from './StatusBarView';
 
 export interface StateProps {
@@ -64,6 +64,8 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
         <TouchableView
             onPress={props.onPress}
             testId={'NavigationHeader/RightButton'}
+            style={styles.rightButtonContainer}
+            hitSlop={{...TouchableViewDefaultHitSlop, left: 0}}
         >
             <Text style={styles.headerRightButtonText}>
                 {props.text ? props.text : ''}
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'flex-end',
     },
     titleText: {
         fontSize: 18,
@@ -120,5 +122,8 @@ const styles = StyleSheet.create({
     headerRightButtonText: {
         fontSize: 18,
         color: Colors.DEFAULT_ACTION_COLOR,
+    },
+    rightButtonContainer: {
+        paddingLeft: 20,
     },
 });
