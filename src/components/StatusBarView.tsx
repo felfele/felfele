@@ -19,7 +19,6 @@ const STATUSBAR_HEIGHT = Platform.OS === 'ios'
 
 const styles = StyleSheet.create({
     statusBar: {
-        flex: 1,
         height: STATUSBAR_HEIGHT,
     },
 });
