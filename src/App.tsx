@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator, NavigationScreenOptions, NavigationScreenRouteConfig, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
+import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform, YellowBox } from 'react-native';
@@ -37,12 +37,12 @@ Debug.addLogger(appendToLog);
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
-        screen: ({navigation}) => (<YourFeedContainer
+        screen: ({navigation}) => (<FavoritesContainer
                                     navigation={navigation}
                                 />),
     },
-    Feeds: {
-        screen: FavoritesContainer,
+    Feed: {
+        screen: FeedContainer,
     },
 };
 const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
@@ -100,7 +100,7 @@ const Root = createBottomTabNavigator(
     {
         YourTab: {
             screen: YourFeedNavigator,
-            path: '/',
+            path: '/your',
             navigationOptions: {
                 title: 'Your story',
                 tabBarLabel: 'Your story',
@@ -113,30 +113,30 @@ const Root = createBottomTabNavigator(
                 ),
             },
         },
-        NewsTab: {
-            screen: NewsFeedNavigator,
-            path: '/',
-            navigationOptions: {
-                title: 'New stories',
-                tabBarLabel: 'New stories',
-                tabBarIcon: ({ tintColor, focused }) => (
-                    <FontAwesomeIcon
-                        name={focused ? 'newspaper-o' : 'newspaper-o'}
-                        size={20}
-                        color={tintColor}
-                    />
-                ),
-            },
-        },
         FavoriteTab: {
             screen: FavoriteFeedNavigator,
-            path: '/',
+            path: '/favorites',
             navigationOptions: {
                 title: 'Favorites',
                 tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }) => (
                     <MaterialIcon
                         name={focused ? 'favorite' : 'favorite'}
+                        size={20}
+                        color={tintColor}
+                    />
+                ),
+            },
+        },
+        NewsTab: {
+            screen: NewsFeedNavigator,
+            path: '/news',
+            navigationOptions: {
+                title: 'New stories',
+                tabBarLabel: 'New stories',
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <FontAwesomeIcon
+                        name={focused ? 'newspaper-o' : 'newspaper-o'}
                         size={20}
                         color={tintColor}
                     />

@@ -4,19 +4,19 @@ import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { List } from 'immutable';
+import { Debug } from '../Debug';
 
-const isPostFromFavoriteFeed = (post: Post, feeds: List<Feed>): boolean => {
-    return feeds.find(feed => {
+const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
+    return favoriteFeeds.find(feed => {
         return feed != null && post.author != null &&
-            feed.feedUrl === post.author.uri &&
-            feed.favorite === true;
+            feed.feedUrl === post.author.uri;
     }) != null;
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
+    const favoriteFeeds = state.feeds.toArray().filter(feed => feed != null && feed.favorite === true);
     const posts = state.rssPosts
-        .filter(post => post != null && isPostFromFavoriteFeed(post, state.feeds))
+        .filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds))
         .toArray();
 
     return {
