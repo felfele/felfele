@@ -23,7 +23,7 @@ export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     ownFeeds: List<PostFeed>;
-    visitedFeeds: List<Feed>;
+    knownFeeds: List<Feed>;
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -130,7 +130,7 @@ const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(defaultFeeds),
     ownFeeds: List<PostFeed>(),
-    visitedFeeds: List<Feed>(),
+    knownFeeds: List<Feed>(),
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
@@ -216,7 +216,7 @@ const ownFeedsReducer = (ownFeeds = List<PostFeed>(), action: Actions): List<Pos
     }
 };
 
-const visitedFeedsReducer = (unfollowedFeeds = List<Feed>(), action: Actions): List<Feed> => {
+const knownFeedsReducer = (unfollowedFeeds = List<Feed>(), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
             const ind = unfollowedFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
@@ -409,7 +409,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'visitedFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'knownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -420,7 +420,7 @@ export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     ownFeeds: ownFeedsReducer,
-    visitedFeeds: visitedFeedsReducer,
+    knownFeeds: knownFeedsReducer,
     settings: settingsReducer,
     author: authorReducer,
     currentTimestamp: currentTimestampReducer,

@@ -16,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: state.feeds.toArray(),
-        visitedFeeds: state.visitedFeeds.toArray(),
+        knownFeeds: state.knownFeeds.toArray(),
         settings: state.settings,
         yourFeedVariant: 'news',
         notOwnFeed: false,

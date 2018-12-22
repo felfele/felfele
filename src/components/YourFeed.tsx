@@ -53,7 +53,7 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    visitedFeeds: Feed[];
+    knownFeeds: Feed[];
     settings: Settings;
     yourFeedVariant: YourFeedVariant;
     notOwnFeed: boolean;
@@ -222,9 +222,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                 this.props.onUnfollowFeed(followedFeed);
             }
         } else {
-            const visitedFeed = this.props.visitedFeeds.find(feed => feed.feedUrl === author.uri);
-            if (visitedFeed != null) {
-                this.props.onAddFeed(visitedFeed);
+            const knownFeed = this.props.knownFeeds.find(feed => feed.feedUrl === author.uri);
+            if (knownFeed != null) {
+                this.props.onAddFeed(knownFeed);
             }
         }
     }
