@@ -23,7 +23,6 @@ export interface AppState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     ownFeeds: List<PostFeed>;
-    knownFeeds: List<Feed>;
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -105,24 +104,28 @@ const defaultFeeds: Feed[] = [
         url: 'https://theverge.com/',
         feedUrl: 'https://www.theverge.com/rss/index.xml',
         favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395361/favicon-64x64.0.ico',
+        followed: true,
     },
     {
         name: 'Wired Photos',
         url: 'https://www.wired.com/',
         feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
         favicon: '',
+        followed: true,
     },
     {
         name: '500px Blog',
         url: 'https://iso.500px.com',
         feedUrl: 'https://iso.500px.com/feed',
         favicon: 'https://iso.500px.com/wp-content/themes/photoform/favicon.ico',
+        followed: true,
     },
     {
         name: 'Favorite Places – Outdoor Photographer',
         url: 'https://www.outdoorphotographer.com',
         feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
         favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
+        followed: true,
     },
 ];
 
@@ -130,7 +133,6 @@ const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(defaultFeeds),
     ownFeeds: List<PostFeed>(),
-    knownFeeds: List<Feed>(),
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
@@ -168,7 +170,10 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
     switch (action.type) {
         case 'ADD-FEED': {
             if (!feeds.find(feed => feed != null && feed.feedUrl === action.payload.feed.feedUrl)) {
-                return feeds.push(action.payload.feed);
+                return feeds.push({
+                    ...action.payload.feed,
+                    followed: true,
+                });
             }
             return feeds;
         }
@@ -177,7 +182,13 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.remove(ind);
+            return feeds.update(ind, feed => {
+                return {
+                    ...feed,
+                    favorite: false,
+                    followed: false,
+                };
+            });
         }
         case 'UPDATE-FEED-FAVICON': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
@@ -212,24 +223,6 @@ const ownFeedsReducer = (ownFeeds = List<PostFeed>(), action: Actions): List<Pos
         }
         default: {
             return ownFeeds;
-        }
-    }
-};
-
-const knownFeedsReducer = (unfollowedFeeds = List<Feed>(), action: Actions): List<Feed> => {
-    switch (action.type) {
-        case 'ADD-FEED': {
-            const ind = unfollowedFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
-            if (ind === -1) {
-                return unfollowedFeeds;
-            }
-            return unfollowedFeeds.remove(ind);
-        }
-        case 'REMOVE-FEED': {
-            return unfollowedFeeds.push(action.payload.feed);
-        }
-        default: {
-            return unfollowedFeeds;
         }
     }
 };
@@ -409,7 +402,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'knownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -420,7 +413,6 @@ export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     ownFeeds: ownFeedsReducer,
-    knownFeeds: knownFeedsReducer,
     settings: settingsReducer,
     author: authorReducer,
     currentTimestamp: currentTimestampReducer,
