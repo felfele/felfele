@@ -26,7 +26,7 @@ export interface State {
 }
 
 const BACK_ICON_NAME = Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back';
-const BACK_BUTTON_TEXT = Platform.OS === 'ios' ? '  Back' : '';
+const BUTTON_COLOR = Platform.OS === 'ios' ? Colors.DEFAULT_ACTION_COLOR : Colors.DARK_GRAY;
 export class NavigationHeader extends React.Component<Props, State> {
     public render() {
         return (
@@ -34,8 +34,11 @@ export class NavigationHeader extends React.Component<Props, State> {
                 <View style={styles.headerContainer}>
                     <TouchableView onPress={this.props.onPressLeftButton} style={styles.leftContainer}>
                         <Text style={styles.headerLeftButtonText}>
-                            {this.props.leftButtonText == null && <Ionicons name={BACK_ICON_NAME} color={Colors.DEFAULT_ACTION_COLOR} size={18} />}
-                            {this.props.leftButtonText ? this.props.leftButtonText : BACK_BUTTON_TEXT}
+                            {
+                                this.props.leftButtonText
+                                ? this.props.leftButtonText
+                                : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
+                            }
                         </Text>
                     </TouchableView>
                     <View style={styles.middleContainer}>
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.BACKGROUND_COLOR,
     },
     headerLeftButtonText: {
-        color: Colors.DEFAULT_ACTION_COLOR,
+        color: BUTTON_COLOR,
         fontSize: 18,
     },
     leftContainer: {
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
     },
     headerRightButtonText: {
         fontSize: 18,
-        color: Colors.DEFAULT_ACTION_COLOR,
+        color: BUTTON_COLOR,
     },
     rightButtonContainer: {
         paddingLeft: 20,

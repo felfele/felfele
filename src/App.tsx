@@ -96,6 +96,46 @@ const NewsFeedNavigator = createStackNavigator(newsTabScenes,
     },
 );
 
+const settingsTabScenes: NavigationRouteConfigMap = {
+    SettingsTab: {
+        screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+    },
+    Debug: {
+        screen: DebugScreenContainer,
+    },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
+    },
+    EditFeed: {
+        screen: EditFeedContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
+    },
+    LogViewer: {
+        screen: LogViewerContainer,
+    },
+    Share: {
+        screen: Share,
+    },
+};
+
+const SettingsNavigator = createStackNavigator(settingsTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'SettingsTab',
+    },
+);
+
 const Root = createBottomTabNavigator(
     {
         YourTab: {
@@ -144,7 +184,7 @@ const Root = createBottomTabNavigator(
             },
         },
         SettingsTab: {
-            screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+            screen: SettingsNavigator,
             path: '/settings',
             navigationOptions: {
                 header: undefined,
@@ -183,7 +223,6 @@ const Root = createBottomTabNavigator(
                     showIcon: true,
                     activeTintColor: 'gray',
                     inactiveTintColor: 'lightgray',
-                    activeBackgroundColor: 'gray',
                     style: {
                         backgroundColor: Colors.BACKGROUND_COLOR,
                         opacity: 0.96,
@@ -198,30 +237,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
-    },
-    Debug: {
-        screen: DebugScreenContainer,
-    },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
-    },
-    Share: {
-        screen: Share,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
-    },
-    EditFeed: {
-        screen: EditFeedContainer,
-    },
-    EditFilter: {
-        screen: EditFilterContainer,
-    },
-    LogViewer: {
-        screen: LogViewerContainer,
     },
 };
 
