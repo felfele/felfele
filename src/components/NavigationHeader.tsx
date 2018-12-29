@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { Colors } from '../styles';
+import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { StatusBarView } from './StatusBarView';
 
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         width: '100%',
-        height: 50,
+        height: DefaultNavigationBarHeight,
         top: 0,
         left: 0,
         padding: 0,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     titleText: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: Colors.DARK_GRAY,
         textAlign: 'center',

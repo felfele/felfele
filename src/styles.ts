@@ -55,3 +55,5 @@ export const DefaultStyle = StyleSheet.create({
         marginVertical: 3,
     },
 });
+
+export const DefaultNavigationBarHeight = 44;
