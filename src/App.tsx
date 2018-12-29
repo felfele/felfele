@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
-import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
@@ -103,26 +102,14 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     Debug: {
         screen: DebugScreenContainer,
     },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
-    },
     FeedListEditorContainer: {
         screen: FeedListEditorContainer,
     },
     FilterListEditorContainer: {
         screen: FilterListEditorContainer,
     },
-    EditFeed: {
-        screen: EditFeedContainer,
-    },
-    EditFilter: {
-        screen: EditFilterContainer,
-    },
     LogViewer: {
         screen: LogViewerContainer,
-    },
-    Share: {
-        screen: Share,
     },
 };
 
@@ -237,6 +224,15 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
+    },
+    EditFeed: {
+        screen: EditFeedContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
+    },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
     },
 };
 

@@ -35,7 +35,7 @@ export class NavigationHeader extends React.Component<Props, State> {
                     <TouchableView onPress={this.props.onPressLeftButton} style={styles.leftContainer}>
                         <Text style={styles.headerLeftButtonText}>
                             {
-                                this.props.leftButtonText
+                                this.props.leftButtonText != null
                                 ? this.props.leftButtonText
                                 : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
                             }
