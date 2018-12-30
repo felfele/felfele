@@ -29,7 +29,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'news',
-        notOwnFeed: false,
+        isOwnFeed: false,
     };
 };
 

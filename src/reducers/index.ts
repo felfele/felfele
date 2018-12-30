@@ -169,13 +169,20 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
 const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<Feed> => {
     switch (action.type) {
         case 'ADD-FEED': {
-            if (!feeds.find(feed => feed != null && feed.feedUrl === action.payload.feed.feedUrl)) {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind ===  -1) {
                 return feeds.push({
                     ...action.payload.feed,
                     followed: true,
                 });
+            } else {
+                return feeds.update(ind, feed => {
+                    return {
+                        ...feed,
+                        followed: true,
+                    };
+                });
             }
-            return feeds;
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
