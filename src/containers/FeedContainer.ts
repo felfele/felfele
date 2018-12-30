@@ -3,6 +3,7 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
+import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const posts = state.rssPosts.concat(state.localPosts)
@@ -12,9 +13,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: posts,
+        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
-        displayFeedHeader: false,
-        showUnfollow: state.author.uri !== ownProps.navigation.state.params.author.uri,
+        yourFeedVariant: 'feed',
+        isOwnFeed: state.author.uri === ownProps.navigation.state.params.author.uri,
     };
 };
 
@@ -32,9 +35,14 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onSharePost: (post: Post) => {
             // do nothing
         },
-        onUnfollowFeed: (feedUrl: string) => {
-            dispatch(Actions.removeFeed(feedUrl));
-            dispatch(AsyncActions.downloadPosts());
+        onUnfollowFeed: (feed: Feed) => {
+            dispatch(Actions.unfollowFeed(feed));
+        },
+        onFollowFeed: (feed: Feed) => {
+            dispatch(Actions.followFeed(feed));
+        },
+        onToggleFavorite: (feedUrl: string) => {
+            dispatch(Actions.toggleFeedFavorite(feedUrl));
         },
     };
 };

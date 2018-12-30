@@ -1,21 +1,30 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
+import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
-import { Actions, AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
+const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
+    return favoriteFeeds.find(feed => {
+        return feed != null && post.author != null &&
+            feed.feedUrl === post.author.uri;
+    }) != null;
+};
+
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const posts = state.localPosts.toArray();
-    const filteredPosts = posts;
+    const favoriteFeeds = state.feeds.toArray().filter(feed => feed != null && feed.favorite === true);
+    const posts = state.rssPosts
+        .filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds))
+        .toArray();
 
     return {
         navigation: ownProps.navigation,
-        posts: filteredPosts,
+        posts: posts,
         feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
         knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
-        yourFeedVariant: 'your',
+        yourFeedVariant: 'favorite',
         isOwnFeed: false,
     };
 };
@@ -23,20 +32,16 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: () => {
-            // workaround to finish refresh
-            dispatch(Actions.timeTick());
+            dispatch(AsyncActions.downloadPosts());
         },
         onDeletePost: (post: Post) => {
-            dispatch(AsyncActions.removePost(post));
+            // do nothing
         },
         onSavePost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
+            // do nothing
         },
         onSharePost: (post: Post) => {
-            if (post.link != null) {
-                return;
-            }
-            dispatch(AsyncActions.sharePost(post));
+            // do nothing
         },
         onUnfollowFeed: (feed: Feed) => {
             // do nothing
@@ -45,12 +50,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {
-            // do nothing
+            dispatch(Actions.toggleFeedFavorite(feedUrl));
         },
     };
 };
 
-export const YourFeedContainer = connect<StateProps, DispatchProps, {}>(
+export const FavoritesContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
 )(YourFeed);

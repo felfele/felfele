@@ -3,19 +3,21 @@ import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Colors } from '../styles';
-import { TouchableView } from './TouchableView';
+import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { StatusBarView } from './StatusBarView';
 
 export interface StateProps {
     leftButtonText?: string;
-    rightButtonText?: string;
+    rightButtonText1?: string | React.ReactNode;
+    rightButtonText2?: string | React.ReactNode;
     title?: string;
     hasStatusBar?: boolean;
 }
 
 export interface DispatchProps {
     onPressLeftButton?: () => void;
-    onPressRightButton?: () => void;
+    onPressRightButton1?: () => void;
+    onPressRightButton2?: () => void;
 }
 
 export type Props = StateProps & DispatchProps;
@@ -45,20 +47,32 @@ export class NavigationHeader extends React.Component<Props, State> {
                             {this.props.title ? this.props.title : ''}
                         </Text>
                     </View>
-                    <TouchableView
-                        onPress={this.props.onPressRightButton}
-                        style={styles.rightContainer}
-                        testId={'NavigationHeader/RightButton'}
-                    >
-                        <Text style={styles.headerRightButtonText}>
-                            {this.props.rightButtonText ? this.props.rightButtonText : ''}
-                        </Text>
-                    </TouchableView>
+                    <View style={styles.rightContainer}>
+                        {this.props.rightButtonText1 &&
+                        <RightButton onPress={this.props.onPressRightButton1} text={this.props.rightButtonText1} />}
+                        {this.props.rightButtonText2 &&
+                        <RightButton onPress={this.props.onPressRightButton2} text={this.props.rightButtonText2} />}
+                    </View>
                 </View>
             </SafeAreaView>
         );
     }
 }
+
+const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
+    return (
+        <TouchableView
+            onPress={props.onPress}
+            testId={'NavigationHeader/RightButton'}
+            style={styles.rightButtonContainer}
+            hitSlop={{...TouchableViewDefaultHitSlop, left: 0}}
+        >
+            <Text style={styles.headerRightButtonText}>
+                {props.text ? props.text : ''}
+            </Text>
+        </TouchableView>
+    );
+};
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -95,7 +109,9 @@ const styles = StyleSheet.create({
     },
     rightContainer: {
         flex: 1,
-        alignItems: 'flex-end',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
     },
     titleText: {
         fontSize: 18,
@@ -106,5 +122,8 @@ const styles = StyleSheet.create({
     headerRightButtonText: {
         fontSize: 18,
         color: Colors.DEFAULT_ACTION_COLOR,
+    },
+    rightButtonContainer: {
+        paddingLeft: 20,
     },
 });
