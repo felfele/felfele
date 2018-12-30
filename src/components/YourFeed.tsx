@@ -31,8 +31,8 @@ export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
+    onFollowFeed: (feed: Feed) => void;
     onUnfollowFeed: (feed: Feed) => void;
-    onAddFeed: (feed: Feed) => void;
     onToggleFavorite: (feedUrl: string) => void;
 }
 
@@ -212,7 +212,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     private followFeed = (author: Author) => {
         const knownFeed = this.props.knownFeeds.find(feed => feed.feedUrl === author.uri);
         if (knownFeed != null) {
-            this.props.onAddFeed(knownFeed);
+            this.props.onFollowFeed(knownFeed);
         }
     }
 

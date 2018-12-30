@@ -36,10 +36,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // do nothing
         },
         onUnfollowFeed: (feed: Feed) => {
-            dispatch(Actions.removeFeed(feed));
+            dispatch(Actions.unfollowFeed(feed));
         },
-        onAddFeed: (feed: Feed) => {
-            dispatch(Actions.addFeed(feed));
+        onFollowFeed: (feed: Feed) => {
+            dispatch(Actions.followFeed(feed));
         },
         onToggleFavorite: (feedUrl: string) => {
             dispatch(Actions.toggleFeedFavorite(feedUrl));

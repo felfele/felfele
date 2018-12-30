@@ -189,6 +189,25 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
+            return feeds.remove(ind);
+        }
+        case 'FOLLOW-FEED': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
+            return feeds.update(ind, feed => {
+                return {
+                    ...feed,
+                    followed: true,
+                };
+            });
+        }
+        case 'UNFOLLOW-FEED': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
             return feeds.update(ind, feed => {
                 return {
                     ...feed,
