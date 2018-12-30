@@ -18,7 +18,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.downloadPosts());
         },
         onRemoveFeed: (feed: Feed) => {
-            dispatch(Actions.unfollowFeed(feed));
+            dispatch(Actions.removeFeed(feed));
             dispatch(AsyncActions.downloadPosts());
         },
     };

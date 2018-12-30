@@ -17,6 +17,7 @@ export enum ActionTypes {
     REMOVE_CONTENT_FILTER = 'REMOVE-CONTENT-FILTER',
     CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
     ADD_FEED = 'ADD-FEED',
+    REMOVE_FEED = 'REMOVE-FEED',
     FOLLOW_FEED = 'FOLLOW-FEED',
     UNFOLLOW_FEED = 'UNFOLLOW-FEED',
     TOGGLE_FEED_FAVORITE = 'TOGGLE-FEED-FAVORITE',
@@ -68,6 +69,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
     addFeed: (feed: Feed) =>
         createAction(ActionTypes.ADD_FEED, { feed }),
+    removeFeed: (feed: Feed) =>
+        createAction(ActionTypes.REMOVE_FEED, { feed }),
     followFeed: (feed: Feed) =>
         createAction(ActionTypes.FOLLOW_FEED, { feed }),
     unfollowFeed: (feed: Feed) =>

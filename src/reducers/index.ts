@@ -184,6 +184,13 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
                 });
             }
         }
+        case 'REMOVE-FEED': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
+            return feeds.remove(ind);
+        }
         case 'FOLLOW-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
             if (ind === -1) {
