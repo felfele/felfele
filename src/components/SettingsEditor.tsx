@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
-import { Colors } from '../styles';
+import { Colors, DefaultTabBarHeight } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 
 export interface StateProps {
@@ -76,6 +76,12 @@ export const SettingsEditor = (props: Props) => {
                 />
                 }
             </SettingsList>
+            <View
+                style={{
+                    height: DefaultTabBarHeight,
+                    backgroundColor: Colors.BACKGROUND_COLOR,
+                }}
+            />
         </View>
     );
 };

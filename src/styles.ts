@@ -57,3 +57,4 @@ export const DefaultStyle = StyleSheet.create({
 });
 
 export const DefaultNavigationBarHeight = 44;
+export const DefaultTabBarHeight = 50;

@@ -4,14 +4,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
-import { StatusBarView } from './StatusBarView';
 
 export interface StateProps {
     leftButtonText?: string;
     rightButtonText1?: string | React.ReactNode;
     rightButtonText2?: string | React.ReactNode;
     title?: string;
-    hasStatusBar?: boolean;
 }
 
 export interface DispatchProps {
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 10,
         paddingRight: 10,
-        paddingTop: 10,
+        paddingTop: 6,
         marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
