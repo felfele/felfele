@@ -57,6 +57,13 @@ interface YourFeedState {
 export type YourFeedVariant = 'favorite' | 'news' | 'your' | 'feed';
 
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
+    public state: YourFeedState = {
+        selectedPost: null,
+        isRefreshing: true,
+        isOnline: true,
+        currentTime: Date.now(),
+    };
+
     constructor(props) {
         super(props);
         NetworkStatus.addConnectionStateChangeListener((result) => {
