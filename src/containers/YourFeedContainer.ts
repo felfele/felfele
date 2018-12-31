@@ -12,11 +12,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: filteredPosts,
-        feeds: state.feeds.toArray(),
-        visitedFeeds: state.visitedFeeds.toArray(),
+        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'your',
-        notOwnFeed: false,
+        isOwnFeed: false,
     };
 };
 
@@ -41,7 +41,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onUnfollowFeed: (feed: Feed) => {
             // do nothing
         },
-        onAddFeed: (feed: Feed) => {
+        onFollowFeed: (feed: Feed) => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {

@@ -4,7 +4,6 @@ import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { Debug } from '../Debug';
 
 const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
     return favoriteFeeds.find(feed => {
@@ -22,11 +21,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: posts,
-        feeds: state.feeds.toArray(),
-        visitedFeeds: state.visitedFeeds.toArray(),
+        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'favorite',
-        notOwnFeed: false,
+        isOwnFeed: false,
     };
 };
 
@@ -47,7 +46,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onUnfollowFeed: (feed: Feed) => {
             // do nothing
         },
-        onAddFeed: (feed: Feed) => {
+        onFollowFeed: (feed: Feed) => {
             // do nothing
         },
         onToggleFavorite: (feedUrl: string) => {

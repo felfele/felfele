@@ -13,11 +13,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: posts,
-        feeds: state.feeds.toArray(),
-        visitedFeeds: state.visitedFeeds.toArray(),
+        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'feed',
-        notOwnFeed: state.author.uri !== ownProps.navigation.state.params.author.uri,
+        isOwnFeed: state.author.uri === ownProps.navigation.state.params.author.uri,
     };
 };
 
@@ -36,10 +36,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // do nothing
         },
         onUnfollowFeed: (feed: Feed) => {
-            dispatch(Actions.removeFeed(feed));
+            dispatch(Actions.unfollowFeed(feed));
         },
-        onAddFeed: (feed: Feed) => {
-            dispatch(Actions.addFeed(feed));
+        onFollowFeed: (feed: Feed) => {
+            dispatch(Actions.followFeed(feed));
         },
         onToggleFavorite: (feedUrl: string) => {
             dispatch(Actions.toggleFeedFavorite(feedUrl));
