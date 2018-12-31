@@ -52,7 +52,10 @@ export class NavigationHeader extends React.Component<Props, State> {
                         {this.props.rightButtonText1 &&
                         <RightButton onPress={this.props.onPressRightButton1} text={this.props.rightButtonText1} />}
                         {this.props.rightButtonText2 &&
-                        <RightButton onPress={this.props.onPressRightButton2} text={this.props.rightButtonText2} />}
+                            <View style={{paddingRight: 20}}>
+                                <RightButton onPress={this.props.onPressRightButton2} text={this.props.rightButtonText2} />
+                            </View>
+                        }
                     </View>
                 </View>
             </SafeAreaView>
@@ -66,7 +69,7 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
             onPress={props.onPress}
             testId={'NavigationHeader/RightButton'}
             style={styles.rightButtonContainer}
-            hitSlop={{...TouchableViewDefaultHitSlop, left: 0}}
+            hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
             <Text style={styles.headerRightButtonText}>
                 {props.text ? props.text : ''}
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 10,
         paddingRight: 10,
-        paddingTop: 6,
+        paddingTop: 2,
         marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
@@ -125,6 +128,6 @@ const styles = StyleSheet.create({
         color: BUTTON_COLOR,
     },
     rightButtonContainer: {
-        paddingLeft: 20,
+        marginLeft: 30,
     },
 });
