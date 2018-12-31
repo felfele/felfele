@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Text } from 'react-native';
+import { Debug } from '../Debug';
 
 export class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     public static getDerivedStateFromError(error) {
@@ -10,7 +11,7 @@ export class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     public state = { hasError: false };
 
     public componentDidCatch(error, info) {
-        console.log(error, info);
+        Debug.log(error, info);
     }
 
     public render() {

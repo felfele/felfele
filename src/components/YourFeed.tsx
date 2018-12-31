@@ -225,7 +225,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private isPostSelected = (post: Post): boolean => {
-        return !!this.state.selectedPost && this.state.selectedPost._id === post._id;
+        return this.state.selectedPost != null && this.state.selectedPost._id === post._id;
     }
 
     private togglePostSelection = (post: Post) => {

@@ -114,9 +114,9 @@ const ButtonList = (props: CardProps) => {
     return <View/>;
 };
 
-const renderCardTopIcon = (post: Post) => {
-    if (post.author) {
-        const imageUri = getAuthorImageUri(post.author);
+const CardTopIcon = (props: { post: Post }) => {
+    if (props.post.author) {
+        const imageUri = getAuthorImageUri(props.post.author);
         const imageSource = imageUri === ''
             ? require('../../images/user_circle.png')
             : { uri: imageUri };
@@ -124,7 +124,7 @@ const renderCardTopIcon = (post: Post) => {
             <Image source={imageSource} style={DefaultStyle.favicon} />
         );
     } else {
-        return null;
+        return <View/>;
     }
 };
 
@@ -139,7 +139,7 @@ const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) =>
             onPress={() => props.navigate('Feed', { author: props.post.author && props.post.author })}
             style={styles.infoContainer}
         >
-            { renderCardTopIcon(props.post) }
+            <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
                 <Text style={styles.username} numberOfLines={1}>{username}</Text>
                 <Text style={styles.location}>{printableTime}{hostnameText}</Text>
