@@ -10,6 +10,7 @@ import { ImageView } from './ImageView';
 import { isSwarmLink } from '../Swarm';
 import { ImageData } from '../models/ImageData';
 import Markdown from 'react-native-easy-markdown';
+import { ErrorBoundary } from './ErrorBoundary';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -56,6 +57,7 @@ export const Card = (props: CardProps) => {
                         const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
                         return (
                             <ImageView
+                                testID={image.uri || '' + index}
                                 key={image.uri || '' + index}
                                 source={image}
                                 style={{
@@ -85,7 +87,9 @@ const ButtonList = (props: CardProps) => {
     const shareIconName = props.post.link != null ? 'share' : 'share-outline';
     if (props.isSelected) {
         return (
-            <View style={styles.itemImageContainer}>
+            <View
+                testID='CardButtonList'
+                style={styles.itemImageContainer}>
                 <TouchableView style={styles.like} onPress={() => props.post.liked = true}>
                     <ActionIcon name={likeIconName}/>
                 </TouchableView>
@@ -131,6 +135,7 @@ const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) =>
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
     return (
         <TouchableOpacity
+            testID={'CardTop'}
             onPress={() => props.navigate('Feed', { author: props.post.author && props.post.author })}
             style={styles.infoContainer}
         >
@@ -143,7 +148,7 @@ const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) =>
     );
 };
 
-const CardWithText = (props: CardProps) => {
+export const CardWithText = (props: CardProps) => {
     return (
         <View
             style={[styles.container, {
@@ -159,9 +164,9 @@ const CardWithText = (props: CardProps) => {
                 onPress={ () => props.openPost(props.post)}
                 activeOpacity={1}
             >
-            <CardTop post={props.post} navigate={props.navigate} />
-            { props.post.text != null &&
-            <CardMarkdown key={props.post._id} text={props.post.text}/>}
+                <CardTop post={props.post} navigate={props.navigate} />
+                { props.post.text != null &&
+                <CardMarkdown key={props.post._id} text={props.post.text}/>}
             </TouchableOpacity>
             <ButtonList {...props} />
         </View>
@@ -169,19 +174,23 @@ const CardWithText = (props: CardProps) => {
 };
 
 const CardMarkdown = (props: { text: string }) => (
-    <Markdown
-        style={styles.markdownStyle}
-        renderLink={(href, title, children) => {
-            return (
-                <TouchableWithoutFeedback
-                    key={'linkWrapper_' + href + Date.now()}
-                    onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
-                >
-                    <Text key={'linkWrapper_' + href + Date.now()} style={{textDecorationLine: 'underline'}}>{children}</Text>
-                </TouchableWithoutFeedback>
-            );
-        }}
-    >{props.text}</Markdown>
+    <ErrorBoundary>
+        <Markdown
+            style={styles.markdownStyle}
+            renderLink={(href, title, children) => {
+                return (
+                    <TouchableWithoutFeedback
+                        key={'linkWrapper_' + href + Date.now()}
+                        onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
+                    >
+                        <Text key={'linkWrapper_' + href + Date.now()} style={{textDecorationLine: 'underline'}}>
+                            {children}
+                        </Text>
+                    </TouchableWithoutFeedback>
+                );
+            }}
+        >{props.text}</Markdown>
+    </ErrorBoundary>
 );
 
 const openPost = async (post: Post) => {
