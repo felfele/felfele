@@ -102,12 +102,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     Debug: {
         screen: DebugScreenContainer,
     },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
-    },
     LogViewer: {
         screen: LogViewerContainer,
     },
@@ -225,14 +219,20 @@ const Scenes: NavigationRouteConfigMap = {
     Post: {
         screen: EditPostContainer,
     },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
     EditFeed: {
         screen: EditFeedContainer,
     },
     EditFilter: {
         screen: EditFilterContainer,
     },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
     },
 };
 
