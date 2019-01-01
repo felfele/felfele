@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Post, getAuthorImageUri } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultStyle } from '../styles';
-import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
@@ -11,19 +11,24 @@ import { isSwarmLink } from '../Swarm';
 import { ImageData } from '../models/ImageData';
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
+import { Debug } from '../Debug';
 
 const WindowWidth = Dimensions.get('window').width;
 
-interface CardProps {
-    post: Post;
-    isSelected: boolean;
+export interface StateProps {
     showSquareImages: boolean;
+    isSelected: boolean;
+    post: Post;
     togglePostSelection: (post: Post) => void;
-    openPost: (post: Post) => void;
-    onDeleteConfirmation: (post: Post) => void;
-    onSharePost: (post: Post) => void;
     navigate: (view: string, {}) => void;
 }
+
+export interface DispatchProps {
+    onDeletePost: (post: Post) => void;
+    onSharePost: (post: Post) => void;
+}
+
+type CardProps = StateProps & DispatchProps;
 
 export const Card = (props: CardProps) => {
     if (props.post.images.length === 0) {
@@ -45,7 +50,7 @@ export const Card = (props: CardProps) => {
                 <TouchableOpacity
                     activeOpacity={1}
                     onLongPress={() => props.togglePostSelection(props.post)}
-                    onPress={() => props.openPost(props.post)}
+                    onPress={() => openPost(props.post)}
                     style = {{
                         backgroundColor: '#fff',
                         padding: 0,
@@ -96,7 +101,7 @@ const ButtonList = (props: CardProps) => {
                 <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
                     <ActionIcon name='comment-multiple-outline'/>
                 </TouchableView>
-                <TouchableView style={styles.share} onPress={() => props.onDeleteConfirmation(props.post)}>
+                <TouchableView style={styles.share} onPress={() => onDeleteConfirmation(props.post, props.onDeletePost)}>
                     <ActionIcon name='trash-can-outline'/>
                 </TouchableView>
                 <TouchableView style={styles.share}>
@@ -161,7 +166,7 @@ export const CardWithText = (props: CardProps) => {
         >
             <TouchableOpacity
                 onLongPress={ () => props.togglePostSelection(props.post) }
-                onPress={ () => props.openPost(props.post)}
+                onPress={ () => openPost(props.post)}
                 activeOpacity={1}
             >
                 <CardTop post={props.post} navigate={props.navigate} />
@@ -199,6 +204,18 @@ const openPost = async (post: Post) => {
             await Linking.openURL(post.link);
         }
     }
+};
+
+const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) => {
+    Alert.alert(
+        'Are you sure you want to delete?',
+        undefined,
+        [
+            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'OK', onPress: async () => await onDeletePost(post) },
+        ],
+        { cancelable: false }
+    );
 };
 
 const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): number[] => {

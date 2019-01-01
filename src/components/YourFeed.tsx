@@ -1,12 +1,9 @@
 import * as React from 'react';
 import {
-    Linking,
     View,
-    Alert,
     FlatList,
     RefreshControl,
     StyleSheet,
-    Platform,
     SafeAreaView,
     LayoutAnimation,
 } from 'react-native';
@@ -16,21 +13,17 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Post, Author } from '../models/Post';
 import { NetworkStatus } from '../NetworkStatus';
 import { FeedHeader } from './FeedHeader';
-import { isSwarmLink } from '../Swarm';
 import { Colors } from '../styles';
-import { Debug } from '../Debug';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Feed } from '../models/Feed';
-import { Card } from './Card';
+import { CardContainer } from '../containers/CardContainer';
 
 export interface DispatchProps {
     onRefreshPosts: () => void;
-    onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
-    onSharePost: (post: Post) => void;
     onFollowFeed: (feed: Feed) => void;
     onUnfollowFeed: (feed: Feed) => void;
     onToggleFavorite: (feedUrl: string) => void;
@@ -110,13 +103,10 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     ListFooterComponent={this.renderListFooter}
                     data={this.props.posts}
                     renderItem={(obj) => (
-                        <Card
+                        <CardContainer
                             post={obj.item}
                             isSelected={this.isPostSelected(obj.item)}
                             navigate={this.props.navigation.navigate}
-                            onDeleteConfirmation={this.onDeleteConfirmation}
-                            onSharePost={this.props.onSharePost}
-                            openPost={this.openPost}
                             togglePostSelection={this.togglePostSelection}
                             showSquareImages={this.props.settings.showSquareImages}
                         />
@@ -223,14 +213,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         }
     }
 
-    private openPost = async (post: Post) => {
-        if (post.link) {
-            if (!isSwarmLink(post.link)) {
-                await Linking.openURL(post.link);
-            }
-        }
-    }
-
     private isPostSelected = (post: Post): boolean => {
         return this.state.selectedPost != null && this.state.selectedPost._id === post._id;
     }
@@ -242,18 +224,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         } else {
             this.setState({ selectedPost: post });
         }
-    }
-
-    private onDeleteConfirmation = (post: Post) => {
-        Alert.alert(
-            'Are you sure you want to delete?',
-            undefined,
-            [
-                { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'OK', onPress: async () => await this.props.onDeletePost(post) },
-            ],
-            { cancelable: false }
-        );
     }
 
     private renderListHeader = () => {

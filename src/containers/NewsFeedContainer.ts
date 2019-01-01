@@ -38,13 +38,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onRefreshPosts: () => {
             dispatch(AsyncActions.downloadPosts());
         },
-        onDeletePost: (post: Post) => {
-            // do nothing
-        },
         onSavePost: (post: Post) => {
-            // do nothing
-        },
-        onSharePost: (post: Post) => {
             // do nothing
         },
         onUnfollowFeed: (feed: Feed) => {

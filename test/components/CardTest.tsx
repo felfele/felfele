@@ -84,9 +84,8 @@ it('should render without images CardWithText', () => {
             post={testPostWithoutImage}
             isSelected={false}
             navigate={(_) => {}}
-            onDeleteConfirmation={(_) => {}}
+            onDeletePost={(_) => {}}
             onSharePost={(_) => {}}
-            openPost={(_) => {}}
             togglePostSelection={(_) => {}}
             showSquareImages={true}
         />
@@ -102,9 +101,8 @@ it('should render unselected post without images with the following components: 
             post={testPostWithoutImage}
             isSelected={false}
             navigate={(_) => {}}
-            onDeleteConfirmation={(_) => {}}
+            onDeletePost={(_) => {}}
             onSharePost={(_) => {}}
-            openPost={(_) => {}}
             togglePostSelection={(_) => {}}
             showSquareImages={true}
         />
@@ -121,9 +119,8 @@ it('should render selected post without images with the following components: Po
             post={testPostWithoutImage}
             isSelected={true}
             navigate={(_) => {}}
-            onDeleteConfirmation={(_) => {}}
+            onDeletePost={(_) => {}}
             onSharePost={(_) => {}}
-            openPost={(_) => {}}
             togglePostSelection={(_) => {}}
             showSquareImages={true}
         />
@@ -140,9 +137,8 @@ it('should render unselected post with images with the following components: Pos
             post={testPostWithImage}
             isSelected={false}
             navigate={(_) => {}}
-            onDeleteConfirmation={(_) => {}}
+            onDeletePost={(_) => {}}
             onSharePost={(_) => {}}
-            openPost={(_) => {}}
             togglePostSelection={(_) => {}}
             showSquareImages={true}
         />
@@ -160,9 +156,8 @@ it('should render selected post with images with the following components: Post,
             post={testPostWithImage}
             isSelected={false}
             navigate={(_) => {}}
-            onDeleteConfirmation={(_) => {}}
+            onDeletePost={(_) => {}}
             onSharePost={(_) => {}}
-            openPost={(_) => {}}
             togglePostSelection={(_) => {}}
             showSquareImages={true}
         />
