@@ -20,6 +20,7 @@ interface SimpleTextInputProps {
     underlineColorAndroid?: string;
     testID?: string;
     returnKeyType?: ReturnKeyTypeOptions;
+    clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always';
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -58,6 +59,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 returnKeyType={this.props.returnKeyType}
                 testID={this.props.testID}
                 onEndEditing={this.onSubmitEditing}
+                clearButtonMode={this.props.clearButtonMode}
             />
         );
     }
