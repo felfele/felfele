@@ -68,7 +68,7 @@ export const SettingsEditor = (props: Props) => {
                 <SettingsList.Item
                     icon={
                         <SettingsIcon>
-                            <Ionicons name='md-bug' size={24} color='gray' />
+                            <Ionicons name='md-bug' size={24} color={Colors.GRAY} />
                         </SettingsIcon>
                     }
                     title='Debug menu'
