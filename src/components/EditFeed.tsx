@@ -140,14 +140,8 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                 <View style={styles.qrCameraContainer}>
                     <QRCodeScanner
                         onRead={async (event) => await this.onScanSuccess(event)}
-                        containerStyle={{
-                            width: QRCameraWidth,
-                            height: QRCameraHeight,
-                        }}
-                        cameraStyle={{
-                            width: QRCameraWidth,
-                            height: QRCameraHeight,
-                        }}
+                        containerStyle={styles.qrCameraStyle}
+                        cameraStyle={styles.qrCameraStyle}
                         fadeIn={false}
                     />
                 </View>
@@ -294,6 +288,10 @@ const styles = StyleSheet.create({
         padding: 0,
         alignSelf: 'center',
         flexDirection: 'column',
+    },
+    qrCameraStyle: {
+        width: QRCameraWidth,
+        height: QRCameraHeight,
     },
     qrCameraText: {
         fontSize: 14,
