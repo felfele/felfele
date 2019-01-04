@@ -7,7 +7,7 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, PersistedState, createMigrate } from 'redux-persist';
 
 import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
@@ -18,8 +18,9 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
+import { migrateAppState } from './migration';
 
-export interface AppState {
+export interface AppState extends PersistedState {
     contentFilters: List<ContentFilter>;
     feeds: List<Feed>;
     ownFeeds: List<PostFeed>;
@@ -421,7 +422,12 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             return defaultState;
         }
         default: {
-            return combinedReducers(state, action);
+            try {
+                return combinedReducers(state, action);
+            } catch (e) {
+                Debug.log('reducer error: ', e);
+                return state;
+            }
         }
     }
 };
@@ -433,6 +439,8 @@ const persistConfig = {
     blacklist: ['currentTimestamp'],
     key: 'root',
     storage: AsyncStorage,
+    version: 0,
+    migrate: createMigrate(migrateAppState, { debug: false}),
 };
 
 export const combinedReducers = combineReducers<AppState>({
@@ -470,6 +478,10 @@ const initStore = () => {
 
 const patchState = () => {
     // placeholder to put patches to fix state
+
+    // TODO migration replaces this funcionality
+    // const state = store.getState();
+    // state.feeds.map(feed => feed != null && store.dispatch(Actions.followFeed(feed)));
 };
 
 export const persistor = persistStore(store, {}, initStore);
