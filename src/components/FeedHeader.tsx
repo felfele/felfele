@@ -13,6 +13,7 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { Debug } from '../Debug';
+import { DefaultNavigationBarHeight } from '../styles';
 
 export interface StateProps {
     navigation: any;
@@ -87,12 +88,12 @@ export class FeedHeader extends React.PureComponent<Props> {
 
 const styles = StyleSheet.create({
     headerContainer: {
-        flex: 1,
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderBottomColor: 'lightgray',
         alignContent: 'center',
         paddingVertical: 6,
+        height: DefaultNavigationBarHeight,
     },
     cameraIconContainer: {
         alignItems: 'center',

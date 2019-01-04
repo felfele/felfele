@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
-import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
@@ -96,6 +95,28 @@ const NewsFeedNavigator = createStackNavigator(newsTabScenes,
     },
 );
 
+const settingsTabScenes: NavigationRouteConfigMap = {
+    SettingsTab: {
+        screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+    },
+    Debug: {
+        screen: DebugScreenContainer,
+    },
+    LogViewer: {
+        screen: LogViewerContainer,
+    },
+};
+
+const SettingsNavigator = createStackNavigator(settingsTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'SettingsTab',
+    },
+);
+
 const Root = createBottomTabNavigator(
     {
         YourTab: {
@@ -144,7 +165,7 @@ const Root = createBottomTabNavigator(
             },
         },
         SettingsTab: {
-            screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+            screen: SettingsNavigator,
             path: '/settings',
             navigationOptions: {
                 header: undefined,
@@ -183,7 +204,6 @@ const Root = createBottomTabNavigator(
                     showIcon: true,
                     activeTintColor: 'gray',
                     inactiveTintColor: 'lightgray',
-                    activeBackgroundColor: 'gray',
                     style: {
                         backgroundColor: Colors.BACKGROUND_COLOR,
                         opacity: 0.96,
@@ -199,20 +219,8 @@ const Scenes: NavigationRouteConfigMap = {
     Post: {
         screen: EditPostContainer,
     },
-    Debug: {
-        screen: DebugScreenContainer,
-    },
     IdentitySettingsContainer: {
         screen: IdentitySettingsContainer,
-    },
-    Share: {
-        screen: Share,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
     },
     EditFeed: {
         screen: EditFeedContainer,
@@ -220,8 +228,11 @@ const Scenes: NavigationRouteConfigMap = {
     EditFilter: {
         screen: EditFilterContainer,
     },
-    LogViewer: {
-        screen: LogViewerContainer,
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
     },
 };
 

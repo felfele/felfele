@@ -158,14 +158,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         { onFollowPressed: (author: Author) => void, isFavorite: () => boolean }) {
         const navParams = props.navigation.state.params;
         switch (props.yourFeedVariant) {
-            case 'favorite': {
-                return (
-                    <NavigationHeader
-                        leftButtonText=' '
-                        title={navParams ? navParams.author.name : 'Favorites'}
-                    />
-                );
-            }
             case 'feed': {
                 const isFollowedFeed = navParams != null &&
                     props.feeds.find(feed => feed.feedUrl === navParams.author.uri) != null;
@@ -435,15 +427,34 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderListHeader = () => {
-        if (this.props.yourFeedVariant === 'news' || this.props.yourFeedVariant === 'your') {
-            return (
-                <FeedHeader
-                    navigation={this.props.navigation}
-                    onSavePost={this.props.onSavePost}
-                />
-            );
-        } else {
-            return null;
+        switch (this.props.yourFeedVariant) {
+            case 'your': {
+                return (
+                    <FeedHeader
+                        navigation={this.props.navigation}
+                        onSavePost={this.props.onSavePost}
+                    />
+                );
+            }
+            case 'favorite': {
+                return (
+                    <NavigationHeader
+                        leftButtonText=''
+                        title='Favorites'
+                    />
+                );
+            }
+            case 'news': {
+                return (
+                    <NavigationHeader
+                        leftButtonText=''
+                        title='News'
+                    />
+                );
+            }
+            default: {
+                return null;
+            }
         }
     }
 

@@ -13,14 +13,7 @@ import { Colors } from '../styles';
 import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-
-interface EditFilterNavigationActions {
-    back?: () => void;
-}
-
-const navigationActions: EditFilterNavigationActions = {
-    back: undefined,
-};
+import { NavigationHeader } from './NavigationHeader';
 
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -66,25 +59,26 @@ interface EditFilterState {
 }
 
 export class EditFilter extends React.Component<DispatchProps & StateProps, EditFilterState> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Edit filter',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-    };
-
     constructor(props) {
         super(props);
         this.state = {
             filterText: this.props.filter.text,
             filterSliderValue: filterValidUntilToSliderValue(this.props.filter.validUntil),
         };
-        navigationActions.back = this.goBack.bind(this);
     }
-
     public render() {
         const sliderText = 'Filter until: ' + sliderValueToText(this.state.filterSliderValue);
+        const isDelete = this.props.filter.text.length > 0;
+        const rightButtonText = isDelete ? 'Delete' : 'Add';
+        const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
             <View style={styles.container}>
+                <NavigationHeader
+                    title='Edit filter'
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                    rightButtonText1={rightButtonText}
+                    onPressRightButton1={rightButtonAction}
+                />
                 <SimpleTextInput
                     defaultValue={this.state.filterText}
                     style={styles.linkInput}
@@ -105,16 +99,6 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                         onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
                     />
                 </View>
-                { this.props.filter.text.length > 0
-                        ? <Button
-                            title='Delete'
-                            onPress={this.onDeleteFilter}
-                        />
-                        : <Button
-                            title='Update'
-                            onPress={this.onAddFilter}
-                        />
-                }
             </View>
         );
     }

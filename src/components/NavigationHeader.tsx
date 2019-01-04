@@ -2,16 +2,15 @@ import * as React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { Colors } from '../styles';
+import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
-import { StatusBarView } from './StatusBarView';
 
 export interface StateProps {
     leftButtonText?: string;
     rightButtonText1?: string | React.ReactNode;
     rightButtonText2?: string | React.ReactNode;
     title?: string;
-    hasStatusBar?: boolean;
+    withoutSafeArea?: boolean;
 }
 
 export interface DispatchProps {
@@ -26,38 +25,51 @@ export interface State {
 }
 
 const BACK_ICON_NAME = Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back';
-const BACK_BUTTON_TEXT = Platform.OS === 'ios' ? '  Back' : '';
-export class NavigationHeader extends React.Component<Props, State> {
-    public render() {
+const BUTTON_COLOR = Platform.OS === 'ios' ? Colors.DEFAULT_ACTION_COLOR : Colors.DARK_GRAY;
+
+const Header = (props: Props) => (
+    <View style={styles.headerContainer}>
+        <TouchableView onPress={props.onPressLeftButton} style={styles.leftContainer}>
+            <Text style={styles.headerLeftButtonText}>
+                {
+                    props.leftButtonText != null
+                    ? props.leftButtonText
+                    : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
+                }
+            </Text>
+        </TouchableView>
+        <View style={styles.middleContainer}>
+            <Text
+                style={styles.titleText}
+                ellipsizeMode='tail'
+                numberOfLines={1}
+            >
+                {props.title ? props.title : ''}
+            </Text>
+        </View>
+        <View style={styles.rightContainer}>
+            {props.rightButtonText1 &&
+            <RightButton onPress={props.onPressRightButton1} text={props.rightButtonText1} />}
+            {props.rightButtonText2 &&
+                <View style={{paddingRight: 20}}>
+                    <RightButton onPress={props.onPressRightButton2} text={props.rightButtonText2} />
+                </View>
+            }
+        </View>
+    </View>
+);
+
+export const NavigationHeader = (props: Props) => {
+    if (props.withoutSafeArea === true) {
+        return <Header {...props} />;
+    } else {
         return (
             <SafeAreaView style={styles.mainContainer}>
-                <View style={styles.headerContainer}>
-                    <TouchableView onPress={this.props.onPressLeftButton} style={styles.leftContainer}>
-                        <Text style={styles.headerLeftButtonText}>
-                            {this.props.leftButtonText == null && <Ionicons name={BACK_ICON_NAME} color={Colors.DEFAULT_ACTION_COLOR} size={18} />}
-                            {this.props.leftButtonText ? this.props.leftButtonText : BACK_BUTTON_TEXT}
-                        </Text>
-                    </TouchableView>
-                    <View style={styles.middleContainer}>
-                        <Text
-                            style={styles.titleText}
-                            ellipsizeMode='tail'
-                            numberOfLines={1}
-                        >
-                            {this.props.title ? this.props.title : ''}
-                        </Text>
-                    </View>
-                    <View style={styles.rightContainer}>
-                        {this.props.rightButtonText1 &&
-                        <RightButton onPress={this.props.onPressRightButton1} text={this.props.rightButtonText1} />}
-                        {this.props.rightButtonText2 &&
-                        <RightButton onPress={this.props.onPressRightButton2} text={this.props.rightButtonText2} />}
-                    </View>
-                </View>
+                <Header {...props} />
             </SafeAreaView>
         );
     }
-}
+};
 
 const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
     return (
@@ -65,7 +77,7 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
             onPress={props.onPress}
             testId={'NavigationHeader/RightButton'}
             style={styles.rightButtonContainer}
-            hitSlop={{...TouchableViewDefaultHitSlop, left: 0}}
+            hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
             <Text style={styles.headerRightButtonText}>
                 {props.text ? props.text : ''}
@@ -82,7 +94,7 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         width: '100%',
-        height: 50,
+        height: DefaultNavigationBarHeight,
         top: 0,
         left: 0,
         padding: 0,
@@ -91,14 +103,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 10,
         paddingRight: 10,
-        paddingTop: 10,
+        paddingTop: 2,
         marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
         backgroundColor: Colors.BACKGROUND_COLOR,
     },
     headerLeftButtonText: {
-        color: Colors.DEFAULT_ACTION_COLOR,
+        color: BUTTON_COLOR,
         fontSize: 18,
     },
     leftContainer: {
@@ -114,16 +126,16 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     titleText: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: Colors.DARK_GRAY,
         textAlign: 'center',
     },
     headerRightButtonText: {
         fontSize: 18,
-        color: Colors.DEFAULT_ACTION_COLOR,
+        color: BUTTON_COLOR,
     },
     rightButtonContainer: {
-        paddingLeft: 20,
+        marginLeft: 30,
     },
 });

@@ -21,16 +21,7 @@ import { Debug } from '../Debug';
 import { Colors } from '../styles';
 import * as Swarm from '../Swarm';
 import { downloadPostFeed } from '../PostFeed';
-
-interface EditFeedNavigationActions {
-    back?: () => void;
-    add?: (feed: Feed) => void;
-}
-
-const navigationActions: EditFeedNavigationActions = {
-    back: undefined,
-    add: undefined,
-};
+import { NavigationHeader } from './NavigationHeader';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -54,12 +45,6 @@ export interface StateProps {
 }
 
 export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Edit feed',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-    };
-
     public state: EditFeedState = {
         url: '',
         checked: false,
@@ -69,8 +54,6 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     constructor(props) {
         super(props);
         this.state.url = this.props.feed.feedUrl;
-        navigationActions.back = this.goBack.bind(this);
-        navigationActions.add = this.onAdd.bind(this);
     }
 
     public async onAdd(feed: Feed) {
@@ -100,8 +83,30 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     }
 
     public render() {
+        const isDelete = this.props.feed.feedUrl.length > 0;
+        const rightButtonText = this.state.loading
+            ? undefined
+            : isDelete
+                ? 'Delete'
+                : 'Fetch'
+            ;
+        const rightButtonAction = this.state.loading
+            ? undefined
+            : isDelete
+                ? async () => await this.onDelete()
+                : async () => await this.fetchFeed()
+            ;
         return (
             <View style={styles.container}>
+                <NavigationHeader
+                    onPressLeftButton={() => {
+                        // null is needed otherwise it does not work with switchnavigator backbehavior property
+                        this.props.navigation.goBack(null);
+                    }}
+                    title='Edit feed'
+                    rightButtonText1={rightButtonText}
+                    onPressRightButton1={rightButtonAction}
+                />
                 <SimpleTextInput
                     defaultValue={this.state.url}
                     style={styles.linkInput}
@@ -132,11 +137,6 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     private NewItemView = (props) => {
         return (
             <View>
-                <Button
-                    title='Fetch'
-                    onPress={async () => await this.fetchFeed()}
-                    disabled={this.state.loading}
-                />
                 <View style={styles.qrCameraContainer}>
                     <QRCodeScanner
                         onRead={async (event) => await this.onScanSuccess(event)}
@@ -160,11 +160,6 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
         const qrCodeValue = this.props.feed.url;
         return (
             <View>
-                <Button
-                    title='Delete'
-                    onPress={async () => this.onDelete()}
-                    disabled={this.state.loading}
-                />
                 <View style={styles.qrCodeContainer}>
                     <QRCode
                         value={qrCodeValue}
