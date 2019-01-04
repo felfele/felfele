@@ -59,8 +59,8 @@ export class LogViewer extends React.PureComponent<Props> {
                 onPressRightButton1={() => clearLog(this.props)}
                 title='Log viewer'
             />
-            <View style={styles.logFilterContainer}>
-                { Platform.OS === 'ios' &&
+            { Platform.OS === 'ios' &&
+                <View style={styles.logFilterContainer}>
                     <View style={styles.logFilterTextInputContainer}>
                         <Ionicon name='md-search' size={28} color={Colors.LIGHT_GRAY} />
                         <SimpleTextInput
@@ -72,8 +72,8 @@ export class LogViewer extends React.PureComponent<Props> {
                             onChangeText={(text) => (logFilter = text.toLowerCase()) && this.props.onTickTime()}
                         />
                     </View>
-                }
-            </View>
+                </View>
+            }
             <FlatList
                 data={filteredLog()}
                 renderItem={({item, index}) => <View style={styles.logLineContainer}>
