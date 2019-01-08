@@ -1,22 +1,24 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, Alert, Share, ShareContent, ShareOptions } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import nacl from 'ecma-nacl';
+import { generateSecureRandom } from 'react-native-securerandom';
+import { keccak256 } from 'js-sha3';
+import { encode, decode } from 'base64-arraybuffer';
 
-import { AsyncStorageWrapper, Storage } from '../Storage';
-import {
-    upload,
-    download,
-    downloadUserFeed,
-    downloadUserFeedTemplate,
-    updateUserFeed,
-} from '../Swarm';
 import { AppState } from '../reducers';
-import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
+import { List } from 'immutable';
+import { Post } from '../models/Post';
+import { stringToByteArray, byteArrayToHex, hexToByteArray, hexToString, byteArrayToString } from '../Swarm';
+import { Version } from '../Version';
+import { DateUtils } from '../DateUtils';
+import { createBackup } from '../BackupRestore';
 
 export interface StateProps {
     appState: AppState;
@@ -30,13 +32,28 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const Icon = (props) => (
+const IconContainer = (props) => (
     <View style={{
-        paddingVertical: 11,
+        paddingTop: 12,
         paddingLeft: 10,
+        paddingRight: 0,
+        width: 40,
+        ...props.style,
     }}>
-        <Ionicons name={props.name} size={28} color={Colors.GRAY} {...props} />
+        {props.children}
     </View>
+);
+
+const IonIcon = (props) => (
+    <IconContainer>
+        <Ionicons name={props.name} size={28} color={Colors.GRAY} {...props} />
+    </IconContainer>
+);
+
+const MaterialCommunityIcon = (props) => (
+    <IconContainer style={{paddingLeft: 8, paddingTop: 14}}>
+        <MaterialCommunityIcons name={props.name} size={22} color={Colors.GRAY} {...props} />
+    </IconContainer>
 );
 
 export const DebugScreen = (props: Props) => (
@@ -49,7 +66,7 @@ export const DebugScreen = (props: Props) => (
             <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-warning' />
+                        <IonIcon name='md-warning' />
                     }
                     title='App state reset'
                     onPress={async () => await onAppStateReset(props)}
@@ -57,7 +74,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-person' />
+                        <IonIcon name='md-person' />
                     }
                     title='Test identity creation'
                     onPress={props.onCreateIdentity}
@@ -65,7 +82,14 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-list' size={30} color='gray' />
+                        <MaterialCommunityIcon name='backup-restore' color='gray' />
+                    }
+                    title='Backup & Restore'
+                    onPress={() => props.navigation.navigate('BackupRestore')}
+                />
+                <SettingsList.Item
+                    icon={
+                        <IonIcon name='md-list' color='gray' />
                     }
                     title='Logs'
                     onPress={() => props.navigation.navigate('LogViewer')}

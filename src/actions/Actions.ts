@@ -11,6 +11,7 @@ import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostF
 import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
+import { restoreBackup } from '../BackupRestore';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -38,6 +39,7 @@ export enum ActionTypes {
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
+    APP_STATE_SET = 'APP-STATE-SET',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
@@ -60,6 +62,8 @@ const InternalActions = {
         createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
+    appStateSet: (appState: AppState) =>
+        createAction(ActionTypes.APP_STATE_SET, { appState }),
 };
 
 export const Actions = {
@@ -279,6 +283,12 @@ export const AsyncActions = {
                     }
                 }
             }
+        };
+    },
+    restoreFromBackup: (backupText: string, secretHex: string) => {
+        return async (dispatch, getState: () => AppState) => {
+            const appState = await restoreBackup(backupText, secretHex);
+            dispatch(InternalActions.appStateSet(appState));
         };
     },
 };

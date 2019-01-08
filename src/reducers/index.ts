@@ -129,7 +129,7 @@ const defaultFeeds: Feed[] = [
     },
 ];
 
-const defaultState: AppState = {
+export const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(defaultFeeds),
     ownFeeds: List<PostFeed>(),
@@ -419,6 +419,10 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
             return defaultState;
+        }
+        case 'APP-STATE-SET': {
+            Debug.log('App state set');
+            return action.payload.appState;
         }
         default: {
             return combinedReducers(state, action);

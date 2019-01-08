@@ -26,6 +26,9 @@ import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
+import { BackupRestore } from './components/BackupRestore';
+import { RestoreContainer } from './containers/RestoreContainer';
+import { BackupContainer } from './containers/BackupContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -104,6 +107,15 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     LogViewer: {
         screen: LogViewerContainer,
+    },
+    BackupRestore: {
+        screen: BackupRestore,
+    },
+    Restore: {
+        screen: RestoreContainer,
+    },
+    Backup: {
+        screen: BackupContainer,
     },
 };
 

@@ -35,7 +35,9 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
+    "base64-arraybuffer": "^0.1.5",
     "buffer": "^5.2.1",
+    "ecma-nacl": "^2.4.2",
     "elliptic": "^6.4.1",
     "immutable": "^3.8.2",
     "js-sha3": "^0.8.0",
@@ -74,6 +76,7 @@
     "tslib": "^1.9.3",
     "tslint": "^5.11.0",
     "url": "^0.11.0",
+    "utf8-encoder": "^1.0.1",
     "util": "^0.10.4",
     "vm-browserify": "^1.1.0"
   },

@@ -195,14 +195,30 @@ const updateMinLength = topicLength + userLength + timeLength + levelLength + he
 
 export const hexToString = (hex: string): string => {
     const byteArray = hexToByteArray(hex);
+    return byteArrayToString(byteArray);
+};
+
+const byteArrayToStringBuiltin = (byteArray: number[]): string => {
     if (String.fromCodePoint != null) {
-        return String.fromCodePoint(...byteArray);
+        return String.fromCodePoint.apply(null, byteArray);
     } else {
-        return String.fromCharCode(...byteArray);
+        return String.fromCharCode.apply(null, byteArray);
     }
 };
 
-const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
+export const byteArrayToString = (byteArray: number[]): string => {
+    const maxSize = 256;
+    let index = 0;
+    let result = '';
+    while (index < byteArray.length) {
+        const slice = byteArray.slice(index, index + maxSize);
+        result += byteArrayToStringBuiltin(slice);
+        index += slice.length;
+    }
+    return result;
+};
+
+export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 
 // cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
 export const byteArrayToHex = (byteArray: number[]): string => {
@@ -221,7 +237,7 @@ export const stringToByteArray = (str: string): number[] => {
     return result;
 };
 
-const hexToByteArray = (hex: string): number[] => {
+export const hexToByteArray = (hex: string): number[] => {
     const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
     const subStrings: string[] = [];
     for (let i = 0; i < hexWithoutPrefix.length; i += 2) {

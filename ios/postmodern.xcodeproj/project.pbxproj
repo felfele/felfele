@@ -478,6 +478,7 @@
 				5F8BA18F66164AFF817725B4 /* libRNSecureRandom.a in Frameworks */,
 				BB86BC0D8E5245DBA9869327 /* libRNSVG.a in Frameworks */,
 				9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */,
+				F8E43555C7334E1C853FEF13 /* RNMailTests.xctest in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,6 +691,8 @@
 				0935BE43C03F4A86A7D7D244 /* libRNSecureRandom.a */,
 				6A14657958194306BDD7454C /* libRNSVG.a */,
 				AD9E60E512304A688F30EDBD /* libRCTImageResizer.a */,
+				67706786D8B341E8A3F8DB5F /* libRNMail.a */,
+				618D085F3830460F8A154EB6 /* RNMailTests.xctest */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1385,8 +1388,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/postmodern\"",
-					"\"$(SRCROOT)/postmodern\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1422,8 +1423,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/postmodern\"",
-					"\"$(SRCROOT)/postmodern\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
