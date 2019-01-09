@@ -1,24 +1,14 @@
 import * as React from 'react';
-import { View, Alert, Share, ShareContent, ShareOptions } from 'react-native';
+import { View } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import nacl from 'ecma-nacl';
-import { generateSecureRandom } from 'react-native-securerandom';
-import { keccak256 } from 'js-sha3';
-import { encode, decode } from 'base64-arraybuffer';
 
 import { AppState } from '../reducers';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
-import { List } from 'immutable';
-import { Post } from '../models/Post';
-import { stringToByteArray, byteArrayToHex, hexToByteArray, hexToString, byteArrayToString } from '../Swarm';
-import { Version } from '../Version';
-import { DateUtils } from '../DateUtils';
-import { createBackup } from '../BackupRestore';
 
 export interface StateProps {
     appState: AppState;
@@ -51,8 +41,8 @@ const IonIcon = (props) => (
 );
 
 const MaterialCommunityIcon = (props) => (
-    <IconContainer style={{paddingLeft: 8, paddingTop: 14}}>
-        <MaterialCommunityIcons name={props.name} size={22} color={Colors.GRAY} {...props} />
+    <IconContainer style={{paddingLeft: 8, paddingTop: 12}}>
+        <MaterialCommunityIcons name={props.name} size={24} color={Colors.GRAY} {...props} />
     </IconContainer>
 );
 
@@ -82,14 +72,14 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
-                        <MaterialCommunityIcon name='backup-restore' color='gray' />
+                        <MaterialCommunityIcon name='backup-restore' />
                     }
                     title='Backup & Restore'
                     onPress={() => props.navigation.navigate('BackupRestore')}
                 />
                 <SettingsList.Item
                     icon={
-                        <IonIcon name='md-list' color='gray' />
+                        <IonIcon name='md-list' />
                     }
                     title='Logs'
                     onPress={() => props.navigation.navigate('LogViewer')}

@@ -1,7 +1,6 @@
-import { createBackupFromString, restoreBackupToString, createBackup, restoreBackup } from '../src/BackupRestore';
+import { createBackupFromString, restoreBackupToString } from '../src/BackupRestore';
 import { generateUnsecureRandomString } from '../src/random';
 import { stringToByteArray } from '../src/Swarm';
-import { defaultState } from '../src/reducers';
 
 const generateRandom = async (num: number): Promise<Uint8Array> => {
     const randomString = await generateUnsecureRandomString(num / 2);
@@ -29,12 +28,3 @@ test('Test fails with different secrets', async () => {
 
     await expect(t()).rejects.toThrow('Cipher bytes fail verification.');
 });
-
-// test('Test JSON backup & restore', async () => {
-//     const input = defaultState;
-//     const secretHex = '0x6cec0ab9211bc17d5c8c422fa11e2ad4ca4a6b2ea9c830bea436752f8bf241c641a3a684844f3cc39bf6ef4c28f238b73bf2e244a14938d06883830bf414ec4a';
-//     const backupText = await createBackup(input, secretHex, generateRandom);
-//     const result = await restoreBackup(backupText, secretHex);
-
-//     expect(result).toBe(input);
-// });

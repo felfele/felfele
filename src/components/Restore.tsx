@@ -5,8 +5,9 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { isValidBackup, stripHeaderAndFooter, restoreBackup } from '../BackupRestore';
+import { isValidBackup, restoreBackupToString } from '../BackupRestore';
 import { stringToHex } from '../Swarm';
+import { getAppStateFromSerialized } from '../reducers';
 
 export interface StateProps {
     navigation: any;
@@ -49,7 +50,7 @@ export class Restore extends React.PureComponent<Props, State> {
                     style={styles.secretTextInput}
                     multiline={true}
                     numberOfLines={4}
-                    placeholder='Enter your secret here'
+                    placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
                     onChangeText={async (text) => this.onChangeSecret(text)}
@@ -69,7 +70,8 @@ export class Restore extends React.PureComponent<Props, State> {
     private onChangeSecret = async (text: string) => {
         try {
             const secretHex = stringToHex(text);
-            const appState = await restoreBackup(this.state.clipboardText, secretHex);
+            const serializedAppState = await restoreBackupToString(this.state.clipboardText, secretHex);
+            const appState = await getAppStateFromSerialized(serializedAppState);
             Debug.log('Restore.onChangeSecret: success');
             this.setState({
                 secretText: text,

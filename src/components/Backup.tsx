@@ -5,9 +5,9 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { isValidBackup, stripHeaderAndFooter, createBackup } from '../BackupRestore';
+import { createBackupFromString } from '../BackupRestore';
 import { DateUtils } from '../DateUtils';
-import { AppState } from '../reducers';
+import { AppState, getSerializedAppState } from '../reducers';
 import { stringToHex } from '../Swarm';
 
 export interface StateProps {
@@ -42,7 +42,7 @@ export class Backup extends React.PureComponent<Props, State> {
                     style={styles.secretTextInput}
                     multiline={true}
                     numberOfLines={4}
-                    placeholder='Enter your secret here'
+                    placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
                     onChangeText={async (text) => await this.setSecretText(text)}
@@ -61,7 +61,8 @@ export class Backup extends React.PureComponent<Props, State> {
 
     private setSecretText = async (text: string) => {
         const secretHex = stringToHex(this.state.secretText);
-        const backupText = await createBackup(this.props.appState, secretHex);
+        const serializedAppState = await getSerializedAppState();
+        const backupText = await createBackupFromString(serializedAppState, secretHex);
 
         this.setState({
             secretText: text,
@@ -83,7 +84,8 @@ export class Backup extends React.PureComponent<Props, State> {
     private onBackupData = async () => {
         try {
             const secretHex = stringToHex(this.state.secretText);
-            const emailBody = await createBackup(this.props.appState, secretHex);
+            const serializedAppState = await getSerializedAppState();
+            const emailBody = await createBackupFromString(serializedAppState, secretHex);
             Debug.log('sendBackup body', emailBody);
 
             this.showShareDialog(emailBody);

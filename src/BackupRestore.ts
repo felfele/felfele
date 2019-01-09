@@ -3,9 +3,6 @@ import nacl from 'ecma-nacl';
 import * as base64 from 'base64-arraybuffer';
 import { generateSecureRandom } from 'react-native-securerandom';
 
-import { AppState } from './reducers';
-import { List } from 'immutable';
-import { Post } from './models/Post';
 import { hexToByteArray } from './Swarm';
 import { Version } from './Version';
 import * as utf8 from 'utf8-encoder';
@@ -39,16 +36,6 @@ export const isValidBackup = (backupText: string): boolean => {
     return true;
 };
 
-export const createBackup = async (appState: AppState, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<string> => {
-    const state = {
-        ...appState,
-        rssPosts: List<Post>(),
-    };
-    const data = JSON.stringify(state);
-    const backupText = createBackupFromString(data, secretHex, generateRandom);
-    return backupText;
-};
-
 export const createBackupFromString = async (data: string, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<string> => {
     const dataUint8Array = utf8.fromString(data);
     const secureRandomUint8Array = await generateRandom(24);
@@ -57,13 +44,6 @@ export const createBackupFromString = async (data: string, secretHex: string, ge
     const encryptedDataBase64 = base64.encode(encryptedData);
     const backupText = wrapWithHeaderAndFooter(encryptedDataBase64);
     return backupText;
-};
-
-export const restoreBackup = async (backupText: string, secretHex: string): Promise<AppState> => {
-    const originalText = await restoreBackupToString(backupText, secretHex);
-    console.log('restoreBackup', originalText);
-    const appState = JSON.parse(originalText) as AppState;
-    return appState;
 };
 
 export const restoreBackupToString = async (backupText: string, secretHex: string): Promise<string> => {

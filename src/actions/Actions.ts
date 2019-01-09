@@ -2,7 +2,7 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState } from '../reducers';
+import { AppState, getAppStateFromSerialized } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
@@ -11,7 +11,7 @@ import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostF
 import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
-import { restoreBackup } from '../BackupRestore';
+import { restoreBackupToString } from '../BackupRestore';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -287,7 +287,8 @@ export const AsyncActions = {
     },
     restoreFromBackup: (backupText: string, secretHex: string) => {
         return async (dispatch, getState: () => AppState) => {
-            const appState = await restoreBackup(backupText, secretHex);
+            const serializedAppState = await restoreBackupToString(backupText, secretHex);
+            const appState = await getAppStateFromSerialized(serializedAppState);
             dispatch(InternalActions.appStateSet(appState));
         };
     },
