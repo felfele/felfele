@@ -40,5 +40,5 @@ test('Test wordlist mnemonic array', () => {
     const hexInput = '0x1eeb82711096bec2931c1577d499d3a7fa52fa0f1a147213';
     const values = mnemonicArray(hexInput, englishWordlist);
 
-    expect(values).toEqual(['zoo', 'abandon']);
+    expect(values).toEqual(['bus', 'foster', 'ordinary', 'cancel', 'hip', 'genuine', 'erase', 'above', 'jelly', 'pill', 'insane', 'exit', 'pioneer', 'laptop', 'detect', 'able', 'improve', 'object']);
 });

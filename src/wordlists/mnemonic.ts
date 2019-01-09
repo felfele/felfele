@@ -6,8 +6,6 @@ interface BitStream {
     bitPosition: number;
 }
 
-const bitPositionToByte = (bitPosition: number) => bitPosition / 8;
-
 export const getByteMasksFromPosition = (startBitPosition: number): number[] => {
     switch (startBitPosition) {
         case 0: return [0xFF, 0xE0];
@@ -36,7 +34,6 @@ const getNext11BitValue = (bitStream: BitStream): [number, BitStream] | null => 
     }
     const startBitPosition = bitStream.bitPosition % 8;
     const mask = getByteMasksFromPosition(startBitPosition);
-    const neededBytes = mask.length - 1;
     let result = 0;
     for (let i = 0; i < mask.length; i++) {
         result = (result << 8) | (getInputByteFromArray(bitStream.inputByteArray, bytePosition + i) & mask[i]);
