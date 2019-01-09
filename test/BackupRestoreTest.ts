@@ -1,10 +1,8 @@
 import { createBackupFromString, restoreBackupToString } from '../src/BackupRestore';
-import { generateUnsecureRandomString } from '../src/random';
 import { stringToByteArray } from '../src/Swarm';
 
 const generateRandom = async (num: number): Promise<Uint8Array> => {
-    const randomString = await generateUnsecureRandomString(num / 2);
-    return new Uint8Array(stringToByteArray(randomString));
+    return new Uint8Array(stringToByteArray('e4219722f9eefbdfe9c66ae9'));
 };
 
 test('Test basic backup & restore', async () => {
