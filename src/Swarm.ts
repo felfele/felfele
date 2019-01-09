@@ -352,7 +352,7 @@ const signDigest = (digest: number[], identity: PrivateIdentity) => {
 };
 
 export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
-    const secureRandomUint8Array = await generateSecureRandom(32);
+    const secureRandomUint8Array = await generateSecureRandom(24);
     const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
     const curve = new ec('secp256k1');
     const keyPair = await curve.genKeyPair({
