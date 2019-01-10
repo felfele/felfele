@@ -35,7 +35,7 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
-    "@erebos/swarm": "=0.5.2",
+    "@erebos/swarm": "=0.6.0",
     "buffer": "=5.2.1",
     "elliptic": "=6.4.1",
     "immutable": "=3.8.2",

@@ -92,7 +92,7 @@ const onAppStateReset = async (props: Props) => {
 };
 
 const testErebos = async () => {
-    const client = new SwarmClient('https://swarm-gateways.net');
-    const hash = await client.uploadFile('hello');
+    const client = new SwarmClient({http: 'https://swarm-gateways.net'});
+    const hash = await client.bzz.upload('hello');
     Debug.log('testErebos: ', hash);
 };
