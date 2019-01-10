@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import Markdown from 'react-native-easy-markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Post, getAuthorImageUri, Author } from '../models/Post';
 import { ImageData, calculateImageDimensions } from '../models/ImageData';
@@ -34,6 +35,7 @@ import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
+import { Feed } from '../models/Feed';
 
 const WindowWidth = Dimensions.get('window').width;
 
@@ -42,15 +44,19 @@ export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
-    onUnfollowFeed: (feedUrl: string) => void;
+    onFollowFeed: (feed: Feed) => void;
+    onUnfollowFeed: (feed: Feed) => void;
+    onToggleFavorite: (feedUrl: string) => void;
 }
 
 export interface StateProps {
     navigation: any;
     posts: Post[];
+    feeds: Feed[];
+    knownFeeds: Feed[];
     settings: Settings;
-    displayFeedHeader: boolean;
-    showUnfollow: boolean;
+    yourFeedVariant: YourFeedVariant;
+    isOwnFeed: boolean;
 }
 
 interface YourFeedState {
@@ -59,6 +65,9 @@ interface YourFeedState {
     isOnline: boolean;
     currentTime: number;
 }
+
+// TODO YourFeed is having too many responsabilities
+export type YourFeedVariant = 'favorite' | 'news' | 'your' | 'feed';
 
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
     private containerStyle = {};
@@ -121,14 +130,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
-                {!this.props.displayFeedHeader &&
-                <NavigationHeader
-                    leftButtonText='Back'
-                    onPressLeftButton={() => this.props.navigation.goBack(null)}
-                    rightButtonText={this.props.showUnfollow ? 'Unfollow' : undefined}
-                    onPressRightButton={async () => this.props.showUnfollow && await this.unfollowFeed(this.props.navigation.state.params.author)}
-                    title={this.props.navigation.state.params.author.name}
-                />}
+                <this.NavHeader {...this.props} onFollowPressed={this.onFollowPressed} isFavorite={this.isFavorite}/>
                 <FlatList
                     ListHeaderComponent={this.renderListHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -152,6 +154,46 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
+    private NavHeader(props: DispatchProps & StateProps &
+        { onFollowPressed: (author: Author) => void, isFavorite: () => boolean }) {
+        const navParams = props.navigation.state.params;
+        switch (props.yourFeedVariant) {
+            case 'feed': {
+                const isFollowedFeed = navParams != null &&
+                    props.feeds.find(feed => feed.feedUrl === navParams.author.uri) != null;
+                return (
+                    <NavigationHeader
+                        onPressLeftButton={() => props.navigation.goBack(null)}
+                        rightButtonText1={!props.isOwnFeed ? <Icon
+                            name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
+                            size={20}
+                            color={Colors.DARK_GRAY}
+                        /> : undefined}
+                        rightButtonText2={!props.isOwnFeed ? <MaterialIcon
+                            name={'favorite'}
+                            size={20}
+                            color={isFollowedFeed
+                                ? props.isFavorite() ? Colors.BRAND_RED : Colors.DARK_GRAY
+                                : 'transparent'
+                            }
+                        /> : undefined}
+                        onPressRightButton1={async () => !props.isOwnFeed && await props.onFollowPressed(navParams.author)}
+                        onPressRightButton2={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(navParams.author.uri)}
+                        title={navParams ? navParams.author.name : 'Favorites'}
+                    />
+                );
+            }
+            default: {
+                return <View/>;
+            }
+        }
+    }
+
+    private isFavorite = (): boolean => {
+        const feed = this.props.feeds.find(value => value.feedUrl === this.props.navigation.state.params.author.uri);
+        return feed != null && !!feed.favorite;
+    }
+
     private onConnectionStateChange(connected) {
         this.setState({
             isOnline: connected,
@@ -165,11 +207,26 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.props.onRefreshPosts();
     }
 
-    private async unfollowFeed(author: Author) {
+    private onFollowPressed = async (author: Author) => {
+        const followedFeed = this.props.feeds.find(feed => feed.feedUrl === author.uri);
+        if (followedFeed != null) {
+            await this.unfollowFeed(followedFeed);
+        } else {
+            this.followFeed(author);
+        }
+    }
+
+    private async unfollowFeed(feed: Feed) {
         const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
         if (confirmUnfollow) {
-            this.props.onUnfollowFeed(author.uri);
-            this.props.navigation.goBack(null);
+            this.props.onUnfollowFeed(feed);
+        }
+    }
+
+    private followFeed(author: Author) {
+        const knownFeed = this.props.knownFeeds.find(feed => feed.feedUrl === author.uri);
+        if (knownFeed != null) {
+            this.props.onFollowFeed(knownFeed);
         }
     }
 
@@ -370,15 +427,34 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     }
 
     private renderListHeader = () => {
-        if (this.props.displayFeedHeader) {
-            return (
-                <FeedHeader
-                    navigation={this.props.navigation}
-                    onSavePost={this.props.onSavePost}
-                />
-            );
-        } else {
-            return null;
+        switch (this.props.yourFeedVariant) {
+            case 'your': {
+                return (
+                    <FeedHeader
+                        navigation={this.props.navigation}
+                        onSavePost={this.props.onSavePost}
+                    />
+                );
+            }
+            case 'favorite': {
+                return (
+                    <NavigationHeader
+                        leftButtonText=''
+                        title='Favorites'
+                    />
+                );
+            }
+            case 'news': {
+                return (
+                    <NavigationHeader
+                        leftButtonText=''
+                        title='News'
+                    />
+                );
+            }
+            default: {
+                return null;
+            }
         }
     }
 

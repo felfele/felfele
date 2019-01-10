@@ -13,17 +13,11 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
    return {
-        createPost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
-        },
         onAppStateReset: () => {
             dispatch(Actions.appStateReset());
         },
         onCreateIdentity: () => {
             dispatch(AsyncActions.createUserIdentity());
-        },
-        onFixFeedFavicons: () => {
-            dispatch(AsyncActions.fixFeedFavicons());
         },
    };
 };

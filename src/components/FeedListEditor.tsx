@@ -1,21 +1,13 @@
 import * as React from 'react';
 import { View, Text, Button, Image, FlatList } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+
 import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
-
-interface FeedListEditorNavigationActions {
-    back?: () => void;
-    add?: () => void;
-}
-
-const navigationActions: FeedListEditorNavigationActions = {
-    back: undefined,
-    add: undefined,
-};
+import { NavigationHeader } from './NavigationHeader';
 
 export interface DispatchProps {
-
 }
 
 export interface StateProps {
@@ -61,6 +53,15 @@ const FeedListItem = (props) => (
         <View>
             <Favicon uri={props.feed.favicon} />
         </View>
+        {props.feed.favorite === true &&
+            <View style={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                paddingLeft: 5,
+            }}>
+                <MaterialIcon name='favorite' color={Colors.LIGHT_GRAY} size={20} />
+            </View>
+        }
         <View
             style={{
                 justifyContent: 'center',
@@ -94,22 +95,18 @@ const FeedListItemSeparator = (props) => (
 );
 
 export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Feed list',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions.add!()} />,
-    };
-
-    constructor(props) {
-        super(props);
-        navigationActions.back = this.props.navigation.goBack;
-        navigationActions.add = this.onAddFeed.bind(this);
-    }
-
     public render() {
         return (
-            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+            <View style={{ backgroundColor: '#EFEFF4'}}>
+                <NavigationHeader
+                    onPressLeftButton={() => {
+                        // null is needed otherwise it does not work with switchnavigator backbehavior property
+                        this.props.navigation.goBack(null);
+                    }}
+                    rightButtonText1='Add'
+                    onPressRightButton1={this.onAddFeed}
+                    title='Feed list'
+                />
                 <FlatList
                     data={this.props.feeds}
                     renderItem={({item}) => (
@@ -131,7 +128,7 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
         );
     }
 
-    private onAddFeed() {
+    private onAddFeed = () => {
         const feed: Feed = {
             favicon: '',
             feedUrl: '',

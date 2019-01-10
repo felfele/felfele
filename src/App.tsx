@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StackNavigator, TabNavigator, NavigationRouteConfigMap, SwitchNavigator, NavigationScreenOptions, NavigationScreenRouteConfig } from 'react-navigation';
+import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform, YellowBox } from 'react-native';
@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
-import { Share } from './components/Share';
 import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
@@ -26,6 +25,7 @@ import { appendToLog } from './components/LogViewer';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
+import { FavoritesContainer } from './containers/FavoritesContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -33,6 +33,26 @@ YellowBox.ignoreWarnings([
 ]);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
+
+const favoriteTabScenes: NavigationRouteConfigMap = {
+    FavoriteTab: {
+        screen: ({navigation}) => (<FavoritesContainer
+                                    navigation={navigation}
+                                />),
+    },
+    Feed: {
+        screen: FeedContainer,
+    },
+};
+const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'FavoriteTab',
+    },
+);
 
 const yourTabScenes: NavigationRouteConfigMap = {
     YourTab: {
@@ -44,7 +64,7 @@ const yourTabScenes: NavigationRouteConfigMap = {
         screen: FeedContainer,
     },
 };
-const YourFeedNavigator = StackNavigator(yourTabScenes,
+const YourFeedNavigator = createStackNavigator(yourTabScenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -65,7 +85,7 @@ const newsTabScenes: NavigationRouteConfigMap = {
     },
 };
 
-const NewsFeedNavigator = StackNavigator(newsTabScenes,
+const NewsFeedNavigator = createStackNavigator(newsTabScenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -75,11 +95,33 @@ const NewsFeedNavigator = StackNavigator(newsTabScenes,
     },
 );
 
-const Root = TabNavigator(
+const settingsTabScenes: NavigationRouteConfigMap = {
+    SettingsTab: {
+        screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+    },
+    Debug: {
+        screen: DebugScreenContainer,
+    },
+    LogViewer: {
+        screen: LogViewerContainer,
+    },
+};
+
+const SettingsNavigator = createStackNavigator(settingsTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'SettingsTab',
+    },
+);
+
+const Root = createBottomTabNavigator(
     {
         YourTab: {
             screen: YourFeedNavigator,
-            path: '/',
+            path: '/your',
             navigationOptions: {
                 title: 'Your story',
                 tabBarLabel: 'Your story',
@@ -92,9 +134,24 @@ const Root = TabNavigator(
                 ),
             },
         },
+        FavoriteTab: {
+            screen: FavoriteFeedNavigator,
+            path: '/favorites',
+            navigationOptions: {
+                title: 'Favorites',
+                tabBarLabel: 'Your story',
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialIcon
+                        name={focused ? 'favorite' : 'favorite'}
+                        size={20}
+                        color={tintColor}
+                    />
+                ),
+            },
+        },
         NewsTab: {
             screen: NewsFeedNavigator,
-            path: '/',
+            path: '/news',
             navigationOptions: {
                 title: 'New stories',
                 tabBarLabel: 'New stories',
@@ -108,7 +165,7 @@ const Root = TabNavigator(
             },
         },
         SettingsTab: {
-            screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+            screen: SettingsNavigator,
             path: '/settings',
             navigationOptions: {
                 header: undefined,
@@ -147,7 +204,6 @@ const Root = TabNavigator(
                     showIcon: true,
                     activeTintColor: 'gray',
                     inactiveTintColor: 'lightgray',
-                    activeBackgroundColor: 'gray',
                     style: {
                         backgroundColor: Colors.BACKGROUND_COLOR,
                         opacity: 0.96,
@@ -163,20 +219,8 @@ const Scenes: NavigationRouteConfigMap = {
     Post: {
         screen: EditPostContainer,
     },
-    Debug: {
-        screen: DebugScreenContainer,
-    },
     IdentitySettingsContainer: {
         screen: IdentitySettingsContainer,
-    },
-    Share: {
-        screen: Share,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
     },
     EditFeed: {
         screen: EditFeedContainer,
@@ -184,12 +228,15 @@ const Scenes: NavigationRouteConfigMap = {
     EditFilter: {
         screen: EditFilterContainer,
     },
-    LogViewer: {
-        screen: LogViewerContainer,
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
     },
 };
 
-const AppNavigator = StackNavigator(Scenes,
+const AppNavigator = createStackNavigator(Scenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -198,7 +245,7 @@ const AppNavigator = StackNavigator(Scenes,
     },
 );
 
-const WelcomeNavigator = StackNavigator({
+const WelcomeNavigator = createStackNavigator({
     Welcome: {
         screen: WelcomeContainer,
     },
@@ -209,7 +256,7 @@ const WelcomeNavigator = StackNavigator({
     },
 });
 
-const InitialNavigator = SwitchNavigator({
+const InitialNavigator = createSwitchNavigator({
     Loading: LoadingScreenContainer,
     App: AppNavigator,
     Welcome: WelcomeNavigator,
