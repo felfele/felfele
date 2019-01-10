@@ -473,15 +473,6 @@ const initStore = () => {
     store.dispatch(AsyncActions.cleanupContentFilters());
     // @ts-ignore
     store.dispatch(AsyncActions.uploadPostsFromQueue());
-    patchState();
-};
-
-const patchState = () => {
-    // placeholder to put patches to fix state
-
-    // TODO migration replaces this funcionality
-    // const state = store.getState();
-    // state.feeds.map(feed => feed != null && store.dispatch(Actions.followFeed(feed)));
 };
 
 export const persistor = persistStore(store, {}, initStore);
