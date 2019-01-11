@@ -4,7 +4,7 @@ import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { AppState } from '../reducers';
+import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -66,8 +66,16 @@ export const DebugScreen = (props: Props) => (
                     icon={
                         <IonIcon name='md-person' />
                     }
-                    title='Test identity creation'
-                    onPress={props.onCreateIdentity}
+                    title='Create new identity'
+                    onPress={async () => await onCreateIdentity(props)}
+                    hasNavArrow={false}
+                />
+                <SettingsList.Item
+                    icon={
+                        <IonIcon name='md-information-circle-outline' />
+                    }
+                    title='Log app state persist info'
+                    onPress={async () => await onLogAppStateVersion()}
                     hasNavArrow={false}
                 />
                 <SettingsList.Item
@@ -81,7 +89,7 @@ export const DebugScreen = (props: Props) => (
                     icon={
                         <IonIcon name='md-list' />
                     }
-                    title='Logs'
+                    title='View logs'
                     onPress={() => props.navigation.navigate('LogViewer')}
                 />
             </SettingsList>
@@ -95,4 +103,17 @@ const onAppStateReset = async (props: Props) => {
     if (confirmed) {
         props.onAppStateReset();
     }
+};
+
+const onCreateIdentity = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show('Are you sure you want to create new identity?');
+    if (confirmed) {
+        props.onCreateIdentity();
+    }
+};
+
+const onLogAppStateVersion = async () => {
+    const serializedAppState = await getSerializedAppState();
+    const appState = await getAppStateFromSerialized(serializedAppState);
+    Debug.log('onLogAppStateVersion', appState._persist);
 };
