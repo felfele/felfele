@@ -23,7 +23,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(Actions.updateAuthorPicturePath(image));
         },
         onDownloadPosts: () => {
-            dispatch(AsyncActions.downloadPosts());
+            dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
     };
 };

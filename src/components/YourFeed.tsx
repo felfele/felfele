@@ -40,7 +40,7 @@ import { Feed } from '../models/Feed';
 const WindowWidth = Dimensions.get('window').width;
 
 export interface DispatchProps {
-    onRefreshPosts: () => void;
+    onRefreshPosts: (feeds: Feed[]) => void;
     onDeletePost: (post: Post) => void;
     onSavePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
@@ -204,7 +204,7 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         this.setState({
             isRefreshing: true,
         });
-        this.props.onRefreshPosts();
+        this.props.onRefreshPosts(this.props.feeds);
     }
 
     private onFollowPressed = async (author: Author) => {
