@@ -122,7 +122,10 @@ export const AsyncActions = {
     },
     downloadPosts: () => {
         return async (dispatch, getState: () => AppState) => {
-            const feeds = getState().feeds.toArray();
+            const feeds = getState()
+                            .feeds
+                            .toArray()
+                            .filter(feed => feed.followed === true);
 
             const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
             const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
