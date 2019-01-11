@@ -22,7 +22,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
-        onRefreshPosts: () => {
+        onRefreshPosts: (feeds: Feed[]) => {
             // workaround to finish refresh
             dispatch(Actions.timeTick());
         },

@@ -6,14 +6,17 @@ import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
+    const authorUri = ownProps.navigation.state.params.author.uri;
+    const selectedFeeds = state.feeds.filter(feed =>
+        feed != null && feed.followed === true && feed.feedUrl === authorUri).toArray();
     const posts = state.rssPosts.concat(state.localPosts)
-        .filter(post => post != null && post.author != null && post.author.uri === ownProps.navigation.state.params.author.uri)
+        .filter(post => post != null && post.author != null && post.author.uri === authorUri)
         .toArray();
 
     return {
         navigation: ownProps.navigation,
         posts: posts,
-        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        feeds: selectedFeeds,
         knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'feed',
@@ -23,8 +26,8 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
-        onRefreshPosts: () => {
-            dispatch(AsyncActions.downloadPosts());
+        onRefreshPosts: (feeds: Feed[]) => {
+            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
         onDeletePost: (post: Post) => {
             // do nothing
