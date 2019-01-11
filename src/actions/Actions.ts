@@ -4,7 +4,7 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
+import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
@@ -120,22 +120,30 @@ export const AsyncActions = {
             });
         };
     },
-    downloadPosts: () => {
+    downloadFollowedFeedPosts: () => {
         return async (dispatch, getState: () => AppState) => {
             const feeds = getState()
                             .feeds
                             .toArray()
                             .filter(feed => feed.followed === true);
 
-            const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
-            const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-
-            const allPostsCombined = await Promise.all([
-                RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
-                loadPosts(postFeeds),
-            ]);
-
-            const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
+            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
+        };
+    },
+    downloadPostsFromFeeds: (feeds: Feed[]) => {
+        return async (dispatch, getState: () => AppState) => {
+            const previousPosts = getState().rssPosts.toArray();
+            const downloadedPosts = await loadPostsFromFeeds(feeds);
+            const uniqueAuthors = new Map<string, Author>();
+            downloadedPosts.map(post => {
+                if (post.author != null) {
+                    if (!uniqueAuthors.has(post.author.uri)) {
+                        uniqueAuthors.set(post.author.uri, post.author);
+                    }
+                }
+            });
+            const notUpdatedPosts = previousPosts.filter(post => post.author != null && !uniqueAuthors.has(post.author.uri));
+            const allPosts = notUpdatedPosts.concat(downloadedPosts);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
             const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
 
@@ -305,4 +313,17 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
         mergedImages.push(mergedImage);
     }
     return mergedImages;
+};
+
+const loadPostsFromFeeds = async (feeds: Feed[]): Promise<Post[]> => {
+    const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
+    const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
+
+    const allPostsCombined = await Promise.all([
+        RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
+        loadPosts(postFeeds),
+    ]);
+
+    const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
+    return allPosts;
 };
