@@ -23,12 +23,14 @@ export type Props = StateProps & DispatchProps;
 export interface State {
     backupText: string;
     secretText: string;
+    serializedAppState?: string;
 }
 
 export class Backup extends React.PureComponent<Props, State> {
     public state = {
         backupText: '',
         secretText: '',
+        serializedAppState: undefined,
     };
 
     public render = () => (
@@ -61,7 +63,7 @@ export class Backup extends React.PureComponent<Props, State> {
 
     private setSecretText = async (text: string) => {
         const secretHex = stringToHex(this.state.secretText);
-        const serializedAppState = await getSerializedAppState();
+        const serializedAppState = await this.getOrLoadSerializedAppState();
         const backupText = await createBackupFromString(serializedAppState, secretHex);
 
         this.setState({
@@ -81,10 +83,21 @@ export class Backup extends React.PureComponent<Props, State> {
         await Share.share(content, options);
     }
 
+    private getOrLoadSerializedAppState = async (): Promise<string> => {
+        if (this.state.serializedAppState != null) {
+            return this.state.serializedAppState!;
+        }
+        const serializedAppState = await getSerializedAppState();
+        this.setState({
+            serializedAppState,
+        });
+        return serializedAppState;
+    }
+
     private onBackupData = async () => {
         try {
             const secretHex = stringToHex(this.state.secretText);
-            const serializedAppState = await getSerializedAppState();
+            const serializedAppState = await this.getOrLoadSerializedAppState();
             const emailBody = await createBackupFromString(serializedAppState, secretHex);
             Debug.log('sendBackup body', emailBody);
 
