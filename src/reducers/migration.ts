@@ -5,6 +5,8 @@ import { Debug } from '../Debug';
 import { AppState } from '.';
 import { Feed } from '../models/Feed';
 
+export const currentAppStateVersion = 0;
+
 const migrateUnversionedToVersion0 = (state: PersistedState): AppState => {
     Debug.log('Migrate unversioned to version 0');
     const appState = state as AppState;

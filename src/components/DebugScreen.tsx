@@ -2,17 +2,9 @@ import * as React from 'react';
 import { View } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { AsyncStorageWrapper, Storage } from '../Storage';
-import {
-    upload,
-    download,
-    downloadUserFeed,
-    downloadUserFeedTemplate,
-    updateUserFeed,
-} from '../Swarm';
-import { AppState } from '../reducers';
-import { Post } from '../models/Post';
+import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -30,13 +22,28 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const Icon = (props) => (
+const IconContainer = (props) => (
     <View style={{
-        paddingVertical: 11,
+        paddingTop: 12,
         paddingLeft: 10,
+        paddingRight: 0,
+        width: 40,
+        ...props.style,
     }}>
-        <Ionicons name={props.name} size={28} color={Colors.GRAY} {...props} />
+        {props.children}
     </View>
+);
+
+const IonIcon = (props) => (
+    <IconContainer>
+        <Ionicons name={props.name} size={28} color={Colors.GRAY} {...props} />
+    </IconContainer>
+);
+
+const MaterialCommunityIcon = (props) => (
+    <IconContainer style={{paddingLeft: 8, paddingTop: 12}}>
+        <MaterialCommunityIcons name={props.name} size={24} color={Colors.GRAY} {...props} />
+    </IconContainer>
 );
 
 export const DebugScreen = (props: Props) => (
@@ -49,7 +56,7 @@ export const DebugScreen = (props: Props) => (
             <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-warning' />
+                        <IonIcon name='md-warning' />
                     }
                     title='App state reset'
                     onPress={async () => await onAppStateReset(props)}
@@ -57,17 +64,32 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-person' />
+                        <IonIcon name='md-person' />
                     }
-                    title='Test identity creation'
-                    onPress={props.onCreateIdentity}
+                    title='Create new identity'
+                    onPress={async () => await onCreateIdentity(props)}
                     hasNavArrow={false}
                 />
                 <SettingsList.Item
                     icon={
-                        <Icon name='md-list' size={30} color='gray' />
+                        <IonIcon name='md-information-circle-outline' />
                     }
-                    title='Logs'
+                    title='Log app state persist info'
+                    onPress={async () => await onLogAppStateVersion()}
+                    hasNavArrow={false}
+                />
+                <SettingsList.Item
+                    icon={
+                        <MaterialCommunityIcon name='backup-restore' />
+                    }
+                    title='Backup & Restore'
+                    onPress={() => props.navigation.navigate('BackupRestore')}
+                />
+                <SettingsList.Item
+                    icon={
+                        <IonIcon name='md-list' />
+                    }
+                    title='View logs'
                     onPress={() => props.navigation.navigate('LogViewer')}
                 />
             </SettingsList>
@@ -81,4 +103,17 @@ const onAppStateReset = async (props: Props) => {
     if (confirmed) {
         props.onAppStateReset();
     }
+};
+
+const onCreateIdentity = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show('Are you sure you want to create new identity?');
+    if (confirmed) {
+        props.onCreateIdentity();
+    }
+};
+
+const onLogAppStateVersion = async () => {
+    const serializedAppState = await getSerializedAppState();
+    const appState = await getAppStateFromSerialized(serializedAppState);
+    Debug.log('onLogAppStateVersion', appState._persist);
 };

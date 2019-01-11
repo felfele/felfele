@@ -7,7 +7,7 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate } from 'redux-persist';
+import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
 
 import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
@@ -18,7 +18,7 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
-import { migrateAppState } from './migration';
+import { migrateAppState, currentAppStateVersion } from './migration';
 
 export interface AppState extends PersistedState {
     contentFilters: List<ContentFilter>;
@@ -130,7 +130,7 @@ const defaultFeeds: Feed[] = [
     },
 ];
 
-const defaultState: AppState = {
+export const defaultState: AppState = {
     contentFilters: List<ContentFilter>(),
     feeds: List<Feed>(defaultFeeds),
     ownFeeds: List<PostFeed>(),
@@ -421,6 +421,10 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             Debug.log('App state reset');
             return defaultState;
         }
+        case 'APP-STATE-SET': {
+            Debug.log('App state set');
+            return action.payload.appState;
+        }
         default: {
             try {
                 return combinedReducers(state, action);
@@ -432,7 +436,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
     }
 };
 
-const persistConfig = {
+export const persistConfig = {
     transforms: [immutableTransform({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
@@ -476,3 +480,29 @@ const initStore = () => {
 };
 
 export const persistor = persistStore(store, {}, initStore);
+
+export const getSerializedAppState = async (): Promise<string> => {
+    const serializedAppState = await persistConfig.storage.getItem(KEY_PREFIX + persistConfig.key);
+    if (serializedAppState != null) {
+        return serializedAppState;
+    }
+    throw new Error('serialized app state is null');
+};
+
+export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
+    const storagePersistConfig = {
+        ...persistConfig,
+        storage: {
+            getItem: (key) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
+            setItem: (key, value) => { /* do nothing */ },
+            removeItem: (key) => { /* do nothing */ },
+        },
+    };
+    const appState = await getStoredState(storagePersistConfig) as AppState;
+    return appState;
+};
+
+export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
+    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
+    return currentVersionAppState;
+};
