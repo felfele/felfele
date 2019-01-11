@@ -73,6 +73,7 @@ const FeedListItem = (props) => (
                 ellipsizeMode='tail'
                 style={{
                     fontSize: 16,
+                    color: props.feed.followed === true ? Colors.DARK_GRAY : Colors.GRAY,
                 }}
             >{props.feed.name}</Text>
         </View>
