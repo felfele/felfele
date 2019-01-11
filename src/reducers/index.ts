@@ -7,7 +7,7 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState } from 'redux-persist';
+import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
 
 import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
@@ -18,7 +18,7 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
-import { migrateAppState } from './migration';
+import { migrateAppState, currentAppStateVersion } from './migration';
 
 export interface AppState extends PersistedState {
     contentFilters: List<ContentFilter>;
@@ -482,7 +482,7 @@ const initStore = () => {
 export const persistor = persistStore(store, {}, initStore);
 
 export const getSerializedAppState = async (): Promise<string> => {
-    const serializedAppState = await persistConfig.storage.getItem('persist:' + persistConfig.key);
+    const serializedAppState = await persistConfig.storage.getItem(KEY_PREFIX + persistConfig.key);
     if (serializedAppState != null) {
         return serializedAppState;
     }
@@ -500,4 +500,9 @@ export const getAppStateFromSerialized = async (serializedAppState: string): Pro
     };
     const appState = await getStoredState(storagePersistConfig) as AppState;
     return appState;
+};
+
+export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
+    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
+    return currentVersionAppState;
 };

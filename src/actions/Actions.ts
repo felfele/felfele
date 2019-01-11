@@ -2,7 +2,7 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState, getAppStateFromSerialized } from '../reducers';
+import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
@@ -289,7 +289,8 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);
-            dispatch(InternalActions.appStateSet(appState));
+            const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
+            dispatch(InternalActions.appStateSet(currentVersionAppState));
         };
     },
 };
