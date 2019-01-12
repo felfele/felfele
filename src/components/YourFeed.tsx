@@ -11,7 +11,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Post, Author } from '../models/Post';
-import { NetworkStatus } from '../NetworkStatus';
 import { FeedHeader } from './FeedHeader';
 import { Colors } from '../styles';
 import { StatusBarView } from './StatusBarView';
@@ -42,8 +41,6 @@ export interface StateProps {
 interface YourFeedState {
     selectedPost: Post | null;
     isRefreshing: boolean;
-    isOnline: boolean;
-    currentTime: number;
 }
 
 // TODO YourFeed is having too many responsabilities
@@ -52,24 +49,8 @@ export type YourFeedVariant = 'favorite' | 'news' | 'your' | 'feed';
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
     public state: YourFeedState = {
         selectedPost: null,
-        isRefreshing: true,
-        isOnline: true,
-        currentTime: Date.now(),
+        isRefreshing: false,
     };
-
-    constructor(props) {
-        super(props);
-        NetworkStatus.addConnectionStateChangeListener((result) => {
-            this.onConnectionStateChange(result);
-        });
-
-        const refreshInterval = 60 * 1000;
-        setInterval(() => {
-                this.setState({currentTime: Date.now()});
-            },
-            refreshInterval
-        );
-    }
 
     public componentDidUpdate(prevProps) {
         if (this.props.posts !== prevProps.posts) {
@@ -167,12 +148,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
     private isFavorite = (): boolean => {
         const feed = this.props.feeds.find(value => value.feedUrl === this.props.navigation.state.params.author.uri);
         return feed != null && !!feed.favorite;
-    }
-
-    private onConnectionStateChange(connected) {
-        this.setState({
-            isOnline: connected,
-        });
     }
 
     private onRefresh() {
