@@ -30,7 +30,7 @@ export interface DispatchProps {
 
 type CardProps = StateProps & DispatchProps;
 
-export const Card = (props: CardProps) => {
+export const Card = React.memo((props: CardProps) => {
     if (props.post.images.length === 0) {
         return <CardWithText {...props}/>;
     } else {
@@ -80,7 +80,7 @@ export const Card = (props: CardProps) => {
             </View>
         );
     }
-};
+});
 
 const ActionIcon = (props: { name: string}) => {
     const iconSize = 20;
