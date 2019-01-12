@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import { SimpleTextInput } from './SimpleTextInput';
-import { Author, getAuthorImageUri } from '../models/Post';
+import { Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
@@ -24,6 +24,7 @@ import { NavigationHeader } from './NavigationHeader';
 const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
+import { ModelHelper } from '../models/ModelHelper';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -39,6 +40,7 @@ export interface StateProps {
 const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const screenTitle = 'Identity';
+const modelHelper = new ModelHelper();
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
@@ -65,7 +67,7 @@ const showShareDialog = async (feed?: Feed) => {
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
-    const authorImageUri = getAuthorImageUri(props.author);
+    const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentitySettings: ', qrCodeValue);
     return (
         <KeyboardAvoidingView>

@@ -1,9 +1,12 @@
 import ImageResizer from 'react-native-image-resizer';
 
 import { Post, Author } from './models/Post';
-import { ImageData, getLocalPath, calculateImageDimensions } from './models/ImageData';
+import { ImageData } from './models/ImageData';
 import { uploadPhoto, isSwarmLink } from './Swarm';
 import { Debug } from './Debug';
+import { ModelHelper } from './models/ModelHelper';
+
+const modelHelper = new ModelHelper();
 
 const MAX_UPLOADED_IMAGE_DIMENSION = 400;
 const MAX_UPLOADED_IMAGE_SIZE = 500 * 1024;
@@ -27,7 +30,7 @@ const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
 
 const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
     if (isImageExceedMaximumDimensions(image)) {
-        const [width, height] = calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
+        const [width, height] = modelHelper.calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
         const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
         Debug.log('resizeImageIfNeeded: ', 'resizedImagePNG', resizedImagePNG);
         if (resizedImagePNG.size != null && resizedImagePNG.size < MAX_UPLOADED_IMAGE_SIZE) {
@@ -45,7 +48,7 @@ export const uploadImage = async (image: ImageData): Promise<ImageData> => {
         if (image.localPath == null || image.localPath === '') {
             return image;
         }
-        const path = getLocalPath(image.localPath);
+        const path = modelHelper.getLocalPath(image.localPath);
         const resizedImagePath = await resizeImageIfNeeded(image, path);
         const uri = await uploadPhoto(resizedImagePath);
         return {

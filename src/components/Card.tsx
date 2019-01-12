@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Post, getAuthorImageUri } from '../models/Post';
+import { Post } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultStyle } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert } from 'react-native';
@@ -12,8 +12,10 @@ import { ImageData } from '../models/ImageData';
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
+import { ModelHelper } from '../models/ModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
+const modelHelper = new ModelHelper();
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -121,7 +123,7 @@ const ButtonList = (props: CardProps) => {
 
 const CardTopIcon = (props: { post: Post }) => {
     if (props.post.author) {
-        const imageUri = getAuthorImageUri(props.post.author);
+        const imageUri = modelHelper.getAuthorImageUri(props.post.author);
         const imageSource = imageUri === ''
             ? require('../../images/user_circle.png')
             : { uri: imageUri };
