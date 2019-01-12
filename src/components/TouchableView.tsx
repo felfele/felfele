@@ -2,9 +2,9 @@ import * as React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 
 export const TouchableViewDefaultHitSlop = {
-    top: 30,
+    top: 20,
     left: 30,
-    bottom: 30,
+    bottom: 20,
     right: 30,
 };
 

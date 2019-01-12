@@ -21,7 +21,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         posts: posts,
-        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        feeds: favoriteFeeds,
         knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
         yourFeedVariant: 'favorite',
@@ -31,8 +31,8 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
-        onRefreshPosts: () => {
-            dispatch(AsyncActions.downloadPosts());
+        onRefreshPosts: (feeds: Feed[]) => {
+            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
         onSavePost: (post: Post) => {
             // do nothing

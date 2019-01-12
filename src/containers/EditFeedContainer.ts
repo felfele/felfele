@@ -15,11 +15,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onAddFeed: (feed: Feed) => {
             dispatch(Actions.addFeed(feed));
-            dispatch(AsyncActions.downloadPosts());
+            dispatch(AsyncActions.downloadPostsFromFeeds([feed]));
         },
         onRemoveFeed: (feed: Feed) => {
             dispatch(Actions.removeFeed(feed));
-            dispatch(AsyncActions.downloadPosts());
+            dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
     };
 };

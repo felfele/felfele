@@ -3,16 +3,7 @@ import { View, SafeAreaView, Button } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
-
-interface FeedListEditorNavigationActions {
-    back?: () => void;
-    add?: () => void;
-}
-
-const navigationActions: FeedListEditorNavigationActions = {
-    back: undefined,
-    add: undefined,
-};
+import { NavigationHeader } from './NavigationHeader';
 
 export interface StateProps {
     navigation: any;
@@ -24,37 +15,29 @@ export interface DispatchProps {
 }
 
 export class FilterListEditor extends React.Component<StateProps & DispatchProps, any> {
-    public static navigationOptions = {
-        header: undefined,
-        title: 'Filters',
-        headerLeft: <Button title='Back' onPress={() => navigationActions.back!()} />,
-        headerRight: <Button title='Add' onPress={() => navigationActions.add!()} />,
-    };
-
-    constructor(props) {
-        super(props);
-        navigationActions.back = this.props.navigation.goBack;
-        navigationActions.add = this.onAddFilter.bind(this);
-    }
     public render() {
         return (
-            <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-                    <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
-                        {this.props.filters.map(filter => (
-                            <SettingsList.Item
-                                title={filter.text}
-                                titleInfo={filterValidUntilToText(filter.validUntil) + ' from ' + DateUtils.printableElapsedTime(filter.createdAt) + ' ago'}
-                                key={filter.text}
-                                onPress={() => {
-                                    this.editFilter(filter);
-                                }}
-                            />
-                        ))}
+            <View style={{ backgroundColor: '#EFEFF4'}}>
+                <NavigationHeader
+                    title='Filters'
+                    onPressLeftButton={() => this.props.navigation.goBack(null)}
+                    rightButtonText1='Add'
+                    onPressRightButton1={this.onAddFilter}
+                />
+                <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
+                    {this.props.filters.map(filter => (
+                        <SettingsList.Item
+                            title={filter.text}
+                            titleInfo={filterValidUntilToText(filter.validUntil) + ' from ' + DateUtils.printableElapsedTime(filter.createdAt) + ' ago'}
+                            key={filter.text}
+                            onPress={() => {
+                                this.editFilter(filter);
+                            }}
+                        />
+                    ))}
 
-                    </SettingsList>
-                </View>
-            </SafeAreaView>
+                </SettingsList>
+            </View>
         );
     }
 

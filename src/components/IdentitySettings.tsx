@@ -79,7 +79,6 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                 title={screenTitle}
-                hasStatusBar={true}
             />
             <Text style={styles.tooltip}>{tooltip}</Text>
             <SimpleTextInput

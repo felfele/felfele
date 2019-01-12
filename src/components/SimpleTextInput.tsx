@@ -4,6 +4,7 @@ import {
     TextStyle,
     StyleProp,
     ReturnKeyTypeOptions,
+    TextInputProps,
 } from 'react-native';
 
 interface SimpleTextInputProps {
@@ -20,6 +21,9 @@ interface SimpleTextInputProps {
     underlineColorAndroid?: string;
     testID?: string;
     returnKeyType?: ReturnKeyTypeOptions;
+    clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always';
+    editable?: boolean;
+    value?: string;
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -27,7 +31,9 @@ interface SimpleTextInputProps {
 
 export class SimpleTextInput extends React.Component<SimpleTextInputProps, { text: string }> {
     public state = {
-        text: this.props.defaultValue ? this.props.defaultValue : '',
+        text: this.props.value
+            ? this.props.value
+            : '',
     };
 
     public render() {
@@ -40,9 +46,10 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                         this.props.onChangeText(text);
                     }
                 }}
+                defaultValue={this.props.defaultValue}
                 onSubmitEditing={this.onSubmitEditing}
                 selectTextOnFocus={this.props.selectTextOnFocus}
-                value={this.state.text}
+                value={this.props.value}
                 placeholder={this.props.placeholder}
                 placeholderTextColor={this.props.placeholderTextColor}
                 autoFocus={this.props.autoFocus}
@@ -58,6 +65,8 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 returnKeyType={this.props.returnKeyType}
                 testID={this.props.testID}
                 onEndEditing={this.onSubmitEditing}
+                clearButtonMode={this.props.clearButtonMode}
+                editable={this.props.editable}
             />
         );
     }

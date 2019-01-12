@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const IconSize = {
     LARGE_LIST_ICON: 32,
@@ -55,3 +55,9 @@ export const DefaultStyle = StyleSheet.create({
         marginVertical: 3,
     },
 });
+
+export const DefaultNavigationBarHeight = 44;
+export const DefaultTabBarHeight = 50;
+
+export const BACK_ICON_NAME = Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back';
+export const BUTTON_COLOR = Platform.OS === 'ios' ? Colors.DEFAULT_ACTION_COLOR : Colors.DARK_GRAY;

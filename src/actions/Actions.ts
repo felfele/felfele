@@ -2,15 +2,16 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState } from '../reducers';
+import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
+import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
 import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
+import { restoreBackupToString } from '../BackupRestore';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -38,6 +39,7 @@ export enum ActionTypes {
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
+    APP_STATE_SET = 'APP-STATE-SET',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
@@ -60,6 +62,8 @@ const InternalActions = {
         createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
+    appStateSet: (appState: AppState) =>
+        createAction(ActionTypes.APP_STATE_SET, { appState }),
 };
 
 export const Actions = {
@@ -120,19 +124,30 @@ export const AsyncActions = {
             });
         };
     },
-    downloadPosts: () => {
+    downloadFollowedFeedPosts: () => {
         return async (dispatch, getState: () => AppState) => {
-            const feeds = getState().feeds.toArray();
+            const feeds = getState()
+                            .feeds
+                            .toArray()
+                            .filter(feed => feed.followed === true);
 
-            const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
-            const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-
-            const allPostsCombined = await Promise.all([
-                RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
-                loadPosts(postFeeds),
-            ]);
-
-            const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
+            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
+        };
+    },
+    downloadPostsFromFeeds: (feeds: Feed[]) => {
+        return async (dispatch, getState: () => AppState) => {
+            const previousPosts = getState().rssPosts.toArray();
+            const downloadedPosts = await loadPostsFromFeeds(feeds);
+            const uniqueAuthors = new Map<string, Author>();
+            downloadedPosts.map(post => {
+                if (post.author != null) {
+                    if (!uniqueAuthors.has(post.author.uri)) {
+                        uniqueAuthors.set(post.author.uri, post.author);
+                    }
+                }
+            });
+            const notUpdatedPosts = previousPosts.filter(post => post.author != null && !uniqueAuthors.has(post.author.uri));
+            const allPosts = notUpdatedPosts.concat(downloadedPosts);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
             const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
 
@@ -281,6 +296,14 @@ export const AsyncActions = {
             }
         };
     },
+    restoreFromBackup: (backupText: string, secretHex: string) => {
+        return async (dispatch, getState: () => AppState) => {
+            const serializedAppState = await restoreBackupToString(backupText, secretHex);
+            const appState = await getAppStateFromSerialized(serializedAppState);
+            const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
+            dispatch(InternalActions.appStateSet(currentVersionAppState));
+        };
+    },
 };
 
 type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
@@ -302,4 +325,17 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
         mergedImages.push(mergedImage);
     }
     return mergedImages;
+};
+
+const loadPostsFromFeeds = async (feeds: Feed[]): Promise<Post[]> => {
+    const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
+    const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
+
+    const allPostsCombined = await Promise.all([
+        RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
+        loadPosts(postFeeds),
+    ]);
+
+    const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
+    return allPosts;
 };
