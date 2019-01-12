@@ -12,7 +12,6 @@
     "babel-jest": "23.6.0",
     "eslint": "=4.19.1",
     "jest": "=23.6.0",
-    "jest-fetch-mock": "=1.6.6",
     "jest-serializer": "=23.0.1",
     "metro-react-native-babel-preset": "0.48.3",
     "mocha": "=5.2.0",

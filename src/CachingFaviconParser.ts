@@ -2,17 +2,16 @@ import { HtmlUtils } from './HtmlUtils';
 import { Debug } from './Debug';
 import { safeFetch } from './Network';
 
-// tslint:disable-next-line:class-name
-class _FaviconCache {
+export class GlobalCachingFaviconParser {
     private favicons: Map<string, string> = new Map();
 
-    public async getFavicon(url): Promise<string> {
+    public async getFavicon(url: string, fetchFunction = safeFetch): Promise<string> {
         if (this.favicons.has(url)) {
             return this.favicons.get(url) || '';
         }
         const baseUrl = this.getBaseUrl(url);
         try {
-            const favicon = await this.downloadIndexAndParseFavicon(baseUrl);
+            const favicon = await this.downloadIndexAndParseFavicon(baseUrl, fetchFunction);
             Debug.log('getFavicon: ', favicon);
             this.favicons.set(url, favicon);
             return favicon;
@@ -30,13 +29,6 @@ class _FaviconCache {
         return baseUrl;
     }
 
-    private async fetchHtml(url): Promise<string> {
-        const response = await safeFetch(url);
-        const html = await response.text();
-        return html;
-
-    }
-
     private matchRelAttributes(node: Node, values: string[]): string | null {
         for (const value of values) {
             if (HtmlUtils.matchAttributes(node, [{name: 'rel', value: value}])) {
@@ -49,8 +41,9 @@ class _FaviconCache {
         return null;
     }
 
-    private async downloadIndexAndParseFavicon(url) {
-        const html = await this.fetchHtml(url);
+    private async downloadIndexAndParseFavicon(url, fetchFunction) {
+        const response = await fetchFunction(url);
+        const html = await response.text();
         const document = HtmlUtils.parse(html);
         const links = HtmlUtils.findPath(document, ['html', 'head', 'link']);
         for (const link of links) {
@@ -70,4 +63,4 @@ class _FaviconCache {
     }
 }
 
-export const FaviconCache = new _FaviconCache();
+export const CachingFaviconParser = new GlobalCachingFaviconParser();

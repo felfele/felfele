@@ -1,7 +1,7 @@
 import { Post, PublicPost } from './models/Post';
 import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
-import { FaviconCache } from './FaviconCache';
+import { CachingFaviconParser } from './CachingFaviconParser';
 import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
 import { HtmlUtils } from './HtmlUtils';
@@ -314,7 +314,7 @@ class _RSSPostManager {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
-                const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
+                const favicon = rssFeed.icon ? rssFeed.icon : await CachingFaviconParser.getFavicon(rssFeed.url);
                 Debug.log('RSSPostManager: ', rssFeed, favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
