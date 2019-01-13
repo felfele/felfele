@@ -26,7 +26,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: followedFeeds,
-        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
     };
 };

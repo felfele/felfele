@@ -13,7 +13,6 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    knownFeeds: Feed[];
     settings: Settings;
 }
 

@@ -22,7 +22,6 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    knownFeeds: Feed[];
     settings: Settings;
     isOwnFeed: boolean;
 }
@@ -32,7 +31,7 @@ type Props = StateProps & DispatchProps;
 export const FeedView = (props: Props) => {
     const navParams = props.navigation.state.params;
     const isFollowedFeed = navParams != null &&
-                    props.feeds.find(feed => feed.feedUrl === navParams.author.uri) != null;
+                    props.feeds.find(feed => feed.feedUrl === navParams.author.uri && feed.followed === true) != null;
     return (
         <RefreshableFeed {...props}>
             {{
@@ -54,7 +53,6 @@ export const FeedView = (props: Props) => {
                                       onPressRightButton1={async () => {
                                           return !props.isOwnFeed && await onFollowPressed(navParams.author,
                                                                                            props.feeds,
-                                                                                           props.knownFeeds,
                                                                                            props.onUnfollowFeed,
                                                                                            props.onFollowFeed);
                                       }}
@@ -71,12 +69,12 @@ const isFavorite = (feeds: Feed[], uri: string): boolean => {
     return feed != null && !!feed.favorite;
 };
 
-const onFollowPressed = async (author: Author, feeds: Feed[], knownFeeds: Feed[], onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
-    const followedFeed = feeds.find(feed => feed.feedUrl === author.uri);
+const onFollowPressed = async (author: Author, feeds: Feed[], onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
+    const followedFeed = feeds.find(feed => feed.feedUrl === author.uri && feed.followed === true);
     if (followedFeed != null) {
         await unfollowFeed(followedFeed, onUnfollowFeed);
     } else {
-        followFeed(author, knownFeeds, onFollowFeed);
+        followFeed(author, feeds, onFollowFeed);
     }
 };
 
@@ -87,8 +85,8 @@ const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void) =>
     }
 };
 
-const followFeed = (author: Author, knownFeeds: Feed[], onFollowFeed: (feed: Feed) => void) => {
-    const knownFeed = knownFeeds.find(feed => feed.feedUrl === author.uri);
+const followFeed = (author: Author, feeds: Feed[], onFollowFeed: (feed: Feed) => void) => {
+    const knownFeed = feeds.find(feed => feed.feedUrl === author.uri && feed.followed !== true);
     if (knownFeed != null) {
         onFollowFeed(knownFeed);
     }
