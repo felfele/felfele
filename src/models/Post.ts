@@ -1,5 +1,5 @@
 import { Model } from './Model';
-import { ImageData, getLocalPath } from './ImageData';
+import { ImageData } from './ImageData';
 import { PrivateIdentity } from './Identity';
 
 interface Location {
@@ -30,18 +30,3 @@ export interface Post extends PublicPost {
     liked?: boolean;
     isUploading?: boolean;
 }
-
-export const getAuthorImageUri = (author: Author): string => {
-    // this is here for compatibility with previous version where
-    // image was optional
-    if (author.image == null) {
-        return author.faviconUri;
-    }
-    if (author.image.localPath != null) {
-        return getLocalPath(author.image.localPath);
-    }
-    if (author.image.uri != null) {
-        return author.image.uri;
-    }
-    return author.faviconUri;
-};

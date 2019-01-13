@@ -26,17 +26,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             // workaround to finish refresh
             dispatch(Actions.timeTick());
         },
-        onDeletePost: (post: Post) => {
-            dispatch(AsyncActions.removePost(post));
-        },
         onSavePost: (post: Post) => {
             dispatch(AsyncActions.createPost(post));
-        },
-        onSharePost: (post: Post) => {
-            if (post.link != null) {
-                return;
-            }
-            dispatch(AsyncActions.sharePost(post));
         },
         onUnfollowFeed: (feed: Feed) => {
             // do nothing
