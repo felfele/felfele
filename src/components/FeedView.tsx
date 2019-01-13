@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { YourFeed } from './YourFeed';
+import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post, Author } from '../models/Post';
 import { Settings } from '../models/Settings';
@@ -34,7 +34,7 @@ export const FeedView = (props: Props) => {
     const isFollowedFeed = navParams != null &&
                     props.feeds.find(feed => feed.feedUrl === navParams.author.uri) != null;
     return (
-        <YourFeed {...props}>
+        <RefreshableFeed {...props}>
             {{
                 navigationHeader: <NavigationHeader
                                       onPressLeftButton={() => props.navigation.goBack(null)}
@@ -62,7 +62,7 @@ export const FeedView = (props: Props) => {
                                       title={navParams ? navParams.author.name : 'Favorites'}
                                   />,
             }}
-        </YourFeed>
+        </RefreshableFeed>
     );
 };
 

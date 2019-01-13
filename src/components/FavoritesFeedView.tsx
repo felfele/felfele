@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { YourFeed } from './YourFeed';
+import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { Settings } from '../models/Settings';
@@ -20,14 +20,14 @@ type Props = StateProps & DispatchProps;
 
 export const FavoritesFeedView = (props: Props) => {
     return (
-        <YourFeed {...props}>
+        <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
                                 leftButtonText=''
                                 title='Favorites'
                         />,
             }}
-        </YourFeed>
+        </RefreshableFeed>
     );
 };
 

@@ -24,19 +24,19 @@ export interface StateProps {
     feeds: Feed[];
     settings: Settings;
     children: {
-        // using here other then any would be good, but it gives a false sense of security, it does not typecheck
+        // using here other then any would be good, but it does not typecheck
         listHeader?: React.ReactElement<any>,
         navigationHeader?: React.ReactElement<any>,
     };
 }
 
-interface YourFeedState {
+interface RefreshableFeedState {
     selectedPost: Post | null;
     isRefreshing: boolean;
 }
 
-export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
-    public state: YourFeedState = {
+export class RefreshableFeed extends React.PureComponent<DispatchProps & StateProps, RefreshableFeedState> {
+    public state: RefreshableFeedState = {
         selectedPost: null,
         isRefreshing: false,
     };
