@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { StateProps, DispatchProps } from '../components/FavoritesFeedView';
+import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
+import { MemoizedFavoritesFeedView } from '../components/FavoritesFeedView';
 
 const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
     return favoriteFeeds.find(feed => {
@@ -22,10 +23,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: posts,
         feeds: favoriteFeeds,
-        knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
-        yourFeedVariant: 'favorite',
-        isOwnFeed: false,
     };
 };
 
@@ -34,22 +32,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
-        onSavePost: (post: Post) => {
-            // do nothing
-        },
-        onUnfollowFeed: (feed: Feed) => {
-            // do nothing
-        },
-        onFollowFeed: (feed: Feed) => {
-            // do nothing
-        },
-        onToggleFavorite: (feedUrl: string) => {
-            dispatch(Actions.toggleFeedFavorite(feedUrl));
-        },
     };
 };
 
 export const FavoritesContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(YourFeed);
+)(MemoizedFavoritesFeedView);

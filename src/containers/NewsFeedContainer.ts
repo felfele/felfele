@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import { StateProps, DispatchProps, YourFeed } from '../components/YourFeed';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
+import { StateProps, DispatchProps, MemoizedNewsFeedView } from '../components/NewsFeedView';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -28,8 +28,6 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         feeds: followedFeeds,
         knownFeeds: state.feeds.filter(feed => feed != null && feed.followed !== true).toArray(),
         settings: state.settings,
-        yourFeedVariant: 'news',
-        isOwnFeed: false,
     };
 };
 
@@ -38,22 +36,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
-        onSavePost: (post: Post) => {
-            // do nothing
-        },
-        onUnfollowFeed: (feed: Feed) => {
-            // do nothing
-        },
-        onFollowFeed: (feed: Feed) => {
-            // do nothing
-        },
-        onToggleFavorite: (feedUrl: string) => {
-            dispatch(Actions.toggleFeedFavorite(feedUrl));
-        },
     };
 };
 
 export const NewsFeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(YourFeed);
+)(MemoizedNewsFeedView);

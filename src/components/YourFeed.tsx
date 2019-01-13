@@ -7,44 +7,33 @@ import {
     SafeAreaView,
     LayoutAnimation,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-
-import { Post, Author } from '../models/Post';
-import { FeedHeader } from './FeedHeader';
+import { Post } from '../models/Post';
 import { Colors } from '../styles';
 import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
-import { NavigationHeader } from './NavigationHeader';
-import * as AreYouSureDialog from './AreYouSureDialog';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
-    onSavePost: (post: Post) => void;
-    onFollowFeed: (feed: Feed) => void;
-    onUnfollowFeed: (feed: Feed) => void;
-    onToggleFavorite: (feedUrl: string) => void;
 }
 
 export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    knownFeeds: Feed[];
     settings: Settings;
-    yourFeedVariant: YourFeedVariant;
-    isOwnFeed: boolean;
+    children: {
+        // using here other then any would be good, but it gives a false sense of security, it does not typecheck
+        listHeader?: React.ReactElement<any>,
+        navigationHeader?: React.ReactElement<any>,
+    };
 }
 
 interface YourFeedState {
     selectedPost: Post | null;
     isRefreshing: boolean;
 }
-
-// TODO YourFeed is having too many responsabilities
-export type YourFeedVariant = 'favorite' | 'news' | 'your' | 'feed';
 
 export class YourFeed extends React.PureComponent<DispatchProps & StateProps, YourFeedState> {
     public state: YourFeedState = {
@@ -78,9 +67,9 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
-                <this.NavHeader {...this.props} onFollowPressed={this.onFollowPressed} isFavorite={this.isFavorite}/>
+                {this.props.children.navigationHeader}
                 <FlatList
-                    ListHeaderComponent={this.renderListHeader}
+                    ListHeaderComponent={this.props.children.listHeader}
                     ListFooterComponent={this.renderListFooter}
                     data={this.props.posts}
                     renderItem={(obj) => (
@@ -110,74 +99,11 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
         );
     }
 
-    private NavHeader(props: DispatchProps & StateProps &
-        { onFollowPressed: (author: Author) => void, isFavorite: () => boolean }) {
-        const navParams = props.navigation.state.params;
-        switch (props.yourFeedVariant) {
-            case 'feed': {
-                const isFollowedFeed = navParams != null &&
-                    props.feeds.find(feed => feed.feedUrl === navParams.author.uri) != null;
-                return (
-                    <NavigationHeader
-                        onPressLeftButton={() => props.navigation.goBack(null)}
-                        rightButtonText1={!props.isOwnFeed ? <Icon
-                            name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
-                            size={20}
-                            color={Colors.DARK_GRAY}
-                        /> : undefined}
-                        rightButtonText2={!props.isOwnFeed ? <MaterialIcon
-                            name={'favorite'}
-                            size={20}
-                            color={isFollowedFeed
-                                ? props.isFavorite() ? Colors.BRAND_RED : Colors.DARK_GRAY
-                                : 'transparent'
-                            }
-                        /> : undefined}
-                        onPressRightButton1={async () => !props.isOwnFeed && await props.onFollowPressed(navParams.author)}
-                        onPressRightButton2={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(navParams.author.uri)}
-                        title={navParams ? navParams.author.name : 'Favorites'}
-                    />
-                );
-            }
-            default: {
-                return <View/>;
-            }
-        }
-    }
-
-    private isFavorite = (): boolean => {
-        const feed = this.props.feeds.find(value => value.feedUrl === this.props.navigation.state.params.author.uri);
-        return feed != null && !!feed.favorite;
-    }
-
     private onRefresh() {
         this.setState({
             isRefreshing: true,
         });
         this.props.onRefreshPosts(this.props.feeds);
-    }
-
-    private onFollowPressed = async (author: Author) => {
-        const followedFeed = this.props.feeds.find(feed => feed.feedUrl === author.uri);
-        if (followedFeed != null) {
-            await this.unfollowFeed(followedFeed);
-        } else {
-            this.followFeed(author);
-        }
-    }
-
-    private unfollowFeed = async (feed: Feed) => {
-        const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
-        if (confirmUnfollow) {
-            this.props.onUnfollowFeed(feed);
-        }
-    }
-
-    private followFeed = (author: Author) => {
-        const knownFeed = this.props.knownFeeds.find(feed => feed.feedUrl === author.uri);
-        if (knownFeed != null) {
-            this.props.onFollowFeed(knownFeed);
-        }
     }
 
     private isPostSelected = (post: Post): boolean => {
@@ -190,38 +116,6 @@ export class YourFeed extends React.PureComponent<DispatchProps & StateProps, Yo
             this.setState({ selectedPost: null });
         } else {
             this.setState({ selectedPost: post });
-        }
-    }
-
-    private renderListHeader = () => {
-        switch (this.props.yourFeedVariant) {
-            case 'your': {
-                return (
-                    <FeedHeader
-                        navigation={this.props.navigation}
-                        onSavePost={this.props.onSavePost}
-                    />
-                );
-            }
-            case 'favorite': {
-                return (
-                    <NavigationHeader
-                        leftButtonText=''
-                        title='Favorites'
-                    />
-                );
-            }
-            case 'news': {
-                return (
-                    <NavigationHeader
-                        leftButtonText=''
-                        title='News'
-                    />
-                );
-            }
-            default: {
-                return null;
-            }
         }
     }
 
