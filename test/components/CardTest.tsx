@@ -34,7 +34,7 @@ describe('card test', () => {
         author: testAuthor,
     };
 
-    it.skip('should render without images CardWithText', () => {
+    it('should render without images CardWithText', () => {
         const renderer = ShallowRenderer.createRenderer();
         renderer.render(
             <Card
