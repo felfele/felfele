@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
-import { Post, Author } from '../models/Post';
+import { Post } from '../models/Post';
 import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';

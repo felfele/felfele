@@ -22,6 +22,7 @@ import { Colors } from '../styles';
 import * as Swarm from '../Swarm';
 import { downloadPostFeed } from '../PostFeed';
 import { NavigationHeader } from './NavigationHeader';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -45,7 +46,7 @@ export interface StateProps {
     navigation: any;
 }
 
-export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
+export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public state: EditFeedState = {
         url: '',
         checked: false,
@@ -85,19 +86,34 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
     }
 
     public render() {
-        const isDelete = this.props.feed.feedUrl.length > 0;
-        const rightButtonText = this.state.loading
+        const isExistingFeed = this.props.feed.feedUrl.length > 0;
+        const rightButtonText1 = this.state.loading
             ? undefined
-            : isDelete
-                ? 'Delete'
-                : 'Fetch'
-            ;
-        const rightButtonAction = this.state.loading
+            : <Icon
+                  name={isExistingFeed ? 'delete' : 'download'}
+                  size={20}
+                  color={Colors.DARK_GRAY}
+              />
+        ;
+        const rightButtonAction1 = this.state.loading
             ? undefined
-            : isDelete
+            : isExistingFeed
                 ? async () => await this.onDelete()
                 : async () => await this.fetchFeed()
-            ;
+        ;
+
+        const rightButtonText2 = this.state.loading || !isExistingFeed
+            ? undefined
+            : <Icon
+                  name={'open-in-new'}
+                  size={20}
+                  color={Colors.DARK_GRAY}
+              />
+        ;
+        const rightButtonAction2 = this.state.loading || !isExistingFeed
+            ? undefined
+            : async () => await this.props.navigation.navigate('Feed', { uri: this.props.feed.feedUrl, name: this.props.feed.name })
+        ;
         return (
             <View style={styles.container}>
                 <NavigationHeader
@@ -105,9 +121,11 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
                         this.props.navigation.goBack(null);
                     }}
-                    title='Edit feed'
-                    rightButtonText1={rightButtonText}
-                    onPressRightButton1={rightButtonAction}
+                    title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
+                    rightButtonText1={rightButtonText1}
+                    onPressRightButton1={rightButtonAction1}
+                    rightButtonText2={rightButtonText2}
+                    onPressRightButton2={rightButtonAction2}
                 />
                 <SimpleTextInput
                     defaultValue={this.state.url}
@@ -117,6 +135,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     autoCapitalize='none'
                     autoFocus={true}
                     autoCorrect={false}
+                    editable={!isExistingFeed}
                 />
                 { this.state.checked
                   ?

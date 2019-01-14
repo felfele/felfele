@@ -136,10 +136,10 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
             name: '',
             url: '',
         };
-        this.props.navigation.navigate('EditFeed', { feed: feed });
+        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 
     private editFeed = (feed) => {
-        this.props.navigation.navigate('EditFeed', { feed: feed });
+        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 }

@@ -11,7 +11,7 @@ import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
-import { EditFeedContainer } from './containers/EditFeedContainer';
+import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { NewsFeedContainer } from './containers/NewsFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
@@ -234,8 +234,8 @@ const Scenes: NavigationRouteConfigMap = {
     IdentitySettingsContainer: {
         screen: IdentitySettingsContainer,
     },
-    EditFeed: {
-        screen: EditFeedContainer,
+    FeedInfo: {
+        screen: FeedInfoContainer,
     },
     EditFilter: {
         screen: EditFilterContainer,

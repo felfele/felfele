@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { Actions, AsyncActions } from '../actions/Actions';
-import { StateProps, DispatchProps, EditFeed } from '../components/EditFeed';
+import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
@@ -30,4 +30,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 export const EditFeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(EditFeed);
+)(FeedInfo);
