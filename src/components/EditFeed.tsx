@@ -37,6 +37,7 @@ interface EditFeedState {
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRemoveFeed: (feed: Feed) => void;
+    onDownloadFeed: (feed: Feed) => void;
 }
 
 export interface StateProps {
@@ -58,7 +59,6 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
 
     public async onAdd(feed: Feed) {
         this.props.onAddFeed(feed);
-        this.props.navigation.navigate('NewsTab');
     }
 
     public goBack() {
@@ -76,7 +76,9 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                 checked: true,
                 loading: false,
             });
-            await this.onAdd(feed);
+            this.onAdd(feed);
+            await this.props.onDownloadFeed(feed);
+            this.props.navigation.navigate('Feed', { uri: feed.feedUrl, name: feed.name });
         } else {
             this.onFailedFeedLoad();
         }

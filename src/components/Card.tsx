@@ -145,7 +145,10 @@ const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) =>
     return (
         <TouchableOpacity
             testID={'CardTop'}
-            onPress={() => props.navigate('Feed', { author: props.post.author && props.post.author })}
+            onPress={() => props.navigate('Feed', {
+                uri: props.post.author && props.post.author.uri,
+                name: username,
+            })}
             style={styles.infoContainer}
         >
             <CardTopIcon post={props.post}/>
