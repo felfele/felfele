@@ -3,7 +3,6 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post, Author } from '../models/Post';
 import { Settings } from '../models/Settings';
-import { FeedHeader } from './FeedHeader';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 

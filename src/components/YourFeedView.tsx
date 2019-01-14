@@ -26,7 +26,7 @@ export const YourFeedView = (props: Props) => {
                 listHeader: <FeedHeader
                                 navigation={props.navigation}
                                 onSavePost={props.onSavePost}
-                        />,
+                            />,
             }}
         </RefreshableFeed>
     );

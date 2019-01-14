@@ -13,6 +13,8 @@ import { StatusBarView } from './StatusBarView';
 import { Settings } from '../models/Settings';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
+import { Props as NavHeaderProps } from './NavigationHeader';
+import { Props as FeedHeaderProps } from './FeedHeader';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -24,9 +26,9 @@ export interface StateProps {
     feeds: Feed[];
     settings: Settings;
     children: {
-        // using here other then any would be good, but it does not typecheck
-        listHeader?: React.ReactElement<any>,
-        navigationHeader?: React.ReactElement<any>,
+        // WARNING, type parameter included for reference, but it does not typecheck
+        listHeader?: React.ReactElement<FeedHeaderProps>,
+        navigationHeader?: React.ReactElement<NavHeaderProps>,
     };
 }
 
