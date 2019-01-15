@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
-import { StateProps, DispatchProps, MemoizedFeedView } from '../components/FeedView';
+import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
@@ -42,4 +42,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 export const FeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(MemoizedFeedView);
+)(FeedView);

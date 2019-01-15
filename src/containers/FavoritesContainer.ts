@@ -4,7 +4,7 @@ import { StateProps, DispatchProps } from '../components/FavoritesFeedView';
 import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { MemoizedFavoritesFeedView } from '../components/FavoritesFeedView';
+import { FavoritesFeedView } from '../components/FavoritesFeedView';
 
 const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
     return favoriteFeeds.find(feed => {
@@ -38,4 +38,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 export const FavoritesContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(MemoizedFavoritesFeedView);
+)(FavoritesFeedView);

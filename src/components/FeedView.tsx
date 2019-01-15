@@ -90,5 +90,3 @@ const followFeed = (uri: string, feeds: Feed[], onFollowFeed: (feed: Feed) => vo
         onFollowFeed(knownFeed);
     }
 };
-
-export const MemoizedFeedView = React.memo(FeedView);
