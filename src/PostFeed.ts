@@ -4,6 +4,7 @@ import { ImageData } from './models/ImageData';
 import * as Swarm from './Swarm';
 import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
+import { downloadImageAndStore, ImageStorePath } from './ImageDownloader';
 
 export interface PostFeed extends Feed {
     posts: PublicPost[];
@@ -59,11 +60,17 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
         const postFeed = JSON.parse(content) as PostFeed;
         const authorImage = {
             uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+            localPath: postFeed.authorImage.uri
+                ? await downloadImageAndStore(postFeed.authorImage.uri, ImageStorePath.AVATARS)
+                : undefined,
         };
+        const faviconUri = authorImage.localPath != null
+            ? authorImage.localPath
+            : authorImage.uri;
         const author: Author = {
             name: postFeed.name,
             uri: postFeed.url,
-            faviconUri: authorImage.uri,
+            faviconUri,
             image: authorImage,
         };
         const postFeedWithGatewayImageLinks = {
@@ -76,7 +83,7 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
                     uri: Swarm.getSwarmGatewayUrl(image.uri!),
                 })),
             })),
-            favicon: authorImage.uri,
+            favicon: faviconUri,
         };
         return postFeedWithGatewayImageLinks;
     } catch (e) {

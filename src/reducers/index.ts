@@ -227,6 +227,16 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
                 favicon: action.payload.favicon,
             }));
         }
+        case 'UPDATE-FEED-LOCAL-FAVICON': {
+            const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return feeds;
+            }
+            return feeds.update(ind, (feed) => ({
+                ...feed,
+                _localFavicon: action.payload.localFavicon,
+            }));
+        }
         case 'TOGGLE-FEED-FAVORITE': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feedUrl === feed.feedUrl);
             if (ind === -1) {

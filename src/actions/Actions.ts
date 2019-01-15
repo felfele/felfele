@@ -12,6 +12,7 @@ import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
+import { downloadImageAndStore } from '../ImageDownloader';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -23,6 +24,7 @@ export enum ActionTypes {
     UNFOLLOW_FEED = 'UNFOLLOW-FEED',
     TOGGLE_FEED_FAVORITE = 'TOGGLE-FEED-FAVORITE',
     UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
+    UPDATE_FEED_LOCAL_FAVICON = 'UPDATE-FEED-LOCAL-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
@@ -85,6 +87,8 @@ export const Actions = {
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>
         createAction(ActionTypes.DELETE_POST, { post }),
+    updateFeedLocalFavicon: (feed: Feed, localFavicon: string) =>
+        createAction(ActionTypes.UPDATE_FEED_LOCAL_FAVICON, {feed, localFavicon}),
     updatePostLink: (post: Post, link?: string) =>
         createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
     updatePostIsUploading: (post: Post, isUploading?: boolean) =>

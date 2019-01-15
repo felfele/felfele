@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/index';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScreen';
-import { Post } from '../models/Post';
+import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
    return {
@@ -18,6 +18,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
         },
         onCreateIdentity: () => {
             dispatch(AsyncActions.createUserIdentity());
+        },
+        onUpdateLocalFavicon: (feed: Feed, localFavicon: string) => {
+            dispatch(Actions.updateFeedLocalFavicon(feed, localFavicon));
         },
    };
 };

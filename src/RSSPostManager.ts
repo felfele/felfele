@@ -7,6 +7,7 @@ import { Utils } from './Utils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 import { Debug } from './Debug';
+import { downloadImageAndStore, ImageStorePath } from './ImageDownloader';
 
 interface RSSEnclosure {
     url: string;
@@ -315,9 +316,10 @@ class _RSSPostManager {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
                 const favicon = rssFeed.icon ? rssFeed.icon : await CachingFaviconParser.getFavicon(rssFeed.url);
-                Debug.log('RSSPostManager: ', rssFeed, favicon);
+                const storedFavicon = await downloadImageAndStore(favicon, ImageStorePath.AVATARS);
+                Debug.log('RSSPostManager: ', rssFeed, favicon, storedFavicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, storedFavicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }
@@ -442,7 +444,7 @@ class _RSSPostManager {
         return s;
     }
 
-    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
+    private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, storedFavicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
@@ -472,6 +474,7 @@ class _RSSPostManager {
                     faviconUri: strippedFaviconUri,
                     image: {
                         uri: strippedFaviconUri,
+                        localPath: storedFavicon,
                     },
                 },
             };

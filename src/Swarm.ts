@@ -6,7 +6,7 @@ import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
 import { safeFetch, safeFetchWithTimeout } from './Network';
 
-export const DefaultGateway = 'https://swarm-gateways.net';
+export const DefaultGateway = 'https://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
@@ -57,7 +57,7 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
     if (isSwarmLink(swarmUrl)) {
         return DefaultGateway + DefaultUrlScheme + swarmUrl.slice(DefaultPrefix.length);
     }
-    if (swarmUrl.length === HashLength) {
+    if (swarmUrl.length === HashLength && isHexStrict('0x' + swarmUrl)) {
         return DefaultGateway + DefaultUrlScheme + swarmUrl;
     }
     return swarmUrl;

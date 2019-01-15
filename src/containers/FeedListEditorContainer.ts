@@ -9,13 +9,16 @@ const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 :
 
 const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
 
+const getFeedFavicon = (feed: Feed) => feed._localFavicon != null ? feed._localFavicon : feed.favicon;
+
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const feeds = state.feeds.toArray()
         .map(feed => ({
             ...feed,
-            favicon: getSwarmGatewayUrl(feed.favicon || ''),
+            favicon: getSwarmGatewayUrl(getFeedFavicon(feed) || ''),
         }))
         .sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
+    console.log('FeedListEditorContainer.mapStateToProps', feeds);
     return {
         feeds,
         navigation: ownProps.navigation,

@@ -9,6 +9,8 @@ import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
+import { downloadImageAndStore } from '../ImageDownloader';
+import { Feed } from '../models/Feed';
 
 export interface StateProps {
     appState: AppState;
@@ -18,6 +20,7 @@ export interface StateProps {
 export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
+    onUpdateLocalFavicon: (feed: Feed, localFavicon: string) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -82,6 +85,14 @@ export const DebugScreen = (props: Props) => (
                     icon={
                         <MaterialCommunityIcon name='backup-restore' />
                     }
+                    title='Fix feed favicons'
+                    onPress={async () => await onFixFeedFavicons(props)}
+                    hasNavArrow={false}
+                />
+                <SettingsList.Item
+                    icon={
+                        <MaterialCommunityIcon name='backup-restore' />
+                    }
                     title='Backup & Restore'
                     onPress={() => props.navigation.navigate('BackupRestore')}
                 />
@@ -116,4 +127,15 @@ const onLogAppStateVersion = async () => {
     const serializedAppState = await getSerializedAppState();
     const appState = await getAppStateFromSerialized(serializedAppState);
     Debug.log('onLogAppStateVersion', appState._persist);
+};
+
+const onFixFeedFavicons = async (props: Props) => {
+    const feeds = props.appState.feeds.toArray();
+    for (const feed of feeds) {
+        Debug.log('onFixFeedFavicons: ', feed);
+        if (feed.favicon !== '') {
+            const storedFavicon = await downloadImageAndStore(feed.favicon);
+            props.onUpdateLocalFavicon(feed, storedFavicon);
+        }
+    }
 };
