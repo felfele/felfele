@@ -38,7 +38,6 @@ interface EditFeedState {
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRemoveFeed: (feed: Feed) => void;
-    onDownloadFeed: (feed: Feed) => void;
 }
 
 export interface StateProps {
@@ -78,7 +77,6 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
                 loading: false,
             });
             this.onAdd(feed);
-            await this.props.onDownloadFeed(feed);
             this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
         } else {
             this.onFailedFeedLoad();
