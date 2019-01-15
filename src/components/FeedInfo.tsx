@@ -79,7 +79,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
             });
             this.onAdd(feed);
             await this.props.onDownloadFeed(feed);
-            this.props.navigation.navigate('Feed', { uri: feed.feedUrl, name: feed.name });
+            this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
         } else {
             this.onFailedFeedLoad();
         }
@@ -112,7 +112,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         ;
         const rightButtonAction2 = this.state.loading || !isExistingFeed
             ? undefined
-            : async () => await this.props.navigation.navigate('Feed', { uri: this.props.feed.feedUrl, name: this.props.feed.name })
+            : async () => await this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
         ;
         return (
             <View style={styles.container}>

@@ -135,21 +135,21 @@ const CardTopIcon = (props: { post: Post }) => {
 
 const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) => {
     const printableTime = DateUtils.printableElapsedTime(props.post.createdAt) + ' ago';
-    const username = props.post.author ? props.post.author.name : 'Space Cowboy';
+    const authorName = props.post.author ? props.post.author.name : 'Space Cowboy';
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
     return (
         <TouchableOpacity
             testID={'CardTop'}
             onPress={() => props.navigate('Feed', {
-                uri: props.post.author && props.post.author.uri,
-                name: username,
+                feedUrl: props.post.author && props.post.author.uri,
+                name: authorName,
             })}
             style={styles.infoContainer}
         >
             <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
-                <Text style={styles.username} numberOfLines={1}>{username}</Text>
+                <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
                 <Text style={styles.location}>{printableTime}{hostnameText}</Text>
             </View>
         </TouchableOpacity>

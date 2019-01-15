@@ -19,8 +19,8 @@ export interface DispatchProps {
 
 export interface StateProps {
     navigation: any;
-    uri: string;
-    name: string;
+    feedUrl: string;
+    feedName: string;
     posts: Post[];
     feeds: Feed[];
     settings: Settings;
@@ -30,7 +30,7 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
-    const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.uri && feed.followed === true) != null;
+    const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
     return (
         <RefreshableFeed {...props}>
             {{
@@ -45,18 +45,18 @@ export const FeedView = (props: Props) => {
                                           name={'favorite'}
                                           size={20}
                                           color={isFollowedFeed
-                                              ? isFavorite(props.feeds, props.uri) ? Colors.BRAND_RED : Colors.DARK_GRAY
+                                              ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_RED : Colors.DARK_GRAY
                                               : 'transparent'
                                           }
                                       /> : undefined}
                                       onPressRightButton1={async () => {
-                                          return !props.isOwnFeed && await onFollowPressed(props.uri,
+                                          return !props.isOwnFeed && await onFollowPressed(props.feedUrl,
                                                                                            props.feeds,
                                                                                            props.onUnfollowFeed,
                                                                                            props.onFollowFeed);
                                       }}
-                                      onPressRightButton2={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(props.uri)}
-                                      title={props.name}
+                                      onPressRightButton2={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(props.feedUrl)}
+                                      title={props.feedName}
                                   />,
             }}
         </RefreshableFeed>
