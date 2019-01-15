@@ -4,7 +4,7 @@ import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { StateProps, DispatchProps, MemoizedNewsFeedView } from '../components/NewsFeedView';
+import { StateProps, DispatchProps, NewsFeedView } from '../components/NewsFeedView';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -41,4 +41,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 export const NewsFeedContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps,
-)(MemoizedNewsFeedView);
+)(NewsFeedView);

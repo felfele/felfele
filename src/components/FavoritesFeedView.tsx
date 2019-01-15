@@ -30,5 +30,3 @@ export const FavoritesFeedView = (props: Props) => {
         </RefreshableFeed>
     );
 };
-
-export const MemoizedFavoritesFeedView = React.memo(FavoritesFeedView);

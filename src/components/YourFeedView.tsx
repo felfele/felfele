@@ -31,5 +31,3 @@ export const YourFeedView = (props: Props) => {
         </RefreshableFeed>
     );
 };
-
-export const MemoizedYourFeedView = React.memo(YourFeedView);

@@ -90,5 +90,3 @@ const followFeed = (author: Author, feeds: Feed[], onFollowFeed: (feed: Feed) =>
         onFollowFeed(knownFeed);
     }
 };
-
-export const MemoizedFeedView = React.memo(FeedView);
