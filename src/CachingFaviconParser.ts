@@ -2,7 +2,7 @@ import { HtmlUtils } from './HtmlUtils';
 import { Debug } from './Debug';
 import { safeFetch } from './Network';
 
-export class GlobalCachingFaviconParser {
+export class CachingFaviconParserStatic {
     private favicons: Map<string, string> = new Map();
 
     public async getFavicon(url: string, fetchFunction = safeFetch): Promise<string> {
@@ -63,4 +63,4 @@ export class GlobalCachingFaviconParser {
     }
 }
 
-export const CachingFaviconParser = new GlobalCachingFaviconParser();
+export const CachingFaviconParser = new CachingFaviconParserStatic();
