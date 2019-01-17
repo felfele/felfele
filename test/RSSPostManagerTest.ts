@@ -1,5 +1,7 @@
 import { RSSPostManager, RSSFeedManager } from '../src/RSSPostManager';
 
+jest.mock('../src/FileSystemHelper');
+
 test('Parse CDATA descriptions from RSS', async () => {
     const text = 'text';
     const description = `<![CDATA[${text}]]>`;
