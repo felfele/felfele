@@ -1,7 +1,6 @@
 import RNFetchBlob from 'rn-fetch-blob';
-import { FileSystem } from '../FileSystem';
 
-class FileSystemHelperStatic implements FileSystem {
+class FileSystemHelperStatic {
     public getDocumentDir = () => '';
 
     public exists = (path: string) => Promise.resolve(true);
