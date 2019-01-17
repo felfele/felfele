@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/index';
-import { StateProps, DispatchProps, Card } from '../components/Card';
+import { StateProps, DispatchProps, MemoizedCard } from '../components/Card';
 import { Post } from '../models/Post';
 import { AsyncActions } from '../actions/Actions';
 
@@ -38,4 +38,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 export const CardContainer = connect<StateProps, DispatchProps, {}>(
     mapStateToProps,
     mapDispatchToProps
-)(Card);
+)(MemoizedCard);

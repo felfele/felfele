@@ -32,57 +32,55 @@ export interface DispatchProps {
 
 type CardProps = StateProps & DispatchProps;
 
-export const Card = React.memo((props: CardProps) => {
-    if (props.post.images.length === 0) {
-        return <CardWithText {...props}/>;
-    } else {
-        return (
-            <View
-                style={[styles.container, {
-                    margin: 0,
-                    padding: 0,
-                    paddingTop: 5,
-                    borderWidth: 0,
-                }]}
-                key={'card-' + props.post._id}
-                testID={'YourFeed/Post' + props.post._id}
-            >
+export const Card = (props: CardProps) => {
+    return (
+        <View
+            style={[styles.container, {
+                margin: 0,
+                padding: 0,
+                paddingTop: 5,
+                borderWidth: 0,
+            }]}
+            key={'card-' + props.post._id}
+            testID={'YourFeed/Post' + props.post._id}
+        >
 
-                <CardTop post={props.post} navigate={props.navigate}/>
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onLongPress={() => props.togglePostSelection(props.post)}
-                    onPress={() => openPost(props.post)}
-                    style = {{
-                        backgroundColor: '#fff',
-                        padding: 0,
-                        paddingTop: 0,
-                        marginTop: 0,
-                    }}
-                >
-                    {props.post.images.map((image, index) => {
-                        const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
-                        return (
-                            <ImageView
-                                testID={image.uri || '' + index}
-                                key={image.uri || '' + index}
-                                source={image}
-                                style={{
-                                    width: width,
-                                    height: height,
-                                }}
-                            />
-                        );
-                    })}
-                    { props.post.text === '' ||
-                        <CardMarkdown key={props.post._id} text={props.post.text}/>
-                    }
-                    <ButtonList {...props}/>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-});
+            <CardTop post={props.post} navigate={props.navigate}/>
+            <TouchableOpacity
+                activeOpacity={1}
+                onLongPress={() => props.togglePostSelection(props.post)}
+                onPress={() => openPost(props.post)}
+                style = {{
+                    backgroundColor: '#fff',
+                    padding: 0,
+                    paddingTop: 0,
+                    marginTop: 0,
+                }}
+            >
+                {props.post.images.map((image, index) => {
+                    const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
+                    return (
+                        <ImageView
+                            testID={image.uri || '' + index}
+                            key={image.uri || '' + index}
+                            source={image}
+                            style={{
+                                width: width,
+                                height: height,
+                            }}
+                        />
+                    );
+                })}
+                { props.post.text === '' ||
+                    <CardMarkdown key={props.post._id} text={props.post.text}/>
+                }
+                <ButtonList {...props}/>
+            </TouchableOpacity>
+        </View>
+    );
+};
+
+export const MemoizedCard = React.memo(Card);
 
 const ActionIcon = (props: { name: string}) => {
     const iconSize = 20;
@@ -152,31 +150,6 @@ const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) =>
                 <Text style={styles.location}>{printableTime}{hostnameText}</Text>
             </View>
         </TouchableOpacity>
-    );
-};
-
-export const CardWithText = (props: CardProps) => {
-    return (
-        <View
-            style={[styles.container, {
-                margin: 0,
-                paddingTop: 5,
-                borderWidth: 0,
-            }]}
-            key={'card-' + props.post._id}
-            testID={'YourFeed/Post' + props.post._id}
-        >
-            <TouchableOpacity
-                onLongPress={ () => props.togglePostSelection(props.post) }
-                onPress={ () => openPost(props.post)}
-                activeOpacity={1}
-            >
-                <CardTop post={props.post} navigate={props.navigate} />
-                { props.post.text != null &&
-                <CardMarkdown key={props.post._id} text={props.post.text}/>}
-            </TouchableOpacity>
-            <ButtonList {...props} />
-        </View>
     );
 };
 

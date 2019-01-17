@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ShallowRenderer from 'react-test-renderer/shallow';
-import { Card, CardWithText } from '../../src/components/Card';
+import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 
@@ -33,24 +33,6 @@ describe('card test', () => {
     Let's see if we can assert something useful.`,
         author: testAuthor,
     };
-
-    it.skip('should render without images CardWithText', () => {
-        const renderer = ShallowRenderer.createRenderer();
-        renderer.render(
-            <Card
-                post={testPostWithoutImage}
-                isSelected={false}
-                navigate={(_) => {}}
-                onDeletePost={(_) => {}}
-                onSharePost={(_) => {}}
-                togglePostSelection={(_) => {}}
-                showSquareImages={true}
-            />
-        );
-
-        const result = renderer.getRenderOutput();
-        expect(result.type).toBe(CardWithText);
-    });
 
     it('should render unselected post without images with the following components: Post, CardTop, without CardButtonList', () => {
         const result = TestRenderer.create(
