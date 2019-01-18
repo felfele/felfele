@@ -33,7 +33,9 @@ export const isPostFeedUrl = (url: string): boolean => {
 
 export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: PostFeed): Promise<PostFeed> => {
     try {
-        const postFeedJson = JSON.stringify(postFeed);
+        const postFeedJson = JSON.stringify(postFeed, (key, value) =>
+            key.startsWith('_') ? undefined : value
+        );
         const contentHash = await Swarm.upload(postFeedJson);
         await swarmFeedApi.update(contentHash);
         const url = swarmFeedApi.getUri();
