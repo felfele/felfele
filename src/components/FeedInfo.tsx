@@ -1,9 +1,7 @@
 import * as React from 'react';
 import {
-    TextInput,
     Alert,
     StyleSheet,
-    Button,
     View,
     Text,
     ActivityIndicator,
@@ -23,6 +21,7 @@ import * as Swarm from '../Swarm';
 import { downloadPostFeed } from '../PostFeed';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { unfollowFeed } from './FeedView';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -38,6 +37,7 @@ interface EditFeedState {
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRemoveFeed: (feed: Feed) => void;
+    onUnfollowFeed: (feed: Feed) => void;
 }
 
 export interface StateProps {
@@ -85,10 +85,15 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
 
     public render() {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
+        const isFollowed = this.props.feed.followed;
         const rightButtonText1 = this.state.loading
             ? undefined
             : <Icon
-                  name={isExistingFeed ? 'delete' : 'download'}
+                  name={isExistingFeed
+                    ? isFollowed
+                        ? 'link-variant-off'
+                        : 'delete'
+                    : 'download'}
                   size={20}
                   color={Colors.DARK_GRAY}
               />
@@ -96,7 +101,9 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         const rightButtonAction1 = this.state.loading
             ? undefined
             : isExistingFeed
-                ? async () => await this.onDelete()
+                ? isFollowed
+                    ? this.onUnfollowFeed
+                    : async () => await this.onDelete()
                 : async () => await this.fetchFeed()
         ;
 
@@ -207,6 +214,15 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
             Debug.log(e);
             return null;
         }
+    }
+
+    private onUnfollowFeed = () => {
+        unfollowFeed(this.props.feed, this.unfollowAndGoBack);
+    }
+
+    private unfollowAndGoBack = (feed: Feed) => {
+        this.props.onUnfollowFeed(feed);
+        this.goBack();
     }
 
     private onDelete = () => {

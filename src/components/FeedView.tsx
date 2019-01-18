@@ -77,7 +77,7 @@ const onFollowPressed = async (uri: string, feeds: Feed[], onUnfollowFeed: (feed
     }
 };
 
-const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void) => {
+export const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void) => {
     const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
     if (confirmUnfollow) {
         onUnfollowFeed(feed);

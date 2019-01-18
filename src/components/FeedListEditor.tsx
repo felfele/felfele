@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Button, Image, FlatList } from 'react-native';
+import { View, Text, Image, FlatList } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';

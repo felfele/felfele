@@ -117,6 +117,24 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     Backup: {
         screen: BackupContainer,
     },
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    Feed: {
+        screen: FeedContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
+    },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
+    },
 };
 
 const SettingsNavigator = createStackNavigator(settingsTabScenes,
@@ -230,21 +248,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
-    },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
-    },
-    FeedInfo: {
-        screen: FeedInfoContainer,
-    },
-    EditFilter: {
-        screen: EditFilterContainer,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
     },
 };
 
