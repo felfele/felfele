@@ -9,7 +9,7 @@ import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
-import { downloadImageAndStore } from '../ImageDownloader';
+import { downloadImageAndStore, ImageStorePath } from '../ImageDownloader';
 import { Feed } from '../models/Feed';
 import { PostFeed, isPostFeedUrl, downloadPostFeed } from '../PostFeed';
 
@@ -137,12 +137,12 @@ const onFixFeedFavicons = async (props: Props) => {
         if (isPostFeedUrl(feed.url)) {
             const downloadedFeed = await downloadPostFeed(feed.url);
             if (downloadedFeed.authorImage.localPath == null && downloadedFeed.authorImage.uri != null) {
-                const storedFavicon = await downloadImageAndStore(downloadedFeed.authorImage.uri);
+                const storedFavicon = await downloadImageAndStore(downloadedFeed.authorImage.uri, ImageStorePath.AVATARS);
                 props.onUpdateLocalFavicon(feed, storedFavicon);
             }
         }
         if (feed.favicon !== '') {
-            const storedFavicon = await downloadImageAndStore(feed.favicon);
+            const storedFavicon = await downloadImageAndStore(feed.favicon, ImageStorePath.AVATARS);
             props.onUpdateLocalFavicon(feed, storedFavicon);
         }
     }
