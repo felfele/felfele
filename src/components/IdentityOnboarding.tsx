@@ -8,7 +8,7 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import { getAuthorImageUri, Author } from '../models/Post';
+import { Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
@@ -17,9 +17,11 @@ import { DispatchProps } from './IdentitySettings';
 // tslint:disable-next-line:no-var-requires
 const defaultUserImage = require('../../images/user_circle.png');
 import { Debug } from '../Debug';
+import { ModelHelper } from '../models/ModelHelper';
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
+const modelHelper = new ModelHelper();
 
 export { DispatchProps };
 export interface StateProps {
@@ -27,7 +29,7 @@ export interface StateProps {
 }
 
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
-    const authorImageUri = getAuthorImageUri(props.author);
+    const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
         <KeyboardAvoidingView>

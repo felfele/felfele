@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react-native';
 
-import { ImageData, getImageUri } from '../models/ImageData';
+import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
+import { ModelHelper } from '../models/ModelHelper';
+
+const modelHelper = new ModelHelper();
 
 export interface StateProps extends ImageProperties {
     source: ImageData;
@@ -18,7 +21,7 @@ export interface State {
 }
 
 export const ImageView = (props: Props) => {
-    const imageUri = getImageUri(props.source);
+    const imageUri = modelHelper.getImageUri(props.source);
     const width = props.style
         ? StyleSheet.flatten(props.style).width != null
             ? StyleSheet.flatten(props.style).width

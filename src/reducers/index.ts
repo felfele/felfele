@@ -16,9 +16,11 @@ import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
-import { getImageUri } from '../models/ImageData';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
+import { ModelHelper } from '../models/ModelHelper';
+
+const modelHelper = new ModelHelper();
 
 export interface AppState extends PersistedState {
     contentFilters: List<ContentFilter>;
@@ -299,7 +301,7 @@ const authorReducer = (author = defaultAuthor, action: Actions): Author => {
         case 'UPDATE-AUTHOR-PICTURE-PATH': {
             return {
                 ...author,
-                faviconUri: getImageUri(action.payload.image),
+                faviconUri: modelHelper.getImageUri(action.payload.image),
                 image: action.payload.image,
             };
         }
