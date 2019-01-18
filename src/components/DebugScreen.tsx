@@ -11,6 +11,7 @@ import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
 import { downloadImageAndStore } from '../ImageDownloader';
 import { Feed } from '../models/Feed';
+import { PostFeed, isPostFeedUrl, downloadPostFeed } from '../PostFeed';
 
 export interface StateProps {
     appState: AppState;
@@ -133,6 +134,13 @@ const onFixFeedFavicons = async (props: Props) => {
     const feeds = props.appState.feeds.toArray();
     for (const feed of feeds) {
         Debug.log('onFixFeedFavicons: ', feed);
+        if (isPostFeedUrl(feed.url)) {
+            const downloadedFeed = await downloadPostFeed(feed.url);
+            if (downloadedFeed.authorImage.localPath == null && downloadedFeed.authorImage.uri != null) {
+                const storedFavicon = await downloadImageAndStore(downloadedFeed.authorImage.uri);
+                props.onUpdateLocalFavicon(feed, storedFavicon);
+            }
+        }
         if (feed.favicon !== '') {
             const storedFavicon = await downloadImageAndStore(feed.favicon);
             props.onUpdateLocalFavicon(feed, storedFavicon);
