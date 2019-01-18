@@ -23,7 +23,7 @@ export interface DispatchProps {
     onSavePost: (post: Post) => void;
 }
 
-type Props = StateProps & DispatchProps;
+export type Props = StateProps & DispatchProps;
 
 export class FeedHeader extends React.PureComponent<Props> {
     public openImagePicker = async () => {
