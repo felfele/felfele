@@ -9,7 +9,7 @@ import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
 import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
-import { uploadPost, uploadPosts } from '../PostUpload';
+import { uploadPost, uploadPosts, uploadImage } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 import { downloadImageAndStore } from '../ImageDownloader';
@@ -198,7 +198,8 @@ export const AsyncActions = {
             try {
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds.toArray();
-                const swarmFeedApi = makeFeedApi(getState().author.identity!);
+                const author = getState().author;
+                const swarmFeedApi = makeFeedApi(author.identity!);
                 if (ownFeeds.length > 0) {
                     const feed = ownFeeds[0];
                     if (post.link === feed.url) {
@@ -227,12 +228,13 @@ export const AsyncActions = {
                         ;
 
                     const uploadedPosts = await uploadPosts(posts);
+                    const authorImage = await uploadImage(author.image);
                     const postFeed = {
                         ...feed,
                         posts: uploadedPosts,
                         authorImage: {
-                            ...feed.authorImage,
-                            localPath: '',
+                            ...authorImage,
+                            localPath: undefined,
                         },
                     };
                     Debug.log('sharePost: after uploadPosts');
@@ -248,7 +250,6 @@ export const AsyncActions = {
                 } else {
                     Debug.log('sharePost: create feed');
 
-                    const author = getState().author;
                     dispatch(Actions.updatePostIsUploading(post, true));
 
                     const uploadedPost = await uploadPost(post);
