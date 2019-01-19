@@ -6,10 +6,9 @@ import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const authorUri = ownProps.navigation.state.params.author.uri;
-    const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === authorUri).toArray();
+    const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === authorUri);
     const posts = state.rssPosts.concat(state.localPosts)
-        .filter(post => post != null && post.author != null && post.author.uri === authorUri)
-        .toArray();
+        .filter(post => post != null && post.author != null && post.author.uri === authorUri);
 
     return {
         navigation: ownProps.navigation,

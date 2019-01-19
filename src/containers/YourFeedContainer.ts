@@ -6,13 +6,13 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const posts = state.localPosts.toArray();
+    const posts = state.localPosts;
     const filteredPosts = posts;
 
     return {
         navigation: ownProps.navigation,
         posts: filteredPosts,
-        feeds: state.feeds.filter(feed => feed != null && feed.followed === true).toArray(),
+        feeds: state.feeds.filter(feed => feed != null && feed.followed === true),
         settings: state.settings,
     };
 };

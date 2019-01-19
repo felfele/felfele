@@ -128,7 +128,6 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             const feeds = getState()
                             .feeds
-                            .toArray()
                             .filter(feed => feed.followed === true);
 
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
@@ -136,7 +135,7 @@ export const AsyncActions = {
     },
     downloadPostsFromFeeds: (feeds: Feed[]) => {
         return async (dispatch, getState: () => AppState) => {
-            const previousPosts = getState().rssPosts.toArray();
+            const previousPosts = getState().rssPosts;
             const downloadedPosts = await loadPostsFromFeeds(feeds);
             const uniqueAuthors = new Map<string, Author>();
             downloadedPosts.map(post => {
@@ -172,7 +171,7 @@ export const AsyncActions = {
     },
     sharePost: (post: Post) => {
         return async (dispatch, getState: () => AppState) => {
-            const isQueueEmtpy = getState().postUploadQueue.size === 0;
+            const isQueueEmtpy = getState().postUploadQueue.length === 0;
             dispatch(InternalActions.queuePostForUpload(post));
             dispatch(Actions.updatePostIsUploading(post, true));
             if (isQueueEmtpy) {
@@ -182,8 +181,8 @@ export const AsyncActions = {
     },
     uploadPostsFromQueue: () => {
         return async (dispatch, getState: () => AppState) => {
-            while (getState().postUploadQueue.size > 0) {
-                const post = getState().postUploadQueue.first();
+            while (getState().postUploadQueue.length > 0) {
+                const post = getState().postUploadQueue[0];
                 await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
                 dispatch(InternalActions.removePostForUpload(post));
             }
@@ -193,7 +192,7 @@ export const AsyncActions = {
         return async (dispatch, getState: () => AppState) => {
             try {
                 Debug.log('sharePost: ', post);
-                const ownFeeds = getState().ownFeeds.toArray();
+                const ownFeeds = getState().ownFeeds;
                 const swarmFeedApi = makeFeedApi(getState().author.identity!);
                 if (ownFeeds.length > 0) {
                     const feed = ownFeeds[0];
@@ -206,7 +205,7 @@ export const AsyncActions = {
                     const uploadedPost = await uploadPost(post);
                     Debug.log('sharePost: after uploadedPost');
 
-                    const localFeedPosts = getState().localPosts.toArray().filter(localPost =>
+                    const localFeedPosts = getState().localPosts.filter(localPost =>
                         localPost.link === feed.url
                     );
                     const feedPosts = [...localFeedPosts, uploadedPost];
@@ -285,7 +284,7 @@ export const AsyncActions = {
     },
     fixFeedFavicons: () => {
         return async (dispatch, getState: () => AppState) => {
-            const feeds = getState().feeds.toArray().filter(feed => isPostFeedUrl(feed.url));
+            const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
             for (const feed of feeds) {
                 if (feed.favicon == null || feed.favicon === '') {
                     const downloadedFeed = await downloadPostFeed(feed.url);

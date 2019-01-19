@@ -10,7 +10,7 @@ const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 :
 const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const feeds = state.feeds.toArray()
+    const feeds = state.feeds
         .map(feed => ({
             ...feed,
             favicon: getSwarmGatewayUrl(feed.favicon || ''),

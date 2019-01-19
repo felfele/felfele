@@ -5,8 +5,8 @@ import { StateProps, DispatchProps, IdentitySettings } from '../components/Ident
 import { ImageData} from '../models/ImageData';
 
 export const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const ownFeed = state.ownFeeds.toArray().length > 0
-        ? state.ownFeeds.toArray()[0]
+    const ownFeed = state.ownFeeds.length > 0
+        ? state.ownFeeds[0]
         : undefined;
     return {
         author: state.author,
