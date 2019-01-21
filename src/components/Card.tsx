@@ -197,7 +197,7 @@ const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquare
     if (showSquareImages) {
         return [maxWidth, maxWidth];
     }
-    return calculateImageDimensions(image, maxWidth, showSquareImages);
+    return modelHelper.calculateImageDimensions(image, maxWidth);
 };
 
 const HeaderOffset = 20;
