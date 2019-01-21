@@ -176,7 +176,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind ===  -1) {
                 return feeds.push({
                     ...action.payload.feed,
-                    followed: false,
+                    followed: true,
                 });
             }
             return feeds;
