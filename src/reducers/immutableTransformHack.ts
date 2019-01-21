@@ -1,7 +1,5 @@
 // tslint:disable-next-line:no-var-requires
 const reduxPersist = require('redux-persist');
-// tslint:disable-next-line:no-var-requires
-const jsan = require('jsan');
 
 export const immutableTransformHack = (config) => {
     config = config || {};
