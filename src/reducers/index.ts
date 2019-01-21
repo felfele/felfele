@@ -113,7 +113,7 @@ const defaultFeeds: Feed[] = [
         name: 'Wired Photos',
         url: 'https://www.wired.com/',
         feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: '',
+        favicon: 'https://www.wired.com/favicon.ico',
         followed: true,
     },
     {
