@@ -29,6 +29,7 @@ import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
+import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -121,7 +122,7 @@ const settingsTabScenes: NavigationRouteConfigMap = {
         screen: FeedListEditorContainer,
     },
     Feed: {
-        screen: FeedContainer,
+        screen: SettingsFeedViewContainer,
     },
     FeedInfo: {
         screen: FeedInfoContainer,

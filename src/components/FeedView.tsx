@@ -19,6 +19,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     navigation: any;
+    onBack: () => void;
     feedUrl: string;
     feedName: string;
     posts: Post[];
@@ -35,7 +36,7 @@ export const FeedView = (props: Props) => {
         <RefreshableFeed {...props}>
             {{
                 navigationHeader: <NavigationHeader
-                                      onPressLeftButton={() => props.navigation.goBack(null)}
+                                      onPressLeftButton={ props.onBack }
                                       rightButtonText1={!props.isOwnFeed ? <Icon
                                           name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
                                           size={20}
