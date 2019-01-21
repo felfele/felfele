@@ -7,7 +7,6 @@ import com.RNFetchBlob.RNFetchBlobPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.horcrux.svg.SvgPackage;
 import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
-import com.rnfs.RNFSPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -36,7 +35,6 @@ public class MainApplication extends Application implements ReactApplication {
             new ImageResizerPackage(),
             new SvgPackage(),
             new RNSecureRandomPackage(),
-            new RNFSPackage(),
             new RNCameraPackage(),
             new ImagePickerPackage(),
             new VectorIconsPackage(),
