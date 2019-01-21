@@ -16,12 +16,12 @@ export const immutableTransformHack = (config) => {
 
     const serializer = {
         stringify: (data) => {
-            return jsan.stringify(
+            return JSON.stringify(
                 data,
             );
         },
         parse: data => {
-            return jsan.parse(
+            return JSON.parse(
                 data,
                 reviver,
             );

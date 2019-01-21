@@ -41,7 +41,6 @@
     "ecma-nacl": "=2.4.2",
     "elliptic": "=6.4.1",
     "js-sha3": "=0.8.0",
-    "jsan": "=3.1.13",
     "node-libs-browser": "=2.1.0",
     "node-libs-react-native": "=1.0.3",
     "react": "16.6.1",
