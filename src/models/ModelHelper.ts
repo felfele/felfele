@@ -1,7 +1,7 @@
-import * as RNFS from 'react-native-fs';
 import { getSwarmGatewayUrl } from '../Swarm';
 import { Author } from './Post';
 import { ImageData } from './ImageData';
+import { FileSystem } from '../FileSystem';
 
 export class ModelHelper {
     public getAuthorImageUri(author: Author): string {
@@ -11,7 +11,7 @@ export class ModelHelper {
             return author.faviconUri;
         }
         if (author.image.localPath != null) {
-            return this.getLocalPath(author.image.localPath);
+            return FileSystem.getLocalPath(author.image.localPath);
         }
         if (author.image.uri != null) {
             return author.image.uri;
@@ -19,17 +19,9 @@ export class ModelHelper {
         return author.faviconUri;
     }
 
-    public getLocalPath(localPath: string): string {
-        if (localPath.startsWith('file://')) {
-            return localPath;
-        }
-        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
-        return documentPath + localPath;
-    }
-
     public getImageUri(image: ImageData): string {
         if (image.localPath != null) {
-            return this.getLocalPath(image.localPath);
+            return FileSystem.getLocalPath(image.localPath);
         }
         if (image.uri != null) {
             return getSwarmGatewayUrl(image.uri);

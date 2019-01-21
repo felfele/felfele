@@ -30,7 +30,7 @@ export const downloadImageAndStore = async (url: string, relativePath: ImageStor
     const filename =  hash + '.' + extension;
     const path = FileSystem.getDocumentDir() + '/' + relativePath + '/' + filename;
 
-    console.log('downloadImageAndStore', 'path', path);
+    console.log('downloadImageAndStore', 'url', url, 'path', path);
     if (await FileSystem.exists(path)) {
         return FILE_PREFIX + path;
     }

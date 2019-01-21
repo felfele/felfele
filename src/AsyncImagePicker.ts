@@ -1,13 +1,10 @@
 import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
 import { Debug } from './Debug';
+import { FileSystem } from './FileSystem';
 
 // tslint:disable-next-line:no-var-requires
 const ImagePicker = require('react-native-image-picker'); // import is broken with this package
-// tslint:disable-next-line:no-var-requires
-const RNFS = require('react-native-fs');
-// tslint:disable-next-line:no-var-requires
-const RNGRP = require('react-native-get-real-path');
 
 interface Response {
     customButton: string;
@@ -70,20 +67,6 @@ const defaultImagePickerOtions: Options = {
     },
 };
 
-const removePathPrefix = async (response: Response): Promise<string> => {
-    if (Platform.OS === 'ios') {
-        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
-        const path = response.uri;
-        if (path.startsWith(documentPath)) {
-            return path.substring(documentPath.length);
-        }
-    } else if (Platform.OS === 'android') {
-        const filePath = await RNGRP.getRealPathFromURI(response.uri);
-        return 'file://' + filePath;
-    }
-    return response.uri;
-};
-
 export class AsyncImagePicker {
     public static async launchImageLibrary(): Promise<ImageData | null> {
         return this.launchPicker(this.launchImageLibraryWithPromise);
@@ -102,7 +85,7 @@ export class AsyncImagePicker {
         if (response.didCancel) {
             return null;
         }
-        const uri = await removePathPrefix(response);
+        const uri = await FileSystem.normalizeImagePathForPlatform(response.uri);
         Debug.log('launchPicker: ', uri, response.uri, response.fileName);
         const imageData: ImageData = {
             uri: undefined,

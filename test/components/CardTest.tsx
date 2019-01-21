@@ -4,7 +4,7 @@ import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 
-jest.mock('../../src/models/ModelHelper');
+jest.mock('../../src/FileSystem');
 
 describe('card test', () => {
     const testAuthor: Author = {

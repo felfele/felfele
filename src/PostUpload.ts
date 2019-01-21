@@ -5,6 +5,7 @@ import { ImageData } from './models/ImageData';
 import { uploadPhoto, isSwarmLink } from './Swarm';
 import { Debug } from './Debug';
 import { ModelHelper } from './models/ModelHelper';
+import { FileSystem } from './FileSystem';
 
 const modelHelper = new ModelHelper();
 
@@ -48,7 +49,7 @@ export const uploadImage = async (image: ImageData): Promise<ImageData> => {
         if (image.localPath == null || image.localPath === '') {
             return image;
         }
-        const path = modelHelper.getLocalPath(image.localPath);
+        const path = FileSystem.getLocalPath(image.localPath);
         const resizedImagePath = await resizeImageIfNeeded(image, path);
         const uri = await uploadPhoto(resizedImagePath);
         return {
