@@ -1,5 +1,4 @@
 import sha1 from 'js-sha1';
-import { getSwarmGatewayUrl } from './Swarm';
 import { FileSystem } from './FileSystem';
 
 const getExtensionFromPath = (path: string): string => {
@@ -15,12 +14,19 @@ export enum ImageStorePath {
 }
 
 const FILE_PREFIX = 'file://';
+
+const calculateStoredImageHash = (url: string): string =>
+    sha1.create().update(url).hex();
+
 export const downloadImageAndStore = async (url: string, relativePath: ImageStorePath): Promise<string> => {
+    if (url.startsWith(FILE_PREFIX)) {
+        return url;
+    }
     const extension = getExtensionFromPath(url);
     if (extension === '') {
         return url;
     }
-    const hash = sha1.create().update(url).hex();
+    const hash = calculateStoredImageHash(url);
     const filename =  hash + '.' + extension;
     const path = FileSystem.getDocumentDir() + '/' + relativePath + '/' + filename;
 
@@ -28,8 +34,10 @@ export const downloadImageAndStore = async (url: string, relativePath: ImageStor
     if (await FileSystem.exists(path)) {
         return FILE_PREFIX + path;
     }
-    const downloadUrl = getSwarmGatewayUrl(url);
-    const resourcePath = FILE_PREFIX + await FileSystem.downloadFile(downloadUrl, path);
+    const resourcePath = FILE_PREFIX + await FileSystem.downloadFile(url, path);
     console.log('downloadImageAndStore', 'resourcePath', resourcePath);
     return resourcePath;
 };
+
+export const downloadAvatarAndStore = async (url: string): Promise<string> =>
+    await downloadImageAndStore(url, ImageStorePath.AVATARS);

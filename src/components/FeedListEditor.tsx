@@ -6,6 +6,7 @@ import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
+import { Favicon } from './Favicon';
 
 export interface DispatchProps {
 }
@@ -20,7 +21,7 @@ const FAVICON_PADDING_VERTICAL = 16;
 const FAVICON_WIDTH = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_LEFT;
 const FAVICON_HEIGHT = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_VERTICAL;
 
-const Favicon = (props) => (
+const FaviconView = (props) => (
     <View style={{
         paddingVertical: FAVICON_PADDING_VERTICAL,
         paddingLeft: FAVICON_PADDING_LEFT,
@@ -29,14 +30,7 @@ const Favicon = (props) => (
         margin: 0,
     }}>
         { props.uri != null && props.uri !== '' &&
-            <Image
-                source={{
-                    uri: props.uri,
-                    width: IconSize.LARGE_LIST_ICON,
-                    height: IconSize.LARGE_LIST_ICON,
-                }}
-                style={DefaultStyle.favicon}
-            />
+            <Favicon url={props.uri} />
         }
     </View>
 );
@@ -51,7 +45,7 @@ const FeedListItem = (props) => (
         onPress={props.onPress}
     >
         <View>
-            <Favicon uri={props.feed.favicon} />
+            <FaviconView uri={props.feed.favicon} />
         </View>
         {props.feed.favorite === true &&
             <View style={{

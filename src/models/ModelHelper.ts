@@ -27,7 +27,7 @@ export class ModelHelper {
         return documentPath + localPath;
     }
 
-    public getImageUri(image: ImageData): string | any {
+    public getImageUri(image: ImageData): string {
         if (image.localPath != null) {
             return this.getLocalPath(image.localPath);
         }

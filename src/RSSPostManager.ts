@@ -7,7 +7,7 @@ import { Utils } from './Utils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 import { Debug } from './Debug';
-import { downloadImageAndStore, ImageStorePath } from './ImageDownloader';
+import { downloadImageAndStore, ImageStorePath, downloadAvatarAndStore } from './ImageDownloader';
 
 interface RSSEnclosure {
     url: string;
@@ -316,7 +316,7 @@ class _RSSPostManager {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
                 const favicon = rssFeed.icon ? rssFeed.icon : await CachingFaviconParser.getFavicon(rssFeed.url);
-                const storedFavicon = await downloadImageAndStore(favicon, ImageStorePath.AVATARS);
+                const storedFavicon = await downloadAvatarAndStore(favicon);
                 Debug.log('RSSPostManager: ', rssFeed, favicon, storedFavicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, storedFavicon, feedWithMetrics.url);

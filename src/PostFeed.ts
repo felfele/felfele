@@ -4,7 +4,7 @@ import { ImageData } from './models/ImageData';
 import * as Swarm from './Swarm';
 import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
-import { downloadImageAndStore, ImageStorePath } from './ImageDownloader';
+import { downloadImageAndStore, ImageStorePath, downloadAvatarAndStore } from './ImageDownloader';
 
 export interface PostFeed extends Feed {
     posts: PublicPost[];
@@ -63,7 +63,7 @@ export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
         const authorImage = {
             uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
             localPath: postFeed.authorImage.uri
-                ? await downloadImageAndStore(postFeed.authorImage.uri, ImageStorePath.AVATARS)
+                ? await downloadAvatarAndStore(postFeed.authorImage.uri)
                 : undefined,
         };
         const faviconUri = authorImage.localPath != null

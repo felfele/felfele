@@ -13,6 +13,7 @@ import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { ModelHelper } from '../models/ModelHelper';
+import { Favicon } from './Favicon';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ModelHelper();
@@ -122,12 +123,10 @@ const ButtonList = (props: CardProps) => {
 const CardTopIcon = (props: { post: Post }) => {
     if (props.post.author) {
         const imageUri = modelHelper.getAuthorImageUri(props.post.author);
-        const imageSource = imageUri === ''
-            ? require('../../images/user_circle.png')
-            : { uri: imageUri };
-        return (
-            <Image source={imageSource} style={DefaultStyle.favicon} />
-        );
+        return imageUri === ''
+            ? <Image source={require('../../images/user_circle.png')} style={DefaultStyle.favicon} />
+            : <Favicon url={imageUri} />
+            ;
     } else {
         return <View/>;
     }
