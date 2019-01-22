@@ -41,7 +41,6 @@ export enum ActionTypes {
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
     APP_STATE_SET = 'APP-STATE-SET',
-    APP_STATE_UPDATE = 'APP-STATE-UPDATE',
     APP_STATE_UPDATE_FUNCTION = 'APP-STATE-UPDATE-FUNCTION',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
@@ -317,9 +316,9 @@ export const AsyncActions = {
             currentTimestamp: Date.now(),
         }))
     ,
-    updateAvatarPath: (url: string, path: string) =>
+    updateFeedAvatarPath: (feed: Feed, path: string) =>
         InternalActions.appStateUpdateWithFunction(appState => ({
-            avatarStore: appState.avatarStore.set(url, path),
+            avatarStore: appState.avatarStore.set(feed.feedUrl, path),
         }))
     ,
 };
