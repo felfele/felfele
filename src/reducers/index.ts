@@ -1,4 +1,4 @@
-import { List, Iterable } from 'immutable';
+import { List, Map } from 'immutable';
 import {
     createStore,
     combineReducers,
@@ -19,6 +19,7 @@ import { Debug } from '../Debug';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { ModelHelper } from '../models/ModelHelper';
+import { string } from 'prop-types';
 
 const modelHelper = new ModelHelper();
 
@@ -34,6 +35,7 @@ export interface AppState extends PersistedState {
     draft: Post | null;
     metadata: Metadata;
     postUploadQueue: List<Post>;
+    avatarStore: Map<string, string>;
 }
 
 interface Metadata {
@@ -144,6 +146,7 @@ export const defaultState: AppState = {
     draft: null,
     metadata: defaultMetadata,
     postUploadQueue: List<Post>(),
+    avatarStore: Map<string, string>(),
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -335,15 +338,6 @@ const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> =
     return rssPosts;
 };
 
-const removeItem = <T>(list: List<T>, predicate: (value?: T, index?: number, iter?: Iterable.Indexed<T>) => boolean): List<T> => {
-    const ind = list.findIndex(predicate);
-    if (ind >= 0) {
-        return list.remove(ind);
-    } else {
-        return list;
-    }
-};
-
 const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
     switch (action.type) {
         case 'ADD-POST': {
@@ -426,6 +420,10 @@ const postUploadQueueReducer = (postUploadQueue = List<Post>(), action: Actions)
     return postUploadQueue;
 };
 
+const avatarStoreReducer = (avatarStore = Map<string, string>(), action: Actions): Map<string, string> => {
+    return avatarStore;
+};
+
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
@@ -436,6 +434,19 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         case 'APP-STATE-SET': {
             Debug.log('App state set');
             return action.payload.appState;
+        }
+        case 'APP-STATE-UPDATE': {
+            const stateCopy = {...state};
+            Object.assign(stateCopy, action.payload.partialAppState);
+            Debug.log('APP-STATE-UPDATE', stateCopy);
+            return stateCopy;
+        }
+        case 'APP-STATE-UPDATE-FUNCTION': {
+            const stateCopy = {...state};
+            const partialAppState = action.payload.appStateUpdater(stateCopy);
+            Object.assign(stateCopy, partialAppState);
+            Debug.log('APP-STATE-UPDATE-FUNCTION', stateCopy, partialAppState);
+            return stateCopy;
         }
         default: {
             try {
@@ -471,6 +482,7 @@ export const combinedReducers = combineReducers<AppState>({
     draft: draftReducer,
     metadata: metadataReducer,
     postUploadQueue: postUploadQueueReducer,
+    avatarStore: avatarStoreReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);

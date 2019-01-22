@@ -22,6 +22,7 @@ export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
     onUpdateLocalFavicon: (feed: Feed, localFavicon: string) => void;
+    onTestTimeTickWithoutReducer: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -88,6 +89,14 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Fix feed favicons'
                     onPress={async () => await onFixFeedFavicons(props)}
+                    hasNavArrow={false}
+                />
+                <SettingsList.Item
+                    icon={
+                        <MaterialCommunityIcon name='backup-restore' />
+                    }
+                    title='Test timeTickWithoutReducer'
+                    onPress={props.onTestTimeTickWithoutReducer}
                     hasNavArrow={false}
                 />
                 <SettingsList.Item

@@ -12,7 +12,7 @@ import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts, uploadImage } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
-import { downloadImageAndStore } from '../ImageDownloader';
+import { downloadAvatarAndStore } from '../ImageDownloader';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -42,6 +42,8 @@ export enum ActionTypes {
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
     APP_STATE_SET = 'APP-STATE-SET',
+    APP_STATE_UPDATE = 'APP-STATE-UPDATE',
+    APP_STATE_UPDATE_FUNCTION = 'APP-STATE-UPDATE-FUNCTION',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
@@ -66,6 +68,10 @@ const InternalActions = {
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
+    appStateUpdate: (partialAppState: Partial<AppState>) =>
+        createAction(ActionTypes.APP_STATE_UPDATE, { partialAppState }),
+    appStateUpdateWithFunction: (appStateUpdater: (appState: AppState) => Partial<AppState>) =>
+        createAction(ActionTypes.APP_STATE_UPDATE_FUNCTION, { appStateUpdater }),
 };
 
 export const Actions = {
@@ -309,6 +315,30 @@ export const AsyncActions = {
             dispatch(InternalActions.appStateSet(currentVersionAppState));
         };
     },
+    updateAppState: (appStateUpdater: (appState: AppState) => Partial<AppState>) => {
+        return async (dispatch, getState: () => AppState) => {
+            const appState = getState();
+            const updatedAppState = appStateUpdater(appState);
+            dispatch(InternalActions.appStateUpdate(updatedAppState));
+        };
+    },
+    timeTickWithoutReducer: () => {
+        return async (dispatch, getState: () => AppState) => {
+            dispatch(AsyncActions.updateAppState((appState => ({
+                currentTimestamp: Date.now(),
+            }))));
+        };
+    },
+    timeTickWithoutReducer2: () =>
+        InternalActions.appStateUpdateWithFunction(appState => ({
+            currentTimestamp: Date.now(),
+        }))
+    ,
+    updateAvatarPath: (url: string, path: string) =>
+        InternalActions.appStateUpdateWithFunction(appState => ({
+            avatarStore: appState.avatarStore.set(url, path),
+        }))
+    ,
 };
 
 type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
