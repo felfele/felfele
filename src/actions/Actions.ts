@@ -12,7 +12,6 @@ import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts, uploadImage } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
-import { downloadAvatarAndStore } from '../ImageDownloader';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -68,8 +67,6 @@ const InternalActions = {
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
-    appStateUpdate: (partialAppState: Partial<AppState>) =>
-        createAction(ActionTypes.APP_STATE_UPDATE, { partialAppState }),
     appStateUpdateWithFunction: (appStateUpdater: (appState: AppState) => Partial<AppState>) =>
         createAction(ActionTypes.APP_STATE_UPDATE_FUNCTION, { appStateUpdater }),
 };
@@ -315,21 +312,7 @@ export const AsyncActions = {
             dispatch(InternalActions.appStateSet(currentVersionAppState));
         };
     },
-    updateAppState: (appStateUpdater: (appState: AppState) => Partial<AppState>) => {
-        return async (dispatch, getState: () => AppState) => {
-            const appState = getState();
-            const updatedAppState = appStateUpdater(appState);
-            dispatch(InternalActions.appStateUpdate(updatedAppState));
-        };
-    },
-    timeTickWithoutReducer: () => {
-        return async (dispatch, getState: () => AppState) => {
-            dispatch(AsyncActions.updateAppState((appState => ({
-                currentTimestamp: Date.now(),
-            }))));
-        };
-    },
-    timeTickWithoutReducer2: () =>
+    timeTickWithoutReducer: () =>
         InternalActions.appStateUpdateWithFunction(appState => ({
             currentTimestamp: Date.now(),
         }))

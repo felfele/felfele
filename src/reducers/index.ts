@@ -435,12 +435,6 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             Debug.log('App state set');
             return action.payload.appState;
         }
-        case 'APP-STATE-UPDATE': {
-            const stateCopy = {...state};
-            Object.assign(stateCopy, action.payload.partialAppState);
-            Debug.log('APP-STATE-UPDATE', stateCopy);
-            return stateCopy;
-        }
         case 'APP-STATE-UPDATE-FUNCTION': {
             const stateCopy = {...state};
             const partialAppState = action.payload.appStateUpdater(stateCopy);

@@ -23,7 +23,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(Actions.updateFeedLocalFavicon(feed, localFavicon));
         },
         onTestTimeTickWithoutReducer: () => {
-            dispatch(AsyncActions.timeTickWithoutReducer2());
+            dispatch(AsyncActions.timeTickWithoutReducer());
         },
    };
 };
