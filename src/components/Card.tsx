@@ -21,6 +21,7 @@ export interface StateProps {
     showSquareImages: boolean;
     isSelected: boolean;
     post: Post;
+    currentTimestamp: number;
     togglePostSelection: (post: Post) => void;
     navigate: (view: string, {}) => void;
 }
@@ -45,7 +46,10 @@ export const Card = (props: CardProps) => {
             testID={'YourFeed/Post' + props.post._id}
         >
 
-            <CardTop post={props.post} navigate={props.navigate}/>
+            <CardTop
+                post={props.post}
+                currentTimestamp={props.currentTimestamp}
+                navigate={props.navigate}/>
             <TouchableOpacity
                 activeOpacity={1}
                 onLongPress={() => props.togglePostSelection(props.post)}
@@ -133,8 +137,8 @@ const CardTopIcon = (props: { post: Post }) => {
     }
 };
 
-const CardTop = (props: { post: Post, navigate: (view: string, {}) => void }) => {
-    const printableTime = DateUtils.printableElapsedTime(props.post.createdAt) + ' ago';
+const CardTop = (props: { post: Post, currentTimestamp: number, navigate: (view: string, {}) => void }) => {
+    const printableTime = DateUtils.printableElapsedTime(props.post.createdAt, props.currentTimestamp) + ' ago';
     const username = props.post.author ? props.post.author.name : 'Space Cowboy';
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
