@@ -1,23 +1,14 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { AsyncActions, Actions } from '../actions/Actions';
-import { Post } from '../models/Post';
+import { AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, NewsFeedView } from '../components/NewsFeedView';
-
-const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
-    return followedFeeds.find(feed => {
-        return feed != null && post.author != null &&
-            feed.feedUrl === post.author.uri;
-    }) != null;
-};
+import { getFollowedNewsPosts, getFollowedFeeds } from '../selectors/selectors';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const followedFeeds = state.feeds.filter(feed => feed != null && feed.followed === true);
-    const posts = state.rssPosts
-        .filter(post => post != null && isPostFromFollowedFeed(post, followedFeeds));
-    const filteredPosts = posts;
+    const followedFeeds = getFollowedFeeds(state);
+    const filteredPosts = getFollowedNewsPosts(state);
 
     RSSPostManager.setContentFilters(state.contentFilters);
 
