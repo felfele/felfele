@@ -1,4 +1,4 @@
-import { Post, PublicPost } from './models/Post';
+import { Post, PublicPost, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
