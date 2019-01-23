@@ -21,7 +21,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         onRefreshPosts: (feeds: Feed[]) => {
             // workaround to finish refresh
-            dispatch(AsyncActions.downloadPostsFromFeeds([]));
+            dispatch(Actions.timeTick());
         },
         onSavePost: (post: Post) => {
             dispatch(AsyncActions.createPost(post));
