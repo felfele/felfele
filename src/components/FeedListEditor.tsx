@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Button, Image, FlatList } from 'react-native';
+import { View, Text, Image, FlatList } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
@@ -136,10 +136,10 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
             name: '',
             url: '',
         };
-        this.props.navigation.navigate('EditFeed', { feed: feed });
+        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 
     private editFeed = (feed) => {
-        this.props.navigation.navigate('EditFeed', { feed: feed });
+        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 }

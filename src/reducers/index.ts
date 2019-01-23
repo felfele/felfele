@@ -193,14 +193,8 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                     ...action.payload.feed,
                     followed: true,
                 }];
-            } else {
-                return updateArrayItem(feeds, ind, feed => {
-                    return {
-                        ...feed,
-                        followed: true,
-                    };
-                });
             }
+            return feeds;
         }
         case 'REMOVE-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
