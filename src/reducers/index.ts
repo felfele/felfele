@@ -1,4 +1,3 @@
-import { List, Iterable } from 'immutable';
 import {
     createStore,
     combineReducers,
@@ -9,7 +8,6 @@ import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
 
-import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
@@ -18,24 +16,11 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
+import { immutableTransformHack } from './immutableTransformHack';
 import { ModelHelper } from '../models/ModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 
 const modelHelper = new ModelHelper();
-
-export interface AppStateV0 extends PersistedState {
-    contentFilters: List<ContentFilter>;
-    feeds: List<Feed>;
-    ownFeeds: List<PostFeed>;
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: List<Post>;
-    localPosts: List<Post>;
-    draft: Post | null;
-    metadata: Metadata;
-    postUploadQueue: List<Post>;
-}
 
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
@@ -439,7 +424,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 };
 
 export const persistConfig = {
-    transforms: [immutableTransform({
+    transforms: [immutableTransformHack({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })],
     blacklist: ['currentTimestamp'],
