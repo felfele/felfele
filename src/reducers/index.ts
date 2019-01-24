@@ -464,6 +464,8 @@ const initStore = () => {
     store.dispatch(AsyncActions.cleanupContentFilters());
     // @ts-ignore
     store.dispatch(AsyncActions.uploadPostsFromQueue());
+    store.dispatch(Actions.timeTick());
+    setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
 
 export const persistor = persistStore(store, {}, initStore);
