@@ -44,6 +44,7 @@ describe('card test', () => {
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
+                currentTimestamp={0}
             />
         ).root;
         console.log(result.props);
@@ -62,6 +63,7 @@ describe('card test', () => {
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
+                currentTimestamp={0}
             />
         ).root;
         console.log(result.props);
@@ -80,6 +82,7 @@ describe('card test', () => {
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
+                currentTimestamp={0}
             />
         ).root;
         console.log(result.props);
@@ -99,6 +102,7 @@ describe('card test', () => {
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
+                currentTimestamp={0}
             />
         ).root;
         console.log(result.props);
