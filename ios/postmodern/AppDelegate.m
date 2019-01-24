@@ -12,6 +12,53 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import <Geth/Geth.h>
+
+BOOL InitSwarm()
+{
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *dataDir = [paths objectAtIndex:0];
+  NSString *keystoreDir = [NSString stringWithFormat:@"%@/keystore", dataDir];
+  
+  GethKeyStore *keyStore = GethNewKeyStore(keystoreDir, GethStandardScryptN, GethStandardScryptP);
+  NSString *password = @"password";
+  
+  NSError *error;
+  GethAccount *account = [keyStore newAccount:password error:&error];
+  if (error != nil) {
+    NSString *message = [NSString stringWithFormat:@"newAccount %@", [error localizedDescription]];
+    NSLog(@"%@", message);
+    return FALSE;
+  }
+  
+  GethNodeConfig *config = GethNewNodeConfig();
+  [config setEthereumEnabled:false];
+  [config setWhisperEnabled:false];
+  
+  [config setSwarmEnabled:true];
+  NSString *hex = [[account getAddress] getHex];
+  [config setSwarmAccount:hex];
+  [config setSwarmAccountPassword:password];
+  
+  NSError* newNodeError = nil;
+  GethNode *node = GethNewNode(dataDir, config, &newNodeError);
+  if (newNodeError != nil) {
+    NSString *message = [NSString stringWithFormat:@"GethNewNode %@", [newNodeError localizedDescription]];
+    NSLog(@"%@", message);
+    return FALSE;
+  }
+  
+  NSError *nodeStartError = nil;
+  [node start:&nodeStartError];
+  if (nodeStartError != nil) {
+    NSString *message = [NSString stringWithFormat:@"node start %@", [nodeStartError localizedDescription]];
+    NSLog(@"%@", message);
+    return FALSE;
+  }
+  
+  return TRUE;
+}
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -35,6 +82,9 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  InitSwarm();
+  
   return YES;
 }
 
