@@ -14,6 +14,7 @@ interface OwnProps {
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return {
         post: ownProps.post,
+        currentTimestamp: state.currentTimestamp,
         isSelected: ownProps.isSelected,
         showSquareImages: state.settings.showSquareImages,
         togglePostSelection: ownProps.togglePostSelection,

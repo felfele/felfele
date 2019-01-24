@@ -4,7 +4,7 @@ import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const feedUrl = ownProps.navigation.state.params.feedUrl;
     const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl);
     const posts = state.rssPosts.concat(state.localPosts)
