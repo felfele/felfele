@@ -4,6 +4,7 @@ import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 
 jest.mock('../../src/FileSystem');
+jest.mock('../../src/reducers/stateSerializer');
 
 describe('card test', () => {
     const testAuthor: Author = {

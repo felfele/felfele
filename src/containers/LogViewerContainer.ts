@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../models/AppState';
 import * as Actions from '../actions/Actions';
 import { StateProps, DispatchProps, LogViewer } from '../components/LogViewer';
 

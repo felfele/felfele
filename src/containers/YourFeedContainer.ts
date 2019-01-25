@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../models/AppState';
 import { StateProps, DispatchProps, YourFeedView } from '../components/YourFeedView';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';

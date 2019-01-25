@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { StateProps, DispatchProps, Welcome } from '../components/Welcome';
-import { AppState } from '../reducers';
+import { AppState } from '../models/AppState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { ImageData } from '../models/ImageData';
 

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../models/AppState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter';
 import { Feed } from '../models/Feed';

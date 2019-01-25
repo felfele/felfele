@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../models/AppState';
 import { StateProps, DispatchProps, MemoizedCard } from '../components/Card';
 import { Post } from '../models/Post';
 import { AsyncActions } from '../actions/Actions';

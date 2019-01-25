@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { StateProps, DispatchProps, LoadingScreen } from '../components/LoadingScreen';
-import { AppState } from '../reducers';
+import { AppState } from '../models/AppState';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {

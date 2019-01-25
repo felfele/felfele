@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../models/AppState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
 import { Post } from '../models/Post';

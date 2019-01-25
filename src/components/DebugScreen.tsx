@@ -4,7 +4,9 @@ import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';
+import { getSerializedAppState } from '../reducers';
+import { getAppStateFromSerialized } from '../reducers/stateSerializer';
+import { AppState } from '../models/AppState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';

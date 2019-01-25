@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../models/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';

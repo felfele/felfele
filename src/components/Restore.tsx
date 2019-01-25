@@ -7,7 +7,7 @@ import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import { isValidBackup, restoreBackupToString } from '../BackupRestore';
 import { stringToHex } from '../Swarm';
-import { getAppStateFromSerialized } from '../reducers';
+import { getAppStateFromSerialized } from '../reducers/stateSerializer';
 
 export interface StateProps {
     navigation: any;

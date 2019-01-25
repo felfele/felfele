@@ -1,8 +1,9 @@
 import { connect } from 'react-redux';
 
-import { AppState, Dict } from '../reducers/index';
-import * as Actions from '../actions/Actions';
+import { AppState } from '../models/AppState';
 import { StateProps, DispatchProps, MemoizedFavicon } from '../components/Favicon';
+import { Dict } from '../helpers/types';
+import { AsyncActions } from '../actions/Actions';
 
 interface OwnProps {
     url: string;
@@ -24,7 +25,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
     return {
         tryDownloadAndStoreAvatar: (url: string) => {
-            dispatch(Actions.AsyncActions.downloadAndStoreFavicon(url));
+            dispatch(AsyncActions.downloadAndStoreFavicon(url));
         },
     };
 };

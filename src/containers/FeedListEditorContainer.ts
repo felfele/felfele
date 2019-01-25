@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 
-import { AppState, Dict } from '../reducers';
+import { AppState } from '../models/AppState';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { isPostFeedUrl, PostFeed } from '../PostFeed';
 import { ModelHelper } from '../models/ModelHelper';
+import { Dict } from '../helpers/types';
 
 const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 : 0) - (a.favorite === true ? 1 : 0);
 

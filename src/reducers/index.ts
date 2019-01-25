@@ -6,7 +6,7 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX, createTransform } from 'redux-persist';
+import { persistStore, persistReducer, createMigrate, KEY_PREFIX } from 'redux-persist';
 import { diff } from 'deep-object-diff';
 
 import { Actions, AsyncActions } from '../actions/Actions';
@@ -20,30 +20,10 @@ import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ModelHelper } from '../models/ModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
+import { AppState, Metadata } from '../models/AppState';
+import { Dict } from '../helpers/types';
 
 const modelHelper = new ModelHelper();
-
-export interface Dict<T> extends Object {
-}
-
-export interface AppState extends PersistedState {
-    contentFilters: ContentFilter[];
-    feeds: Feed[];
-    ownFeeds: PostFeed[];
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: Post[];
-    localPosts: Post[];
-    draft: Post | null;
-    metadata: Metadata;
-    avatarStore: Dict<string>;
-    postUploadQueue: Post[];
-}
-
-interface Metadata {
-    highestSeenPostId: number;
-}
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
@@ -527,22 +507,4 @@ export const getSerializedAppState = async (): Promise<string> => {
         return serializedAppState;
     }
     throw new Error('serialized app state is null');
-};
-
-export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
-    const storagePersistConfig = {
-        ...persistConfig,
-        storage: {
-            getItem: (key) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
-            setItem: (key, value) => { /* do nothing */ },
-            removeItem: (key) => { /* do nothing */ },
-        },
-    };
-    const appState = await getStoredState(storagePersistConfig) as AppState;
-    return appState;
-};
-
-export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
-    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
-    return currentVersionAppState;
 };

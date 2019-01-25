@@ -1,6 +1,6 @@
 import { MigrationManifest, PersistedState } from 'redux-persist';
 import { Debug } from '../Debug';
-import { AppState } from '.';
+import { AppState } from '../models/AppState';
 
 export const currentAppStateVersion = 1;
 
