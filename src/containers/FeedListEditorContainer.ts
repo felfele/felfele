@@ -22,7 +22,7 @@ const getFeedFavicon = (feed: Feed): string => {
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const feeds = state.feeds.toArray()
+    const feeds = state.feeds
         .map(feed => ({
             ...feed,
             favicon: getFeedFavicon(feed),

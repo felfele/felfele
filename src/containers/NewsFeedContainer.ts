@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, NewsFeedView } from '../components/NewsFeedView';
@@ -14,13 +14,12 @@ const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const followedFeeds = state.feeds.toArray().filter(feed => feed != null && feed.followed === true);
+    const followedFeeds = state.feeds.filter(feed => feed != null && feed.followed === true);
     const posts = state.rssPosts
-        .filter(post => post != null && isPostFromFollowedFeed(post, followedFeeds))
-        .toArray();
+        .filter(post => post != null && isPostFromFollowedFeed(post, followedFeeds));
     const filteredPosts = posts;
 
-    RSSPostManager.setContentFilters(state.contentFilters.toArray());
+    RSSPostManager.setContentFilters(state.contentFilters);
 
     return {
         navigation: ownProps.navigation,

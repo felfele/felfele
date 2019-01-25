@@ -22,7 +22,7 @@ const sortFilters = (a: ContentFilter, b: ContentFilter): number => {
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
    return {
        navigation: ownProps.navigation,
-       filters: state.contentFilters.toArray().sort(sortFilters),
+       filters: state.contentFilters.sort(sortFilters),
    };
 };
 
