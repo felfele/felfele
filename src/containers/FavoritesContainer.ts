@@ -14,10 +14,9 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const favoriteFeeds = state.feeds.toArray().filter(feed => feed != null && feed.favorite === true);
+    const favoriteFeeds = state.feeds.filter(feed => feed != null && feed.favorite === true);
     const posts = state.rssPosts
-        .filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds))
-        .toArray();
+        .filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds));
 
     return {
         navigation: ownProps.navigation,

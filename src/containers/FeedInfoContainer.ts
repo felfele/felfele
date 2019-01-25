@@ -3,7 +3,6 @@ import { AppState } from '../reducers';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
-import { List } from 'immutable';
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     // this fixes the case when navigating back from an opened Feed
@@ -15,8 +14,8 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     };
 };
 
-const updateNavParam = (feeds: List<Feed>, navigation: any) => {
-    const updatedFeed = feeds.find(feed => feed != null && feed.feedUrl === navigation.state.params.feed.feedUrl);
+const updateNavParam = (feeds: Feed[], navigation: any) => {
+    const updatedFeed = feeds.find(feed => feed.feedUrl === navigation.state.params.feed.feedUrl);
     if (updatedFeed != null && updatedFeed.followed !== navigation.state.params.feed.followed) {
         navigation.setParams({ feed: updatedFeed });
     }

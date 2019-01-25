@@ -28,7 +28,7 @@ const getStoredFavicon = (url: string, avatarStore: Dict<string>): string => {
 };
 
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
-    const feeds = state.feeds.toArray()
+    const feeds = state.feeds
         .map(feed => ({
             ...feed,
             favicon: getStoredFavicon(getFeedFavicon(feed), state.avatarStore),

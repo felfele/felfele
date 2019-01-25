@@ -1,4 +1,3 @@
-import { List } from 'immutable';
 import {
     createStore,
     combineReducers,
@@ -10,7 +9,6 @@ import thunkMiddleware from 'redux-thunk';
 import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX, createTransform } from 'redux-persist';
 import { diff } from 'deep-object-diff';
 
-import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
@@ -19,7 +17,9 @@ import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
+import { immutableTransformHack } from './immutableTransformHack';
 import { ModelHelper } from '../models/ModelHelper';
+import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 
 const modelHelper = new ModelHelper();
 
@@ -27,18 +27,18 @@ export interface Dict<T> extends Object {
 }
 
 export interface AppState extends PersistedState {
-    contentFilters: List<ContentFilter>;
-    feeds: List<Feed>;
-    ownFeeds: List<PostFeed>;
+    contentFilters: ContentFilter[];
+    feeds: Feed[];
+    ownFeeds: PostFeed[];
     settings: Settings;
     author: Author;
     currentTimestamp: number;
-    rssPosts: List<Post>;
-    localPosts: List<Post>;
+    rssPosts: Post[];
+    localPosts: Post[];
     draft: Post | null;
     metadata: Metadata;
-    postUploadQueue: List<Post>;
     avatarStore: Dict<string>;
+    postUploadQueue: Post[];
 }
 
 interface Metadata {
@@ -98,12 +98,12 @@ const defaultPost3: Post = {
     author: onboardingAuthor,
 };
 
-const defaultLocalPosts = List.of(defaultPost1, defaultPost2, defaultPost3);
+const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
 
 const defaultCurrentTimestamp = 0;
 
 const defaultMetadata = {
-    highestSeenPostId: defaultLocalPosts.size - 1,
+    highestSeenPostId: defaultLocalPosts.length - 1,
 };
 
 const defaultFeeds: Feed[] = [
@@ -138,21 +138,21 @@ const defaultFeeds: Feed[] = [
 ];
 
 export const defaultState: AppState = {
-    contentFilters: List<ContentFilter>(),
-    feeds: List<Feed>(defaultFeeds),
-    ownFeeds: List<PostFeed>(),
+    contentFilters: [],
+    feeds: defaultFeeds,
+    ownFeeds: [],
     settings: defaultSettings,
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
-    rssPosts: List<Post>(),
+    rssPosts: [],
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
-    postUploadQueue: List<Post>(),
     avatarStore: {},
+    postUploadQueue: [],
 };
 
-const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
+const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
         case 'ADD-CONTENT-FILTER': {
             const filter: ContentFilter = {
@@ -160,14 +160,14 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
                 createdAt: action.payload.createdAt,
                 validUntil: action.payload.validUntil,
             };
-            return contentFilters.push(filter);
+            return [...contentFilters, filter];
         }
         case 'REMOVE-CONTENT-FILTER': {
             const ind = contentFilters.findIndex(filter => filter != null && action.payload.filter.text === filter.text);
             if (ind === -1) {
                 return contentFilters;
             }
-            return contentFilters.remove(ind);
+            return removeFromArray(contentFilters, ind);
         }
         default: {
             return contentFilters;
@@ -175,15 +175,15 @@ const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: A
     }
 };
 
-const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<Feed> => {
+const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => {
     switch (action.type) {
         case 'ADD-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
             if (ind ===  -1) {
-                return feeds.push({
+                return [...feeds, {
                     ...action.payload.feed,
                     followed: true,
-                });
+                }];
             }
             return feeds;
         }
@@ -192,14 +192,14 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.remove(ind);
+            return removeFromArray(feeds, ind);
         }
         case 'FOLLOW-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, feed => {
+            return updateArrayItem(feeds, ind, feed => {
                 return {
                     ...feed,
                     followed: true,
@@ -211,7 +211,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, feed => {
+            return updateArrayItem(feeds, ind, feed => {
                 return {
                     ...feed,
                     favorite: false,
@@ -224,7 +224,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, (feed) => ({
+            return updateArrayItem(feeds, ind, (feed) => ({
                 ...feed,
                 favicon: action.payload.favicon,
             }));
@@ -234,7 +234,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, (feed) => ({
+            return updateArrayItem(feeds, ind, (feed) => ({
                 ...feed,
                 _localFavicon: action.payload.localFavicon,
             }));
@@ -244,7 +244,7 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, (feed) => ({
+            return updateArrayItem(feeds, ind, (feed) => ({
                 ...feed,
                 favorite: !feed.favorite,
             }));
@@ -255,10 +255,10 @@ const feedsReducer = (feeds = List<Feed>(defaultFeeds), action: Actions): List<F
     }
 };
 
-const ownFeedsReducer = (ownFeeds = List<PostFeed>(), action: Actions): List<PostFeed> => {
+const ownFeedsReducer = (ownFeeds: PostFeed[] = [], action: Actions): PostFeed[] => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
-            return ownFeeds.push(action.payload.feed);
+            return [...ownFeeds, action.payload.feed];
         }
         default: {
             return ownFeeds;
@@ -326,50 +326,50 @@ const currentTimestampReducer = (currentTimestamp = defaultCurrentTimestamp, act
     return currentTimestamp;
 };
 
-const rssPostsReducer = (rssPosts = List<Post>(), action: Actions): List<Post> => {
+const rssPostsReducer = (rssPosts: Post[] = [], action: Actions): Post[] => {
     switch (action.type) {
         case 'UPDATE-RSS-POSTS': {
-            return List<Post>(action.payload.posts);
+            return action.payload.posts;
         }
     }
     return rssPosts;
 };
 
-const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): List<Post> => {
+const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Post[] => {
     switch (action.type) {
         case 'ADD-POST': {
-            if (action.payload.post._id === defaultLocalPosts.size) {
-                return List.of(action.payload.post);
+            if (action.payload.post._id === defaultLocalPosts.length) {
+                return [action.payload.post];
             }
-            return localPosts.insert(0, action.payload.post);
+            return insertInArray(localPosts, action.payload.post, 0);
         }
         case 'DELETE-POST': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
                 return localPosts;
             }
-            return localPosts.remove(ind);
+            return removeFromArray(localPosts, ind);
         }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
                 return localPosts;
             }
-            return localPosts.update(ind, (post => ({...post, link: action.payload.link})));
+            return updateArrayItem(localPosts, ind, (post => ({...post, link: action.payload.link})));
         }
         case 'UPDATE-POST-IS-UPLOADING': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
                 return localPosts;
             }
-            return localPosts.update(ind, (post => ({...post, isUploading: action.payload.isUploading})));
+            return updateArrayItem(localPosts, ind, (post => ({...post, isUploading: action.payload.isUploading})));
         }
         case 'UPDATE-POST-IMAGES': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
                 return localPosts;
             }
-            return localPosts.update(ind, (post => ({...post, images: action.payload.images})));
+            return updateArrayItem(localPosts, ind, (post => ({...post, images: action.payload.images})));
         }
     }
     return localPosts;
@@ -401,17 +401,17 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
-const postUploadQueueReducer = (postUploadQueue = List<Post>(), action: Actions): List<Post> => {
+const postUploadQueueReducer = (postUploadQueue: Post[] = [], action: Actions): Post[] => {
     switch (action.type) {
         case 'QUEUE-POST-FOR-UPLOAD': {
-            return postUploadQueue.push(action.payload.post);
+            return [...postUploadQueue, action.payload.post];
         }
         case 'REMOVE-POST-FOR-UPLOAD': {
             const ind = postUploadQueue.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
                 return postUploadQueue;
             }
-            return postUploadQueue.remove(ind);
+            return removeFromArray(postUploadQueue, ind);
         }
     }
     return postUploadQueue;
@@ -466,7 +466,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 };
 
 export const persistConfig = {
-    transforms: [immutableTransform({
+    transforms: [immutableTransformHack({
         whitelist: [
             'contentFilters',
             'feeds',
@@ -480,7 +480,7 @@ export const persistConfig = {
     blacklist: ['currentTimestamp'],
     key: 'root',
     storage: AsyncStorage,
-    version: 0,
+    version: currentAppStateVersion,
     migrate: createMigrate(migrateAppState, { debug: false}),
 };
 
