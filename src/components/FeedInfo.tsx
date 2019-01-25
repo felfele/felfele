@@ -1,9 +1,7 @@
 import * as React from 'react';
 import {
-    TextInput,
     Alert,
     StyleSheet,
-    Button,
     View,
     Text,
     ActivityIndicator,
@@ -22,6 +20,8 @@ import { Colors } from '../styles';
 import * as Swarm from '../Swarm';
 import { downloadPostFeed } from '../PostFeed';
 import { NavigationHeader } from './NavigationHeader';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { unfollowFeed } from './FeedView';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -37,6 +37,7 @@ interface EditFeedState {
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRemoveFeed: (feed: Feed) => void;
+    onUnfollowFeed: (feed: Feed) => void;
 }
 
 export interface StateProps {
@@ -44,7 +45,7 @@ export interface StateProps {
     navigation: any;
 }
 
-export class EditFeed extends React.Component<DispatchProps & StateProps, EditFeedState> {
+export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFeedState> {
     public state: EditFeedState = {
         url: '',
         checked: false,
@@ -58,7 +59,6 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
 
     public async onAdd(feed: Feed) {
         this.props.onAddFeed(feed);
-        this.props.navigation.navigate('NewsTab');
     }
 
     public goBack() {
@@ -76,26 +76,49 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                 checked: true,
                 loading: false,
             });
-            await this.onAdd(feed);
+            this.onAdd(feed);
+            this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
         } else {
             this.onFailedFeedLoad();
         }
     }
 
     public render() {
-        const isDelete = this.props.feed.feedUrl.length > 0;
-        const rightButtonText = this.state.loading
+        const isExistingFeed = this.props.feed.feedUrl.length > 0;
+        const isFollowed = this.props.feed.followed;
+        const rightButtonText1 = this.state.loading
             ? undefined
-            : isDelete
-                ? 'Delete'
-                : 'Fetch'
-            ;
-        const rightButtonAction = this.state.loading
+            : <Icon
+                  name={isExistingFeed
+                    ? isFollowed
+                        ? 'link-variant-off'
+                        : 'delete'
+                    : 'download'}
+                  size={20}
+                  color={Colors.DARK_GRAY}
+              />
+        ;
+        const rightButtonAction1 = this.state.loading
             ? undefined
-            : isDelete
-                ? async () => await this.onDelete()
+            : isExistingFeed
+                ? isFollowed
+                    ? this.onUnfollowFeed
+                    : async () => await this.onDelete()
                 : async () => await this.fetchFeed()
-            ;
+        ;
+
+        const rightButtonText2 = this.state.loading || !isExistingFeed
+            ? undefined
+            : <Icon
+                  name={'open-in-new'}
+                  size={20}
+                  color={Colors.DARK_GRAY}
+              />
+        ;
+        const rightButtonAction2 = this.state.loading || !isExistingFeed
+            ? undefined
+            : async () => await this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
+        ;
         return (
             <View style={styles.container}>
                 <NavigationHeader
@@ -103,9 +126,11 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
                         this.props.navigation.goBack(null);
                     }}
-                    title='Edit feed'
-                    rightButtonText1={rightButtonText}
-                    onPressRightButton1={rightButtonAction}
+                    title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
+                    rightButtonText1={rightButtonText1}
+                    onPressRightButton1={rightButtonAction1}
+                    rightButtonText2={rightButtonText2}
+                    onPressRightButton2={rightButtonAction2}
                 />
                 <SimpleTextInput
                     defaultValue={this.state.url}
@@ -115,6 +140,7 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
                     autoCapitalize='none'
                     autoFocus={true}
                     autoCorrect={false}
+                    editable={!isExistingFeed}
                 />
                 { this.state.checked
                   ?
@@ -188,6 +214,15 @@ export class EditFeed extends React.Component<DispatchProps & StateProps, EditFe
             Debug.log(e);
             return null;
         }
+    }
+
+    private onUnfollowFeed = () => {
+        unfollowFeed(this.props.feed, this.unfollowAndGoBack);
+    }
+
+    private unfollowAndGoBack = (feed: Feed) => {
+        this.props.onUnfollowFeed(feed);
+        this.goBack();
     }
 
     private onDelete = () => {

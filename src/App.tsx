@@ -11,7 +11,7 @@ import { Debug } from './Debug';
 import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
-import { EditFeedContainer } from './containers/EditFeedContainer';
+import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { NewsFeedContainer } from './containers/NewsFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
@@ -29,6 +29,7 @@ import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
+import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -116,6 +117,24 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     Backup: {
         screen: BackupContainer,
+    },
+    FeedListEditorContainer: {
+        screen: FeedListEditorContainer,
+    },
+    Feed: {
+        screen: SettingsFeedViewContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
+    },
+    IdentitySettingsContainer: {
+        screen: IdentitySettingsContainer,
+    },
+    EditFilter: {
+        screen: EditFilterContainer,
+    },
+    FilterListEditorContainer: {
+        screen: FilterListEditorContainer,
     },
 };
 
@@ -230,21 +249,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: EditPostContainer,
-    },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
-    },
-    EditFeed: {
-        screen: EditFeedContainer,
-    },
-    EditFilter: {
-        screen: EditFilterContainer,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
-    },
-    FilterListEditorContainer: {
-        screen: FilterListEditorContainer,
     },
 };
 
