@@ -1,8 +1,7 @@
 import { connect } from 'react-redux';
 
-import { AppState } from '../reducers';
+import { AppState, Dict } from '../reducers';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
-import { getSwarmGatewayUrl } from '../Swarm';
 import { Feed } from '../models/Feed';
 import { isPostFeedUrl, PostFeed } from '../PostFeed';
 import { ModelHelper } from '../models/ModelHelper';
@@ -21,11 +20,18 @@ const getFeedFavicon = (feed: Feed): string => {
     }
 };
 
+const getStoredFavicon = (url: string, avatarStore: Dict<string>): string => {
+    if (avatarStore.hasOwnProperty(url)) {
+        return avatarStore[url] || url;
+    }
+    return url;
+};
+
 const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const feeds = state.feeds.toArray()
         .map(feed => ({
             ...feed,
-            favicon: getFeedFavicon(feed),
+            favicon: getStoredFavicon(getFeedFavicon(feed), state.avatarStore),
         }))
         .sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
     console.log('FeedListEditorContainer.mapStateToProps', feeds);

@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
-import { Favicon } from './Favicon';
+import { FaviconContainer } from '../containers/FaviconContainer';
 
 export interface DispatchProps {
 }
@@ -30,7 +30,7 @@ const FaviconView = (props) => (
         margin: 0,
     }}>
         { props.uri != null && props.uri !== '' &&
-            <Favicon url={props.uri} />
+            <FaviconContainer url={props.uri} />
         }
     </View>
 );

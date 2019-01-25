@@ -1,4 +1,4 @@
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import {
     createStore,
     combineReducers,
@@ -7,7 +7,8 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
+import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX, createTransform } from 'redux-persist';
+import { diff } from 'deep-object-diff';
 
 import immutableTransform from 'redux-persist-transform-immutable';
 import { Actions, AsyncActions } from '../actions/Actions';
@@ -19,9 +20,11 @@ import { Debug } from '../Debug';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { ModelHelper } from '../models/ModelHelper';
-import { string } from 'prop-types';
 
 const modelHelper = new ModelHelper();
+
+export interface Dict<T> extends Object {
+}
 
 export interface AppState extends PersistedState {
     contentFilters: List<ContentFilter>;
@@ -35,7 +38,7 @@ export interface AppState extends PersistedState {
     draft: Post | null;
     metadata: Metadata;
     postUploadQueue: List<Post>;
-    avatarStore: Map<string, string>;
+    avatarStore: Dict<string>;
 }
 
 interface Metadata {
@@ -146,7 +149,7 @@ export const defaultState: AppState = {
     draft: null,
     metadata: defaultMetadata,
     postUploadQueue: List<Post>(),
-    avatarStore: Map<string, string>(),
+    avatarStore: {},
 };
 
 const contentFiltersReducer = (contentFilters = List<ContentFilter>(), action: Actions): List<ContentFilter> => {
@@ -420,12 +423,12 @@ const postUploadQueueReducer = (postUploadQueue = List<Post>(), action: Actions)
     return postUploadQueue;
 };
 
-const avatarStoreReducer = (avatarStore = Map<string, string>(), action: Actions): Map<string, string> => {
+const avatarStoreReducer = (avatarStore = {}, action: Actions): Dict<string> => {
     return avatarStore;
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
-    Debug.log('appStateReducer', 'action', action);
+    Debug.log('appStateReducer', 'action', action, 'state', state);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -435,11 +438,26 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             Debug.log('App state set');
             return action.payload.appState;
         }
-        case 'APP-STATE-UPDATE-FUNCTION': {
+        case 'APP-STATE-UPDATE': {
+            const partialAppState = action.payload.appStateUpdater(state);
+            if (__DEV__) {
+                const diffObject = diff(state, partialAppState);
+                Debug.log(`${action.type}/${action.payload.callerName}`, 'change:', diffObject);
+            }
+            return {
+                ...state,
+                ...partialAppState,
+            };
+        }
+        case 'APP-STATE-UPDATE-PART': {
+            const appStatePart = action.payload.appStateUpdater(state, action.payload.part);
             const stateCopy = {...state};
-            const partialAppState = action.payload.appStateUpdater(stateCopy);
-            Object.assign(stateCopy, partialAppState);
-            Debug.log('APP-STATE-UPDATE-FUNCTION', stateCopy, partialAppState);
+            stateCopy[action.payload.part] = appStatePart;
+            if (__DEV__) {
+                const diffObject = diff(stateCopy, state);
+                const name = `${action.payload.part}`;
+                Debug.log('appStateReducer', action.type, {name, current: appStatePart, previous: state[action.payload.part]});
+            }
             return stateCopy;
         }
         default: {
@@ -455,7 +473,15 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 export const persistConfig = {
     transforms: [immutableTransform({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
+        whitelist: [
+            'contentFilters',
+            'feeds',
+            'ownFeeds',
+            'rssPosts',
+            'localPosts',
+            'postUploadQueue',
+            'avatarStore',
+        ],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',

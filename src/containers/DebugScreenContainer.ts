@@ -20,10 +20,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.createUserIdentity());
         },
         onUpdateLocalFavicon: (feed: Feed, localFavicon: string) => {
-            dispatch(Actions.updateFeedLocalFavicon(feed, localFavicon));
+            dispatch(AsyncActions.updateFeedAvatarPath(feed, localFavicon));
         },
         onTestTimeTickWithoutReducer: () => {
-            dispatch(AsyncActions.timeTickWithoutReducer());
+            dispatch(AsyncActions.timeTickWithoutReducer2());
         },
    };
 };

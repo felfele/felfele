@@ -12,6 +12,7 @@ import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts, uploadImage } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
+import { downloadAvatarAndStore } from '../ImageDownloader';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -41,7 +42,8 @@ export enum ActionTypes {
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
     APP_STATE_SET = 'APP-STATE-SET',
-    APP_STATE_UPDATE_FUNCTION = 'APP-STATE-UPDATE-FUNCTION',
+    APP_STATE_UPDATE = 'APP-STATE-UPDATE',
+    APP_STATE_UPDATE_PART = 'APP-STATE-UPDATE-PART',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
@@ -66,8 +68,10 @@ const InternalActions = {
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
-    appStateUpdateWithFunction: (appStateUpdater: (appState: AppState) => Partial<AppState>) =>
-        createAction(ActionTypes.APP_STATE_UPDATE_FUNCTION, { appStateUpdater }),
+    appStateUpdate: (callerName: string, appStateUpdater: (appState: AppState) => Partial<AppState>) =>
+        createAction(ActionTypes.APP_STATE_UPDATE, { callerName, appStateUpdater }),
+    appStateUpdatePart: <K extends keyof AppState>(part: K, appStateUpdater: (appState: AppState, part: K) => AppState[K]) =>
+        createAction(ActionTypes.APP_STATE_UPDATE_PART, { part, appStateUpdater }),
 };
 
 export const Actions = {
@@ -303,6 +307,19 @@ export const AsyncActions = {
             }
         };
     },
+    downloadAndStoreFavicon: (url: string) => {
+        return async (dispatch, getState: () => AppState) => {
+            const localPath = await downloadAvatarAndStore(url);
+            const updateObject = {};
+            updateObject[url] = localPath;
+            dispatch(InternalActions.appStateUpdatePart('avatarStore', appState =>
+                ({
+                    ...appState.avatarStore,
+                    ...updateObject,
+                })
+            ));
+        };
+    },
     restoreFromBackup: (backupText: string, secretHex: string) => {
         return async (dispatch, getState: () => AppState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
@@ -312,15 +329,23 @@ export const AsyncActions = {
         };
     },
     timeTickWithoutReducer: () =>
-        InternalActions.appStateUpdateWithFunction(appState => ({
+        InternalActions.appStateUpdate('timeTickWithoutReducer', appState => ({
             currentTimestamp: Date.now(),
         }))
     ,
-    updateFeedAvatarPath: (feed: Feed, path: string) =>
-        InternalActions.appStateUpdateWithFunction(appState => ({
-            avatarStore: appState.avatarStore.set(feed.feedUrl, path),
-        }))
+    timeTickWithoutReducer2: () =>
+        InternalActions.appStateUpdatePart('currentTimestamp', appState =>
+            Date.now(),
+        )
     ,
+    updateFeedAvatarPath: (feed: Feed, path: string) => {
+        const updateObject = {};
+        updateObject[feed.feedUrl] = path;
+        return InternalActions.appStateUpdatePart('avatarStore', appState => ({
+            ...appState.avatarStore,
+            updateObject,
+        }));
+    },
 };
 
 type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
