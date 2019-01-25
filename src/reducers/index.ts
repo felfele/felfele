@@ -228,7 +228,7 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
             if (ind === -1) {
                 return feeds;
             }
-            return feeds.update(ind, (feed) => ({
+            return updateArrayItem(feeds, ind, (feed) => ({
                 ...feed,
                 _localFavicon: action.payload.localFavicon,
             }));
