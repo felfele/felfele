@@ -140,7 +140,7 @@ const onLogAppStateVersion = async () => {
 };
 
 const onFixFeedFavicons = async (props: Props) => {
-    const feeds = props.appState.feeds.toArray();
+    const feeds = props.appState.feeds;
     for (const feed of feeds) {
         Debug.log('onFixFeedFavicons: ', feed);
         if (isPostFeedUrl(feed.url)) {
