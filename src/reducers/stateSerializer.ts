@@ -1,9 +1,9 @@
 import { getStoredState } from 'redux-persist';
 import { currentAppStateVersion } from './migration';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { persistConfig } from './index';
 
-export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
+export const getAppStateFromSerialized = async (serializedAppState: string): Promise<ApplicationState> => {
     const storagePersistConfig = {
         ...persistConfig,
         storage: {
@@ -12,10 +12,10 @@ export const getAppStateFromSerialized = async (serializedAppState: string): Pro
             removeItem: (key) => { },
         },
     };
-    const appState = await getStoredState(storagePersistConfig) as AppState;
+    const appState = await getStoredState(storagePersistConfig) as ApplicationState;
     return appState;
 };
-export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
-    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
+export const migrateAppStateToCurrentVersion = async (appState: ApplicationState): Promise<ApplicationState> => {
+    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as ApplicationState;
     return currentVersionAppState;
 };

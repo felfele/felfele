@@ -10,7 +10,7 @@ export interface Metadata {
     highestSeenPostId: number;
 }
 
-export interface AppState extends PersistedState {
+export interface ApplicationState extends PersistedState {
     contentFilters: ContentFilter[];
     feeds: Feed[];
     ownFeeds: PostFeed[];

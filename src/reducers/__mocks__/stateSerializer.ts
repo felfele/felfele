@@ -1,4 +1,4 @@
-import { AppState } from '../../models/AppState';
+import { ApplicationState } from '../../models/ApplicationState';
 import { Author } from '../../models/Post';
 
 const mockAuthor: Author = {
@@ -8,7 +8,7 @@ const mockAuthor: Author = {
     image: {},
 };
 
-const mockAppState: AppState = {
+const mockAppState: ApplicationState = {
      author: mockAuthor,
      avatarStore: {},
      contentFilters: [],
@@ -29,9 +29,9 @@ const mockAppState: AppState = {
      },
 };
 
-export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
+export const getAppStateFromSerialized = async (serializedAppState: string): Promise<ApplicationState> => {
     return mockAppState;
 };
-export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
+export const migrateAppStateToCurrentVersion = async (appState: ApplicationState): Promise<ApplicationState> => {
     return mockAppState;
 };

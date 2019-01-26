@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { isPostFeedUrl, PostFeed } from '../PostFeed';
@@ -28,7 +28,7 @@ const getStoredFavicon = (url: string, avatarStore: Dict<string>): string => {
     return url;
 };
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     const feeds = state.feeds
         .map(feed => ({
             ...feed,

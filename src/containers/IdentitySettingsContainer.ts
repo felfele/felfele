@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
 
-export const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
         ? state.ownFeeds[0]
         : undefined;

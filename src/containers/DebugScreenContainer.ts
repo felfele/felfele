@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScreen';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
    return {
        navigation: ownProps.navigation,
        appState: state,

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import * as Actions from '../actions/Actions';
 import { StateProps, DispatchProps, LogViewer } from '../components/LogViewer';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         currentTimestamp: state.currentTimestamp,
         navigation: ownProps.navigation,

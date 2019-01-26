@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import * as Actions from '../actions/Actions';
 import { StateProps, DispatchProps, Backup } from '../components/Backup';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         appState: state,

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { mapStateToProps as defaultStateToProps, mapDispatchToProps } from './FeedContainer';
 
-export const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         ...defaultStateToProps(state, ownProps),
         onBack: () => {

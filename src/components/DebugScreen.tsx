@@ -6,7 +6,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import { getSerializedAppState } from '../reducers';
 import { getAppStateFromSerialized } from '../reducers/stateSerializer';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -16,7 +16,7 @@ import { Feed } from '../models/Feed';
 import { PostFeed, isPostFeedUrl, downloadPostFeed } from '../PostFeed';
 
 export interface StateProps {
-    appState: AppState;
+    appState: ApplicationState;
     navigation: any;
 }
 

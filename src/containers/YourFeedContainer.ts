@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, YourFeedView } from '../components/YourFeedView';
 import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     const posts = state.localPosts;
     const filteredPosts = posts;
 

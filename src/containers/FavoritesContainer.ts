@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps } from '../components/FavoritesFeedView';
 import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
@@ -13,7 +13,7 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
     }) != null;
 };
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     const favoriteFeeds = state.feeds.filter(feed => feed != null && feed.favorite === true);
     const posts = state.rssPosts
         .filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds));

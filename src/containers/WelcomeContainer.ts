@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { StateProps, DispatchProps, Welcome } from '../components/Welcome';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { ImageData } from '../models/ImageData';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         navigation: ownProps.navigation,
         author: state.author,

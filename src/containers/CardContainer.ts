@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, MemoizedCard } from '../components/Card';
 import { Post } from '../models/Post';
 import { AsyncActions } from '../actions/Actions';
@@ -11,7 +11,7 @@ interface OwnProps {
     navigate: (view: string, {}) => void;
 }
 
-const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps: OwnProps): StateProps => {
     return {
         post: ownProps.post,
         currentTimestamp: state.currentTimestamp,

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, MemoizedFavicon } from '../components/Favicon';
 import { Dict } from '../helpers/types';
 import { AsyncActions } from '../actions/Actions';
@@ -16,7 +16,7 @@ const getStoredFavicon = (url: string, avatarStore: Dict<string>): string => {
     return url;
 };
 
-const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps: OwnProps): StateProps => {
     return {
         url: getStoredFavicon(ownProps.url, state.avatarStore),
     };

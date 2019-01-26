@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions } from '../actions/Actions';
 import { Post } from '../models/Post';
@@ -13,7 +13,7 @@ const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     }) != null;
 };
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     const followedFeeds = state.feeds.filter(feed => feed != null && feed.followed === true);
     const posts = state.rssPosts
         .filter(post => post != null && isPostFromFollowedFeed(post, followedFeeds));

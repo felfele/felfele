@@ -20,7 +20,7 @@ import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ModelHelper } from '../models/ModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
-import { AppState, Metadata } from '../models/AppState';
+import { ApplicationState, Metadata } from '../models/ApplicationState';
 import { Dict } from '../helpers/types';
 
 const modelHelper = new ModelHelper();
@@ -117,7 +117,7 @@ const defaultFeeds: Feed[] = [
     },
 ];
 
-export const defaultState: AppState = {
+export const defaultState: ApplicationState = {
     contentFilters: [],
     feeds: defaultFeeds,
     ownFeeds: [],
@@ -401,7 +401,7 @@ const avatarStoreReducer = (avatarStore = {}, action: Actions): Dict<string> => 
     return avatarStore;
 };
 
-const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+const appStateReducer = (state: ApplicationState = defaultState, action: Actions): ApplicationState => {
     Debug.log('appStateReducer', 'action', action, 'state', state);
     switch (action.type) {
         case 'APP-STATE-RESET': {
@@ -464,7 +464,7 @@ export const persistConfig = {
     migrate: createMigrate(migrateAppState, { debug: false}),
 };
 
-export const combinedReducers = combineReducers<AppState>({
+export const combinedReducers = combineReducers<ApplicationState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     ownFeeds: ownFeedsReducer,

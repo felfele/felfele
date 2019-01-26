@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         filter: ownProps.navigation.state.params.filter,
         navigation: ownProps.navigation,

@@ -3,7 +3,7 @@ import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers/stateSerializer';
-import { AppState } from '../models/AppState';
+import { ApplicationState } from '../models/ApplicationState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
@@ -67,11 +67,11 @@ const InternalActions = {
         createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
-    appStateSet: (appState: AppState) =>
+    appStateSet: (appState: ApplicationState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
-    appStateUpdate: (callerName: string, appStateUpdater: (appState: AppState) => Partial<AppState>) =>
+    appStateUpdate: (callerName: string, appStateUpdater: (appState: ApplicationState) => Partial<ApplicationState>) =>
         createAction(ActionTypes.APP_STATE_UPDATE, { callerName, appStateUpdater }),
-    appStateUpdatePart: <K extends keyof AppState>(part: K, appStateUpdater: (appState: AppState, part: K) => AppState[K]) =>
+    appStateUpdatePart: <K extends keyof ApplicationState>(part: K, appStateUpdater: (appState: ApplicationState, part: K) => ApplicationState[K]) =>
         createAction(ActionTypes.APP_STATE_UPDATE_PART, { part, appStateUpdater }),
 };
 
@@ -124,7 +124,7 @@ export const Actions = {
 
 export const AsyncActions = {
     cleanupContentFilters: (currentTimestamp: number = Date.now()) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
@@ -136,7 +136,7 @@ export const AsyncActions = {
         };
     },
     downloadFollowedFeedPosts: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const feeds = getState()
                             .feeds
                             .filter(feed => feed.followed === true);
@@ -145,7 +145,7 @@ export const AsyncActions = {
         };
     },
     downloadPostsFromFeeds: (feeds: Feed[]) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const previousPosts = getState().rssPosts;
             const downloadedPosts = await loadPostsFromFeeds(feeds);
             const uniqueAuthors = new Map<string, Author>();
@@ -165,7 +165,7 @@ export const AsyncActions = {
         };
     },
     createPost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             dispatch(Actions.removeDraft());
             const { metadata, author } = getState();
             post._id = metadata.highestSeenPostId + 1;
@@ -176,12 +176,12 @@ export const AsyncActions = {
         };
     },
     removePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             dispatch(Actions.deletePost(post));
         };
     },
     sharePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const isQueueEmtpy = getState().postUploadQueue.length === 0;
             dispatch(InternalActions.queuePostForUpload(post));
             dispatch(Actions.updatePostIsUploading(post, true));
@@ -191,7 +191,7 @@ export const AsyncActions = {
         };
     },
     uploadPostsFromQueue: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             while (getState().postUploadQueue.length > 0) {
                 const post = getState().postUploadQueue[0];
                 await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
@@ -200,7 +200,7 @@ export const AsyncActions = {
         };
     },
     uploadPostFromQueue: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             try {
                 Debug.log('sharePost: ', post);
                 const author = getState().author;
@@ -275,7 +275,7 @@ export const AsyncActions = {
         };
     },
     chainActions: (thunks: ThunkTypes[], callback?: () => void) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             for (const thunk of thunks) {
                 if (isActionTypes(thunk)) {
                     dispatch(thunk);
@@ -289,13 +289,13 @@ export const AsyncActions = {
         };
     },
     createUserIdentity: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const privateIdentity = await generateSecureIdentity();
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
     fixFeedFavicons: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
             for (const feed of feeds) {
                 if (feed.favicon == null || feed.favicon === '') {
@@ -308,7 +308,7 @@ export const AsyncActions = {
         };
     },
     downloadAndStoreFavicon: (url: string) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const localPath = await downloadAvatarAndStore(url);
             const updateObject = {};
             updateObject[url] = localPath;
@@ -321,7 +321,7 @@ export const AsyncActions = {
         };
     },
     restoreFromBackup: (backupText: string, secretHex: string) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
@@ -348,7 +348,7 @@ export const AsyncActions = {
     },
 };
 
-type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
+type Thunk = (dispatch: any, getState: () => ApplicationState) => Promise<void>;
 type ThunkTypes = Thunk | Actions;
 
 const isActionTypes = (t: ThunkTypes): t is Actions => {
