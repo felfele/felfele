@@ -65,8 +65,8 @@ export const Card = (props: CardProps) => {
                     const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
                     return (
                         <ImageView
-                            testID={image.uri || '' + index}
-                            key={image.uri || '' + index}
+                            testID={(image.uri || '') + index}
+                            key={(image.uri || '') + index}
                             source={image}
                             style={{
                                 width: width,
