@@ -20,6 +20,12 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
 const getFeeds = (state: AppState) => state.feeds;
 const getRssPosts = (state: AppState) => state.rssPosts;
 
+const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
+    return state.rssPosts
+        .concat(state.localPosts)
+        .filter(post => post != null && post.author != null && post.author.uri === feedUrl);
+};
+
 export const getFollowedFeeds = createSelector([ getFeeds ], (feeds) => {
     return feeds.filter(feed => feed.followed === true);
 });
@@ -35,4 +41,8 @@ export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFee
 export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFeeds ], (rssPosts, favoriteFeeds) => {
     return rssPosts.filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds));
 
+});
+
+export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {
+    return posts;
 });
