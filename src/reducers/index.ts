@@ -6,7 +6,8 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
+import { persistStore, persistReducer, createMigrate, KEY_PREFIX } from 'redux-persist';
+import { diff } from 'deep-object-diff';
 
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
@@ -19,26 +20,10 @@ import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ModelHelper } from '../models/ModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
+import { ApplicationState, Metadata } from '../models/ApplicationState';
+import { Dict } from '../helpers/types';
 
 const modelHelper = new ModelHelper();
-
-export interface AppState extends PersistedState {
-    contentFilters: ContentFilter[];
-    feeds: Feed[];
-    ownFeeds: PostFeed[];
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: Post[];
-    localPosts: Post[];
-    draft: Post | null;
-    metadata: Metadata;
-    postUploadQueue: Post[];
-}
-
-interface Metadata {
-    highestSeenPostId: number;
-}
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
@@ -132,7 +117,7 @@ const defaultFeeds: Feed[] = [
     },
 ];
 
-export const defaultState: AppState = {
+export const defaultState: ApplicationState = {
     contentFilters: [],
     feeds: defaultFeeds,
     ownFeeds: [],
@@ -143,6 +128,7 @@ export const defaultState: AppState = {
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
+    avatarStore: {},
     postUploadQueue: [],
 };
 
@@ -411,8 +397,12 @@ const postUploadQueueReducer = (postUploadQueue: Post[] = [], action: Actions): 
     return postUploadQueue;
 };
 
-const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
-    Debug.log('appStateReducer', 'action', action);
+const avatarStoreReducer = (avatarStore = {}, action: Actions): Dict<string> => {
+    return avatarStore;
+};
+
+const appStateReducer = (state: ApplicationState = defaultState, action: Actions): ApplicationState => {
+    Debug.log('appStateReducer', 'action', action, 'state', state);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -421,6 +411,28 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         case 'APP-STATE-SET': {
             Debug.log('App state set');
             return action.payload.appState;
+        }
+        case 'APP-STATE-UPDATE': {
+            const partialAppState = action.payload.appStateUpdater(state);
+            if (__DEV__) {
+                const diffObject = diff(state, partialAppState);
+                Debug.log(`${action.type}/${action.payload.callerName}`, 'change:', diffObject);
+            }
+            return {
+                ...state,
+                ...partialAppState,
+            };
+        }
+        case 'APP-STATE-UPDATE-PART': {
+            const appStatePart = action.payload.appStateUpdater(state, action.payload.part);
+            const stateCopy = {...state};
+            stateCopy[action.payload.part] = appStatePart;
+            if (__DEV__) {
+                const diffObject = diff(stateCopy, state);
+                const name = `${action.payload.part}`;
+                Debug.log('appStateReducer', action.type, {name, current: appStatePart, previous: state[action.payload.part]});
+            }
+            return stateCopy;
         }
         default: {
             try {
@@ -435,7 +447,15 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 export const persistConfig = {
     transforms: [immutableTransformHack({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
+        whitelist: [
+            'contentFilters',
+            'feeds',
+            'ownFeeds',
+            'rssPosts',
+            'localPosts',
+            'postUploadQueue',
+            'avatarStore',
+        ],
     })],
     blacklist: ['currentTimestamp'],
     key: 'root',
@@ -444,7 +464,7 @@ export const persistConfig = {
     migrate: createMigrate(migrateAppState, { debug: false}),
 };
 
-export const combinedReducers = combineReducers<AppState>({
+export const combinedReducers = combineReducers<ApplicationState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
     ownFeeds: ownFeedsReducer,
@@ -456,6 +476,7 @@ export const combinedReducers = combineReducers<AppState>({
     draft: draftReducer,
     metadata: metadataReducer,
     postUploadQueue: postUploadQueueReducer,
+    avatarStore: avatarStoreReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
@@ -486,22 +507,4 @@ export const getSerializedAppState = async (): Promise<string> => {
         return serializedAppState;
     }
     throw new Error('serialized app state is null');
-};
-
-export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
-    const storagePersistConfig = {
-        ...persistConfig,
-        storage: {
-            getItem: (key) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
-            setItem: (key, value) => { /* do nothing */ },
-            removeItem: (key) => { /* do nothing */ },
-        },
-    };
-    const appState = await getStoredState(storagePersistConfig) as AppState;
-    return appState;
-};
-
-export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
-    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
-    return currentVersionAppState;
 };

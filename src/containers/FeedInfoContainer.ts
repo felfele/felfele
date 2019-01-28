@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { ApplicationState } from '../models/ApplicationState';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     // this fixes the case when navigating back from an opened Feed
     updateNavParam(state.feeds, ownProps.navigation);
 

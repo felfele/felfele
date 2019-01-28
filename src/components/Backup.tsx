@@ -7,12 +7,13 @@ import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import { createBackupFromString } from '../BackupRestore';
 import { DateUtils } from '../DateUtils';
-import { AppState, getSerializedAppState } from '../reducers';
+import { getSerializedAppState } from '../reducers';
+import { ApplicationState } from '../models/ApplicationState';
 import { stringToHex } from '../Swarm';
 
 export interface StateProps {
     navigation: any;
-    appState: AppState;
+    appState: ApplicationState;
 }
 
 export interface DispatchProps {

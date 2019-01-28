@@ -13,7 +13,7 @@ import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { ModelHelper } from '../models/ModelHelper';
-import { Favicon } from './Favicon';
+import { FaviconContainer } from '../containers/FaviconContainer';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ModelHelper();
@@ -129,7 +129,7 @@ const CardTopIcon = (props: { post: Post }) => {
         const imageUri = modelHelper.getAuthorImageUri(props.post.author);
         return imageUri === ''
             ? <Image source={require('../../images/user_circle.png')} style={DefaultStyle.favicon} />
-            : <Favicon url={imageUri} />
+            : <FaviconContainer url={imageUri} />
             ;
     } else {
         return <View/>;

@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { ApplicationState } from '../models/ApplicationState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {

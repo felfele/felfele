@@ -85,4 +85,16 @@ export class Utils {
     public static stripNonAscii(s: string): string {
         return s.replace(/[^\x00-\x7F]/g, '');
     }
+
+    public static getCallerNameOf(depth: number): string {
+        const error = new Error();
+        if (error && error.stack) {
+            const caller = error.stack.split('\n')[depth]
+                                        .replace(/.*at ([\w\d.<>]+).*/, '$1')
+                                        .replace(/(@http.*)/, '');
+            return caller;
+        }
+
+        return '';
+    }
 }

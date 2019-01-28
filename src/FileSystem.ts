@@ -22,8 +22,12 @@ class FileSystemStatic {
         return resource.path();
     }
 
+    public isLocalPath = (path: string): boolean => {
+         return path.startsWith('file://');
+    }
+
     public getLocalPath = (localPath: string): string => {
-        if (localPath.startsWith('file://')) {
+        if (FileSystem.isLocalPath(localPath)) {
             return localPath;
         }
         const documentPath = 'file://' + this.getDocumentDir() + '/';

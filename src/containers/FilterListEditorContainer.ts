@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { ApplicationState } from '../models/ApplicationState';
 import { StateProps, DispatchProps, FilterListEditor } from '../components/FilterListEditor';
 import { ContentFilter } from '../models/ContentFilter';
 
@@ -19,7 +19,7 @@ const sortFilters = (a: ContentFilter, b: ContentFilter): number => {
     return 0;
 };
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
    return {
        navigation: ownProps.navigation,
        filters: state.contentFilters.sort(sortFilters),

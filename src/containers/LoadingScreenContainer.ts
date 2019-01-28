@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import { StateProps, DispatchProps, LoadingScreen } from '../components/LoadingScreen';
-import { AppState } from '../reducers';
+import { ApplicationState } from '../models/ApplicationState';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: ApplicationState, ownProps): StateProps => {
     return {
         author: state.author,
         navigation: ownProps.navigation,

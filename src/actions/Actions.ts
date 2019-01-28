@@ -2,17 +2,18 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers/stateSerializer';
+import { ApplicationState } from '../models/ApplicationState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
+import { makeFeedApi, generateSecureIdentity } from '../Swarm';
 import { uploadPost, uploadPosts, uploadImage } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
-import { downloadImageAndStore } from '../ImageDownloader';
+import { downloadAvatarAndStore } from '../ImageDownloader';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -42,6 +43,8 @@ export enum ActionTypes {
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
     APP_STATE_SET = 'APP-STATE-SET',
+    APP_STATE_UPDATE = 'APP-STATE-UPDATE',
+    APP_STATE_UPDATE_PART = 'APP-STATE-UPDATE-PART',
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
@@ -64,8 +67,12 @@ const InternalActions = {
         createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
-    appStateSet: (appState: AppState) =>
+    appStateSet: (appState: ApplicationState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
+    appStateUpdate: (callerName: string, appStateUpdater: (appState: ApplicationState) => Partial<ApplicationState>) =>
+        createAction(ActionTypes.APP_STATE_UPDATE, { callerName, appStateUpdater }),
+    appStateUpdatePart: <K extends keyof ApplicationState>(part: K, appStateUpdater: (appState: ApplicationState, part: K) => ApplicationState[K]) =>
+        createAction(ActionTypes.APP_STATE_UPDATE_PART, { part, appStateUpdater }),
 };
 
 export const Actions = {
@@ -117,7 +124,7 @@ export const Actions = {
 
 export const AsyncActions = {
     cleanupContentFilters: (currentTimestamp: number = Date.now()) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
@@ -129,7 +136,7 @@ export const AsyncActions = {
         };
     },
     downloadFollowedFeedPosts: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const feeds = getState()
                             .feeds
                             .filter(feed => feed.followed === true);
@@ -138,7 +145,7 @@ export const AsyncActions = {
         };
     },
     downloadPostsFromFeeds: (feeds: Feed[]) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const previousPosts = getState().rssPosts;
             const downloadedPosts = await loadPostsFromFeeds(feeds);
             const uniqueAuthors = new Map<string, Author>();
@@ -158,7 +165,7 @@ export const AsyncActions = {
         };
     },
     createPost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             dispatch(Actions.removeDraft());
             const { metadata, author } = getState();
             post._id = metadata.highestSeenPostId + 1;
@@ -169,12 +176,12 @@ export const AsyncActions = {
         };
     },
     removePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             dispatch(Actions.deletePost(post));
         };
     },
     sharePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const isQueueEmtpy = getState().postUploadQueue.length === 0;
             dispatch(InternalActions.queuePostForUpload(post));
             dispatch(Actions.updatePostIsUploading(post, true));
@@ -184,7 +191,7 @@ export const AsyncActions = {
         };
     },
     uploadPostsFromQueue: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             while (getState().postUploadQueue.length > 0) {
                 const post = getState().postUploadQueue[0];
                 await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
@@ -193,7 +200,7 @@ export const AsyncActions = {
         };
     },
     uploadPostFromQueue: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             try {
                 Debug.log('sharePost: ', post);
                 const author = getState().author;
@@ -268,7 +275,7 @@ export const AsyncActions = {
         };
     },
     chainActions: (thunks: ThunkTypes[], callback?: () => void) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             for (const thunk of thunks) {
                 if (isActionTypes(thunk)) {
                     dispatch(thunk);
@@ -282,13 +289,13 @@ export const AsyncActions = {
         };
     },
     createUserIdentity: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const privateIdentity = await generateSecureIdentity();
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
     fixFeedFavicons: () => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
             for (const feed of feeds) {
                 if (feed.favicon == null || feed.favicon === '') {
@@ -300,17 +307,48 @@ export const AsyncActions = {
             }
         };
     },
+    downloadAndStoreFavicon: (url: string) => {
+        return async (dispatch, getState: () => ApplicationState) => {
+            const localPath = await downloadAvatarAndStore(url);
+            const updateObject = {};
+            updateObject[url] = localPath;
+            dispatch(InternalActions.appStateUpdatePart('avatarStore', appState =>
+                ({
+                    ...appState.avatarStore,
+                    ...updateObject,
+                })
+            ));
+        };
+    },
     restoreFromBackup: (backupText: string, secretHex: string) => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState: () => ApplicationState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
             dispatch(InternalActions.appStateSet(currentVersionAppState));
         };
     },
+    timeTickWithoutReducer: () =>
+        InternalActions.appStateUpdate('timeTickWithoutReducer', appState => ({
+            currentTimestamp: Date.now(),
+        }))
+    ,
+    timeTickWithoutReducer2: () =>
+        InternalActions.appStateUpdatePart('currentTimestamp', appState =>
+            Date.now(),
+        )
+    ,
+    updateFeedAvatarPath: (feed: Feed, path: string) => {
+        const updateObject = {};
+        updateObject[feed.feedUrl] = path;
+        return InternalActions.appStateUpdatePart('avatarStore', appState => ({
+            ...appState.avatarStore,
+            updateObject,
+        }));
+    },
 };
 
-type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
+type Thunk = (dispatch: any, getState: () => ApplicationState) => Promise<void>;
 type ThunkTypes = Thunk | Actions;
 
 const isActionTypes = (t: ThunkTypes): t is Actions => {
