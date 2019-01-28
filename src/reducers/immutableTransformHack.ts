@@ -9,6 +9,13 @@ export const immutableTransformHack = (config) => {
           const data = value.data;
           return data;
         }
+        if (typeof value === 'object') {
+            const objectValue = value as object;
+            // tslint:disable-next-line:no-string-literal
+            if (objectValue.hasOwnProperty('$jsan') && objectValue['$jsan'] === 'u') {
+                return undefined;
+            }
+        }
         return value;
     };
 
