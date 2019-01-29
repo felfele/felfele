@@ -1,3 +1,15 @@
+## v0.9.27 (2019-01-29)
+
+This release adds the following new features and fixes:
+
+- [FEATURE] Feed preview when you are adding feed(https://github.com/agazso/postmodern/pull/127)
+- [BUGFIX] Fixed feed list editor footer (https://github.com/agazso/postmodern/commit/ed842210843d20526ff109e6f307a3ab57f20ceb)
+- [BUGFIX] Card times were fixed (https://github.com/agazso/postmodern/pull/136)
+- [INTERNAL] We changed how we display the feeds, they are unified now (https://github.com/agazso/postmodern/pull/126)
+- [INTERNAL] Removed immutable-js (https://github.com/agazso/postmodern/pull/132)
+- [INTERNAL] Added more documentation and contribution guidelines (https://github.com/agazso/postmodern/pull/140) (https://github.com/agazso/postmodern/pull/138)
+
+
 ## v0.9.26 (2019-01-11)
 
 This release adds the following new features and fixes:

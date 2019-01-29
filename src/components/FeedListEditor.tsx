@@ -3,7 +3,7 @@ import { View, Text, Image, FlatList } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
-import { Colors, DefaultStyle, IconSize } from '../styles';
+import { Colors, DefaultStyle, IconSize, DefaultTabBarHeight } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
@@ -97,10 +97,17 @@ const FeedListItemSeparator = (props: {}) => (
     </View>
 );
 
+const FeedListFooter = (props: {}) => (
+    <View style={{
+        paddingBottom: DefaultTabBarHeight,
+        backgroundColor: Colors.LIGHTER_GRAY,
+    }} />
+);
+
 export class FeedList extends React.Component<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
         return (
-            <View style={{ backgroundColor: '#EFEFF4'}}>
+            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
                 {this.props.children}
                 <FlatList
                     data={this.props.feeds}
@@ -113,6 +120,7 @@ export class FeedList extends React.Component<DispatchProps & StateProps & { chi
                         />
                     )}
                     ItemSeparatorComponent={FeedListItemSeparator}
+                    ListFooterComponent={FeedListFooter}
                     keyExtractor={(item) => item.feedUrl}
                     style={{
                         backgroundColor: Colors.LIGHTER_GRAY,
