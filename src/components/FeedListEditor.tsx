@@ -3,7 +3,7 @@ import { View, Text, Image, FlatList } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
-import { Colors, DefaultStyle, IconSize } from '../styles';
+import { Colors, DefaultStyle, IconSize, DefaultTabBarHeight } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
 
@@ -95,10 +95,17 @@ const FeedListItemSeparator = (props) => (
     </View>
 );
 
+const FeedListFooter = (props) => (
+    <View style={{
+        paddingBottom: DefaultTabBarHeight,
+        backgroundColor: Colors.LIGHTER_GRAY,
+    }} />
+);
+
 export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
     public render() {
         return (
-            <View style={{ backgroundColor: '#EFEFF4'}}>
+            <View style={{ backgroundColor: '#EFEFF4', flex: 1}}>
                 <NavigationHeader
                     onPressLeftButton={() => {
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
@@ -117,6 +124,7 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
                         />
                     )}
                     ItemSeparatorComponent={FeedListItemSeparator}
+                    ListFooterComponent={FeedListFooter}
                     keyExtractor={(item) => item.feedUrl}
                     style={{
                         backgroundColor: Colors.LIGHTER_GRAY,
