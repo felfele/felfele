@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 ./scripts/bump_build_number.sh
 version=$(./scripts/cli.sh version)
