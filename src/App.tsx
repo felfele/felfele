@@ -87,7 +87,6 @@ const newsTabScenes: NavigationRouteConfigMap = {
     },
     FeedListViewerContainer: {
         screen: FeedListViewerContainer,
-        mode: 'modal',
     },
     Feed: {
         screen: FeedContainer,

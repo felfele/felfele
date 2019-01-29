@@ -163,21 +163,9 @@ export class FeedListViewer extends React.Component<DispatchProps & StateProps> 
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
                         this.props.navigation.goBack(null);
                     }}
-                    rightButtonText1='Add'
-                    onPressRightButton1={this.onAddFeed}
-                    title='News Feed List'
+                    title='News Feeds'
                 />
             </FeedList>
         );
-    }
-
-    private onAddFeed = () => {
-        const feed: Feed = {
-            favicon: '',
-            feedUrl: '',
-            name: '',
-            url: '',
-        };
-        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 }
