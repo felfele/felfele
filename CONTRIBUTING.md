@@ -14,7 +14,7 @@ We aim to document all our work on GitHub. The processing of a new issue is the 
 
 ### How to contact us
 
-Our slack channel is open to everyone interested in the project. Here you can ask questions, but also follow the latest discussion including product, design, and development. You can always reach out to us at community@felfele.com.
+Our [slack](https://join.slack.com/t/felfele/shared_invite/enQtNTM1MjUwNTI1NzI5LTY5Yjg0YmVjN2MyN2MzMzc0Y2RkMGRiYzE0N2U0ZjgwNmYxMTQ3YjUwMDg1MGFiZTZlMWViZjU2MWJjY2Y0OTY) channel is open to everyone interested in the project. Here you can ask questions, but also follow the latest discussion including product, design, and development. You can always reach out to us at community@felfele.com.
 
 ### Meetings
 
