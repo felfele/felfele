@@ -24,7 +24,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 };
 
 const onPressFeed = (navigation: any, feed: Feed) => {
-    navigation.navigate('Feed', { feedUrl: feed.feedUrl });
+    navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
 };
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
