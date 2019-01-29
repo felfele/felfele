@@ -3,12 +3,14 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
+import { getFeedPosts } from '../selectors/selectors';
 
 export const mapStateToProps = (state: AppState, ownProps): StateProps => {
     const feedUrl = ownProps.navigation.state.params.feedUrl;
     const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl);
-    const posts = state.rssPosts.concat(state.localPosts)
-        .filter(post => post != null && post.author != null && post.author.uri === feedUrl);
+    // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
+    // see https://github.com/reduxjs/reselect/blob/master/README.md#accessing-react-props-in-selectors
+    const posts = getFeedPosts(state, feedUrl);
 
     return {
         onBack: () => ownProps.navigation.goBack(null),
