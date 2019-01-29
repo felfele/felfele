@@ -30,6 +30,7 @@ import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
+import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -83,6 +84,10 @@ const newsTabScenes: NavigationRouteConfigMap = {
         screen: ({navigation}) => (<NewsFeedContainer
                                     navigation={navigation}
                                     postManager={RSSPostManager} />),
+    },
+    FeedListViewerContainer: {
+        screen: FeedListViewerContainer,
+        mode: 'modal',
     },
     Feed: {
         screen: FeedContainer,

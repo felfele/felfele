@@ -6,6 +6,7 @@ import { Feed } from '../models/Feed';
 import { Colors, DefaultStyle, IconSize } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
+import { Props as NavHeaderProps } from './NavigationHeader';
 
 export interface DispatchProps {
 }
@@ -13,6 +14,7 @@ export interface DispatchProps {
 export interface StateProps {
     navigation: any;
     feeds: Feed[];
+    onPressFeed: (navigation: any, feed: Feed) => void;
 }
 
 const FAVICON_PADDING_LEFT = 5;
@@ -41,7 +43,7 @@ const Favicon = (props) => (
     </View>
 );
 
-const FeedListItem = (props) => (
+const FeedListItem = (props: { feed: Feed, onPress: () => void }) => (
     <TouchableView
         style={{
             width: '100%',
@@ -80,7 +82,7 @@ const FeedListItem = (props) => (
     </TouchableView>
 );
 
-const FeedListItemSeparator = (props) => (
+const FeedListItemSeparator = (props: {}) => (
     <View
         style={{
             width: '100%',
@@ -95,25 +97,19 @@ const FeedListItemSeparator = (props) => (
     </View>
 );
 
-export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
+export class FeedList extends React.Component<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4'}}>
-                <NavigationHeader
-                    onPressLeftButton={() => {
-                        // null is needed otherwise it does not work with switchnavigator backbehavior property
-                        this.props.navigation.goBack(null);
-                    }}
-                    rightButtonText1='Add'
-                    onPressRightButton1={this.onAddFeed}
-                    title='Feed list'
-                />
+                {this.props.children}
                 <FlatList
                     data={this.props.feeds}
                     renderItem={({item}) => (
                         <FeedListItem
                             feed={item}
-                            onPress={() => this.editFeed(item)}
+                            onPress={() => {
+                                this.props.onPressFeed(this.props.navigation, item);
+                            }}
                         />
                     )}
                     ItemSeparatorComponent={FeedListItemSeparator}
@@ -128,6 +124,24 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
             </View>
         );
     }
+}
+
+export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
+    public render() {
+        return (
+            <FeedList {...this.props}>
+                <NavigationHeader
+                    onPressLeftButton={() => {
+                        // null is needed otherwise it does not work with switchnavigator backbehavior property
+                        this.props.navigation.goBack(null);
+                    }}
+                    rightButtonText1='Add'
+                    onPressRightButton1={this.onAddFeed}
+                    title='Feed list'
+                />
+            </FeedList>
+        );
+    }
 
     private onAddFeed = () => {
         const feed: Feed = {
@@ -138,8 +152,32 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
         };
         this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
+}
 
-    private editFeed = (feed) => {
+export class FeedListViewer extends React.Component<DispatchProps & StateProps> {
+    public render() {
+        return (
+            <FeedList {...this.props}>
+                <NavigationHeader
+                    onPressLeftButton={() => {
+                        // null is needed otherwise it does not work with switchnavigator backbehavior property
+                        this.props.navigation.goBack(null);
+                    }}
+                    rightButtonText1='Add'
+                    onPressRightButton1={this.onAddFeed}
+                    title='News Feed List'
+                />
+            </FeedList>
+        );
+    }
+
+    private onAddFeed = () => {
+        const feed: Feed = {
+            favicon: '',
+            feedUrl: '',
+            name: '',
+            url: '',
+        };
         this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 }

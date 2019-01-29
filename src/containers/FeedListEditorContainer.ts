@@ -19,7 +19,12 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
     return {
         feeds,
         navigation: ownProps.navigation,
+        onPressFeed: onPressFeed,
     };
+};
+
+const onPressFeed = (navigation: any, feed: Feed) => {
+    navigation.navigate('FeedInfo', { feed: feed });
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
