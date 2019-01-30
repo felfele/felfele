@@ -9,6 +9,8 @@ function ask {
     fi
 }
 
+ask "Write an update to CHANGELOG.md with the changes since last release"
+
 echo "Running checks locally..."
 npm run check
 
