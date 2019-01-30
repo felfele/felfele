@@ -10,6 +10,7 @@ Before creating a release, make sure you
 - [ ] In AppstoreConnect provide the crypto information to enable the new build
 - [ ] Build the android release with the script (`./scripts/build_signed_android_release.sh`)
 - [ ] Upload the android version to https://app.felfele.com
+- [ ] Download the released versions and do manual QA (both android and iOS)
 - [ ] Create and push a tag with the new version number (`./scripts/git_tag_release.sh "$(./scripts/cli.sh version)"`)
 - [ ] Update the git release branch with to the master (`./scripts/git_update_release_branch`)
 - [ ] Announce the release on Slack in the #releases channel

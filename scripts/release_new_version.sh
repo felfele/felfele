@@ -16,7 +16,10 @@ npm run check
 
 echo "Bumping the build number..."
 ./scripts/bump_build_number.sh
+
+echo "Determining the version number..."
 version="$(./scripts/cli.sh version)"
+echo "Version: $version"
 
 echo "Commit and push changes to the repo"
 commit_message="Bumped version to $version"
@@ -24,18 +27,22 @@ ask "TODO: git commit -am \"$commit_message\" && git push"
 
 ask "Check if the CI is green"
 
-ask "Build the iOS version with XCode for archive"
+echo "Build the iOS version with XCode for archive..."
+./scripts/build_xcode_archive.sh
 
 ask "Upload the build to the App Store"
 
 ask "In AppstoreConnect provide the crypto information to enable the new build"
 
 echo "Building the android release version signed with debug key..."
-ask "TODO: ./scripts/build_signed_android_release.sh"
+./scripts/build_signed_android_release.sh
 
-ask "Upload the android version to https://app.felfele.com"
+echo "Uploading the android version to https://app.felfele.com..."
+./scripts/upload_android_release "$version"
 
-echo "Tagging the git release with v$version"
+ask "Download the released versions and do manual QA (both android and iOS)"
+
+echo "Tagging the git release with v$version..."
 ask "TODO: ./scripts/git_tag_release.sh $version"
 
 echo "Updating the git release branch with to the master..."
