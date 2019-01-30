@@ -1,4 +1,11 @@
-Before creating a release, make sure you
+### Release HOWTO
+
+You can do the release with a script that will guide you through the process:
+```
+./scripts/release_new_version.sh
+```
+
+Or if you would like manually, make sure you
 
 - [ ] Write an update to CHANGELOG.md with the changes since last release
 - [ ] Run checks locally if the build is green (`npm run check`)
