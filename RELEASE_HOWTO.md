@@ -12,11 +12,11 @@ Or if you would like manually, make sure you
 - [ ] Bump the build number with the script (`./scripts/bump_build_number.sh`)
 - [ ] Commit and push changes to the repo
 - [ ] Check if the CI is green
-- [ ] Build the iOS version with XCode for archive
+- [ ] Build the iOS version with XCode for archive (`./scripts/build_xcode_archive.sh`)
 - [ ] Upload the build to the App Store
 - [ ] In AppstoreConnect provide the crypto information to enable the new build
 - [ ] Build the android release with the script (`./scripts/build_signed_android_release.sh`)
-- [ ] Upload the android version to https://app.felfele.com
+- [ ] Upload the android version to https://app.felfele.com (`./scripts/upload_android_release.sh "$(./scripts/cli.sh version)"`)
 - [ ] Download the released versions and do manual QA (both android and iOS)
 - [ ] Create and push a tag with the new version number (`./scripts/git_tag_release.sh "$(./scripts/cli.sh version)"`)
 - [ ] Update the git release branch with to the master (`./scripts/git_update_release_branch`)
