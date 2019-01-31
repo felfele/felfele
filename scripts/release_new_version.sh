@@ -1,12 +1,14 @@
 #!/bin/bash -e
 
 function ask {
-    echo
-    read -p "$1, press y when done: " -n1 input
-    echo
-    if [ "$input" != "y" ]; then
-        exit 1
-    fi
+    while true; do
+        echo
+        read -p "$1, press y when done: " -n1 input
+        echo
+        if [ "$input" = "y" ]; then
+            return
+        fi
+    done
 }
 
 ask "Write an update to CHANGELOG.md with the changes since last release"
