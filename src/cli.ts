@@ -11,7 +11,7 @@ if (process.argv.length > 2) {
             break;
         }
         default: {
-            console.log('usage: cli [version]')
+            console.log('usage: cli [version]');
             break;
         }
     }
