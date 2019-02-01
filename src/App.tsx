@@ -91,6 +91,10 @@ const newsTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
+
+    FeedFromList: {
+        screen: SettingsFeedViewContainer,
+    },
 };
 
 const NewsFeedNavigator = createStackNavigator(newsTabScenes,

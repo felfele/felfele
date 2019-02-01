@@ -16,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 };
 
 const onPressFeed = (navigation: any, feed: Feed) => {
-    navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
+    navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
 };
 
 export const FeedListViewerContainer = connect<StateProps, DispatchProps, {}>(
