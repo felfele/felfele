@@ -20,7 +20,7 @@ import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-// @ts-ignore
+// tslint:disable-next-line:no-var-requires
 const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
