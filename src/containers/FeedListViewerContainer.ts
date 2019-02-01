@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { sortFeeds, updateFavicons, mapDispatchToProps } from './FeedListEditorContainer';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    const feedsWithCorrectFavicons = updateFavicons(state.feeds);
+    const feedsWithCorrectFavicons = updateFavicons(ownProps.navigation.state.params.feeds);
     const feedsToDisplay = sortFeeds(feedsWithCorrectFavicons);
     return {
         feeds: feedsToDisplay,
