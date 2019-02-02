@@ -3,12 +3,14 @@ import { View } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { generateSecureRandom } from 'react-native-securerandom';
 
 import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
+import * as Swarm from '../Swarm';
 
 export interface StateProps {
     appState: AppState;
@@ -72,6 +74,14 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
+                        <IonIcon name='md-person' />
+                    }
+                    title='Generate new identity'
+                    onPress={async () => await onGenerateNewIdentity(props)}
+                    hasNavArrow={false}
+                />
+                <SettingsList.Item
+                    icon={
                         <IonIcon name='md-information-circle-outline' />
                     }
                     title='Log app state persist info'
@@ -110,6 +120,11 @@ const onCreateIdentity = async (props: Props) => {
     if (confirmed) {
         props.onCreateIdentity();
     }
+};
+
+const onGenerateNewIdentity = async (props: Props) => {
+    const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+    console.log(privateIdentity);
 };
 
 const onLogAppStateVersion = async () => {

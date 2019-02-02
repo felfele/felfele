@@ -1,6 +1,5 @@
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
-import { generateSecureRandom } from 'react-native-securerandom';
 
 import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
@@ -221,7 +220,7 @@ export const byteArrayToString = (byteArray: number[]): string => {
 export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 
 // cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
-export const byteArrayToHex = (byteArray: number[]): string => {
+export const byteArrayToHex = (byteArray: number[] | Uint8Array): string => {
     return '0x' + Array.from(byteArray, (byte) => {
         // tslint:disable-next-line:no-bitwise
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
@@ -351,8 +350,8 @@ const signDigest = (digest: number[], identity: PrivateIdentity) => {
     return byteArrayToHex(signature);
 };
 
-export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
-    const secureRandomUint8Array = await generateSecureRandom(32);
+export const generateSecureIdentity = async (generateRandom: (length: number) => Promise<Uint8Array>): Promise<PrivateIdentity> => {
+    const secureRandomUint8Array = await generateRandom(32);
     const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
     const curve = new ec('secp256k1');
     const keyPair = await curve.genKeyPair({

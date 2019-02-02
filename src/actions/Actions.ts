@@ -12,6 +12,7 @@ import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
+import { generateSecureRandom } from 'react-native-securerandom';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -278,7 +279,7 @@ export const AsyncActions = {
     },
     createUserIdentity: () => {
         return async (dispatch, getState: () => AppState) => {
-            const privateIdentity = await generateSecureIdentity();
+            const privateIdentity = await generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },

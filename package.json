@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@microsoft/tsdoc": "^0.12.5",
     "@types/jest": "=23.3.8",
     "@types/react": "=16.7.13",
     "@types/react-native": "=0.57.7",
@@ -18,6 +19,7 @@
     "metro-react-native-babel-preset": "0.48.3",
     "mocha": "=5.2.0",
     "mock-async-storage": "=2.0.3",
+    "node-fetch": "^2.3.0",
     "react-native-debugger-open": "=0.3.17",
     "react-native-typescript-transformer": "=1.2.10",
     "react-test-renderer": "16.6.1",
