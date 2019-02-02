@@ -6,6 +6,7 @@ import {
     Text,
     ActivityIndicator,
     Dimensions,
+    Clipboard,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
@@ -55,6 +56,10 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
     constructor(props) {
         super(props);
         this.state.url = this.props.feed.feedUrl;
+    }
+
+    public componentDidMount() {
+        this.tryToAddFeedFromClipboard();
     }
 
     public async onAdd(feed: Feed) {
@@ -192,9 +197,24 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         );
     }
 
+    private tryToAddFeedFromClipboard = () => {
+        const isExistingFeed = this.props.feed.feedUrl.length > 0;
+        if (!isExistingFeed) {
+            Clipboard.getString().then(value => {
+                const link = Utils.getLinkFromText(value);
+                if (link != null) {
+                    this.setState({
+                        url: link,
+                    });
+                    this.fetchFeed().then();
+                }
+            });
+        }
+    }
+
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         if (url.startsWith(Swarm.DefaultFeedPrefix)) {
-            const feed: Feed = await downloadPostFeed(url);
+            const feed: Feed = await downloadPostFeed(url, 60 * 1000);
             return feed;
         } else {
             const canonicalUrl = Utils.getCanonicalUrl(this.state.url);
