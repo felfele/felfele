@@ -8,7 +8,6 @@ import {
     Dimensions,
     Clipboard,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
