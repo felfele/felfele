@@ -31,7 +31,6 @@ const QRCameraHeight = QRCameraWidth;
 
 interface FeedInfoState {
     url: string;
-    checked: boolean;
     loading: boolean;
     showQRCamera: boolean;
     activityText: string;
@@ -51,7 +50,6 @@ export interface StateProps {
 export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedInfoState> {
     public state: FeedInfoState = {
         url: '',
-        checked: false,
         loading: false,
         showQRCamera: false,
         activityText: '',
@@ -86,7 +84,6 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         const feed = await this.fetchFeedFromUrl(this.state.url);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
-                checked: true,
                 loading: false,
             });
             this.onAdd(feed);
@@ -155,20 +152,15 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
                     autoCorrect={false}
                     editable={!isExistingFeed}
                 />
-                { this.state.checked
-                  ?
+                { this.state.loading
+                ?
                     <View style={styles.centerIcon}>
-                        <Ionicons name='md-checkmark' size={40} color='green' />
+                        <Text style={styles.activityText}>{this.state.activityText}</Text>
+                        <ActivityIndicator size='large' color='grey' />
                     </View>
-                  : this.state.loading
-                    ?
-                        <View style={styles.centerIcon}>
-                            <Text style={styles.activityText}>{this.state.activityText}</Text>
-                            <ActivityIndicator size='large' color='grey' />
-                        </View>
-                    : this.props.feed.feedUrl.length > 0
-                        ? <this.ExistingItemView />
-                        : <this.NewItemView showQRCamera={this.state.showQRCamera} />
+                : this.props.feed.feedUrl.length > 0
+                    ? <this.ExistingItemView />
+                    : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                 }
             </View>
         );
