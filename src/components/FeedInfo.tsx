@@ -29,10 +29,12 @@ const QRCodeHeight = QRCodeWidth;
 const QRCameraWidth = Dimensions.get('window').width * 0.6;
 const QRCameraHeight = QRCameraWidth;
 
-interface EditFeedState {
+interface FeedInfoState {
     url: string;
     checked: boolean;
     loading: boolean;
+    showQRCamera: boolean;
+    activityText: string;
 }
 
 export interface DispatchProps {
@@ -46,11 +48,13 @@ export interface StateProps {
     navigation: any;
 }
 
-export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFeedState> {
-    public state: EditFeedState = {
+export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedInfoState> {
+    public state: FeedInfoState = {
         url: '',
         checked: false,
         loading: false,
+        showQRCamera: false,
+        activityText: '',
     };
 
     constructor(props) {
@@ -58,8 +62,11 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         this.state.url = this.props.feed.feedUrl;
     }
 
-    public componentDidMount() {
-        this.tryToAddFeedFromClipboard();
+    public async componentDidMount() {
+        await this.tryToAddFeedFromClipboard();
+        this.setState({
+            showQRCamera: true,
+        });
     }
 
     public async onAdd(feed: Feed) {
@@ -73,6 +80,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
     public async fetchFeed() {
         this.setState({
             loading: true,
+            activityText: 'Loading feed',
         });
 
         const feed = await this.fetchFeedFromUrl(this.state.url);
@@ -155,30 +163,35 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
                   : this.state.loading
                     ?
                         <View style={styles.centerIcon}>
+                            <Text style={styles.activityText}>{this.state.activityText}</Text>
                             <ActivityIndicator size='large' color='grey' />
                         </View>
                     : this.props.feed.feedUrl.length > 0
                         ? <this.ExistingItemView />
-                        : <this.NewItemView />
+                        : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                 }
             </View>
         );
     }
 
     private NewItemView = (props) => {
-        return (
-            <View>
-                <View style={styles.qrCameraContainer}>
-                    <QRCodeScanner
-                        onRead={async (event) => await this.onScanSuccess(event)}
-                        containerStyle={styles.qrCameraStyle}
-                        cameraStyle={styles.qrCameraStyle}
-                        fadeIn={false}
-                    />
+        if (props.showQRCamera) {
+            return (
+                <View>
+                    <View style={styles.qrCameraContainer}>
+                        <QRCodeScanner
+                            onRead={async (event) => await this.onScanSuccess(event)}
+                            containerStyle={styles.qrCameraStyle}
+                            cameraStyle={styles.qrCameraStyle}
+                            fadeIn={false}
+                        />
+                    </View>
+                    <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
                 </View>
-                <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
-            </View>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 
     private ExistingItemView = (props) => {
@@ -197,18 +210,17 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         );
     }
 
-    private tryToAddFeedFromClipboard = () => {
+    private tryToAddFeedFromClipboard = async () => {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         if (!isExistingFeed) {
-            Clipboard.getString().then(value => {
-                const link = Utils.getLinkFromText(value);
-                if (link != null) {
-                    this.setState({
-                        url: link,
-                    });
-                    this.fetchFeed().then();
-                }
-            });
+            const value = await Clipboard.getString();
+            const link = Utils.getLinkFromText(value);
+            if (link != null) {
+                this.setState({
+                    url: link,
+                });
+                await this.fetchFeed();
+            }
         }
     }
 
@@ -326,9 +338,9 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         flexDirection: 'column',
-        height: 40,
+        height: 100,
         backgroundColor: '#EFEFF4',
-        paddingTop: 10,
+        paddingTop: 50,
     },
     qrCodeContainer: {
         marginTop: 10,
@@ -353,5 +365,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.GRAY,
         alignSelf: 'center',
+    },
+    activityText: {
+        fontSize: 14,
+        color: Colors.GRAY,
+        alignSelf: 'center',
+        marginBottom: 10,
     },
 });
