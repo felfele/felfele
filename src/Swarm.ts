@@ -6,20 +6,20 @@ import { Debug } from './Debug';
 import { safeFetch, safeFetchWithTimeout } from './Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from './conversion';
 
-export const DefaultGateway = 'https://swarm-gateways.net';
+export const DefaultGateway = 'https://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
 export const HashLength = 64;
 
 export const upload = async (data: string): Promise<string> => {
-    Debug.log('upload to Swarm: ', data);
+    Debug.log('upload: to Swarm: ', data);
     try {
         const hash = await uploadData(data);
-        Debug.log('hash is ', hash);
+        Debug.log('upload:', 'hash is', hash);
         return hash;
     } catch (e) {
-        Debug.log('upload to Swarm failed: ', JSON.stringify(e));
+        Debug.log('upload:', 'failed', JSON.stringify(e));
         return '';
     }
 };
@@ -109,6 +109,7 @@ export const uploadData = async (data: string): Promise<string> => {
 
 export const downloadData = async (hash: string, timeout: number = 0): Promise<string> => {
     const url = DefaultGateway + '/bzz:/' + hash + '/';
+    Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
@@ -128,10 +129,10 @@ interface FeedTemplate {
 
 export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promise<FeedTemplate> => {
     const url = DefaultGateway + `/bzz-feed:/?user=${identity.address}&meta=1`;
-    Debug.log('downloadFeedTemplate: ', url);
+    Debug.log('downloadUserFeedTemplate: ', url);
     const response = await safeFetch(url);
     const feedUpdateResponse = await response.json() as FeedTemplate;
-    Debug.log('downloadFeedTemplate: ', feedUpdateResponse);
+    Debug.log('downloadUserFeedTemplate: ', feedUpdateResponse);
     return feedUpdateResponse;
 };
 
@@ -159,6 +160,10 @@ export const downloadUserFeed = async (identity: PublicIdentity): Promise<string
     return await downloadFeed(`bzz-feed:/?user=${identity.address}`);
 };
 
+export const downloadUserFeedPreviousVersion = async (address: string, time: number): Promise<string> => {
+    return await downloadFeed(`bzz-feed:/?user=${address}&time=${time}`);
+};
+
 export const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
     const url = DefaultGateway + '/' + feedUri;
     Debug.log('downloadFeed: ', url);
@@ -169,6 +174,7 @@ export const downloadFeed = async (feedUri: string, timeout: number = 0): Promis
 
 export interface FeedApi {
     download: () => Promise<string>;
+    downloadPreviousVersion: (time: number) => Promise<string>;
     update: (data: string) => Promise<void>;
     downloadFeed: (feedUri: string) => Promise<string>;
     getUri: () => string;
@@ -177,6 +183,7 @@ export interface FeedApi {
 export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
     return {
         download: async (): Promise<string> => downloadUserFeed(identity),
+        downloadPreviousVersion: async (time: number) => downloadUserFeedPreviousVersion(identity.address, time),
         update: async (data: string): Promise<void> => {
             const feedTemplate = await downloadUserFeedTemplate(identity);
             await updateUserFeed(feedTemplate, identity, data);

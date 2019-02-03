@@ -17,11 +17,11 @@ import { DispatchProps } from './IdentitySettings';
 // tslint:disable-next-line:no-var-requires
 const defaultUserImage = require('../../images/user_circle.png');
 import { Debug } from '../Debug';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 export { DispatchProps };
 export interface StateProps {

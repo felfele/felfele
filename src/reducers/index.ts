@@ -17,10 +17,10 @@ import { Debug } from '../Debug';
 import { PostFeed } from '../PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];

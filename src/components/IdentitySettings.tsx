@@ -24,7 +24,7 @@ import { NavigationHeader } from './NavigationHeader';
 const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -40,7 +40,7 @@ export interface StateProps {
 const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
 const screenTitle = 'Identity';
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 

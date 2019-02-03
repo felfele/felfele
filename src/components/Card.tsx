@@ -12,10 +12,10 @@ import { ImageData } from '../models/ImageData';
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 export interface StateProps {
     showSquareImages: boolean;

@@ -13,6 +13,10 @@ import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 import { generateSecureRandom } from 'react-native-securerandom';
+import { resizeImageIfNeeded } from '../ImageUtils';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+
+const modelHelper = new ReactNativeModelHelper();
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -203,7 +207,7 @@ export const AsyncActions = {
 
                     dispatch(Actions.updatePostIsUploading(post, true));
 
-                    const uploadedPost = await uploadPost(post);
+                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
                     Debug.log('sharePost: after uploadedPost');
 
                     const localFeedPosts = getState().localPosts.filter(localPost =>
@@ -222,7 +226,7 @@ export const AsyncActions = {
                         }))
                         ;
 
-                    const uploadedPosts = await uploadPosts(posts);
+                    const uploadedPosts = await uploadPosts(posts, resizeImageIfNeeded, modelHelper);
                     const postFeed = {
                         ...feed,
                         posts: uploadedPosts,
@@ -247,8 +251,8 @@ export const AsyncActions = {
                     const author = getState().author;
                     dispatch(Actions.updatePostIsUploading(post, true));
 
-                    const uploadedPost = await uploadPost(post);
-                    const feed = await createPostFeed(swarmFeedApi, author, uploadedPost);
+                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
+                    const feed = await createPostFeed(swarmFeedApi, author, uploadedPost, resizeImageIfNeeded, modelHelper);
 
                     dispatch(InternalActions.addOwnFeed(feed));
                     dispatch(Actions.updatePostLink(post, feed.url));
