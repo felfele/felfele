@@ -1,5 +1,5 @@
 import { createBackupFromString, restoreBackupToString } from '../src/BackupRestore';
-import { stringToByteArray } from '../src/Swarm';
+import { stringToByteArray } from '../src/conversion';
 
 const generateRandom = async (num: number): Promise<Uint8Array> => {
     return new Uint8Array(stringToByteArray('e4219722f9eefbdfe9c66ae9'));

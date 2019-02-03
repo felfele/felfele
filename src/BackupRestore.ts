@@ -3,7 +3,7 @@ import nacl from 'ecma-nacl';
 import * as base64 from 'base64-arraybuffer';
 import { generateSecureRandom } from 'react-native-securerandom';
 
-import { hexToByteArray } from './Swarm';
+import { hexToByteArray } from './conversion';
 import { Version } from './Version';
 import * as utf8 from 'utf8-encoder';
 
