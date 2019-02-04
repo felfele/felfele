@@ -115,15 +115,24 @@ export const downloadData = async (hash: string, timeout: number = 0): Promise<s
     return text;
 };
 
+export const DefaultEpoch = {
+    time: 0,
+    level: 0,
+};
+
+export interface Epoch {
+    time: number;
+    level: number;
+}
+
+export interface FeedAddress {
+    topic: string;
+    user: string;
+}
+
 interface FeedTemplate {
-    feed: {
-        topic: string;
-        user: string;
-    };
-    epoch: {
-        time: number;
-        level: number;
-    };
+    feed: FeedAddress;
+    epoch: Epoch;
     protocolVersion: number;
 }
 
@@ -136,7 +145,7 @@ export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promis
     return feedUpdateResponse;
 };
 
-export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string) => {
+export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string): Promise<FeedTemplate> => {
     const digest = feedUpdateDigest(feedTemplate, data);
 
     if (digest == null) {
@@ -144,7 +153,7 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
     }
     const signature = signDigest(digest, identity);
     const url = DefaultGateway + `/bzz-feed:/?topic=${feedTemplate.feed.topic}&user=${identity.address}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
-    Debug.log('updateFeed: ', url);
+    Debug.log('updateFeed: ', url, data);
     const options: RequestInit = {
         method: 'POST',
         body: data,
@@ -153,15 +162,15 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
     const text = await response.text();
     Debug.log('updateFeed: ', text);
 
-    return '';
+    return feedTemplate;
 };
 
 export const downloadUserFeed = async (identity: PublicIdentity): Promise<string> => {
     return await downloadFeed(`bzz-feed:/?user=${identity.address}`);
 };
 
-export const downloadUserFeedPreviousVersion = async (address: string, time: number): Promise<string> => {
-    return await downloadFeed(`bzz-feed:/?user=${address}&time=${time}`);
+export const downloadUserFeedPreviousVersion = async (address: string, epoch: Epoch): Promise<string> => {
+    return await downloadFeed(`bzz-feed:/?user=${address}&time=${epoch.time}`);
 };
 
 export const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
@@ -174,8 +183,8 @@ export const downloadFeed = async (feedUri: string, timeout: number = 0): Promis
 
 export interface FeedApi {
     download: () => Promise<string>;
-    downloadPreviousVersion: (time: number) => Promise<string>;
-    update: (data: string) => Promise<void>;
+    downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
+    update: (data: string) => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string) => Promise<string>;
     getUri: () => string;
 }
@@ -183,10 +192,10 @@ export interface FeedApi {
 export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
     return {
         download: async (): Promise<string> => downloadUserFeed(identity),
-        downloadPreviousVersion: async (time: number) => downloadUserFeedPreviousVersion(identity.address, time),
-        update: async (data: string): Promise<void> => {
+        downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(identity.address, epoch),
+        update: async (data: string): Promise<FeedTemplate> => {
             const feedTemplate = await downloadUserFeedTemplate(identity);
-            await updateUserFeed(feedTemplate, identity, data);
+            return await updateUserFeed(feedTemplate, identity, data);
         },
         downloadFeed: async (feedUri: string) => await downloadFeed(feedUri),
         getUri: () => `bzz-feed:/?user=${identity.address}`,
