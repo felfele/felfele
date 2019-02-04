@@ -75,7 +75,7 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
     return (
         <TouchableView
             onPress={props.onPress}
-            testId={'NavigationHeader/RightButton'}
+            testID={'NavigationHeader/RightButton'}
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >

@@ -9,6 +9,7 @@ import { Utils } from '../Utils';
 import { ImageView } from './ImageView';
 import { isSwarmLink } from '../Swarm';
 import { ImageData } from '../models/ImageData';
+// @ts-ignore
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
@@ -211,7 +212,7 @@ const CardMarkdown = (props: { text: string }) => (
     <ErrorBoundary>
         <Markdown
             style={styles.markdownStyle}
-            renderLink={(href, title, children) => {
+            renderLink={(href: string, title: string, children: React.ReactNode) => {
                 return (
                     <TouchableWithoutFeedback
                         key={'linkWrapper_' + href + Date.now()}

@@ -1,4 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, ViewStyle, ImageStyle } from 'react-native';
 
 export const IconSize = {
     LARGE_LIST_ICON: 32,
@@ -40,7 +40,12 @@ export const Colors = {
 
 export const DefaultFont = 'Helvetica Neue';
 
-export const DefaultStyle = StyleSheet.create({
+interface Styles {
+    container: ViewStyle;
+    favicon: ImageStyle;
+}
+
+export const DefaultStyle = StyleSheet.create<Styles>({
     container: {
         flex: 1,
         backgroundColor: '#fff',

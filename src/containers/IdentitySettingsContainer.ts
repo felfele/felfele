@@ -4,7 +4,7 @@ import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
 
-export const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
         ? state.ownFeeds[0]
         : undefined;
@@ -15,7 +15,7 @@ export const mapStateToProps = (state: AppState, ownProps): StateProps => {
    };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onUpdateAuthor: (text: string) => {
             dispatch(Actions.updateAuthorName(text));
@@ -26,7 +26,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const IdentitySettingsContainer = connect<StateProps, DispatchProps, {}>(
+export const IdentitySettingsContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
 )(IdentitySettings);

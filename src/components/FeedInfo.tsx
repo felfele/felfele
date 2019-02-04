@@ -6,10 +6,10 @@ import {
     Text,
     ActivityIndicator,
     Dimensions,
+    Clipboard,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
@@ -28,10 +28,11 @@ const QRCodeHeight = QRCodeWidth;
 const QRCameraWidth = Dimensions.get('window').width * 0.6;
 const QRCameraHeight = QRCameraWidth;
 
-interface EditFeedState {
+interface FeedInfoState {
     url: string;
-    checked: boolean;
     loading: boolean;
+    showQRCamera: boolean;
+    activityText: string;
 }
 
 export interface DispatchProps {
@@ -45,16 +46,26 @@ export interface StateProps {
     navigation: any;
 }
 
-export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFeedState> {
-    public state: EditFeedState = {
+type Props = DispatchProps & StateProps;
+
+export class FeedInfo extends React.Component<Props, FeedInfoState> {
+    public state: FeedInfoState = {
         url: '',
-        checked: false,
         loading: false,
+        showQRCamera: false,
+        activityText: '',
     };
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
         this.state.url = this.props.feed.feedUrl;
+    }
+
+    public async componentDidMount() {
+        await this.tryToAddFeedFromClipboard();
+        this.setState({
+            showQRCamera: true,
+        });
     }
 
     public async onAdd(feed: Feed) {
@@ -65,17 +76,20 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         this.props.navigation.goBack();
     }
 
-    public async fetchFeed() {
+    public async fetchFeed(onSuccess?: () => void) {
         this.setState({
             loading: true,
+            activityText: 'Loading feed',
         });
 
         const feed = await this.fetchFeedFromUrl(this.state.url);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
-                checked: true,
                 loading: false,
             });
+            if (onSuccess != null) {
+                onSuccess();
+            }
             this.onAdd(feed);
             this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
         } else {
@@ -142,41 +156,41 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
                     autoCorrect={false}
                     editable={!isExistingFeed}
                 />
-                { this.state.checked
-                  ?
+                { this.state.loading
+                ?
                     <View style={styles.centerIcon}>
-                        <Ionicons name='md-checkmark' size={40} color='green' />
+                        <Text style={styles.activityText}>{this.state.activityText}</Text>
+                        <ActivityIndicator size='large' color='grey' />
                     </View>
-                  : this.state.loading
-                    ?
-                        <View style={styles.centerIcon}>
-                            <ActivityIndicator size='large' color='grey' />
-                        </View>
-                    : this.props.feed.feedUrl.length > 0
-                        ? <this.ExistingItemView />
-                        : <this.NewItemView />
+                : this.props.feed.feedUrl.length > 0
+                    ? <this.ExistingItemView />
+                    : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                 }
             </View>
         );
     }
 
-    private NewItemView = (props) => {
-        return (
-            <View>
-                <View style={styles.qrCameraContainer}>
-                    <QRCodeScanner
-                        onRead={async (event) => await this.onScanSuccess(event)}
-                        containerStyle={styles.qrCameraStyle}
-                        cameraStyle={styles.qrCameraStyle}
-                        fadeIn={false}
-                    />
+    private NewItemView = (props: { showQRCamera: boolean }) => {
+        if (props.showQRCamera) {
+            return (
+                <View>
+                    <View style={styles.qrCameraContainer}>
+                        <QRCodeScanner
+                            onRead={async (event) => await this.onScanSuccess(event)}
+                            containerStyle={styles.qrCameraStyle}
+                            cameraStyle={styles.qrCameraStyle}
+                            fadeIn={false}
+                        />
+                    </View>
+                    <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
                 </View>
-                <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
-            </View>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 
-    private ExistingItemView = (props) => {
+    private ExistingItemView = () => {
         const qrCodeValue = this.props.feed.url;
         return (
             <View>
@@ -192,9 +206,24 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         );
     }
 
+    private tryToAddFeedFromClipboard = async () => {
+        const isExistingFeed = this.props.feed.feedUrl.length > 0;
+        if (!isExistingFeed) {
+            const value = await Clipboard.getString();
+            const link = Utils.getLinkFromText(value);
+            if (link != null) {
+                this.setState({
+                    url: link,
+                });
+                const clearClipboard = () => Clipboard.setString('');
+                await this.fetchFeed(clearClipboard);
+            }
+        }
+    }
+
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         if (url.startsWith(Swarm.DefaultFeedPrefix)) {
-            const feed: Feed = await downloadPostFeed(url);
+            const feed: Feed = await downloadPostFeed(url, 60 * 1000);
             return feed;
         } else {
             const canonicalUrl = Utils.getCanonicalUrl(this.state.url);
@@ -259,7 +288,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, EditFe
         this.goBack();
     }
 
-    private onScanSuccess = async (event) => {
+    private onScanSuccess = async (event: ScanEvent) => {
         try {
             Debug.log(event);
             const feedUri = event.data;
@@ -306,9 +335,9 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         flexDirection: 'column',
-        height: 40,
+        height: 100,
         backgroundColor: '#EFEFF4',
-        paddingTop: 10,
+        paddingTop: 50,
     },
     qrCodeContainer: {
         marginTop: 10,
@@ -333,5 +362,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.GRAY,
         alignSelf: 'center',
+    },
+    activityText: {
+        fontSize: 14,
+        color: Colors.GRAY,
+        alignSelf: 'center',
+        marginBottom: 10,
     },
 });

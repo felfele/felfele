@@ -65,7 +65,7 @@ const RSSMimeTypes = [
 ];
 
 export class RSSFeedManager {
-    public static getFeedUrlFromHtmlLink(link): string {
+    public static getFeedUrlFromHtmlLink(link: Node): string {
         for (const mimeType of RSSMimeTypes) {
             const matcher = [{name: 'type', value: mimeType}];
             if (HtmlUtils.matchAttributes(link, matcher)) {
@@ -78,7 +78,7 @@ export class RSSFeedManager {
         return '';
     }
 
-    public static parseFeedFromHtml(html): Feed {
+    public static parseFeedFromHtml(html: any): Feed {
         const feed: Feed = {
             name: '',
             url: '',
@@ -125,6 +125,7 @@ export class RSSFeedManager {
                 }
                 // The lib we use (react-native-parse-html) returns the value
                 // incorrectly in 'value' instead of 'textContent'
+                // @ts-ignore
                 // tslint:disable-next-line:no-string-literal
                 const value = title.childNodes[0]['value'];
                 if (value != null) {
@@ -137,7 +138,7 @@ export class RSSFeedManager {
         return feed;
     }
 
-    public static async fetchContentWithMimeType(url): Promise<ContentWithMimeType | null> {
+    public static async fetchContentWithMimeType(url: string): Promise<ContentWithMimeType | null> {
         const response = await fetch(url);
         if (response.status !== 200) {
             Debug.log('fetch failed: ', response);
@@ -160,7 +161,7 @@ export class RSSFeedManager {
         };
     }
 
-    public static getFeedFromHtml(baseUrl, html): Feed {
+    public static getFeedFromHtml(baseUrl: string, html: string): Feed {
         const feed = RSSFeedManager.parseFeedFromHtml(html);
         if (feed.feedUrl !== '') {
             feed.feedUrl = Utils.createUrlFromUrn(feed.feedUrl, baseUrl);
@@ -187,7 +188,7 @@ export class RSSFeedManager {
         return false;
     }
 
-    public static async fetchRSSFeedUrlFromUrl(url): Promise<string> {
+    public static async fetchRSSFeedUrlFromUrl(url: string): Promise<string> {
         const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
         if (!contentWithMimeType) {
             return '';
@@ -200,7 +201,7 @@ export class RSSFeedManager {
         return '';
     }
 
-    public static async fetchFeedFromHtmlFromUrl(url): Promise<string> {
+    public static async fetchFeedFromHtmlFromUrl(url: string): Promise<string> {
         const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
         if (!contentWithMimeType) {
             return '';
@@ -214,7 +215,7 @@ export class RSSFeedManager {
     }
 
     // url can be either a website url or a feed url
-    public static async fetchFeedFromUrl(url): Promise<Feed | null> {
+    public static async fetchFeedFromUrl(url: string): Promise<Feed | null> {
         const contentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
         if (!contentWithMimeType) {
             return null;
@@ -301,7 +302,7 @@ class _RSSPostManager {
         const posts: Post[] = [];
         const metrics: FeedWithMetrics[] = [];
 
-        const feedMap = {};
+        const feedMap: { [index: string]: string } = {};
         for (const feed of storedFeeds) {
             feedMap[feed.feedUrl] = feed.name;
         }
@@ -356,7 +357,7 @@ class _RSSPostManager {
         return ++this.id;
     }
 
-    public formatDescription(description): string {
+    public formatDescription(description: string): string {
         return description
             // strip spaces at the beginning of lines
             .replace(/^( *)/gm, '')
@@ -389,7 +390,7 @@ class _RSSPostManager {
             ;
     }
 
-    public extractTextAndImagesFromMarkdown(markdown: string, baseUri): [string, ImageData[]] {
+    public extractTextAndImagesFromMarkdown(markdown: string, baseUri: string): [string, ImageData[]] {
         const images: ImageData[] = [];
         const text = markdown.replace(/(\!\[\]\(.*?\))/gi, (uri) => {
             const image: ImageData = {
@@ -557,7 +558,7 @@ interface FeedHelper {
 }
 const feedHelper: FeedHelper = {
     DefaultTimeout: 10000,
-    fetch: async (url): Promise<FeedWithMetrics> => {
+    fetch: async (url: string): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
         const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
             headers: {
@@ -574,14 +575,14 @@ const feedHelper: FeedHelper = {
         }
     },
 
-    load: async (url, xml, startTime = 0, downloadTime = 0): Promise<FeedWithMetrics> => {
+    load: async (url: string, xml: string, startTime = 0, downloadTime = 0): Promise<FeedWithMetrics> => {
         const xmlTime = Date.now();
         const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
-        parser.addListener('error', (err) => {
+        parser.addListener('error', (err: string) => {
             throw new Error(err);
         });
         return await new Promise<FeedWithMetrics>((resolve, reject) => {
-            parser.parseString(xml, (err, result) => {
+            parser.parseString(xml, (err: string, result: any) => {
                 if (err) {
                     reject(err);
                     return;
@@ -601,7 +602,7 @@ const feedHelper: FeedHelper = {
         });
     },
 
-    parser: (json) => {
+    parser: (json: any) => {
         if (json.feed) {
             return feedHelper.parseAtom(json);
         } else if (json.rss) {
@@ -609,7 +610,7 @@ const feedHelper: FeedHelper = {
         }
     },
 
-    getDate: (entry): string | null => {
+    getDate: (entry: any): string | null => {
         if (entry.published != null) {
             return entry.published[0];
         }
@@ -619,7 +620,7 @@ const feedHelper: FeedHelper = {
         return null;
     },
 
-    parseAtom: (json) => {
+    parseAtom: (json: any) => {
         const feed = json.feed;
         const rss: any = { items: [] };
 
@@ -633,7 +634,7 @@ const feedHelper: FeedHelper = {
             rss.url = feed.link[0].href[0];
         }
 
-        rss.items = feed.entry.map(entry => {
+        rss.items = feed.entry.map((entry: any) => {
             const entryDate = feedHelper.getDate(entry);
             const item: RSSItem = {
                 title: entry.title ? entry.title[0] : '',
@@ -648,7 +649,7 @@ const feedHelper: FeedHelper = {
         return rss;
     },
 
-    parseRSS: (json) => {
+    parseRSS: (json: any) => {
         let channel = json.rss.channel;
         const rss: any = { items: [] };
         if (util.isArray(json.rss.channel)) {
@@ -667,7 +668,7 @@ const feedHelper: FeedHelper = {
             if (!util.isArray(channel.item)) {
                 channel.item = [channel.item];
             }
-            channel.item.forEach((val) => {
+            channel.item.forEach((val: any) => {
                 const obj: any = {};
                 obj.title = !util.isNullOrUndefined(val.title) ? val.title[0] : '';
                 obj.description = !util.isNullOrUndefined(val.description) ? val.description[0] : '';
@@ -689,8 +690,8 @@ const feedHelper: FeedHelper = {
                     if (!util.isArray(val.enclosure)) {
                         val.enclosure = [val.enclosure];
                     }
-                    val.enclosure.forEach((enclosure) => {
-                        const enc = {};
+                    val.enclosure.forEach((enclosure: any) => {
+                        const enc: { [index: string]: any } = {};
 
                         // tslint:disable-next-line:forin
                         for (const x in enclosure) {

@@ -22,7 +22,7 @@ const FAVICON_PADDING_VERTICAL = 20;
 const FAVICON_WIDTH = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_LEFT;
 const FAVICON_HEIGHT = IconSize.LARGE_LIST_ICON + 2 * FAVICON_PADDING_VERTICAL;
 
-const Favicon = (props) => (
+const Favicon = (props: { uri: string }) => (
     <View style={{
         paddingVertical: FAVICON_PADDING_VERTICAL,
         paddingLeft: FAVICON_PADDING_LEFT,

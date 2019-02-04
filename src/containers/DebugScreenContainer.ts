@@ -4,14 +4,14 @@ import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScreen';
 import { Post } from '../models/Post';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
    return {
        navigation: ownProps.navigation,
        appState: state,
    };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
    return {
         onAppStateReset: () => {
             dispatch(Actions.appStateReset());
@@ -22,7 +22,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
    };
 };
 
-export const DebugScreenContainer = connect<StateProps, DispatchProps, {}>(
+export const DebugScreenContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
 )(DebugScreen);

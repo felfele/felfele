@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
+// @ts-ignore
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +25,11 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const IconContainer = (props) => (
+interface IconProps {
+    name: string;
+}
+
+const IconContainer = (props: { children: React.ReactNode, style?: ViewStyle }) => (
     <View style={{
         paddingTop: 12,
         paddingLeft: 10,
@@ -36,13 +41,13 @@ const IconContainer = (props) => (
     </View>
 );
 
-const IonIcon = (props) => (
+const IonIcon = (props: IconProps) => (
     <IconContainer>
         <Ionicons name={props.name} size={28} color={Colors.GRAY} {...props} />
     </IconContainer>
 );
 
-const MaterialCommunityIcon = (props) => (
+const MaterialCommunityIcon = (props: IconProps) => (
     <IconContainer style={{paddingLeft: 8, paddingTop: 12}}>
         <MaterialCommunityIcons name={props.name} size={24} color={Colors.GRAY} {...props} />
     </IconContainer>

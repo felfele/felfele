@@ -1,18 +1,16 @@
-// tslint:disable-next-line:no-var-requires
-const reduxPersist = require('redux-persist');
+import { createTransform, PersistConfig } from 'redux-persist';
 
-export const immutableTransformHack = (config) => {
+export const immutableTransformHack = (config: Pick<PersistConfig, 'whitelist' | 'blacklist'>) => {
     config = config || {};
 
-    const reviver = (key, value) => {
+    const reviver = (key: any, value: any) => {
         if (typeof value === 'object' && value !== null && '__serializedType__'  in value) {
           const data = value.data;
           return data;
         }
-        if (typeof value === 'object') {
-            const objectValue = value as object;
-            // tslint:disable-next-line:no-string-literal
-            if (objectValue.hasOwnProperty('$jsan') && objectValue['$jsan'] === 'u') {
+        if (typeof value === 'object' && value.hasOwnProperty('$jsan')) {
+            const objectValue: { [index: string]: any } = value as object;
+            if (objectValue.$jsan === 'u') {
                 return undefined;
             }
         }
@@ -20,12 +18,12 @@ export const immutableTransformHack = (config) => {
     };
 
     const serializer = {
-        stringify: (data) => {
+        stringify: (data: any) => {
             return JSON.stringify(
                 data,
             );
         },
-        parse: data => {
+        parse: (data: string) => {
             return JSON.parse(
                 data,
                 reviver,
@@ -33,5 +31,5 @@ export const immutableTransformHack = (config) => {
         },
     };
 
-    return reduxPersist.createTransform(serializer.stringify, serializer.parse, config);
+    return createTransform(serializer.stringify, serializer.parse, config);
 };

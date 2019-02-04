@@ -5,7 +5,7 @@ import { Post } from '../models/Post';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const posts = state.localPosts;
     const filteredPosts = posts;
 
@@ -13,11 +13,10 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: state.feeds.filter(feed => feed != null && feed.followed === true),
-        settings: state.settings,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: Feed[]) => {
             // workaround to finish refresh
@@ -29,7 +28,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const YourFeedContainer = connect<StateProps, DispatchProps, {}>(
+export const YourFeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(YourFeedView);

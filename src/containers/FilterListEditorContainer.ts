@@ -19,19 +19,19 @@ const sortFilters = (a: ContentFilter, b: ContentFilter): number => {
     return 0;
 };
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
    return {
        navigation: ownProps.navigation,
        filters: state.contentFilters.sort(sortFilters),
    };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
    return {
    };
 };
 
-export const FilterListEditorContainer = connect<StateProps, DispatchProps, {}>(
+export const FilterListEditorContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
 )(FilterListEditor);

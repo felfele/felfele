@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
@@ -34,7 +34,7 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
                     source={image}
                     style={{
                         width: this.notGreaterThan(image.width, maxWidth),
-                        height: this.notGreaterThan(image.height, maxHeight),
+                        height: maxHeight != null ? this.notGreaterThan(image.height, maxHeight) : maxWidth,
                         borderWidth: 1,
                         borderColor: 'white',
                     }}
@@ -54,13 +54,13 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
         );
     }
 
-    private onLayout(event) {
-        const {x, y, height, width} = event.nativeEvent.layout;
+    private onLayout(event: LayoutChangeEvent) {
+        const { width } = event.nativeEvent.layout;
         this.width = width;
     }
 
-    private notGreaterThan(value, maxValue) {
-        return value > maxValue ? maxValue : value;
+    private notGreaterThan(value: number | undefined, maxValue: number) {
+        return value != null && value > maxValue ? maxValue : value;
     }
 }
 

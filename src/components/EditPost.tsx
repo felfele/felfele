@@ -9,6 +9,7 @@ import {
     ActivityIndicator,
     Alert,
     AlertIOS,
+    EmitterSubscription,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -45,11 +46,11 @@ interface State {
 export class EditPost extends React.Component<Props, State> {
     public state: State;
 
-    private keyboardDidShowListener;
-    private keyboardWillShowListener;
-    private keyboardDidHideListener;
+    private keyboardDidShowListener: EmitterSubscription | null = null;
+    private keyboardWillShowListener: EmitterSubscription | null = null;
+    private keyboardDidHideListener: EmitterSubscription | null = null;
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
         this.state = {
             isKeyboardVisible: false,
@@ -60,7 +61,7 @@ export class EditPost extends React.Component<Props, State> {
         };
     }
 
-    public onKeyboardDidShow = (e) => {
+    public onKeyboardDidShow = (e: any) => {
         Debug.log('onKeyboardDidShow', this.state.keyboardHeight);
 
         this.setState({
@@ -68,7 +69,7 @@ export class EditPost extends React.Component<Props, State> {
         });
     }
 
-    public onKeyboardWillShow = (e) => {
+    public onKeyboardWillShow = (e: any) => {
         const extraKeyboardHeight = 15;
         const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
         this.setState({
@@ -318,7 +319,7 @@ export class EditPost extends React.Component<Props, State> {
         );
     }
 
-    private renderActionButton(onPress, text, iconName, color, showText) {
+    private renderActionButton(onPress: () => void, text: string, iconName: string, color: string, showText: boolean) {
         const iconSize = showText ? 20 : 30;
         const justifyContent = showText ? 'center' : 'space-around';
         return (
