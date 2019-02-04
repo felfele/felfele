@@ -112,8 +112,8 @@ export const Actions = {
 };
 
 export const AsyncActions = {
-    cleanupContentFilters: (currentTimestamp: number = Date.now()) => {
-        return async (dispatch, getState: () => AppState) => {
+    cleanupContentFilters: (currentTimestamp: number = Date.now()): Thunk => {
+        return async (dispatch, getState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
@@ -124,8 +124,8 @@ export const AsyncActions = {
             });
         };
     },
-    downloadFollowedFeedPosts: () => {
-        return async (dispatch, getState: () => AppState) => {
+    downloadFollowedFeedPosts: (): Thunk => {
+        return async (dispatch, getState) => {
             const feeds = getState()
                             .feeds
                             .filter(feed => feed.followed === true);
@@ -133,8 +133,8 @@ export const AsyncActions = {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         };
     },
-    downloadPostsFromFeeds: (feeds: Feed[]) => {
-        return async (dispatch, getState: () => AppState) => {
+    downloadPostsFromFeeds: (feeds: Feed[]): Thunk => {
+        return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             const downloadedPosts = await loadPostsFromFeeds(feeds);
             const uniqueAuthors = new Map<string, Author>();
@@ -153,8 +153,8 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    createPost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    createPost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             dispatch(Actions.removeDraft());
             const { metadata, author } = getState();
             post._id = metadata.highestSeenPostId + 1;
@@ -164,13 +164,13 @@ export const AsyncActions = {
             Debug.log('Post saved and synced, ', post._id);
         };
     },
-    removePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    removePost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             dispatch(Actions.deletePost(post));
         };
     },
-    sharePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    sharePost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             const isQueueEmtpy = getState().postUploadQueue.length === 0;
             dispatch(InternalActions.queuePostForUpload(post));
             dispatch(Actions.updatePostIsUploading(post, true));
@@ -179,8 +179,8 @@ export const AsyncActions = {
             }
         };
     },
-    uploadPostsFromQueue: () => {
-        return async (dispatch, getState: () => AppState) => {
+    uploadPostsFromQueue: (): Thunk => {
+        return async (dispatch, getState) => {
             while (getState().postUploadQueue.length > 0) {
                 const post = getState().postUploadQueue[0];
                 await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
@@ -188,8 +188,8 @@ export const AsyncActions = {
             }
         };
     },
-    uploadPostFromQueue: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    uploadPostFromQueue: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             try {
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds;
@@ -262,8 +262,8 @@ export const AsyncActions = {
             }
         };
     },
-    chainActions: (thunks: ThunkTypes[], callback?: () => void) => {
-        return async (dispatch, getState: () => AppState) => {
+    chainActions: (thunks: ThunkTypes[], callback?: () => void): Thunk => {
+        return async (dispatch, getState) => {
             for (const thunk of thunks) {
                 if (isActionTypes(thunk)) {
                     dispatch(thunk);
@@ -276,14 +276,14 @@ export const AsyncActions = {
             }
         };
     },
-    createUserIdentity: () => {
-        return async (dispatch, getState: () => AppState) => {
+    createUserIdentity: (): Thunk => {
+        return async (dispatch, getState) => {
             const privateIdentity = await generateSecureIdentity();
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
-    fixFeedFavicons: () => {
-        return async (dispatch, getState: () => AppState) => {
+    fixFeedFavicons: (): Thunk => {
+        return async (dispatch, getState) => {
             const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
             for (const feed of feeds) {
                 if (feed.favicon == null || feed.favicon === '') {
@@ -295,8 +295,8 @@ export const AsyncActions = {
             }
         };
     },
-    restoreFromBackup: (backupText: string, secretHex: string) => {
-        return async (dispatch, getState: () => AppState) => {
+    restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
+        return async (dispatch, getState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);

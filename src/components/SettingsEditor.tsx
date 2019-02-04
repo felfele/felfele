@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
+// @ts-ignore
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -86,7 +87,7 @@ export const SettingsEditor = (props: Props) => {
     );
 };
 
-const SettingsIcon = (props) => (
+const SettingsIcon = (props: { children: React.ReactNode}) => (
     <View style={{
         paddingVertical: 10,
         paddingLeft: 5,

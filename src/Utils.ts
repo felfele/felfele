@@ -2,7 +2,7 @@
 const Url = require('url');
 
 export class Utils {
-    public static async timeout<T>(ms, promise: Promise<T>): Promise<T> {
+    public static async timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             if (ms > 0) {
                 setTimeout(() => reject(new Error('timeout')), ms);
@@ -11,14 +11,14 @@ export class Utils {
         });
     }
 
-    public static take(list, num, defaultReturn) {
+    public static take<T>(list: Array<T>, num: number, defaultReturn: T) {
         if (list.length < num) {
             return [defaultReturn];
         }
         return list.slice(0, num);
     }
 
-    public static takeLast(list, num, defaultReturn) {
+    public static takeLast<T>(list: Array<T>, num: number, defaultReturn: T) {
         if (list.length < num) {
             return [defaultReturn];
         }

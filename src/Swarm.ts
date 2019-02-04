@@ -1,5 +1,6 @@
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
+// @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
 import { PublicIdentity, PrivateIdentity } from './models/Identity';
@@ -337,18 +338,21 @@ const calculateRecovery = (rec: string): string => {
     throw new Error('invalid recovery: ' + rec);
 };
 
-function publicKeyToAddress(pubKey) {
+function publicKeyToAddress(pubKey: any) {
     const pubBytes = pubKey.encode();
     return keccak256.array(pubBytes.slice(1)).slice(12);
 }
 
 const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
-    const keyPair = curve.keyFromPrivate(identity.privateKey.substring(2));
-    const privateKey = keyPair.getPrivate();
-    const sigRaw = curve.sign(digest, privateKey, { canonical: true });
-    const signature = sigRaw.r.toArray().concat(sigRaw.s.toArray()).concat(sigRaw.recoveryParam);
-    return byteArrayToHex(signature);
+    const keyPair = curve.keyFromPrivate(new Buffer(identity.privateKey.substring(2)));
+    const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
+    const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
+    if (sigRaw.recoveryParam != null) {
+        const signature = partialSignature.concat(sigRaw.recoveryParam);
+        return byteArrayToHex(signature);
+    }
+    throw new Error('signDigest recovery param was null');
 };
 
 export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
@@ -358,6 +362,7 @@ export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
     const keyPair = await curve.genKeyPair({
         entropy: secureRandom,
         entropyEnc: 'hex',
+        pers: undefined,
     });
     Debug.log('generateSecureIdentity: ', keyPair, secureRandom);
     const privateKey = '0x' + keyPair.getPrivate('hex');

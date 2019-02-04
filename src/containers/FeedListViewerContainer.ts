@@ -19,7 +19,7 @@ const onPressFeed = (navigation: any, feed: Feed) => {
     navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
 };
 
-export const FeedListViewerContainer = connect<StateProps, DispatchProps, {}>(
+export const FeedListViewerContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedListViewer);

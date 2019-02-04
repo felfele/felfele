@@ -5,14 +5,14 @@ import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter'
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         filter: ownProps.navigation.state.params.filter,
         navigation: ownProps.navigation,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onAddFilter: (filter: ContentFilter) => {
             dispatch(Actions.addContentFilter(
@@ -27,7 +27,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const EditFilterContainer = connect<StateProps, DispatchProps, {}>(
+export const EditFilterContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(EditFilter);

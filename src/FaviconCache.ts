@@ -2,11 +2,11 @@ import { HtmlUtils } from './HtmlUtils';
 import { Debug } from './Debug';
 import { safeFetch } from './Network';
 
-// tslint:disable-next-line:class-name
+// tslint:disable:class-name
 class _FaviconCache {
     private favicons: Map<string, string> = new Map();
 
-    public async getFavicon(url): Promise<string> {
+    public async getFavicon(url: string): Promise<string> {
         if (this.favicons.has(url)) {
             return this.favicons.get(url) || '';
         }
@@ -30,7 +30,7 @@ class _FaviconCache {
         return baseUrl;
     }
 
-    private async fetchHtml(url): Promise<string> {
+    private async fetchHtml(url: string): Promise<string> {
         const response = await safeFetch(url);
         const html = await response.text();
         return html;
@@ -49,7 +49,7 @@ class _FaviconCache {
         return null;
     }
 
-    private async downloadIndexAndParseFavicon(url) {
+    private async downloadIndexAndParseFavicon(url: string) {
         const html = await this.fetchHtml(url);
         const document = HtmlUtils.parse(html);
         const links = HtmlUtils.findPath(document, ['html', 'head', 'link']);

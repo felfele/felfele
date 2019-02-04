@@ -1,3 +1,4 @@
+// @ts-ignore
 import { parse } from 'react-native-parse-html';
 
 export interface HtmlAttrNameValue {
@@ -6,7 +7,7 @@ export interface HtmlAttrNameValue {
 }
 
 export class HtmlUtils {
-    public static parse(html): HTMLElement {
+    public static parse(html: any): HTMLElement {
         return parse(html);
     }
 
@@ -26,7 +27,7 @@ export class HtmlUtils {
         return foundNodes;
     }
 
-    public static matchAttributes(node, attrs: HtmlAttrNameValue[]): boolean {
+    public static matchAttributes(node: any, attrs: HtmlAttrNameValue[]): boolean {
         for (const attr of attrs) {
             let found = false;
             for (const nodeAttr of node.attrs) {
@@ -42,7 +43,7 @@ export class HtmlUtils {
         return true;
     }
 
-    public static getAttribute(node, name): string | null {
+    public static getAttribute(node: any, name: string): string | null {
         for (const attr of node.attrs) {
             if (attr.name === name) {
                 return attr.value;

@@ -22,7 +22,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onDeletePost: (post: Post) => {
             dispatch(AsyncActions.removePost(post));
@@ -36,7 +36,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const CardContainer = connect<StateProps, DispatchProps, {}>(
+export const CardContainer = connect(
     mapStateToProps,
     mapDispatchToProps
 )(MemoizedCard);

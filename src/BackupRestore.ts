@@ -1,10 +1,12 @@
 import { keccak256 } from 'js-sha3';
 import nacl from 'ecma-nacl';
 import * as base64 from 'base64-arraybuffer';
+// @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
 import { hexToByteArray } from './Swarm';
 import { Version } from './Version';
+// @ts-ignore
 import * as utf8 from 'utf8-encoder';
 
 const header = `-----BEGIN FELFELE BACKUP-----`;
@@ -37,11 +39,11 @@ export const isValidBackup = (backupText: string): boolean => {
 };
 
 export const createBackupFromString = async (data: string, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<string> => {
-    const dataUint8Array = utf8.fromString(data);
+    const dataUint8Array: Uint8Array = utf8.fromString(data);
     const secureRandomUint8Array = await generateRandom(24);
     const secretUint8Array = new Uint8Array(keccak256.array(hexToByteArray(secretHex)));
     const encryptedData = nacl.secret_box.formatWN.pack(dataUint8Array, secureRandomUint8Array, secretUint8Array);
-    const encryptedDataBase64 = base64.encode(encryptedData);
+    const encryptedDataBase64 = base64.encode(encryptedData.buffer);
     const backupText = wrapWithHeaderAndFooter(encryptedDataBase64);
     return backupText;
 };

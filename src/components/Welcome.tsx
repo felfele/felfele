@@ -1,4 +1,5 @@
 import * as React from 'react';
+// @ts-ignore
 import Onboarding from 'react-native-onboarding-swiper';
 import {
     Image,
