@@ -1,8 +1,10 @@
 import { keccak256 } from 'js-sha3';
 
 import { Version } from './Version';
-import { testSharePost, testSharePosts, testListAllPosts } from './social/api';
+import { allTests } from './social/api';
 import * as Swarm from './Swarm';
+import { generateUnsecureRandom } from './random';
+import { stringToByteArray } from './conversion';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -22,16 +24,12 @@ const main = async () => {
                 console.log(Version);
                 break;
             }
-            case 'testSharePost': {
-                await testSharePost();
-                break;
-            }
-            case 'testSharePosts': {
-                await testSharePosts();
-                break;
-            }
-            case 'testListAllPosts': {
-                await testListAllPosts();
+            case 'api': {
+                if (process.argv.length > 3) {
+                    const testName = process.argv[3];
+                    const test = allTests[testName];
+                    await test();
+                }
                 break;
             }
             case 'swarm': {
@@ -50,11 +48,25 @@ const main = async () => {
                         case 'sha3': {
                             if (process.argv.length > 4) {
                                 const data = process.argv[4];
-                                const hash = keccak256.hex(data);
+                                const byteArrayData = stringToByteArray(data);
+                                const paddingByteArray: number[] = new Array<number>(4096 - byteArrayData.length);
+                                paddingByteArray.fill(0);
+                                const hash = keccak256.hex(byteArrayData.concat(paddingByteArray));
                                 console.log(hash);
                             } else {
                                 console.log('usage: cli swarm sha3 <bzz-hash>');
                             }
+                            break;
+                        }
+                        case 'testId': {
+                            const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
+                            const identityString = `{
+                                privateKey: '${identity.privateKey}',
+                                publicKey: '${identity.publicKey}',
+                                address: '${identity.address}',
+                            }`;
+                            console.log('Generated identity:', identityString);
+                            console.warn('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
                             break;
                         }
                     }
