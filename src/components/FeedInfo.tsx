@@ -74,7 +74,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         this.props.navigation.goBack();
     }
 
-    public async fetchFeed() {
+    public async fetchFeed(onSuccess?: () => void) {
         this.setState({
             loading: true,
             activityText: 'Loading feed',
@@ -85,6 +85,9 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
             this.setState({
                 loading: false,
             });
+            if (onSuccess != null) {
+                onSuccess();
+            }
             this.onAdd(feed);
             this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
         } else {
@@ -210,7 +213,8 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
                 this.setState({
                     url: link,
                 });
-                await this.fetchFeed();
+                const clearClipboard = () => Clipboard.setString('');
+                await this.fetchFeed(clearClipboard);
             }
         }
     }
