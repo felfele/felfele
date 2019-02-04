@@ -78,3 +78,36 @@ test('Test canonical url with path', () => {
         expect(result).toBe(expectedResult);
     }
 });
+
+test('Test getLinkFromText with https link', () => {
+    const link = 'https://swarm-gateways.net/';
+    const input = `Lorem ipsum ${link}`;
+    const result = Utils.getLinkFromText(input);
+
+    expect(result).toBe(link);
+});
+
+test('Test getLinkFromText with https link in a sentence', () => {
+    const link = 'https://swarm-gateways.net/';
+    const input = `Lorem ipsum ${link} dolor sit amet`;
+    const result = Utils.getLinkFromText(input);
+
+    expect(result).toBe(link);
+});
+
+test('Test getLinkFromText with bzz-feed link', () => {
+    const link = 'bzz-feed:/?user=0x2668dd69812af4fdf63b241acbb62051308de4df';
+    const input = `Lorem ipsum ${link}`;
+    const result = Utils.getLinkFromText(input);
+
+    expect(result).toBe(link);
+});
+
+test('Test getLinkFromText with bzz link', () => {
+    const link = 'bzz://ebe1491e2e3463c11af327b1bd26e5f6f1e04b9daaecb02c8ce774bc090cc7d4';
+    const input = `Lorem ipsum ${link}`;
+    const result = Utils.getLinkFromText(input);
+
+    expect(result).toBe(link);
+});
+

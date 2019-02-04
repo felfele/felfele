@@ -47,9 +47,8 @@ export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: Post
     }
 };
 
-export const downloadPostFeed = async (url: string): Promise<PostFeed> => {
+export const downloadPostFeed = async (url: string, timeout: number = 5000): Promise<PostFeed> => {
     try {
-        const timeout = 5000;
         const contentHash = await Swarm.downloadFeed(url, timeout);
         Debug.log('downloadPostFeed: contentHash: ', contentHash);
 
