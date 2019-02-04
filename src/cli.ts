@@ -1,5 +1,8 @@
+import { keccak256 } from 'js-sha3';
+
 import { Version } from './Version';
-import { testSharePost } from './social/api';
+import { testSharePost, testSharePosts, testListAllPosts } from './social/api';
+import * as Swarm from './Swarm';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -23,8 +26,46 @@ const main = async () => {
                 await testSharePost();
                 break;
             }
+            case 'testSharePosts': {
+                await testSharePosts();
+                break;
+            }
+            case 'testListAllPosts': {
+                await testListAllPosts();
+                break;
+            }
+            case 'swarm': {
+                if (process.argv.length > 3) {
+                    switch (process.argv[3]) {
+                        case 'get': {
+                            if (process.argv.length > 4) {
+                                const bzzHash = process.argv[4];
+                                const data = await Swarm.download(bzzHash);
+                                console.log(data);
+                            } else {
+                                console.log('usage: cli swarm get <bzz-hash>');
+                            }
+                            break;
+                        }
+                        case 'sha3': {
+                            if (process.argv.length > 4) {
+                                const data = process.argv[4];
+                                const hash = keccak256.hex(data);
+                                console.log(hash);
+                            } else {
+                                console.log('usage: cli swarm sha3 <bzz-hash>');
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    console.log('usage: cli swarm [get | sha3]');
+                }
+                break;
+            }
             default: {
-                console.log('usage: cli [version]');
+                console.log('usage: cli [version | swarm]');
                 break;
             }
         }

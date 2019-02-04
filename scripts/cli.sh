@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 source="src/cli.ts"
 target="build/dist/src/cli.js"
