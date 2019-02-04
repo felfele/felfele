@@ -4,6 +4,7 @@ import { View, ViewStyle } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
 import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';

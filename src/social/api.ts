@@ -219,7 +219,7 @@ export const testListAllPosts = async () => {
     }
 };
 
-export const allTests = {
+export const allTests: { [ index: string]: () => void } = {
     testSharePost,
     testSharePosts,
     testSharePostsWithUpdate,
