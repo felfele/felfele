@@ -6,6 +6,7 @@ import { uploadPost } from '../PostUpload';
 import { ModelHelper } from '../models/ModelHelper';
 import { MockModelHelper } from '../models/__mocks__/ModelHelper';
 import { Debug } from '../Debug';
+import { Utils } from '../Utils';
 
 type PostCommandType = 'update' | 'remove';
 
@@ -126,30 +127,39 @@ export const updatePost = async (
     };
 };
 
-// TODO
-// export const removePost = async (
-//     post: Post,
-//     postCommandFeed: PostCommandLog,
-//     swarmFeedApi: Swarm.FeedApi,
-//     options: PostOptions = DefaultPostOptions,
-// ) => {
-//     const removedPost: Post = {
-//         _id: post._id,
-//         text: '',
-//         images: [],
-//         createdAt: post.createdAt,
-//     };
-//     const postCommand: PostCommand = {
-//         version: CurrentPostCommandVersion,
-//         post: removedPost,
-//         type: 'remove',
-//     };
-//     const uploadedPostCommand =  await addPostCommandToFeed(postCommand, swarmFeedApi);
-//     return {
-//         ...postCommandFeed,
-//         commands: [uploadedPostCommand, ...postCommandFeed.commands],
-//     };
-// };
+export const removePost = async (
+    post: Post,
+    postCommandLog: PostCommandLog,
+    swarmFeedApi: Swarm.FeedApi,
+    options: PostOptions = DefaultPostOptions,
+) => {
+    const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
+    if (parentTimestamp === 0) {
+        throw new Error('removePost failed, no previous post with the same id: ' + post._id);
+    }
+    const timestamp = getPreviousPostCommandTimestampFromLog(postCommandLog) + 1;
+    const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
+
+    const removedPost: Post = {
+        _id: post._id,
+        text: '',
+        images: [],
+        createdAt: post.createdAt,
+    };
+    const postCommand: PostCommand = {
+        protocolVersion: PostCommandProtocolVersion,
+        post: removedPost,
+        type: 'remove',
+        timestamp,
+        parentTimestamp,
+        previousEpoch,
+    };
+    const removedPostCommand =  await addPostCommandToFeed(postCommand, swarmFeedApi);
+    return {
+        ...postCommandLog,
+        commands: [removedPostCommand, ...postCommandLog.commands],
+    };
+};
 
 const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.FeedApi): Promise<PostCommand> => {
     const data = serialize(postCommand);
@@ -160,10 +170,33 @@ const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swar
     };
 };
 
+export const getLatestPostsFromLog = (count: number, postCommandLog: PostCommandLog): Post[] => {
+    const updatePostCommands = getLatestUpdatePostCommandsFromLog(count, postCommandLog);
+    const updatedPosts = updatePostCommands.map(postCommand => postCommand.post);
+    return updatedPosts;
+};
+
+export const getLatestUpdatePostCommandsFromLog = (count: number, postCommandLog: PostCommandLog): PostCommand[] => {
+    const skipPostCommandSet = new Set<number>();
+    const updatePostCommands = postCommandLog.commands.filter(postCommand => {
+        if (postCommand.parentTimestamp !== 0) {
+            skipPostCommandSet.add(postCommand.parentTimestamp);
+        }
+        if (postCommand.type === 'remove') {
+            return false;
+        }
+        if (skipPostCommandSet.has(postCommand.timestamp)) {
+            return false;
+        }
+        return true;
+    });
+    return Utils.take(updatePostCommands, count, []);
+};
+
 const testIdentity = {
-    privateKey: '0xe2c4b9cd9d0ea08fff1d797c756c1b0e8afbd7f151588f1f3a4d14149d93a5d7',
-    publicKey: '0x047b441bb5656f69a721b466c087aa5087a31647f477919cf6f97e7583583db61fb0f555e154de4821c9b7e33f33eaf41b637d2ddfff1f8ccd10d330043fc667a6',
-    address: '0xec3879077574f5d53c438e3de0627a4cbcf30512',
+    privateKey: '0x9e7cb8f7f92f0a62060f40dea2b782415e4ef70835b25f81bb942cb4994b5a3c',
+    publicKey: '0x044d89c68f8bdc289764149ba5ed6fe2aeca546dfa3a36648946d546df41d52d6c5bf2bbadb1c5b74ebab9ca3bddf08d4b6fe4dc523b7358dc9c883fa6d0c39d79',
+    address: '0xfe6368fe6f10dab84b95a1079929323fd256980f',
 };
 
 const testPostCommandFeed: PostCommandLog = {
@@ -204,6 +237,19 @@ export const testSharePostsWithUpdate = async () => {
     const postCommandLogAfter4 = await updatePost(post1Update, postCommandLogAfter3, swarmFeedApi);
 };
 
+export const testSharePostsWithRemove = async () => {
+    const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
+
+    const postCommandLogAfter1 = await testSharePost(1, testPostCommandFeed);
+    const postCommandLogAfter2 = await testSharePost(2, postCommandLogAfter1);
+    const postCommandLogAfter3 = await testSharePost(3, postCommandLogAfter2);
+    const post3 = postCommandLogAfter3.commands[2].post;
+    const postCommandLogAfter4 = await removePost(post3, postCommandLogAfter3, swarmFeedApi);
+
+    const posts = await getLatestPostsFromLog(2, postCommandLogAfter4);
+    Debug.log('testSharePostsWithRemove', 'posts', posts);
+};
+
 export const testListAllPosts = async () => {
     const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
     let postCommandJSON = await swarmFeedApi.download();
@@ -223,5 +269,6 @@ export const allTests = {
     testSharePost,
     testSharePosts,
     testSharePostsWithUpdate,
+    testSharePostsWithRemove,
     testListAllPosts,
 };
