@@ -184,6 +184,8 @@ export const downloadFeed = async (feedUri: string, timeout: number = 0): Promis
 export interface FeedApi {
     download: () => Promise<string>;
     downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
+    downloadFeedTemplate: () => Promise<FeedTemplate>;
+    updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
     update: (data: string) => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string) => Promise<string>;
     getUri: () => string;
@@ -193,6 +195,8 @@ export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
     return {
         download: async (): Promise<string> => downloadUserFeed(identity),
         downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(identity.address, epoch),
+        downloadFeedTemplate: async () => downloadUserFeedTemplate(identity),
+        updateWithFeedTemplate: async (feedTemplate: FeedTemplate, data) => await updateUserFeed(feedTemplate, identity, data),
         update: async (data: string): Promise<FeedTemplate> => {
             const feedTemplate = await downloadUserFeedTemplate(identity);
             return await updateUserFeed(feedTemplate, identity, data);
