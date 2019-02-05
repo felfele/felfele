@@ -199,11 +199,6 @@ const CardTop = (props: {
                 <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
                 <Text style={styles.location}>{printableTime}{hostnameText}</Text>
             </View>
-            <ShareButton
-                post={props.post}
-                onSharePost={props.onSharePost}
-                author={props.author}
-            />
         </TouchableOpacity>
     );
 };
