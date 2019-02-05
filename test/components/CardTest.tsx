@@ -4,7 +4,7 @@ import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 
-jest.mock('../../src/models/ModelHelper');
+jest.mock('../../src/models/ReactNativeModelHelper');
 
 describe('card test', () => {
     const testAuthor: Author = {
@@ -45,6 +45,7 @@ describe('card test', () => {
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
                 currentTimestamp={0}
+                author={testAuthor}
             />
         ).root;
         console.log(result.props);
@@ -64,6 +65,7 @@ describe('card test', () => {
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
                 currentTimestamp={0}
+                author={testAuthor}
             />
         ).root;
         console.log(result.props);
@@ -83,6 +85,7 @@ describe('card test', () => {
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
                 currentTimestamp={0}
+                author={testAuthor}
             />
         ).root;
         console.log(result.props);
@@ -103,6 +106,7 @@ describe('card test', () => {
                 togglePostSelection={(_) => {}}
                 showSquareImages={true}
                 currentTimestamp={0}
+                author={testAuthor}
             />
         ).root;
         console.log(result.props);

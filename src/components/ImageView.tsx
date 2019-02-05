@@ -3,9 +3,9 @@ import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react
 
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 export interface StateProps extends ImageProperties {
     source: ImageData;

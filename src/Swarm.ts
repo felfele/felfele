@@ -1,40 +1,40 @@
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
-import { generateSecureRandom } from 'react-native-securerandom';
 
 import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
 import { safeFetch, safeFetchWithTimeout } from './Network';
+import { hexToByteArray, byteArrayToHex, stringToByteArray } from './conversion';
 
-export const DefaultGateway = 'https://swarm-gateways.net';
+export const DefaultGateway = 'https://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
 export const HashLength = 64;
 
-export const upload = async (data: string): Promise<string> => {
-    Debug.log('upload to Swarm: ', data);
+export const upload = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+    Debug.log('upload: to Swarm: ', data);
     try {
-        const hash = await uploadData(data);
-        Debug.log('hash is ', hash);
+        const hash = await uploadData(data, swarmGateway);
+        Debug.log('upload:', 'hash is', hash);
         return hash;
     } catch (e) {
-        Debug.log('upload to Swarm failed: ', JSON.stringify(e));
+        Debug.log('upload:', 'failed', JSON.stringify(e));
         return '';
     }
 };
 
-export const download = async (hash: string): Promise<string> => {
-    return await downloadData(hash);
+export const download = async (hash: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+    return await downloadData(hash, 0, swarmGateway);
 };
 
 export const getUrlFromHash = (hash: string): string => {
     return DefaultGateway + DefaultUrlScheme + hash;
 };
 
-export const uploadForm = async (data: FormData): Promise<string> => {
+const uploadForm = async (data: FormData, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadForm: ', data);
-    const url = DefaultGateway + '/bzz:/';
+    const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -76,7 +76,7 @@ const imageMimeTypeFromPath = (path: string): string => {
     return 'unknown';
 };
 
-export const uploadPhoto = async (localPath: string): Promise<string> => {
+export const uploadPhoto = async (localPath: string, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadPhoto: ', localPath);
     const data = new FormData();
     const imageMimeType = imageMimeTypeFromPath(localPath);
@@ -88,13 +88,13 @@ export const uploadPhoto = async (localPath: string): Promise<string> => {
     } as any as Blob);
     data.append('title', 'photo');
 
-    const hash = await uploadForm(data);
+    const hash = await uploadForm(data, swarmGateway);
     return DefaultPrefix + hash + '/' + name;
 };
 
-export const uploadData = async (data: string): Promise<string> => {
+const uploadData = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadData: ', data);
-    const url = DefaultGateway + '/bzz:/';
+    const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
             'Content-Type': 'text/plain',
@@ -107,35 +107,45 @@ export const uploadData = async (data: string): Promise<string> => {
     return text;
 };
 
-export const downloadData = async (hash: string, timeout: number = 0): Promise<string> => {
-    const url = DefaultGateway + '/bzz:/' + hash + '/';
+export const downloadData = async (hash: string, timeout: number = 0, swarmGateway: string = DefaultGateway): Promise<string> => {
+    const url = swarmGateway + '/bzz:/' + hash + '/';
+    Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
 };
 
+export const DefaultEpoch = {
+    time: 0,
+    level: 0,
+};
+
+export interface Epoch {
+    time: number;
+    level: number;
+}
+
+export interface FeedAddress {
+    topic: string;
+    user: string;
+}
+
 interface FeedTemplate {
-    feed: {
-        topic: string;
-        user: string;
-    };
-    epoch: {
-        time: number;
-        level: number;
-    };
+    feed: FeedAddress;
+    epoch: Epoch;
     protocolVersion: number;
 }
 
 export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promise<FeedTemplate> => {
     const url = DefaultGateway + `/bzz-feed:/?user=${identity.address}&meta=1`;
-    Debug.log('downloadFeedTemplate: ', url);
+    Debug.log('downloadUserFeedTemplate: ', url);
     const response = await safeFetch(url);
     const feedUpdateResponse = await response.json() as FeedTemplate;
-    Debug.log('downloadFeedTemplate: ', feedUpdateResponse);
+    Debug.log('downloadUserFeedTemplate: ', feedUpdateResponse);
     return feedUpdateResponse;
 };
 
-export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string) => {
+export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string): Promise<FeedTemplate> => {
     const digest = feedUpdateDigest(feedTemplate, data);
 
     if (digest == null) {
@@ -143,7 +153,7 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
     }
     const signature = signDigest(digest, identity);
     const url = DefaultGateway + `/bzz-feed:/?topic=${feedTemplate.feed.topic}&user=${identity.address}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
-    Debug.log('updateFeed: ', url);
+    Debug.log('updateFeed: ', url, data);
     const options: RequestInit = {
         method: 'POST',
         body: data,
@@ -152,11 +162,15 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
     const text = await response.text();
     Debug.log('updateFeed: ', text);
 
-    return '';
+    return feedTemplate;
 };
 
 export const downloadUserFeed = async (identity: PublicIdentity): Promise<string> => {
     return await downloadFeed(`bzz-feed:/?user=${identity.address}`);
+};
+
+export const downloadUserFeedPreviousVersion = async (address: string, epoch: Epoch): Promise<string> => {
+    return await downloadFeed(`bzz-feed:/?user=${address}&time=${epoch.time}`);
 };
 
 export const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
@@ -169,7 +183,10 @@ export const downloadFeed = async (feedUri: string, timeout: number = 0): Promis
 
 export interface FeedApi {
     download: () => Promise<string>;
-    update: (data: string) => Promise<void>;
+    downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
+    downloadFeedTemplate: () => Promise<FeedTemplate>;
+    updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
+    update: (data: string) => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string) => Promise<string>;
     getUri: () => string;
 }
@@ -177,12 +194,41 @@ export interface FeedApi {
 export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
     return {
         download: async (): Promise<string> => downloadUserFeed(identity),
-        update: async (data: string): Promise<void> => {
+        downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(identity.address, epoch),
+        downloadFeedTemplate: async () => downloadUserFeedTemplate(identity),
+        updateWithFeedTemplate: async (feedTemplate: FeedTemplate, data) => await updateUserFeed(feedTemplate, identity, data),
+        update: async (data: string): Promise<FeedTemplate> => {
             const feedTemplate = await downloadUserFeedTemplate(identity);
-            await updateUserFeed(feedTemplate, identity, data);
+            return await updateUserFeed(feedTemplate, identity, data);
         },
         downloadFeed: async (feedUri: string) => await downloadFeed(feedUri),
         getUri: () => `bzz-feed:/?user=${identity.address}`,
+    };
+};
+
+export interface BzzApi {
+    download: (hash: string) => Promise<string>;
+    upload: (data: string) => Promise<string>;
+    uploadPhoto: (localPath: string) => Promise<string>;
+}
+
+export const makeBzzApi = (swarmGateway: string = DefaultGateway): BzzApi => {
+    return {
+        download: (hash: string) => download(hash, swarmGateway),
+        upload: (data: string) => upload(data, swarmGateway),
+        uploadPhoto: (localPath: string) => uploadPhoto(localPath, swarmGateway),
+    };
+};
+
+export interface Api {
+    bzz: BzzApi;
+    feed: FeedApi;
+}
+
+export const makeApi = (identity: PrivateIdentity, swarmGateway: string = DefaultGateway): Api => {
+    return {
+        bzz: makeBzzApi(swarmGateway),
+        feed: makeFeedApi(identity),
     };
 };
 
@@ -192,78 +238,6 @@ const timeLength = 7;
 const levelLength = 1;
 const headerLength = 8;
 const updateMinLength = topicLength + userLength + timeLength + levelLength + headerLength;
-
-export const hexToString = (hex: string): string => {
-    const byteArray = hexToByteArray(hex);
-    return byteArrayToString(byteArray);
-};
-
-const byteArrayToStringBuiltin = (byteArray: number[]): string => {
-    if (String.fromCodePoint != null) {
-        return String.fromCodePoint.apply(null, byteArray);
-    } else {
-        return String.fromCharCode.apply(null, byteArray);
-    }
-};
-
-export const byteArrayToString = (byteArray: number[]): string => {
-    const maxSize = 256;
-    let index = 0;
-    let result = '';
-    while (index < byteArray.length) {
-        const slice = byteArray.slice(index, index + maxSize);
-        result += byteArrayToStringBuiltin(slice);
-        index += slice.length;
-    }
-    return result;
-};
-
-export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
-
-// cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
-export const byteArrayToHex = (byteArray: number[]): string => {
-    return '0x' + Array.from(byteArray, (byte) => {
-        // tslint:disable-next-line:no-bitwise
-        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('');
-};
-
-// equally cheekily borrowed from https://stackoverflow.com/questions/17720394/javascript-string-to-byte-to-string
-export const stringToByteArray = (str: string): number[] => {
-    const result = new Array<number>();
-    for (let i = 0; i < str.length; i++) {
-        result.push(str.charCodeAt(i));
-    }
-    return result;
-};
-
-export const hexToByteArray = (hex: string): number[] => {
-    const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-    const subStrings: string[] = [];
-    for (let i = 0; i < hexWithoutPrefix.length; i += 2) {
-        subStrings.push(hexWithoutPrefix.substr(i, 2));
-    }
-    return subStrings.map(s => parseInt(s, 16));
-};
-
-const isHexStrict = (s: string): boolean => {
-    if (!s.startsWith('0x')) {
-        return false;
-    }
-    if (s.length < 4) {
-        return false;
-    }
-    if (s.length % 2 === 1) {
-        return false;
-    }
-    const legalChars: string = '0123456789aAbBcCdDeEfF';
-    for (let i = 2; i < s.length; i++) {
-        if (!legalChars.includes(s.charAt(i))) {
-            return false;
-        }
-    }
-    return true;
-};
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
@@ -351,8 +325,8 @@ const signDigest = (digest: number[], identity: PrivateIdentity) => {
     return byteArrayToHex(signature);
 };
 
-export const generateSecureIdentity = async (): Promise<PrivateIdentity> => {
-    const secureRandomUint8Array = await generateSecureRandom(32);
+export const generateSecureIdentity = async (generateRandom: (length: number) => Promise<Uint8Array>): Promise<PrivateIdentity> => {
+    const secureRandomUint8Array = await generateRandom(32);
     const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
     const curve = new ec('secp256k1');
     const keyPair = await curve.genKeyPair({

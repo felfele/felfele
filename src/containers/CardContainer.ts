@@ -17,6 +17,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
         currentTimestamp: state.currentTimestamp,
         isSelected: ownProps.isSelected,
         showSquareImages: state.settings.showSquareImages,
+        author: state.author,
         togglePostSelection: ownProps.togglePostSelection,
         navigate: ownProps.navigate,
     };
@@ -28,9 +29,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
             dispatch(AsyncActions.removePost(post));
         },
         onSharePost: (post: Post) => {
-            if (post.link != null) {
-                return;
-            }
             dispatch(AsyncActions.sharePost(post));
         },
     };

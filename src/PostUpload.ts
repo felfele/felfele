@@ -1,15 +1,8 @@
-import ImageResizer from 'react-native-image-resizer';
-
 import { Post, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
-import { uploadPhoto, isSwarmLink } from './Swarm';
-import { Debug } from './Debug';
+import { uploadPhoto, isSwarmLink, upload, DefaultPrefix } from './Swarm';
 import { ModelHelper } from './models/ModelHelper';
-
-const modelHelper = new ModelHelper();
-
-const MAX_UPLOADED_IMAGE_DIMENSION = 400;
-const MAX_UPLOADED_IMAGE_SIZE = 500 * 1024;
+import { serialize } from './social/serialization';
 
 const isImageUploaded = (image: ImageData): boolean => {
     if (image.uri != null && isSwarmLink(image.uri)) {
@@ -18,38 +11,17 @@ const isImageUploaded = (image: ImageData): boolean => {
     return false;
 };
 
-const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
-    if (image.width != null && image.width >= MAX_UPLOADED_IMAGE_DIMENSION) {
-        return true;
-    }
-    if (image.height != null && image.height >= MAX_UPLOADED_IMAGE_DIMENSION) {
-        return true;
-    }
-    return false;
-};
-
-const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
-    if (isImageExceedMaximumDimensions(image)) {
-        const [width, height] = modelHelper.calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
-        const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
-        Debug.log('resizeImageIfNeeded: ', 'resizedImagePNG', resizedImagePNG);
-        if (resizedImagePNG.size != null && resizedImagePNG.size < MAX_UPLOADED_IMAGE_SIZE) {
-            return resizedImagePNG.uri;
-        }
-        const resizedImageJPEG = await ImageResizer.createResizedImage(path, width, height, 'JPEG', 100);
-        Debug.log('resizeImageIfNeeded: ', 'resizedImageJPEG', resizedImageJPEG);
-        return resizedImageJPEG.uri;
-    }
-    return path;
-};
-
-export const uploadImage = async (image: ImageData): Promise<ImageData> => {
+export const uploadImage = async (
+    image: ImageData,
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper,
+): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
         if (image.localPath == null || image.localPath === '') {
             return image;
         }
         const path = modelHelper.getLocalPath(image.localPath);
-        const resizedImagePath = await resizeImageIfNeeded(image, path);
+        const resizedImagePath = await imageResizer(image, path);
         const uri = await uploadPhoto(resizedImagePath);
         return {
             ...image,
@@ -60,20 +32,25 @@ export const uploadImage = async (image: ImageData): Promise<ImageData> => {
     return image;
 };
 
-export const uploadImages = async (images: ImageData[]): Promise<ImageData[]> => {
+export const uploadImages = async (
+    images: ImageData[],
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper,
+): Promise<ImageData[]> => {
     const updateImages: ImageData[] = [];
     for (const image of images) {
-        const updateImage = await uploadImage(image);
+        const updateImage = await uploadImage(image, imageResizer, modelHelper);
         updateImages.push(updateImage);
     }
     return updateImages;
 };
 
-export const uploadAuthor = async (author?: Author): Promise<Author | undefined> => {
-    if (author == null) {
-        return undefined;
-    }
-    const uploadedImage = await uploadImage(author.image!);
+export const uploadAuthor = async (
+    author: Author,
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper,
+): Promise<Author | undefined> => {
+    const uploadedImage = await uploadImage(author.image!, imageResizer, modelHelper);
     return {
         ...author,
         faviconUri: '',
@@ -82,26 +59,39 @@ export const uploadAuthor = async (author?: Author): Promise<Author | undefined>
     };
 };
 
-export const uploadPost = async (post: Post): Promise<Post> => {
+export const uploadPost = async (
+    post: Post,
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper,
+): Promise<Post> => {
     if (post.link != null && isSwarmLink(post.link)) {
         return post;
     }
-    const uploadedImages = await uploadImages(post.images);
+    const uploadedImages = await uploadImages(post.images, imageResizer, modelHelper);
     const uploadedPost = {
         ...post,
         images: uploadedImages,
         author: undefined,
     };
 
-    // TODO upload post
+    const uploadedPostJSON = serialize(uploadedPost);
+    const postContentHash = await upload(uploadedPostJSON);
+    const postLink = DefaultPrefix + postContentHash;
 
-    return uploadedPost;
+    return {
+        ...uploadedPost,
+        link: postLink,
+    };
 };
 
-export const uploadPosts = async (posts: Post[]): Promise<Post[]> => {
+export const uploadPosts = async (
+    posts: Post[],
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper,
+): Promise<Post[]> => {
     const uploadedPosts: Post[] = [];
     for (const post of posts) {
-        const uploadedPost = await uploadPost(post);
+        const uploadedPost = await uploadPost(post, imageResizer, modelHelper);
         uploadedPosts.push(uploadedPost);
     }
     return uploadedPosts;

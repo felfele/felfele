@@ -6,7 +6,7 @@ import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import { isValidBackup, restoreBackupToString } from '../BackupRestore';
-import { stringToHex } from '../Swarm';
+import { stringToHex } from '../conversion';
 import { getAppStateFromSerialized } from '../reducers';
 
 export interface StateProps {

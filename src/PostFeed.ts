@@ -4,17 +4,24 @@ import { ImageData } from './models/ImageData';
 import * as Swarm from './Swarm';
 import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
+import { ModelHelper } from './models/ModelHelper';
 
 export interface PostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
 }
 
-export const createPostFeed = async (swarmFeedApi: Swarm.FeedApi, author: Author, firstPost: PublicPost): Promise<PostFeed> => {
+export const createPostFeed = async (
+    swarmFeedApi: Swarm.FeedApi,
+    author: Author,
+    firstPost: PublicPost,
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper
+): Promise<PostFeed> => {
     const url = swarmFeedApi.getUri();
     Debug.log('createPostFeed: ', author);
-    const uploadedImage = await uploadImage(author.image);
-    const uploadedPost = await uploadPost(firstPost);
+    const uploadedImage = await uploadImage(author.image, imageResizer, modelHelper);
+    const uploadedPost = await uploadPost(firstPost, imageResizer, modelHelper);
     const postFeed: PostFeed = {
         name: author.name,
         url,

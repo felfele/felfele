@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Post } from '../models/Post';
+import { Post, Author } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultStyle } from '../styles';
-import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
@@ -12,16 +12,17 @@ import { ImageData } from '../models/ImageData';
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
-import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
-const modelHelper = new ModelHelper();
+const modelHelper = new ReactNativeModelHelper();
 
 export interface StateProps {
     showSquareImages: boolean;
     isSelected: boolean;
     post: Post;
     currentTimestamp: number;
+    author: Author;
     togglePostSelection: (post: Post) => void;
     navigate: (view: string, {}) => void;
 }
@@ -49,7 +50,10 @@ export const Card = (props: CardProps) => {
             <CardTop
                 post={props.post}
                 currentTimestamp={props.currentTimestamp}
-                navigate={props.navigate}/>
+                author={props.author}
+                navigate={props.navigate}
+                onSharePost={props.onSharePost}
+            />
             <TouchableOpacity
                 activeOpacity={1}
                 onLongPress={() => props.togglePostSelection(props.post)}
@@ -91,9 +95,42 @@ const ActionIcon = (props: { name: string}) => {
     return <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
 };
 
+const isPostShareable = (post: Post, author: Author): boolean => {
+    if (post.author == null ) {
+        return false;
+    }
+    if (post.author.identity == null) {
+        // RSS post
+        return true;
+    }
+    if (author.identity == null) {
+        return false;
+    }
+    if (post.author.identity.publicKey === author.identity.publicKey) {
+        if (post.link != null) {
+            return false;
+        }
+        return true;
+    }
+    return true;
+};
+
+const ShareButton = (props: {post: Post, onSharePost: (post: Post) => void, author: Author}) => {
+    const isShareable = isPostShareable(props.post, props.author);
+    const shareIconName = isShareable ? 'share-outline' : 'share';
+    const onPress = isShareable ? () => props.onSharePost(props.post) : undefined;
+    return (
+        <TouchableView style={styles.share} onPress={onPress}>
+        { props.post.isUploading === true
+            ? <ActivityIndicator color={Colors.DARK_GRAY} />
+            : <ActionIcon name={shareIconName}/>
+        }
+        </TouchableView>
+    );
+};
+
 const ButtonList = (props: CardProps) => {
     const likeIconName = props.post.liked === true ? 'heart' : 'heart-outline';
-    const shareIconName = props.post.link != null ? 'share' : 'share-outline';
     if (props.isSelected) {
         return (
             <View
@@ -111,12 +148,11 @@ const ButtonList = (props: CardProps) => {
                 <TouchableView style={styles.share}>
                     {/* <ActionIcon name='playlist-edit'/> */}
                 </TouchableView>
-                <TouchableView style={styles.share} onPress={() => props.onSharePost(props.post)}>
-                    { props.post.isUploading === true
-                        ? <ActivityIndicator color={Colors.DARK_GRAY} />
-                        : <ActionIcon name={shareIconName}/>
-                    }
-                </TouchableView>
+                <ShareButton
+                    post={props.post}
+                    onSharePost={props.onSharePost}
+                    author={props.author}
+                />
             </View>
         );
     }
@@ -137,7 +173,13 @@ const CardTopIcon = (props: { post: Post }) => {
     }
 };
 
-const CardTop = (props: { post: Post, currentTimestamp: number, navigate: (view: string, {}) => void }) => {
+const CardTop = (props: {
+    post: Post,
+    currentTimestamp: number,
+    author: Author,
+    navigate: (view: string, {}) => void,
+    onSharePost: (post: Post) => void,
+}) => {
     const printableTime = DateUtils.printableElapsedTime(props.post.createdAt, props.currentTimestamp) + ' ago';
     const authorName = props.post.author ? props.post.author.name : 'Space Cowboy';
     const url = props.post.link || '';
@@ -230,6 +272,7 @@ const styles = StyleSheet.create({
     usernameContainer: {
         justifyContent: 'center',
         flexDirection: 'column',
+        flex: 1,
     },
     location: {
         fontSize: 10,

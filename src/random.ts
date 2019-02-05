@@ -13,3 +13,12 @@ export const generateUnsecureRandomString = (lengthInBytes: number): string => {
         '',
     );
 };
+
+export const generateUnsecureRandomUint8Array = (lengthInBytes: number): Uint8Array => {
+    const randomBytes = generateMathRandomValues(lengthInBytes);
+    return new Uint8Array(randomBytes);
+};
+
+export const generateUnsecureRandom = async (lengthInBytes: number): Promise<Uint8Array> => {
+    return generateUnsecureRandomUint8Array(lengthInBytes);
+};

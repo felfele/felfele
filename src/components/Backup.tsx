@@ -8,7 +8,7 @@ import { Button } from './Button';
 import { createBackupFromString } from '../BackupRestore';
 import { DateUtils } from '../DateUtils';
 import { AppState, getSerializedAppState } from '../reducers';
-import { stringToHex } from '../Swarm';
+import { stringToHex } from '../conversion';
 
 export interface StateProps {
     navigation: any;
