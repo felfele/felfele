@@ -190,7 +190,7 @@ export const getLatestUpdatePostCommandsFromLog = (count: number, postCommandLog
         }
         return true;
     });
-    return Utils.take(updatePostCommands, count, []);
+    return updatePostCommands.slice(0, count);
 };
 
 const testIdentity = {
@@ -246,7 +246,7 @@ export const testSharePostsWithRemove = async () => {
     const post3 = postCommandLogAfter3.commands[2].post;
     const postCommandLogAfter4 = await removePost(post3, postCommandLogAfter3, swarmFeedApi);
 
-    const posts = await getLatestPostsFromLog(2, postCommandLogAfter4);
+    const posts = await getLatestPostsFromLog(3, postCommandLogAfter4);
     Debug.log('testSharePostsWithRemove', 'posts', posts);
 };
 
