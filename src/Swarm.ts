@@ -12,10 +12,10 @@ export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
 export const HashLength = 64;
 
-export const upload = async (data: string): Promise<string> => {
+export const upload = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('upload: to Swarm: ', data);
     try {
-        const hash = await uploadData(data);
+        const hash = await uploadData(data, swarmGateway);
         Debug.log('upload:', 'hash is', hash);
         return hash;
     } catch (e) {
@@ -24,17 +24,17 @@ export const upload = async (data: string): Promise<string> => {
     }
 };
 
-export const download = async (hash: string): Promise<string> => {
-    return await downloadData(hash);
+export const download = async (hash: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+    return await downloadData(hash, 0, swarmGateway);
 };
 
 export const getUrlFromHash = (hash: string): string => {
     return DefaultGateway + DefaultUrlScheme + hash;
 };
 
-export const uploadForm = async (data: FormData): Promise<string> => {
+const uploadForm = async (data: FormData, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadForm: ', data);
-    const url = DefaultGateway + '/bzz:/';
+    const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -76,7 +76,7 @@ const imageMimeTypeFromPath = (path: string): string => {
     return 'unknown';
 };
 
-export const uploadPhoto = async (localPath: string): Promise<string> => {
+export const uploadPhoto = async (localPath: string, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadPhoto: ', localPath);
     const data = new FormData();
     const imageMimeType = imageMimeTypeFromPath(localPath);
@@ -88,13 +88,13 @@ export const uploadPhoto = async (localPath: string): Promise<string> => {
     } as any as Blob);
     data.append('title', 'photo');
 
-    const hash = await uploadForm(data);
+    const hash = await uploadForm(data, swarmGateway);
     return DefaultPrefix + hash + '/' + name;
 };
 
-export const uploadData = async (data: string): Promise<string> => {
+const uploadData = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
     Debug.log('uploadData: ', data);
-    const url = DefaultGateway + '/bzz:/';
+    const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
             'Content-Type': 'text/plain',
@@ -107,8 +107,8 @@ export const uploadData = async (data: string): Promise<string> => {
     return text;
 };
 
-export const downloadData = async (hash: string, timeout: number = 0): Promise<string> => {
-    const url = DefaultGateway + '/bzz:/' + hash + '/';
+export const downloadData = async (hash: string, timeout: number = 0, swarmGateway: string = DefaultGateway): Promise<string> => {
+    const url = swarmGateway + '/bzz:/' + hash + '/';
     Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
@@ -199,6 +199,32 @@ export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
         },
         downloadFeed: async (feedUri: string) => await downloadFeed(feedUri),
         getUri: () => `bzz-feed:/?user=${identity.address}`,
+    };
+};
+
+export interface BzzApi {
+    download: (hash: string) => Promise<string>;
+    upload: (data: string) => Promise<string>;
+    uploadPhoto: (localPath: string) => Promise<string>;
+}
+
+export const makeBzzApi = (swarmGateway: string = DefaultGateway): BzzApi => {
+    return {
+        download: (hash: string) => download(hash, swarmGateway),
+        upload: (data: string) => upload(data, swarmGateway),
+        uploadPhoto: (localPath: string) => uploadPhoto(localPath, swarmGateway),
+    };
+};
+
+export interface Api {
+    bzz: BzzApi;
+    feed: FeedApi;
+}
+
+export const makeApi = (identity: PrivateIdentity, swarmGateway: string = DefaultGateway): Api => {
+    return {
+        bzz: makeBzzApi(swarmGateway),
+        feed: makeFeedApi(identity),
     };
 };
 
