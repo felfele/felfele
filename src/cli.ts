@@ -38,7 +38,8 @@ const main = async () => {
                         case 'get': {
                             if (process.argv.length > 4) {
                                 const bzzHash = process.argv[4];
-                                const data = await Swarm.download(bzzHash);
+                                const bzz = Swarm.makeBzzApi();
+                                const data = await bzz.download(bzzHash, 0);
                                 console.log(data);
                             } else {
                                 console.log('usage: cli swarm get <bzz-hash>');

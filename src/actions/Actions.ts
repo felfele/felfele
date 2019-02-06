@@ -141,7 +141,9 @@ export const AsyncActions = {
     downloadPostsFromFeeds: (feeds: Feed[]) => {
         return async (dispatch, getState: () => AppState) => {
             const previousPosts = getState().rssPosts;
-            const downloadedPosts = await loadPostsFromFeeds(feeds);
+            // TODO this is a hack, because we don't need a feed address
+            const swarm = Swarm.makeReadableApi({user: '', topic: ''});
+            const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const uniqueAuthors = new Map<string, Author>();
             downloadedPosts.map(post => {
                 if (post.author != null) {
@@ -207,11 +209,11 @@ export const AsyncActions = {
                         return;
                     }
                     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
-                    const swarmFeedApi = Swarm.makeFeedApi(feedAddress, signFeedDigest);
+                    const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
 
                     dispatch(Actions.updatePostIsUploading(post, true));
 
-                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
+                    const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
                     Debug.log('sharePost: after uploadedPost');
 
                     const localFeedPosts = getState().localPosts.filter(localPost =>
@@ -230,7 +232,7 @@ export const AsyncActions = {
                         }))
                         ;
 
-                    const uploadedPosts = await uploadPosts(posts, resizeImageIfNeeded, modelHelper);
+                    const uploadedPosts = await uploadPosts(swarm.bzz, posts, resizeImageIfNeeded, modelHelper);
                     const postFeed = {
                         ...feed,
                         posts: uploadedPosts,
@@ -241,7 +243,7 @@ export const AsyncActions = {
                     };
                     Debug.log('sharePost: after uploadPosts');
 
-                    await updatePostFeed(swarmFeedApi, postFeed);
+                    await updatePostFeed(swarm, postFeed);
                     Debug.log('sharePost: after uploadPostFeed');
 
                     dispatch(Actions.updatePostLink(post, feed.url));
@@ -255,11 +257,11 @@ export const AsyncActions = {
                     const author = getState().author;
                     dispatch(Actions.updatePostIsUploading(post, true));
 
-                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
                     const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
-                    const swarmFeedApi = Swarm.makeFeedApi(feedAddress, signFeedDigest);
+                    const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
+                    const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
 
-                    const feed = await createPostFeed(swarmFeedApi, author, uploadedPost, resizeImageIfNeeded, modelHelper);
+                    const feed = await createPostFeed(swarm, author, uploadedPost, resizeImageIfNeeded, modelHelper);
 
                     dispatch(InternalActions.addOwnFeed(feed));
                     dispatch(Actions.updatePostLink(post, feed.url));
@@ -325,13 +327,13 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadPostsFromFeeds = async (feeds: Feed[]): Promise<Post[]> => {
+const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
     const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
 
     const allPostsCombined = await Promise.all([
         RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
-        loadPosts(postFeeds),
+        loadPosts(swarm, postFeeds),
     ]);
 
     const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);

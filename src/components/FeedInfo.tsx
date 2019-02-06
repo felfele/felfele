@@ -221,7 +221,9 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         if (url.startsWith(Swarm.DefaultFeedPrefix)) {
-            const feed: Feed = await downloadPostFeed(url, 60 * 1000);
+            const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
+            const swarm = Swarm.makeReadableApi(feedAddress);
+            const feed: Feed = await downloadPostFeed(swarm, url, 60 * 1000);
             return feed;
         } else {
             const canonicalUrl = Utils.getCanonicalUrl(this.state.url);

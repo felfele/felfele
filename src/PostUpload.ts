@@ -1,17 +1,18 @@
 import { Post, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
-import { uploadPhoto, isSwarmLink, upload, DefaultPrefix } from './swarm/Swarm';
 import { ModelHelper } from './models/ModelHelper';
 import { serialize } from './social/serialization';
+import * as Swarm from './swarm/Swarm';
 
 const isImageUploaded = (image: ImageData): boolean => {
-    if (image.uri != null && isSwarmLink(image.uri)) {
+    if (image.uri != null && Swarm.isSwarmLink(image.uri)) {
         return true;
     }
     return false;
 };
 
 export const uploadImage = async (
+    swarm: Swarm.BzzApi,
     image: ImageData,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper,
@@ -22,7 +23,7 @@ export const uploadImage = async (
         }
         const path = modelHelper.getLocalPath(image.localPath);
         const resizedImagePath = await imageResizer(image, path);
-        const uri = await uploadPhoto(resizedImagePath);
+        const uri = await swarm.uploadPhoto(resizedImagePath);
         return {
             ...image,
             localPath: undefined,
@@ -33,24 +34,26 @@ export const uploadImage = async (
 };
 
 export const uploadImages = async (
+    swarm: Swarm.BzzApi,
     images: ImageData[],
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper,
 ): Promise<ImageData[]> => {
     const updateImages: ImageData[] = [];
     for (const image of images) {
-        const updateImage = await uploadImage(image, imageResizer, modelHelper);
+        const updateImage = await uploadImage(swarm, image, imageResizer, modelHelper);
         updateImages.push(updateImage);
     }
     return updateImages;
 };
 
 export const uploadAuthor = async (
+    swarm: Swarm.BzzApi,
     author: Author,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper,
 ): Promise<Author | undefined> => {
-    const uploadedImage = await uploadImage(author.image!, imageResizer, modelHelper);
+    const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, modelHelper);
     return {
         ...author,
         faviconUri: '',
@@ -60,14 +63,15 @@ export const uploadAuthor = async (
 };
 
 export const uploadPost = async (
+    swarm: Swarm.BzzApi,
     post: Post,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper,
 ): Promise<Post> => {
-    if (post.link != null && isSwarmLink(post.link)) {
+    if (post.link != null && Swarm.isSwarmLink(post.link)) {
         return post;
     }
-    const uploadedImages = await uploadImages(post.images, imageResizer, modelHelper);
+    const uploadedImages = await uploadImages(swarm, post.images, imageResizer, modelHelper);
     const uploadedPost = {
         ...post,
         images: uploadedImages,
@@ -75,8 +79,8 @@ export const uploadPost = async (
     };
 
     const uploadedPostJSON = serialize(uploadedPost);
-    const postContentHash = await upload(uploadedPostJSON);
-    const postLink = DefaultPrefix + postContentHash;
+    const postContentHash = await swarm.upload(uploadedPostJSON);
+    const postLink = Swarm.DefaultPrefix + postContentHash;
 
     return {
         ...uploadedPost,
@@ -85,13 +89,14 @@ export const uploadPost = async (
 };
 
 export const uploadPosts = async (
+    swarm: Swarm.BzzApi,
     posts: Post[],
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper,
 ): Promise<Post[]> => {
     const uploadedPosts: Post[] = [];
     for (const post of posts) {
-        const uploadedPost = await uploadPost(post, imageResizer, modelHelper);
+        const uploadedPost = await uploadPost(swarm, post, imageResizer, modelHelper);
         uploadedPosts.push(uploadedPost);
     }
     return uploadedPosts;
