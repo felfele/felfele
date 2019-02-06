@@ -1,6 +1,6 @@
 import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
-import * as Swarm from '../Swarm';
+import * as Swarm from '../swarm/Swarm';
 import { serialize, deserialize } from './serialization';
 import { uploadPost } from '../PostUpload';
 import { ModelHelper } from '../models/ModelHelper';
@@ -26,7 +26,7 @@ interface PostCommand {
 }
 
 interface PostCommandLog {
-    commands: PostCommand[];
+    readonly commands: PostCommand[];
 }
 
 interface PostOptions {
@@ -35,13 +35,13 @@ interface PostOptions {
     modelHelper: ModelHelper;
 }
 
-const DefaultImageResizer = (image: ImageData, path: string): Promise<string> => {
+const defaultImageResizer = (image: ImageData, path: string): Promise<string> => {
     return Promise.resolve(path);
 };
 
-const DefaultPostOptions: PostOptions = {
+const defaultPostOptions: PostOptions = {
     shareFeedAddress: false,
-    imageResizer: DefaultImageResizer,
+    imageResizer: defaultImageResizer,
     modelHelper: new MockModelHelper(),
 };
 
@@ -94,13 +94,32 @@ const sourceCompare = (a: PostCommand, b: PostCommand) => {
     return a.source.localeCompare(b.source);
 };
 
+const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
+    if (a == null && b == null) {
+        return 0;
+    }
+    if (a == null) {
+        return 1;
+    }
+    if (b == null) {
+        return 0;
+    }
+    const timeDiff = a.time - b.time;
+    if (timeDiff !== 0) {
+        return timeDiff;
+    }
+    return a.level - b.level;
+};
+
 const mergePostCommandLogs = (postCommandLogA: PostCommandLog, postCommandLogB: PostCommandLog): PostCommandLog => {
     const mergedPostCommandLog = {
         commands: postCommandLogA.commands.concat(postCommandLogB.commands),
     };
     const sortedPostCommandLog = {
         commands: mergedPostCommandLog.commands.sort((a, b) =>
-            timestampCompare(a, b) || sourceCompare(a, b)),
+            // reversed time ordering
+            epochCompare(b.epoch, a.epoch)
+        ),
     };
     return sortedPostCommandLog;
 };
@@ -128,12 +147,12 @@ export const shareNewPost = (
     };
 };
 
-export const shareNewPostSwarm = async (
+const shareNewPostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
     swarmFeedApi: Swarm.FeedApi,
-    options: PostOptions = DefaultPostOptions,
+    options: PostOptions = defaultPostOptions,
 ): Promise<PostCommandLog> => {
     const uploadedPost = await uploadPost(post, options.imageResizer, options.modelHelper);
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
@@ -182,12 +201,12 @@ export const updatePost = (
     };
 };
 
-export const updatePostSwarm = async (
+const updatePostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
     swarmFeedApi: Swarm.FeedApi,
-    options: PostOptions = DefaultPostOptions,
+    options: PostOptions = defaultPostOptions,
 ): Promise<PostCommandLog> => {
     const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
     if (parentTimestamp === 0) {
@@ -251,12 +270,11 @@ export const removePost = (
     };
 };
 
-export const removePostSwarm = async (
+const removePostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
     swarmFeedApi: Swarm.FeedApi,
-    options: PostOptions = DefaultPostOptions,
 ) => {
     const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
     if (parentTimestamp === 0) {
@@ -298,6 +316,72 @@ const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swar
     return updatedCommand;
 };
 
+const getUnsyncedPostCommandLog = (postCommandLog: PostCommandLog): PostCommandLog => {
+    const unsyncedCommands: PostCommand[] = [];
+    for (const postCommand of postCommandLog.commands) {
+        if (postCommand.epoch != null) {
+            return {
+                ...postCommandLog,
+                commands: unsyncedCommands,
+            };
+        }
+        unsyncedCommands.push(postCommand);
+    }
+    return {
+        ...postCommandLog,
+        commands: unsyncedCommands,
+    };
+};
+
+const uploadPostCommandPost = async (postCommand: PostCommand): Promise<PostCommand> => {
+    if (postCommand.type === 'update') {
+        const post = {
+            ...postCommand.post,
+            link: undefined,
+        };
+        const uploadedPost = await uploadPost(post,  defaultPostOptions.imageResizer, defaultPostOptions.modelHelper);
+        return {
+            ...postCommand,
+            post: uploadedPost,
+        };
+    } else {
+        return postCommand;
+    }
+};
+
+const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api): Promise<PostCommand> => {
+    const postCommandAfterUploadPost = await uploadPostCommandPost(postCommand);
+    const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
+    const postCommandAfterPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
+    return postCommandAfterPostFeedUpdated;
+};
+
+const uploadUnsyncedPostCommandsToSwarm = async (postCommandLog: PostCommandLog, swarmApi: Swarm.Api): Promise<PostCommandLog> => {
+    const unsyncedCommandLog = getUnsyncedPostCommandLog(postCommandLog);
+    const syncedCommands = postCommandLog.commands.slice(unsyncedCommandLog.commands.length);
+    const reversedUnsyncedCommands = unsyncedCommandLog.commands.reverse();
+
+    const previousSyncedEpoch = getLatestPostCommandEpochFromLog({commands: syncedCommands});
+
+    let previousEpoch = previousSyncedEpoch;
+    const uploadedCommands: PostCommand[] = [];
+    for (const postCommand of reversedUnsyncedCommands) {
+        const postCommandWithPreviousEpoch = {
+            ...postCommand,
+            previousEpoch,
+        };
+
+        const uploadedCommand = await uploadPostCommandToSwarm(postCommandWithPreviousEpoch, swarmApi);
+        uploadedCommands.push(uploadedCommand);
+
+        previousEpoch = uploadedCommand.epoch;
+    }
+
+    return {
+        commands: uploadedCommands.reverse().concat(syncedCommands),
+    };
+};
+
 const syncPostCommandLogWithSwarm = async (postCommandLog: PostCommandLog, swarmApi: Swarm.Api): Promise<PostCommandLog> => {
     const latestEpoch = getLatestPostCommandEpochFromLog(postCommandLog);
 
@@ -306,10 +390,13 @@ const syncPostCommandLogWithSwarm = async (postCommandLog: PostCommandLog, swarm
 
     Debug.log('syncPostCommandLogWithSwarm', latestEpoch, swarmLatestEpoch);
 
-    return postCommandLog;
+    const mergedPostCommandLog = mergePostCommandLogs(postCommandLog, swarmPostCommandLog);
+    const uploadedPostCommandLog = await uploadUnsyncedPostCommandsToSwarm(mergedPostCommandLog, swarmApi);
+
+    return uploadedPostCommandLog;
 };
 
-export const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.FeedApi): Promise<PostCommandLog> => {
+const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.FeedApi): Promise<PostCommandLog> => {
     const postCommandLog: PostCommandLog = {
         commands: [],
     };
@@ -333,13 +420,13 @@ export const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.FeedApi): Pro
     }
 };
 
-export const getLatestPostsFromLog = (postCommandLog: PostCommandLog, count: number | undefined = undefined): Post[] => {
+const getLatestPostsFromLog = (postCommandLog: PostCommandLog, count: number | undefined = undefined): Post[] => {
     const updatePostCommands = getLatestUpdatePostCommandsFromLog(postCommandLog, count);
     const updatedPosts = updatePostCommands.map(postCommand => postCommand.post);
     return updatedPosts;
 };
 
-export const getLatestUpdatePostCommandsFromLog = (postCommandLog: PostCommandLog, count: number | undefined = undefined): PostCommand[] => {
+const getLatestUpdatePostCommandsFromLog = (postCommandLog: PostCommandLog, count: number | undefined = undefined): PostCommand[] => {
     const skipPostCommandSet = new Set<number>();
     const updatePostCommands = postCommandLog.commands.filter(postCommand => {
         if (postCommand.parentTimestamp !== 0) {
@@ -366,7 +453,7 @@ const emptyPostCommandFeed: PostCommandLog = {
     commands: [],
 };
 
-export const testSharePost = (
+const testSharePost = (
     id: number = 1,
     postCommandLog: PostCommandLog = emptyPostCommandFeed,
     source: string = '',
@@ -380,7 +467,7 @@ export const testSharePost = (
     return shareNewPost(post, source, postCommandLog);
 };
 
-export const testSharePostSwarm = async (
+const testSharePostSwarm = async (
     id: number = 1,
     postCommandLog: PostCommandLog = emptyPostCommandFeed,
     source: string = '',
@@ -395,25 +482,27 @@ export const testSharePostSwarm = async (
     return await shareNewPostSwarm(post, source, postCommandLog, swarmFeedApi);
 };
 
-export const testSharePosts = async () => {
-    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
-    const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1);
-    const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2);
-
-    Debug.log('testSharePosts', postCommandLogAfter3);
-};
-
-export const testSharePostsSwarm = async (source = ''): Promise<PostCommandLog> => {
-    const postCommandLogAfter1 = await testSharePostSwarm(1, emptyPostCommandFeed, source);
-    const postCommandLogAfter2 = await testSharePostSwarm(2, postCommandLogAfter1, source);
-    const postCommandLogAfter3 = await testSharePostSwarm(3, postCommandLogAfter2, source);
+const testSharePosts = async (source = ''): Promise<PostCommandLog> => {
+    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1, source);
+    const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2, source);
 
     Debug.log('testSharePosts', postCommandLogAfter3);
 
     return postCommandLogAfter3;
 };
 
-export const testSharePostsWithUpdate = async () => {
+const testSharePostsSwarm = async (source = ''): Promise<PostCommandLog> => {
+    const postCommandLogAfter1 = await testSharePostSwarm(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter2 = await testSharePostSwarm(2, postCommandLogAfter1, source);
+    const postCommandLogAfter3 = await testSharePostSwarm(3, postCommandLogAfter2, source);
+
+    Debug.log('testSharePostsSwarm', postCommandLogAfter3);
+
+    return postCommandLogAfter3;
+};
+
+const testSharePostsWithUpdate = async () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -429,7 +518,7 @@ export const testSharePostsWithUpdate = async () => {
     Debug.log('testSharePostsWithUpdate', postCommandLogAfter4);
 };
 
-export const testSharePostsWithRemove = async () => {
+const testSharePostsWithRemove = async () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -442,7 +531,7 @@ export const testSharePostsWithRemove = async () => {
     Debug.log('testSharePostsWithRemove', 'posts', posts);
 };
 
-export const testSharePostsWithRemoveOnSwarm = async () => {
+const testSharePostsWithRemoveOnSwarm = async () => {
     const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
     const source = '';
 
@@ -457,22 +546,44 @@ export const testSharePostsWithRemoveOnSwarm = async () => {
     Debug.log('testSharePostsWithRemove', 'posts', posts);
 };
 
-export const testListAllPosts = async () => {
+const testListAllPosts = async () => {
     const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
     await fetchSwarmPostCommandLog(swarmFeedApi);
 };
 
-export const testFetchLastThreePosts = async () => {
+const testFetchLastThreePosts = async () => {
     const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
     const swarmPostCommandLog = await fetchSwarmPostCommandLog(swarmFeedApi);
     const posts = await getLatestPostsFromLog(swarmPostCommandLog, 3);
     Debug.log('fetchLastTwoPosts', 'posts', posts);
 };
 
-export const testSyncPostCommandLogWithSwarm = async () => {
+const testSyncLocalEmptyPostCommandLogWithSwarm = async () => {
     const swarmApi = Swarm.makeApi(testIdentity);
-    await testSharePostsSwarm();
-    await syncPostCommandLogWithSwarm(emptyPostCommandFeed, swarmApi);
+    const swarmSource = 'swarm';
+    await testSharePostsSwarm(swarmSource);
+    const syncedPostCommandLog = await syncPostCommandLogWithSwarm(emptyPostCommandFeed, swarmApi);
+    Debug.log('testSyncPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+};
+
+const testSyncLocalPostCommandLogWithSwarm = async () => {
+    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmSource = 'swarm';
+    await testSharePostsSwarm(swarmSource);
+
+    const localPostCommandFeed = await testSharePosts('local');
+    const syncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandFeed, swarmApi);
+    Debug.log('testSyncPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+
+    const posts = getLatestPostsFromLog(syncedPostCommandLog);
+    Debug.log('testSyncPostCommandLogWithSwarm', 'posts', posts);
+};
+
+const testDownloadFeedTemplate = async () => {
+    const swarmApi = Swarm.makeApi(testIdentity);
+    const feedTemplate = await swarmApi.feed.downloadFeedTemplate();
+
+    Debug.log('testDownloadFeedTemplate', feedTemplate);
 };
 
 export const allTests = {
@@ -483,5 +594,7 @@ export const allTests = {
     testSharePostsWithRemoveOnSwarm,
     testListAllPosts,
     testFetchLastThreePosts,
-    testSyncPostCommandLogWithSwarm,
+    testSyncLocalEmptyPostCommandLogWithSwarm,
+    testSyncLocalPostCommandLogWithSwarm,
+    testDownloadFeedTemplate,
 };
