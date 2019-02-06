@@ -11,6 +11,22 @@ export class Utils {
         });
     }
 
+    public static async waitMillisec(ms: number): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            if (ms > 0) {
+                setTimeout(() => resolve(ms), ms);
+            }
+        });
+    }
+
+    public static async waitUntil(untilTimestamp: number, now: number = Date.now()): Promise<number> {
+        const diff = untilTimestamp - now;
+        if (diff > 0) {
+            return Utils.waitMillisec(diff);
+        }
+        return 0;
+    }
+
     public static take(list, num, defaultReturn) {
         if (list.length < num) {
             return [defaultReturn];

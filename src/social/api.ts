@@ -6,6 +6,7 @@ import { uploadPost } from '../PostUpload';
 import { ModelHelper } from '../models/ModelHelper';
 import { MockModelHelper } from '../models/__mocks__/ModelHelper';
 import { Debug } from '../Debug';
+import { Utils } from '../Utils';
 
 type PostCommandType = 'update' | 'remove';
 
@@ -362,7 +363,14 @@ const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swar
         epoch: feedTemplate.epoch,
     };
     const data = serialize(updatedCommand);
+
+    const currentTimeMillis = Date.now();
     await swarmFeedApi.updateWithFeedTemplate(feedTemplate, data);
+
+    // Wait minimum one second between updates, because Swarm Feeds cannot handle well
+    // multiple updates within one second
+    await Utils.waitUntil(currentTimeMillis + 1000);
+
     return updatedCommand;
 };
 
@@ -403,6 +411,7 @@ const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swar
     const postCommandAfterUploadPost = await uploadPostCommandPostToSwarm(postCommand, swarmApi.bzz);
     const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
     const postCommandAfterPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
+
     return postCommandAfterPostFeedUpdated;
 };
 
@@ -422,6 +431,7 @@ const uploadUnsyncedPostCommandsToSwarm = async (postCommandLog: PostCommandLog,
         };
 
         const uploadedCommand = await uploadPostCommandToSwarm(postCommandWithPreviousEpoch, swarmApi);
+
         uploadedCommands.push(uploadedCommand);
 
         previousEpoch = uploadedCommand.epoch;
