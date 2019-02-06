@@ -12,7 +12,7 @@ export interface PostFeed extends Feed {
 }
 
 export const createPostFeed = async (
-    swarmFeedApi: Swarm.FeedApi,
+    swarmFeedApi: Swarm.WriteableFeedApi,
     author: Author,
     firstPost: PublicPost,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
@@ -37,7 +37,7 @@ export const isPostFeedUrl = (url: string): boolean => {
     return url.startsWith(Swarm.DefaultFeedPrefix);
 };
 
-export const updatePostFeed = async (swarmFeedApi: Swarm.FeedApi, postFeed: PostFeed): Promise<PostFeed> => {
+export const updatePostFeed = async (swarmFeedApi: Swarm.WriteableFeedApi, postFeed: PostFeed): Promise<PostFeed> => {
     try {
         const postFeedJson = JSON.stringify(postFeed);
         const contentHash = await Swarm.upload(postFeedJson);

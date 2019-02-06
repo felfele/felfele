@@ -290,8 +290,10 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         try {
             Debug.log(event);
             const feedUri = event.data;
-            const feed = await downloadPostFeed(feedUri);
-            this.onAdd(feed);
+            this.setState({
+                url: feedUri,
+            });
+            await this.fetchFeed();
         } catch (e) {
             Debug.log(e);
         }

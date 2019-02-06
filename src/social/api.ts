@@ -201,7 +201,7 @@ const shareNewPostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
-    swarmFeedApi: Swarm.FeedApi,
+    swarmFeedApi: Swarm.WriteableFeedApi,
     options: PostOptions = defaultPostOptions,
 ): Promise<PostCommandLog> => {
     const uploadedPost = await uploadPost(post, options.imageResizer, options.modelHelper);
@@ -255,7 +255,7 @@ const updatePostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
-    swarmFeedApi: Swarm.FeedApi,
+    swarmFeedApi: Swarm.WriteableFeedApi,
     options: PostOptions = defaultPostOptions,
 ): Promise<PostCommandLog> => {
     const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
@@ -324,7 +324,7 @@ const removePostSwarm = async (
     post: Post,
     source: string,
     postCommandLog: PostCommandLog,
-    swarmFeedApi: Swarm.FeedApi,
+    swarmFeedApi: Swarm.WriteableFeedApi,
 ) => {
     const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
     if (parentTimestamp === 0) {
@@ -355,7 +355,7 @@ const removePostSwarm = async (
     };
 };
 
-const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.FeedApi): Promise<PostCommand> => {
+const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.WriteableFeedApi): Promise<PostCommand> => {
     const feedTemplate = await swarmFeedApi.downloadFeedTemplate();
     const updatedCommand = {
         ...postCommand,
@@ -449,7 +449,7 @@ const syncPostCommandLogWithSwarm = async (postCommandLog: PostCommandLog, swarm
     return uploadedPostCommandLog;
 };
 
-const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.FeedApi): Promise<PostCommandLog> => {
+const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.WriteableFeedApi): Promise<PostCommandLog> => {
     const postCommandLog: PostCommandLog = {
         commands: [],
     };
@@ -506,6 +506,13 @@ const emptyPostCommandFeed: PostCommandLog = {
     commands: [],
 };
 
+const defaultSwarmApi = Swarm.makeApi(
+    Swarm.makeFeedAddressFromPublicIdentity(testIdentity),
+    (digest) => Swarm.signDigest(digest, testIdentity),
+);
+
+const defaultSwarmFeedApi = defaultSwarmApi.feed;
+
 const testSharePost = (
     id: number = 1,
     postCommandLog: PostCommandLog = emptyPostCommandFeed,
@@ -524,7 +531,7 @@ const testSharePostSwarm = async (
     id: number = 1,
     postCommandLog: PostCommandLog = emptyPostCommandFeed,
     source: string = '',
-    swarmFeedApi = Swarm.makeFeedApi(testIdentity),
+    swarmFeedApi = defaultSwarmFeedApi,
 ): Promise<PostCommandLog> => {
     const post: Post = {
         _id: id,
@@ -585,7 +592,7 @@ const testSharePostsWithRemove = async () => {
 };
 
 const testSharePostsWithRemoveOnSwarm = async () => {
-    const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
+    const swarmFeedApi = defaultSwarmFeedApi;
     const source = '';
 
     const postCommandLogAfter1 = await testSharePostSwarm(1, emptyPostCommandFeed, source, swarmFeedApi);
@@ -600,19 +607,19 @@ const testSharePostsWithRemoveOnSwarm = async () => {
 };
 
 const testListAllPosts = async () => {
-    const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
+    const swarmFeedApi = defaultSwarmFeedApi;
     await fetchSwarmPostCommandLog(swarmFeedApi);
 };
 
 const testFetchLastThreePosts = async () => {
-    const swarmFeedApi = Swarm.makeFeedApi(testIdentity);
+    const swarmFeedApi = defaultSwarmFeedApi;
     const swarmPostCommandLog = await fetchSwarmPostCommandLog(swarmFeedApi);
     const posts = await getLatestPostsFromLog(swarmPostCommandLog, 3);
     Debug.log('fetchLastTwoPosts', 'posts', posts);
 };
 
 const testSyncLocalEmptyPostCommandLogWithSwarm = async () => {
-    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
     await testSharePostsSwarm(swarmSource);
     const syncedPostCommandLog = await syncPostCommandLogWithSwarm(emptyPostCommandFeed, swarmApi);
@@ -620,7 +627,7 @@ const testSyncLocalEmptyPostCommandLogWithSwarm = async () => {
 };
 
 const testSyncLocalPostCommandLogWithSwarm = async () => {
-    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
     await testSharePostsSwarm(swarmSource);
 
@@ -635,7 +642,7 @@ const testSyncLocalPostCommandLogWithSwarm = async () => {
 };
 
 const testResyncLocalPostCommandLogWithSwarm = async () => {
-    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
     await testSharePostsSwarm(swarmSource);
 
@@ -652,7 +659,7 @@ const testResyncLocalPostCommandLogWithSwarm = async () => {
 };
 
 const testSyncConcurrentPostCommandLogWithSwarm = async () => {
-    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
     const localSource = 'local';
     await testSharePostsSwarm(swarmSource);
@@ -676,7 +683,7 @@ const testSyncConcurrentPostCommandLogWithSwarm = async () => {
 };
 
 const testDownloadFeedTemplate = async () => {
-    const swarmApi = Swarm.makeApi(testIdentity);
+    const swarmApi = defaultSwarmApi;
     const feedTemplate = await swarmApi.feed.downloadFeedTemplate();
 
     Debug.log('testDownloadFeedTemplate', feedTemplate);

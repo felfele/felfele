@@ -7,8 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../swarm/Swarm';
+import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, PostFeed } from '../PostFeed';
+import * as Swarm from '../swarm/Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
@@ -198,12 +198,16 @@ export const AsyncActions = {
             try {
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds;
-                const swarmFeedApi = makeFeedApi(getState().author.identity!);
+                const identity = getState().author.identity!;
+                const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+
                 if (ownFeeds.length > 0) {
                     const feed = ownFeeds[0];
                     if (post.link === feed.url) {
                         return;
                     }
+                    const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
+                    const swarmFeedApi = Swarm.makeFeedApi(feedAddress, signFeedDigest);
 
                     dispatch(Actions.updatePostIsUploading(post, true));
 
@@ -252,6 +256,9 @@ export const AsyncActions = {
                     dispatch(Actions.updatePostIsUploading(post, true));
 
                     const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
+                    const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
+                    const swarmFeedApi = Swarm.makeFeedApi(feedAddress, signFeedDigest);
+
                     const feed = await createPostFeed(swarmFeedApi, author, uploadedPost, resizeImageIfNeeded, modelHelper);
 
                     dispatch(InternalActions.addOwnFeed(feed));
@@ -283,21 +290,8 @@ export const AsyncActions = {
     },
     createUserIdentity: () => {
         return async (dispatch, getState: () => AppState) => {
-            const privateIdentity = await generateSecureIdentity(generateSecureRandom);
+            const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
-        };
-    },
-    fixFeedFavicons: () => {
-        return async (dispatch, getState: () => AppState) => {
-            const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
-            for (const feed of feeds) {
-                if (feed.favicon == null || feed.favicon === '') {
-                    const downloadedFeed = await downloadPostFeed(feed.url);
-                    if (downloadedFeed.favicon !== '') {
-                        dispatch(InternalActions.updateFeedFavicon(feed, downloadedFeed.favicon));
-                    }
-                }
-            }
         };
     },
     restoreFromBackup: (backupText: string, secretHex: string) => {

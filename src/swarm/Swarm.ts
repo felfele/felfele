@@ -136,8 +136,8 @@ interface FeedTemplate {
     protocolVersion: number;
 }
 
-export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promise<FeedTemplate> => {
-    const url = DefaultGateway + `/bzz-feed:/?user=${identity.address}&meta=1`;
+const downloadUserFeedTemplate = async (address: FeedAddress): Promise<FeedTemplate> => {
+    const url = DefaultGateway + `/bzz-feed:/?user=${address.user}&meta=1`;
     Debug.log('downloadUserFeedTemplate: ', url);
     const response = await safeFetch(url);
     const feedUpdateResponse = await response.json() as FeedTemplate;
@@ -145,7 +145,27 @@ export const downloadUserFeedTemplate = async (identity: PublicIdentity): Promis
     return feedUpdateResponse;
 };
 
-export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string): Promise<FeedTemplate> => {
+const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate: FeedTemplate, signFeedDigest: (digest: number[]) => string, data: string): Promise<FeedTemplate> => {
+    const digest = feedUpdateDigest(feedTemplate, data);
+
+    if (digest == null) {
+        throw new Error('digest is null');
+    }
+    const signature = signFeedDigest(digest);
+    const url = swarmGateway + `/bzz-feed:/?topic=${feedTemplate.feed.topic}&user=${feedTemplate.feed.user}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
+    Debug.log('updateFeed: ', url, data);
+    const options: RequestInit = {
+        method: 'POST',
+        body: data,
+    };
+    const response = await safeFetch(url, options);
+    const text = await response.text();
+    Debug.log('updateFeed: ', text);
+
+    return feedTemplate;
+};
+
+const updateUserFeed = async (feedTemplate: FeedTemplate, identity: PrivateIdentity, data: string): Promise<FeedTemplate> => {
     const digest = feedUpdateDigest(feedTemplate, data);
 
     if (digest == null) {
@@ -165,12 +185,12 @@ export const updateUserFeed = async (feedTemplate: FeedTemplate, identity: Priva
     return feedTemplate;
 };
 
-export const downloadUserFeed = async (identity: PublicIdentity): Promise<string> => {
-    return await downloadFeed(`bzz-feed:/?user=${identity.address}`);
+const downloadUserFeed = async (address: FeedAddress): Promise<string> => {
+    return await downloadFeed(`bzz-feed:/?user=${address.user}`);
 };
 
-export const downloadUserFeedPreviousVersion = async (address: string, epoch: Epoch): Promise<string> => {
-    return await downloadFeed(`bzz-feed:/?user=${address}&time=${epoch.time}`);
+export const downloadUserFeedPreviousVersion = async (address: FeedAddress, epoch: Epoch): Promise<string> => {
+    return await downloadFeed(`bzz-feed:/?user=${address.user}&time=${epoch.time}`);
 };
 
 export const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
@@ -181,28 +201,56 @@ export const downloadFeed = async (feedUri: string, timeout: number = 0): Promis
     return text;
 };
 
-export interface FeedApi {
+export interface ReadableFeedApi {
     download: () => Promise<string>;
     downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
     downloadFeedTemplate: () => Promise<FeedTemplate>;
-    updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
-    update: (data: string) => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string) => Promise<string>;
     getUri: () => string;
 }
 
-export const makeFeedApi = (identity: PrivateIdentity): FeedApi => {
+export const makeFeedAddressFromBzzFeedUrl = (bzzFeedUrl: string): FeedAddress => {
+    if (bzzFeedUrl.startsWith('bzz-feed:/?user=')) {
+        return {
+            topic: '',
+            user: bzzFeedUrl.replace('bzz-feed:/?user=', ''),
+        };
+    }
     return {
-        download: async (): Promise<string> => downloadUserFeed(identity),
-        downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(identity.address, epoch),
-        downloadFeedTemplate: async () => downloadUserFeedTemplate(identity),
-        updateWithFeedTemplate: async (feedTemplate: FeedTemplate, data) => await updateUserFeed(feedTemplate, identity, data),
+        topic: '',
+        user: '',
+    };
+};
+
+export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity): FeedAddress => {
+    return {
+        topic: '',
+        user: publicIdentity.address,
+    };
+};
+
+export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string): ReadableFeedApi => ({
+    download: async (): Promise<string> => downloadUserFeed(address),
+    downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(address, epoch),
+    downloadFeedTemplate: async () => downloadUserFeedTemplate(address),
+    downloadFeed: async (feedUri: string) => await downloadFeed(feedUri),
+    getUri: () => `bzz-feed:/?user=${address}`,
+});
+
+export interface WriteableFeedApi extends ReadableFeedApi {
+    updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
+    update: (data: string) => Promise<FeedTemplate>;
+}
+
+export const makeFeedApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): WriteableFeedApi => {
+    return {
+        ...makeReadableFeedApi(address, swarmGateway),
+
+        updateWithFeedTemplate: async (feedTemplate: FeedTemplate, data) => await updateUserFeedWithSignFunction(swarmGateway, feedTemplate, signFeedDigest, data),
         update: async (data: string): Promise<FeedTemplate> => {
-            const feedTemplate = await downloadUserFeedTemplate(identity);
-            return await updateUserFeed(feedTemplate, identity, data);
+            const feedTemplate = await downloadUserFeedTemplate(address);
+            return await updateUserFeedWithSignFunction(swarmGateway, feedTemplate, signFeedDigest, data);
         },
-        downloadFeed: async (feedUri: string) => await downloadFeed(feedUri),
-        getUri: () => `bzz-feed:/?user=${identity.address}`,
     };
 };
 
@@ -222,13 +270,13 @@ export const makeBzzApi = (swarmGateway: string = DefaultGateway): BzzApi => {
 
 export interface Api {
     bzz: BzzApi;
-    feed: FeedApi;
+    feed: WriteableFeedApi;
 }
 
-export const makeApi = (identity: PrivateIdentity, swarmGateway: string = DefaultGateway): Api => {
+export const makeApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): Api => {
     return {
         bzz: makeBzzApi(swarmGateway),
-        feed: makeFeedApi(identity),
+        feed: makeFeedApi(address, signFeedDigest, swarmGateway),
     };
 };
 
@@ -316,7 +364,7 @@ function publicKeyToAddress(pubKey) {
     return keccak256.array(pubBytes.slice(1)).slice(12);
 }
 
-const signDigest = (digest: number[], identity: PrivateIdentity) => {
+export const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
     const keyPair = curve.keyFromPrivate(identity.privateKey.substring(2));
     const privateKey = keyPair.getPrivate();
