@@ -48,6 +48,12 @@ const favoriteTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
+    FeedListViewerContainer: {
+        screen: FeedListViewerContainer,
+    },
+    FeedFromList: {
+        screen: SettingsFeedViewContainer,
+    },
 };
 const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
     {
@@ -85,11 +91,14 @@ const newsTabScenes: NavigationRouteConfigMap = {
                                     navigation={navigation}
                                     postManager={RSSPostManager} />),
     },
+    Feed: {
+        screen: FeedContainer,
+    },
     FeedListViewerContainer: {
         screen: FeedListViewerContainer,
     },
-    Feed: {
-        screen: FeedContainer,
+    FeedFromList: {
+        screen: SettingsFeedViewContainer,
     },
 };
 
