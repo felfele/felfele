@@ -1,10 +1,10 @@
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
 
-import { PublicIdentity, PrivateIdentity } from './models/Identity';
-import { Debug } from './Debug';
-import { safeFetch, safeFetchWithTimeout } from './Network';
-import { hexToByteArray, byteArrayToHex, stringToByteArray } from './conversion';
+import { PublicIdentity, PrivateIdentity } from '../models/Identity';
+import { Debug } from '../Debug';
+import { safeFetch, safeFetchWithTimeout } from '../Network';
+import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 
 export const DefaultGateway = 'https://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';

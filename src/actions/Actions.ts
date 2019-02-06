@@ -8,7 +8,7 @@ import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
+import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../swarm/Swarm';
 import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';

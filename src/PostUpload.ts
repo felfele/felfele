@@ -1,6 +1,6 @@
 import { Post, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
-import { uploadPhoto, isSwarmLink, upload, DefaultPrefix } from './Swarm';
+import { uploadPhoto, isSwarmLink, upload, DefaultPrefix } from './swarm/Swarm';
 import { ModelHelper } from './models/ModelHelper';
 import { serialize } from './social/serialization';
 

@@ -2,7 +2,7 @@ import { keccak256 } from 'js-sha3';
 
 import { Version } from './Version';
 import { allTests } from './social/api';
-import * as Swarm from './Swarm';
+import * as Swarm from './swarm/Swarm';
 import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
 

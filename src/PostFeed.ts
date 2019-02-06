@@ -1,7 +1,7 @@
 import { Feed } from './models/Feed';
 import { PublicPost, Author } from './models/Post';
 import { ImageData } from './models/ImageData';
-import * as Swarm from './Swarm';
+import * as Swarm from './swarm/Swarm';
 import { uploadPost, uploadImage } from './PostUpload';
 import { Debug } from './Debug';
 import { ModelHelper } from './models/ModelHelper';

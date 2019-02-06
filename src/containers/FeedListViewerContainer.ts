@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedListViewer } from '../components/FeedListEditor';
-import { getSwarmGatewayUrl } from '../Swarm';
+import { getSwarmGatewayUrl } from '../swarm/Swarm';
 import { Feed } from '../models/Feed';
 
 const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 : 0) - (a.favorite === true ? 1 : 0);

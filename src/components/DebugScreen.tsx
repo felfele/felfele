@@ -10,7 +10,7 @@ import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
-import * as Swarm from '../Swarm';
+import * as Swarm from '../swarm/Swarm';
 
 export interface StateProps {
     appState: AppState;
