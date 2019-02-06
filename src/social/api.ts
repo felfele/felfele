@@ -56,7 +56,7 @@ const defaultPostOptions: PostOptions = {
     modelHelper: new MockModelHelper(),
 };
 
-const getLatestPostCommandTimestampFromLog = (postCommandLog: PostCommandLog): number => {
+const getHighestSeenTimestampFromLog = (postCommandLog: PostCommandLog): number => {
     if (postCommandLog.commands.length === 0) {
         return 0;
     }
@@ -146,7 +146,7 @@ export const shareNewPost = (
     postCommandLog: PostCommandLog,
 ): PostCommandLog => {
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
         timestamp,
@@ -172,7 +172,7 @@ const shareNewPostSwarm = async (
 ): Promise<PostCommandLog> => {
     const uploadedPost = await uploadPost(post, options.imageResizer, options.modelHelper);
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
         timestamp,
@@ -200,7 +200,7 @@ export const updatePost = (
         throw new Error('updatePost failed, no previous post with the same id: ' + post._id);
     }
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
         timestamp,
@@ -235,7 +235,7 @@ const updatePostSwarm = async (
     };
     const uploadedPost = await uploadPost(updatedPost, options.imageResizer, options.modelHelper);
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
         timestamp,
@@ -262,7 +262,7 @@ export const removePost = (
     if (parentTimestamp === 0) {
         throw new Error('removePost failed, no previous post with the same id: ' + post._id);
     }
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
 
     const removedPost: Post = {
@@ -296,7 +296,7 @@ const removePostSwarm = async (
     if (parentTimestamp === 0) {
         throw new Error('removePost failed, no previous post with the same id: ' + post._id);
     }
-    const timestamp = getLatestPostCommandTimestampFromLog(postCommandLog) + 1;
+    const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
 
     const removedPost: Post = {
