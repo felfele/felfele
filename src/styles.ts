@@ -40,12 +40,7 @@ export const Colors = {
 
 export const DefaultFont = 'Helvetica Neue';
 
-interface Styles {
-    container: ViewStyle;
-    favicon: ImageStyle;
-}
-
-export const DefaultStyle = StyleSheet.create<Styles>({
+export const DefaultStyle = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
