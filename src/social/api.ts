@@ -27,15 +27,44 @@ interface PostCommand {
 
 interface PostCommandLog {
     /*
-     * There assumptions that must held in order to this works correctly:
-     *
-     * TODO: write an assert function that checks these invariants in tests
+     * These assumptions must held in order to this works correctly:
      *
      * - The posts are ordered by epoch in the array, when there is no epoch
      *   the posts are ordered by timestamp
+     *
+     * With `assertPostCommandLogInvariants` you can check the validity of
+     * the logs in the tests.
+     *
      */
     readonly commands: PostCommand[];
 }
+
+const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => {
+    const sortedCommands = sortAndFilterPostCommands(commands);
+    if (sortedCommands.length !== commands.length) {
+        throw new Error(`assertPostCommandsAreSortedAndUnique failed: length: ${sortedCommands.length} !== ${commands.length}`);
+    }
+    for (let i = 0; i < sortedCommands.length; i++) {
+        if (arePostCommandsEqual(sortedCommands[i], commands[i]) === false) {
+            throw new Error(`assertPostCommandsAreSortedAndUnique failed: diff ${i}: ${sortedCommands[i].timestamp} ${commands[i].timestamp}`);
+        }
+    }
+};
+
+const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLog): void => {
+    const highestTimestampFromLog = getHighestSeenTimestampFromLog(postCommandLog);
+
+    for (const command of postCommandLog.commands) {
+        if (command.timestamp > highestTimestampFromLog) {
+            throw new Error(`assertFirstPostCommandHasHighestTimestamp failed: ${command.timestamp} > ${highestTimestampFromLog}`);
+        }
+    }
+};
+
+const assertPostCommandLogInvariants = (postCommandLog: PostCommandLog): void => {
+    assertPostCommandsAreSortedAndUnique(postCommandLog.commands);
+    assertFirstPostCommandHasHighestTimestamp(postCommandLog);
+};
 
 const arePostCommandsEqual = (a: PostCommand, b: PostCommand): boolean =>
     a.timestamp === b.timestamp && a.source === b.source;
@@ -122,19 +151,24 @@ const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
     return a.level - b.level;
 };
 
-const mergePostCommandLogs = (postCommandLogA: PostCommandLog, postCommandLogB: PostCommandLog): PostCommandLog => {
-    const commands = postCommandLogA.commands.concat(postCommandLogB.commands);
-
+const sortAndFilterPostCommands = (commands: PostCommand[]): PostCommand[] => {
     const sortedCommands = commands.sort((a, b) =>
             // reversed time ordering
             epochCompare(b.epoch, a.epoch)
-        ).filter((value, index, cmds) =>
+        )
+        .filter((value, index, cmds) =>
             // filter out doubles
             index === 0
             ? true
             : arePostCommandsEqual(value, cmds[index - 1]) === false
         );
 
+    return sortedCommands;
+};
+
+const mergePostCommandLogs = (postCommandLogA: PostCommandLog, postCommandLogB: PostCommandLog): PostCommandLog => {
+    const commands = postCommandLogA.commands.concat(postCommandLogB.commands);
+    const sortedCommands = sortAndFilterPostCommands(commands);
     return {
         commands: sortedCommands,
     };
@@ -596,6 +630,8 @@ const testSyncLocalPostCommandLogWithSwarm = async () => {
 
     const posts = getLatestPostsFromLog(syncedPostCommandLog);
     Debug.log('testSyncPostCommandLogWithSwarm', 'posts', posts);
+
+    assertPostCommandLogInvariants(syncedPostCommandLog);
 };
 
 const testResyncLocalPostCommandLogWithSwarm = async () => {
