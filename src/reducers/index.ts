@@ -14,7 +14,7 @@ import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
-import { PostFeed } from '../swarm-social/PostFeed';
+import { RecentPostFeed } from '../swarm-social/RecentPostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -25,7 +25,7 @@ const modelHelper = new ReactNativeModelHelper();
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
     feeds: Feed[];
-    ownFeeds: PostFeed[];
+    ownFeeds: RecentPostFeed[];
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -239,7 +239,7 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
     }
 };
 
-const ownFeedsReducer = (ownFeeds: PostFeed[] = [], action: Actions): PostFeed[] => {
+const ownFeedsReducer = (ownFeeds: RecentPostFeed[] = [], action: Actions): RecentPostFeed[] => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
             return [...ownFeeds, action.payload.feed];

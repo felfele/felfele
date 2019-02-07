@@ -80,9 +80,9 @@ const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swa
 const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api): Promise<PostCommand> => {
     const postCommandAfterUploadPost = await uploadPostCommandPostToSwarm(postCommand, swarmApi.bzz);
     const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
-    const postCommandAfterPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
+    const postCommandAfterRecentPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
 
-    return postCommandAfterPostFeedUpdated;
+    return postCommandAfterRecentPostFeedUpdated;
 };
 
 const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.WriteableFeedApi): Promise<PostCommand> => {

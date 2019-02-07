@@ -18,7 +18,7 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors } from '../styles';
 import * as Swarm from '../swarm/Swarm';
-import { downloadPostFeed } from '../swarm-social/PostFeed';
+import { downloadRecentPostFeed } from '../swarm-social/RecentPostFeed';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -223,7 +223,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         if (url.startsWith(Swarm.DefaultFeedPrefix)) {
             const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
             const swarm = Swarm.makeReadableApi(feedAddress);
-            const feed: Feed = await downloadPostFeed(swarm, url, 60 * 1000);
+            const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
             return feed;
         } else {
             const canonicalUrl = Utils.getCanonicalUrl(this.state.url);

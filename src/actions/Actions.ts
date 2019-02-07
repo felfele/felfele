@@ -7,7 +7,7 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, PostFeed } from '../swarm-social/PostFeed';
+import { isPostFeedUrl, loadRecentPosts, createRecentPostFeed, updateRecentPostFeed, RecentPostFeed } from '../swarm-social/RecentPostFeed';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
@@ -57,7 +57,7 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
-    addOwnFeed: (feed: PostFeed) =>
+    addOwnFeed: (feed: RecentPostFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
@@ -243,7 +243,7 @@ export const AsyncActions = {
                     };
                     Debug.log('sharePost: after uploadPosts');
 
-                    await updatePostFeed(swarm, postFeed);
+                    await updateRecentPostFeed(swarm, postFeed);
                     Debug.log('sharePost: after uploadPostFeed');
 
                     dispatch(Actions.updatePostLink(post, feed.url));
@@ -261,7 +261,7 @@ export const AsyncActions = {
                     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
                     const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
 
-                    const feed = await createPostFeed(swarm, author, uploadedPost, resizeImageIfNeeded, modelHelper);
+                    const feed = await createRecentPostFeed(swarm, author, uploadedPost, resizeImageIfNeeded, modelHelper);
 
                     dispatch(InternalActions.addOwnFeed(feed));
                     dispatch(Actions.updatePostLink(post, feed.url));
@@ -333,7 +333,7 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
 
     const allPostsCombined = await Promise.all([
         RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
-        loadPosts(swarm, postFeeds),
+        loadRecentPosts(swarm, postFeeds),
     ]);
 
     const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
