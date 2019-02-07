@@ -1,7 +1,8 @@
 import { keccak256 } from 'js-sha3';
 
 import { Version } from './Version';
-import { allTests } from './social/api';
+import { apiTests } from './social/apiTest';
+import { syncTests } from './social/syncTest';
 import * as Swarm from './swarm/Swarm';
 import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
@@ -27,8 +28,13 @@ const main = async () => {
             case 'api': {
                 if (process.argv.length > 3) {
                     const testName = process.argv[3];
+                    const allTests = {
+                        ...apiTests,
+                        ...syncTests,
+                    };
                     if (testName === 'allTests') {
                         for (const test of Object.keys(allTests)) {
+                            console.log('\nRunning test: ', test);
                             await allTests[test]();
                         }
                     } else {

@@ -6,7 +6,7 @@ import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 
-export const DefaultGateway = 'https://swarm.felfele.com';
+export const DefaultGateway = 'http://swarm-local:8500';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';

@@ -9,12 +9,12 @@ import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, PostFeed } from '../PostFeed';
 import * as Swarm from '../swarm/Swarm';
-import { uploadPost, uploadPosts } from '../PostUpload';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 import { generateSecureRandom } from 'react-native-securerandom';
 import { resizeImageIfNeeded } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { uploadPost, uploadPosts } from '../swarm-social/swarmStorage';
 
 const modelHelper = new ReactNativeModelHelper();
 
