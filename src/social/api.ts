@@ -59,7 +59,6 @@ const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLo
         : 0
         ;
 
-    console.log('assertFirstPostCommandHasHighestTimestamp', firstCommandTimestamp, highestTimestampFromLog);
     if (highestTimestampFromLog !== firstCommandTimestamp) {
         throw new Error(`assertFirstPostCommandHasHighestTimestamp first timestamp failed: ${firstCommandTimestamp} != ${highestTimestampFromLog}`);
     }
@@ -73,7 +72,6 @@ const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLo
 
 const assertThereAreNoUnsyncedCommandsAfterSyncedCommands = (postCommandLog: PostCommandLog) => {
     const firstSyncedCommand = postCommandLog.commands.findIndex(value => value.epoch != null);
-    console.log('assertThereAreNoUnsyncedCommandsAfterSyncedCommands', 'firstSyncedCommand', firstSyncedCommand);
     if (firstSyncedCommand === -1) {
         return;
     }
@@ -639,6 +637,7 @@ const testSharePostsWithRemoveOnSwarm = async () => {
     const swarmPostCommandLog = await fetchSwarmPostCommandLog(swarmApi.feed);
     const posts = getLatestPostsFromLog(swarmPostCommandLog, 3);
     Debug.log('testSharePostsWithRemove', 'posts', posts);
+    assertPostCommandLogInvariants(swarmPostCommandLog);
 };
 
 const testListAllPosts = async () => {
@@ -659,6 +658,7 @@ const testSyncLocalEmptyPostCommandLogWithSwarm = async () => {
     await testSharePostsSwarm(swarmSource);
     const syncedPostCommandLog = await syncPostCommandLogWithSwarm(emptyPostCommandFeed, swarmApi);
     Debug.log('testSyncPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+    assertPostCommandLogInvariants(syncedPostCommandLog);
 };
 
 const testSyncLocalPostCommandLogWithSwarm = async () => {
@@ -698,16 +698,19 @@ const testMergeTwoLocalPostCommandLogs = async () => {
 const testResyncLocalPostCommandLogWithSwarm = async () => {
     const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
-    await testSharePostsSwarm(swarmSource);
+    const swarmPostCommandLog = await testSharePostsSwarm(swarmSource);
 
-    const localPostCommandFeed = await testSharePosts('local');
-    const syncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandFeed, swarmApi);
+    const localPostCommandLog = await testSharePosts('local');
+    const syncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandLog, swarmApi);
     Debug.log('testResyncLocalPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+    assertPostCommandLogInvariants(syncedPostCommandLog);
 
     const posts = getLatestPostsFromLog(syncedPostCommandLog);
     Debug.log('testResyncLocalPostCommandLogWithSwarm', 'posts', posts);
 
     const resyncedPostCommandLog = await syncPostCommandLogWithSwarm(syncedPostCommandLog, swarmApi);
+    assertPostCommandLogInvariants(resyncedPostCommandLog);
+
     const resyncedPosts = getLatestPostsFromLog(resyncedPostCommandLog);
     Debug.log('testResyncLocalPostCommandLogWithSwarm', 'posts', resyncedPosts);
 };
@@ -721,16 +724,21 @@ const testSyncConcurrentPostCommandLogWithSwarm = async () => {
     const localPostCommandLog = await testSharePosts(localSource);
     const syncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandLog, swarmApi);
     Debug.log('testSyncConcurrentPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+    assertPostCommandLogInvariants(syncedPostCommandLog);
 
     const posts = getLatestPostsFromLog(syncedPostCommandLog);
     Debug.log('testSyncConcurrentPostCommandLogWithSwarm', 'posts', posts);
 
     // concurrent update
     const localPostCommandLogAfterUpdate = await testSharePost(4, syncedPostCommandLog, localSource);
+    assertPostCommandLogInvariants(localPostCommandLogAfterUpdate);
+
     const remotePostCommandLogAfterUpdate = await testSharePostSwarm(4, syncedPostCommandLog, swarmSource);
+    assertPostCommandLogInvariants(remotePostCommandLogAfterUpdate);
 
     const resyncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandLogAfterUpdate, swarmApi);
     Debug.log('testSyncConcurrentPostCommandLogWithSwarm', 'syncedPostCommandLog', resyncedPostCommandLog);
+    assertPostCommandLogInvariants(resyncedPostCommandLog);
 
     const resyncedPosts = getLatestPostsFromLog(resyncedPostCommandLog);
     Debug.log('testSyncConcurrentPostCommandLogWithSwarm', 'resyncedPosts', resyncedPosts);
