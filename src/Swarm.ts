@@ -5,6 +5,7 @@ import { PublicIdentity, PrivateIdentity } from './models/Identity';
 import { Debug } from './Debug';
 import { safeFetch, safeFetchWithTimeout } from './Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from './conversion';
+import { Buffer } from 'buffer';
 
 export const DefaultGateway = 'https://swarm.felfele.com';
 export const DefaultUrlScheme = '/bzz-raw:/';
@@ -318,7 +319,7 @@ function publicKeyToAddress(pubKey: any) {
 
 const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
-    const keyPair = curve.keyFromPrivate(new Buffer(identity.privateKey.substring(2)));
+    const keyPair = curve.keyFromPrivate(new Buffer(identity.privateKey.substring(2), 'hex'));
     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
     const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
     if (sigRaw.recoveryParam != null) {
