@@ -54,10 +54,32 @@ const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => 
 
 const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLog): void => {
     const highestTimestampFromLog = getHighestSeenTimestampFromLog(postCommandLog);
+    const firstCommandTimestamp = postCommandLog.commands.length > 0
+        ? postCommandLog.commands[0].timestamp
+        : 0
+        ;
+
+    console.log('assertFirstPostCommandHasHighestTimestamp', firstCommandTimestamp, highestTimestampFromLog);
+    if (highestTimestampFromLog !== firstCommandTimestamp) {
+        throw new Error(`assertFirstPostCommandHasHighestTimestamp first timestamp failed: ${firstCommandTimestamp} != ${highestTimestampFromLog}`);
+    }
 
     for (const command of postCommandLog.commands) {
         if (command.timestamp > highestTimestampFromLog) {
-            throw new Error(`assertFirstPostCommandHasHighestTimestamp failed: ${command.timestamp} > ${highestTimestampFromLog}`);
+            throw new Error(`assertFirstPostCommandHasHighestTimestamp failed: ${command.timestamp} > ${highestTimestampFromLog}, ${JSON.stringify(postCommandLog.commands)}`);
+        }
+    }
+};
+
+const assertThereAreNoUnsyncedCommandsAfterSyncedCommands = (postCommandLog: PostCommandLog) => {
+    const firstSyncedCommand = postCommandLog.commands.findIndex(value => value.epoch != null);
+    console.log('assertThereAreNoUnsyncedCommandsAfterSyncedCommands', 'firstSyncedCommand', firstSyncedCommand);
+    if (firstSyncedCommand === -1) {
+        return;
+    }
+    for (let i = firstSyncedCommand; i < postCommandLog.commands.length; i++) {
+        if (postCommandLog.commands[i].epoch == null) {
+            throw new Error(`assertThereAreNoUnsyncedCommandsAfterSyncedCommands failed: command ${i} is unsynced}`);
         }
     }
 };
@@ -65,6 +87,7 @@ const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLo
 const assertPostCommandLogInvariants = (postCommandLog: PostCommandLog): void => {
     assertPostCommandsAreSortedAndUnique(postCommandLog.commands);
     assertFirstPostCommandHasHighestTimestamp(postCommandLog);
+    assertThereAreNoUnsyncedCommandsAfterSyncedCommands(postCommandLog);
 };
 
 const arePostCommandsEqual = (a: PostCommand, b: PostCommand): boolean =>
@@ -143,7 +166,7 @@ const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
         return 1;
     }
     if (b == null) {
-        return 0;
+        return -1;
     }
     const timeDiff = a.time - b.time;
     if (timeDiff !== 0) {
@@ -153,9 +176,9 @@ const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
 };
 
 const sortAndFilterPostCommands = (commands: PostCommand[]): PostCommand[] => {
-    const sortedCommands = commands.sort((a, b) =>
+    const sortedCommands = [...commands].sort((a, b) =>
             // reversed time ordering
-            epochCompare(b.epoch, a.epoch)
+            epochCompare(b.epoch, a.epoch) || timestampCompare(b, a)
         )
         .filter((value, index, cmds) =>
             // filter out doubles
@@ -418,7 +441,7 @@ const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swar
 const uploadUnsyncedPostCommandsToSwarm = async (postCommandLog: PostCommandLog, swarmApi: Swarm.Api): Promise<PostCommandLog> => {
     const unsyncedCommandLog = getUnsyncedPostCommandLog(postCommandLog);
     const syncedCommands = postCommandLog.commands.slice(unsyncedCommandLog.commands.length);
-    const reversedUnsyncedCommands = unsyncedCommandLog.commands.reverse();
+    const reversedUnsyncedCommands = [...unsyncedCommandLog.commands].reverse();
 
     const previousSyncedEpoch = getLatestPostCommandEpochFromLog({commands: syncedCommands});
 
@@ -454,6 +477,8 @@ const syncPostCommandLogWithSwarm = async (postCommandLog: PostCommandLog, swarm
     }
 
     const mergedPostCommandLog = mergePostCommandLogs(postCommandLog, swarmPostCommandLog);
+    Debug.log('syncPostCommandLogWithSwarm', 'mergedPostCommandLog', mergedPostCommandLog);
+
     const uploadedPostCommandLog = await uploadUnsyncedPostCommandsToSwarm(mergedPostCommandLog, swarmApi);
 
     return uploadedPostCommandLog;
@@ -639,16 +664,35 @@ const testSyncLocalEmptyPostCommandLogWithSwarm = async () => {
 const testSyncLocalPostCommandLogWithSwarm = async () => {
     const swarmApi = defaultSwarmApi;
     const swarmSource = 'swarm';
-    await testSharePostsSwarm(swarmSource);
+    const swarmPostCommandFeed = await testSharePostsSwarm(swarmSource);
+    assertPostCommandLogInvariants(swarmPostCommandFeed);
 
     const localPostCommandFeed = await testSharePosts('local');
+    assertPostCommandLogInvariants(localPostCommandFeed);
+
     const syncedPostCommandLog = await syncPostCommandLogWithSwarm(localPostCommandFeed, swarmApi);
-    Debug.log('testSyncPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+    Debug.log('testSyncLocalPostCommandLogWithSwarm', 'syncedPostCommandLog', syncedPostCommandLog);
+    assertPostCommandLogInvariants(syncedPostCommandLog);
 
     const posts = getLatestPostsFromLog(syncedPostCommandLog);
-    Debug.log('testSyncPostCommandLogWithSwarm', 'posts', posts);
+    Debug.log('testSyncLocalPostCommandLogWithSwarm', 'posts', posts);
+};
 
-    assertPostCommandLogInvariants(syncedPostCommandLog);
+const testMergeTwoLocalPostCommandLogs = async () => {
+    const localSource1 = 'local1';
+    const localPostCommandFeed1 = await testSharePosts(localSource1);
+    assertPostCommandLogInvariants(localPostCommandFeed1);
+
+    const localSource2 = 'local2';
+    const localPostCommandFeed2 = await testSharePosts(localSource2);
+    assertPostCommandLogInvariants(localPostCommandFeed2);
+
+    const mergedPostCommandLog = await mergePostCommandLogs(localPostCommandFeed1, localPostCommandFeed2);
+    Debug.log('testMergeTwoLocalPostCommandLogs', 'mergedPostCommandLog', mergedPostCommandLog);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+
+    const posts = getLatestPostsFromLog(mergedPostCommandLog);
+    Debug.log('testMergeTwoLocalPostCommandLogs', 'posts', posts);
 };
 
 const testResyncLocalPostCommandLogWithSwarm = async () => {
@@ -712,4 +756,5 @@ export const allTests = {
     testSyncConcurrentPostCommandLogWithSwarm,
     testResyncLocalPostCommandLogWithSwarm,
     testDownloadFeedTemplate,
+    testMergeTwoLocalPostCommandLogs,
 };
