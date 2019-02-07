@@ -14,7 +14,7 @@ import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
 import { Debug } from '../Debug';
-import { PostFeed } from '../PostFeed';
+import { PostFeed } from '../swarm-social/PostFeed';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';

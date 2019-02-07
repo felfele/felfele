@@ -7,7 +7,7 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, PostFeed } from '../PostFeed';
+import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, PostFeed } from '../swarm-social/PostFeed';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';

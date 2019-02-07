@@ -1,28 +1,28 @@
-import { Feed } from './models/Feed';
-import { PublicPost, Author } from './models/Post';
-import { ImageData } from './models/ImageData';
-import * as Swarm from './swarm/Swarm';
-import { uploadPost, uploadImage } from './swarm-social/swarmStorage';
-import { Debug } from './Debug';
-import { ModelHelper } from './models/ModelHelper';
+import { Feed } from '../models/Feed';
+import { PublicPost, Author } from '../models/Post';
+import { ImageData } from '../models/ImageData';
+import * as Swarm from '../swarm/Swarm';
+import { uploadPost, uploadImage } from './swarmStorage';
+import { Debug } from '../Debug';
+import { ModelHelper } from '../models/ModelHelper';
 
-export interface PostFeed extends Feed {
+export interface RecentPostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
 }
 
-export const createPostFeed = async (
+export const createRecentPostFeed = async (
     swarm: Swarm.Api,
     author: Author,
     firstPost: PublicPost,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
     modelHelper: ModelHelper
-): Promise<PostFeed> => {
+): Promise<RecentPostFeed> => {
     const url = swarm.feed.getUri();
     Debug.log('createPostFeed: ', author);
     const uploadedImage = await uploadImage(swarm.bzz, author.image, imageResizer, modelHelper);
     const uploadedPost = await uploadPost(swarm.bzz, firstPost, imageResizer, modelHelper);
-    const postFeed: PostFeed = {
+    const postFeed: RecentPostFeed = {
         name: author.name,
         url,
         feedUrl: url,
@@ -30,14 +30,14 @@ export const createPostFeed = async (
         posts: [uploadedPost],
         authorImage: uploadedImage,
     };
-    return await updatePostFeed(swarm, postFeed);
+    return await updateRecentPostFeed(swarm, postFeed);
 };
 
 export const isPostFeedUrl = (url: string): boolean => {
     return url.startsWith(Swarm.DefaultFeedPrefix);
 };
 
-export const updatePostFeed = async (swarm: Swarm.Api, postFeed: PostFeed): Promise<PostFeed> => {
+export const updateRecentPostFeed = async (swarm: Swarm.Api, postFeed: RecentPostFeed): Promise<RecentPostFeed> => {
     try {
         const postFeedJson = JSON.stringify(postFeed);
         const contentHash = await swarm.bzz.upload(postFeedJson);
@@ -54,7 +54,7 @@ export const updatePostFeed = async (swarm: Swarm.Api, postFeed: PostFeed): Prom
     }
 };
 
-export const downloadPostFeed = async (swarm: Swarm.ReadableApi, url: string, timeout: number = 5000): Promise<PostFeed> => {
+export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: string, timeout: number = 5000): Promise<RecentPostFeed> => {
     try {
         const contentHash = await swarm.feed.downloadFeed(url, timeout);
         Debug.log('downloadPostFeed: contentHash: ', contentHash);
@@ -62,7 +62,7 @@ export const downloadPostFeed = async (swarm: Swarm.ReadableApi, url: string, ti
         const content = await swarm.bzz.download(contentHash, timeout);
         Debug.log('downloadPostFeed: content: ', content);
 
-        const postFeed = JSON.parse(content) as PostFeed;
+        const postFeed = JSON.parse(content) as RecentPostFeed;
         const authorImage = {
             uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
         };
@@ -100,8 +100,8 @@ export const downloadPostFeed = async (swarm: Swarm.ReadableApi, url: string, ti
     }
 };
 
-export const loadPosts = async (swarm: Swarm.ReadableApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
-    const loadFeedPromises = postFeeds.map(feed => downloadPostFeed(swarm, feed.feedUrl));
+export const loadRecentPosts = async (swarm: Swarm.ReadableApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
+    const loadFeedPromises = postFeeds.map(feed => downloadRecentPostFeed(swarm, feed.feedUrl));
     const feeds = await Promise.all(loadFeedPromises);
     let posts: PublicPost[] = [];
     for (const feed of feeds) {
