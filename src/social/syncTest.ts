@@ -1,7 +1,7 @@
 import {
-    defaultSwarmApi,
     makeSwarmPostCommandLogStorage,
- } from '../swarm-social/swarmStorage';
+} from '../swarm-social/swarmStorage';
+import * as Swarm from '../swarm/Swarm';
 import {
     PostCommandLog,
     removePost,
@@ -19,6 +19,19 @@ import {
     syncPostCommandLogWithStorage,
     uploadUnsyncedPostCommandsToStorage,
 } from './sync';
+
+const testIdentity = {
+    privateKey: '0x12ce6e8759025973fe69dde3873fc2d9e040d79072135ab168369c57589413bc',
+    publicKey: '0x042a8300b3447ffcc27ab32a0e0cf74a8a72022ca51420d9c15ea475d26da40d6ca866ad4504b1943edc784ee96e1f11e84ba62cedcd75ab719dcc626902877a28',
+    address: '0x8f24f61d21a6e3087a7f0b3e158a639a624036cf',
+};
+
+export const defaultSwarmApi = Swarm.makeApi(
+    Swarm.makeFeedAddressFromPublicIdentity(testIdentity),
+    (digest) => Swarm.signDigest(digest, testIdentity),
+);
+
+export const defaultSwarmFeedApi = defaultSwarmApi.feed;
 
 export const defaultStorage = makeSwarmPostCommandLogStorage(defaultSwarmApi);
 
