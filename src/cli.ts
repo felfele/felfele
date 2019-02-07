@@ -27,8 +27,14 @@ const main = async () => {
             case 'api': {
                 if (process.argv.length > 3) {
                     const testName = process.argv[3];
-                    const test = allTests[testName];
-                    await test();
+                    if (testName === 'allTests') {
+                        for (const test of Object.keys(allTests)) {
+                            await allTests[test]();
+                        }
+                    } else {
+                        const test = allTests[testName];
+                        await test();
+                    }
                 }
                 break;
             }
