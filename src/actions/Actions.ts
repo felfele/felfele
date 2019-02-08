@@ -13,7 +13,7 @@ import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
-import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmPostOptions } from '../swarm-social/swarmStorage';
+import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
 import { isPostFeedUrl } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -212,9 +212,9 @@ export const AsyncActions = {
                     }
                     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
                     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
-                    const postOptions: SwarmPostOptions = {
+                    const postOptions: SwarmHelpers = {
                         imageResizer: resizeImageIfNeeded,
-                        modelHelper,
+                        getLocalPath: modelHelper.getLocalPath,
                     };
                     const swarmStorage = makeSwarmStorage(swarm, postOptions);
                     const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);

@@ -11,36 +11,34 @@ import { Debug } from '../Debug';
 import { Utils } from '../Utils';
 import { PublicPost, Post, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
-import { ModelHelper } from '../models/ModelHelper';
-import { MockModelHelper } from '../models/__mocks__/ModelHelper';
 import { Feed } from '../models/Feed';
 import { RecentPostFeed } from '../social/api';
 import { syncPostCommandLogWithStorage } from '../social/sync';
 
-export interface SwarmPostOptions {
+export interface SwarmHelpers {
     imageResizer: (image: ImageData, path: string) => Promise<string>;
-    modelHelper: ModelHelper;
+    getLocalPath: (localPath: string) => string;
 }
 
 const defaultImageResizer = (image: ImageData, path: string): Promise<string> => {
     return Promise.resolve(path);
 };
 
-const defaultPostOptions: SwarmPostOptions = {
+const defaultSwarmHelpers: SwarmHelpers = {
     imageResizer: defaultImageResizer,
-    modelHelper: new MockModelHelper(),
+    getLocalPath: (localPath) => localPath,
 };
 
 const DEFAULT_POST_COMMAND_LOG_TOPIC = 'posts';
 
 interface SwarmStorage extends Storage {
     readonly swarmApi: Swarm.Api;
-    readonly postOptions: SwarmPostOptions;
+    readonly swarmHelpers: SwarmHelpers;
 }
 
-export const makeSwarmStorage = (swarmApi: Swarm.Api, postOptions: SwarmPostOptions = defaultPostOptions): SwarmStorage => ({
+export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers = defaultSwarmHelpers): SwarmStorage => ({
     swarmApi,
-    postOptions,
+    swarmHelpers,
     uploadPostCommand: async (postCommand: PostCommand) => {
         const postCommandLogFeedAddress = {
             ...swarmApi.feed.address,
@@ -51,7 +49,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, postOptions: SwarmPostOpti
             ...swarmApi,
             feed: feedApi,
         };
-        return await uploadPostCommandToSwarm(postCommand, newSwarmApi, postOptions);
+        return await uploadPostCommandToSwarm(postCommand, newSwarmApi, swarmHelpers);
     },
     downloadPostCommandLog: async () => {
         const postCommandLogFeedAddress = {
@@ -62,7 +60,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, postOptions: SwarmPostOpti
         return await fetchSwarmPostCommandLog(feedApi);
     },
     uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
-        return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, postOptions);
+        return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, swarmHelpers);
     },
     downloadRecentPostFeed: async (url: string, timeout: number = 0) => {
         return await downloadRecentPostFeed(swarmApi, url, timeout);
@@ -72,7 +70,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, postOptions: SwarmPostOpti
 export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSyncer => ({
     sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
         const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
-        const updatedRecentPostFeed = await uploadRecentPostFeed(swarmStorage.swarmApi, syncedPostCommandLog, recentPostFeed, swarmStorage.postOptions);
+        const updatedRecentPostFeed = await uploadRecentPostFeed(swarmStorage.swarmApi, syncedPostCommandLog, recentPostFeed, swarmStorage.swarmHelpers);
         return {
             postCommandLog: syncedPostCommandLog,
             recentPostFeed: updatedRecentPostFeed,
@@ -108,13 +106,13 @@ const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi): Pr
     }
 };
 
-const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swarm.BzzApi, postOptions: SwarmPostOptions): Promise<PostCommand> => {
+const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swarm.BzzApi, postOptions: SwarmHelpers): Promise<PostCommand> => {
     if (postCommand.type === 'update') {
         const post = {
             ...postCommand.post,
             link: undefined,
         };
-        const uploadedPost = await uploadPost(swarm, post, postOptions.imageResizer, postOptions.modelHelper);
+        const uploadedPost = await uploadPost(swarm, post, postOptions.imageResizer, postOptions.getLocalPath);
         return {
             ...postCommand,
             post: uploadedPost,
@@ -124,7 +122,7 @@ const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swa
     }
 };
 
-const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api, postOptions: SwarmPostOptions): Promise<PostCommand> => {
+const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api, postOptions: SwarmHelpers): Promise<PostCommand> => {
     const postCommandAfterUploadPost = await uploadPostCommandPostToSwarm(postCommand, swarmApi.bzz, postOptions);
     const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
     const postCommandAfterRecentPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
@@ -161,13 +159,13 @@ const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper,
+    getLocalPath: (localPath: string) => string,
 ): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
         if (image.localPath == null || image.localPath === '') {
             return image;
         }
-        const path = modelHelper.getLocalPath(image.localPath);
+        const path = getLocalPath(image.localPath);
         const resizedImagePath = await imageResizer(image, path);
         const uri = await swarm.uploadPhoto(resizedImagePath);
         return {
@@ -183,11 +181,11 @@ const uploadImages = async (
     swarm: Swarm.BzzApi,
     images: ImageData[],
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper,
+    getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
     const updateImages: ImageData[] = [];
     for (const image of images) {
-        const updateImage = await uploadImage(swarm, image, imageResizer, modelHelper);
+        const updateImage = await uploadImage(swarm, image, imageResizer, getLocalPath);
         updateImages.push(updateImage);
     }
     return updateImages;
@@ -197,9 +195,9 @@ const uploadAuthor = async (
     swarm: Swarm.BzzApi,
     author: Author,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper,
+    getLocalPath: (localPath: string) => string,
 ): Promise<Author | undefined> => {
-    const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, modelHelper);
+    const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, getLocalPath);
     return {
         ...author,
         faviconUri: '',
@@ -212,12 +210,12 @@ const uploadPost = async (
     swarm: Swarm.BzzApi,
     post: Post,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper,
+    getLocalPath: (localPath: string) => string,
 ): Promise<Post> => {
     if (post.link != null && Swarm.isSwarmLink(post.link)) {
         return post;
     }
-    const uploadedImages = await uploadImages(swarm, post.images, imageResizer, modelHelper);
+    const uploadedImages = await uploadImages(swarm, post.images, imageResizer, getLocalPath);
     const uploadedPost = {
         ...post,
         images: uploadedImages,
@@ -238,11 +236,11 @@ const uploadPosts = async (
     swarm: Swarm.BzzApi,
     posts: Post[],
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper,
+    getLocalPath: (localPath: string) => string,
 ): Promise<Post[]> => {
     const uploadedPosts: Post[] = [];
     for (const post of posts) {
-        const uploadedPost = await uploadPost(swarm, post, imageResizer, modelHelper);
+        const uploadedPost = await uploadPost(swarm, post, imageResizer, getLocalPath);
         uploadedPosts.push(uploadedPost);
     }
     return uploadedPosts;
@@ -253,12 +251,12 @@ const createRecentPostFeed = async (
     author: Author,
     firstPost: PublicPost,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
-    modelHelper: ModelHelper
+    getLocalPath: (localPath: string) => string,
 ): Promise<RecentPostFeed> => {
     const url = swarm.feed.getUri();
     Debug.log('createPostFeed: ', author);
-    const uploadedImage = await uploadImage(swarm.bzz, author.image, imageResizer, modelHelper);
-    const uploadedPost = await uploadPost(swarm.bzz, firstPost, imageResizer, modelHelper);
+    const uploadedImage = await uploadImage(swarm.bzz, author.image, imageResizer, getLocalPath);
+    const uploadedPost = await uploadPost(swarm.bzz, firstPost, imageResizer, getLocalPath);
     const postFeed: RecentPostFeed = {
         name: author.name,
         url,
@@ -347,7 +345,7 @@ const uploadRecentPostFeed = async (
     swarm: Swarm.Api,
     postCommandLog: PostCommandLog,
     recentPostFeed: RecentPostFeed,
-    postOptions: SwarmPostOptions,
+    swarmHelpers: SwarmHelpers,
 ): Promise<RecentPostFeed> => {
     const feedPosts = getLatestPostsFromLog(postCommandLog, 20);
     const posts = feedPosts
@@ -360,7 +358,7 @@ const uploadRecentPostFeed = async (
         }))
         ;
 
-    const uploadedPosts = await uploadPosts(swarm.bzz, posts, postOptions.imageResizer, postOptions.modelHelper);
+    const uploadedPosts = await uploadPosts(swarm.bzz, posts, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
     const postFeed = {
         ...recentPostFeed,
         posts: uploadedPosts,
