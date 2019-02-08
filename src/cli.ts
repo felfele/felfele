@@ -28,7 +28,7 @@ const main = async () => {
             case 'api': {
                 if (process.argv.length > 3) {
                     const testName = process.argv[3];
-                    const allTests = {
+                    const allTests: any = {
                         ...apiTests,
                         ...syncTests,
                     };

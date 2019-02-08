@@ -4,7 +4,7 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     // this fixes the case when navigating back from an opened Feed
     updateNavParam(state.feeds, ownProps.navigation);
 
@@ -21,7 +21,7 @@ const updateNavParam = (feeds: Feed[], navigation: any) => {
     }
 };
 
-const mapDispatchToProps = (dispatch, ownProps): DispatchProps => {
+const mapDispatchToProps = (dispatch: any, ownProps: { navigation: any }): DispatchProps => {
     return {
         onAddFeed: (feed: Feed) => {
             dispatch(Actions.addFeed(feed));
@@ -37,7 +37,7 @@ const mapDispatchToProps = (dispatch, ownProps): DispatchProps => {
     };
 };
 
-export const EditFeedContainer = connect<StateProps, DispatchProps, {}>(
+export const EditFeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedInfo);

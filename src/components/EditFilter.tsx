@@ -53,13 +53,15 @@ export interface StateProps {
     navigation: any;
 }
 
+type Props = DispatchProps & StateProps;
+
 interface EditFilterState {
     filterText: string;
     filterSliderValue: SliderValue;
 }
 
 export class EditFilter extends React.Component<DispatchProps & StateProps, EditFilterState> {
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
         this.state = {
             filterText: this.props.filter.text,

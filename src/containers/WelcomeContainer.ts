@@ -4,14 +4,14 @@ import { AppState } from '../reducers';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { ImageData } from '../models/ImageData';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         navigation: ownProps.navigation,
         author: state.author,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onCreateIdentity: () => {
             dispatch(AsyncActions.createUserIdentity());
@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const WelcomeContainer = connect<StateProps, DispatchProps, {}>(
+export const WelcomeContainer = connect(
     mapStateToProps,
     mapDispatchToProps
 )(Welcome);

@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { FavoritesFeedView } from '../components/FavoritesFeedView';
 import { getFavoriteFeedsPosts, getFavoriteFeeds } from '../selectors/selectors';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const posts = getFavoriteFeedsPosts(state);
     const favoriteFeeds = getFavoriteFeeds(state);
 
@@ -14,11 +14,10 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: posts,
         feeds: favoriteFeeds,
-        settings: state.settings,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
@@ -26,7 +25,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const FavoritesContainer = connect<StateProps, DispatchProps, {}>(
+export const FavoritesContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FavoritesFeedView);

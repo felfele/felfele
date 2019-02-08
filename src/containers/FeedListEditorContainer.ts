@@ -16,7 +16,7 @@ export const updateFavicons = (feeds: Feed[]): Feed[] => feeds.map(feed => ({
 
 export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
 
-const mapStateToProps = (state: AppState, ownProps: any): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const feedsWithCorrectFavicons = updateFavicons(state.feeds);
     const feedsToDisplay = sortFeeds(feedsWithCorrectFavicons);
     return {
@@ -35,7 +35,7 @@ export const mapDispatchToProps = (dispatch: any): DispatchProps => {
     };
 };
 
-export const FeedListEditorContainer = connect<StateProps, DispatchProps, {}>(
+export const FeedListEditorContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedListEditor);

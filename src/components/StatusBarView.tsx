@@ -4,11 +4,16 @@ import {
     View,
     StatusBar,
     Platform,
+    StatusBarProps,
 } from 'react-native';
 
-export const StatusBarView = ({ backgroundColor, ...props }) => (
-    <View style={[styles.statusBar, { backgroundColor }]}>
-        <StatusBar translucent backgroundColor={backgroundColor} {...props} />
+interface Props extends StatusBarProps {
+    backgroundColor: string;
+}
+
+export const StatusBarView = (props: Props) => (
+    <View style={[styles.statusBar, { backgroundColor: props.backgroundColor }]}>
+        <StatusBar translucent backgroundColor={props.backgroundColor} {...props} />
     </View>
 );
 

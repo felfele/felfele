@@ -5,7 +5,7 @@ export class Debug {
         Debug.isDebug = isDebug;
     }
 
-    public static setMaxLength(length) {
+    public static setMaxLength(length: number) {
         Debug.maxLength = length;
     }
 

@@ -5,7 +5,7 @@ import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {
@@ -14,7 +14,7 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
    };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
    return {
        onPost: (post: Post) => {
             dispatch(AsyncActions.createPost(post));
@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
    };
 };
 
-export const EditPostContainer = connect<StateProps, DispatchProps, {}>(
+export const EditPostContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
 )(EditPost);

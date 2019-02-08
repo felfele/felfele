@@ -10,7 +10,6 @@ import {
 import { Post } from '../models/Post';
 import { Colors } from '../styles';
 import { StatusBarView } from './StatusBarView';
-import { Settings } from '../models/Settings';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
@@ -24,7 +23,6 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    settings: Settings;
     children: {
         // WARNING, type parameter included for reference, but it does not typecheck
         listHeader?: React.ReactElement<FeedHeaderProps>,
@@ -32,18 +30,20 @@ export interface StateProps {
     };
 }
 
+type Props = DispatchProps & StateProps;
+
 interface RefreshableFeedState {
     selectedPost: Post | null;
     isRefreshing: boolean;
 }
 
-export class RefreshableFeed extends React.PureComponent<DispatchProps & StateProps, RefreshableFeedState> {
+export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedState> {
     public state: RefreshableFeedState = {
         selectedPost: null,
         isRefreshing: false,
     };
 
-    public componentDidUpdate(prevProps) {
+    public componentDidUpdate(prevProps: Props) {
         if (this.props.posts !== prevProps.posts) {
             this.setState({
                 isRefreshing: false,
@@ -80,7 +80,6 @@ export class RefreshableFeed extends React.PureComponent<DispatchProps & StatePr
                             isSelected={this.isPostSelected(obj.item)}
                             navigate={this.props.navigation.navigate}
                             togglePostSelection={this.togglePostSelection}
-                            showSquareImages={this.props.settings.showSquareImages}
                         />
                     )}
                     keyExtractor={(item) => '' + item._id}

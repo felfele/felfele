@@ -24,7 +24,6 @@ export interface StateProps {
     feedName: string;
     posts: Post[];
     feeds: Feed[];
-    settings: Settings;
     isOwnFeed: boolean;
 }
 

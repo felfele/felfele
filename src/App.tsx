@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
+import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { Platform, YellowBox } from 'react-native';
@@ -8,7 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
@@ -41,9 +40,9 @@ Debug.addLogger(appendToLog);
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
-        screen: ({navigation}) => (<FavoritesContainer
-                                    navigation={navigation}
-                                />),
+        screen: ({navigation}: NavigationScreenProps) => (
+            <FavoritesContainer navigation={navigation}/>
+        ),
     },
     Feed: {
         screen: FeedContainer,
@@ -67,9 +66,9 @@ const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
 
 const yourTabScenes: NavigationRouteConfigMap = {
     YourTab: {
-        screen: ({navigation}) => (<YourFeedContainer
-                                    navigation={navigation}
-                                />),
+        screen: ({navigation}: NavigationScreenProps) => (
+            <YourFeedContainer navigation={navigation}/>
+        ),
     },
     Feed: {
         screen: FeedContainer,
@@ -87,9 +86,11 @@ const YourFeedNavigator = createStackNavigator(yourTabScenes,
 
 const newsTabScenes: NavigationRouteConfigMap = {
     NewsTab: {
-        screen: ({navigation}) => (<NewsFeedContainer
-                                    navigation={navigation}
-                                    postManager={RSSPostManager} />),
+        screen: ({navigation}: NavigationScreenProps) => (
+            <NewsFeedContainer
+                navigation={navigation}
+            />
+        ),
     },
     Feed: {
         screen: FeedContainer,
@@ -114,7 +115,9 @@ const NewsFeedNavigator = createStackNavigator(newsTabScenes,
 
 const settingsTabScenes: NavigationRouteConfigMap = {
     SettingsTab: {
-        screen: ({navigation}) => (<SettingsEditorContainer navigation={navigation} />),
+        screen: ({navigation}: NavigationScreenProps) => (
+            <SettingsEditorContainer navigation={navigation} />
+        ),
     },
     Debug: {
         screen: DebugScreenContainer,
@@ -169,7 +172,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 title: 'Your story',
                 tabBarLabel: 'Your story',
-                tabBarIcon: ({ tintColor, focused }) => (
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
                         name={focused ? 'rss-feed' : 'rss-feed'}
                         size={20}
@@ -184,7 +187,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 title: 'Favorites',
                 tabBarLabel: 'Your story',
-                tabBarIcon: ({ tintColor, focused }) => (
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
                         name={focused ? 'favorite' : 'favorite'}
                         size={20}
@@ -199,7 +202,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 title: 'New stories',
                 tabBarLabel: 'New stories',
-                tabBarIcon: ({ tintColor, focused }) => (
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <FontAwesomeIcon
                         name={focused ? 'newspaper-o' : 'newspaper-o'}
                         size={20}
@@ -214,7 +217,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 header: undefined,
                 title: 'Settings',
-                tabBarIcon: ({ tintColor, focused }) => (
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
                         name={focused ? 'settings' : 'settings'}
                         size={20}

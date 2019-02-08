@@ -11,6 +11,7 @@ import { RecentPostFeed, PostCommandLog, shareNewPost } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
+// @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmPostOptions } from '../swarm-social/swarmStorage';
 import { isPostFeedUrl } from '../swarm-social/swarmStorage';
@@ -118,8 +119,8 @@ export const Actions = {
 };
 
 export const AsyncActions = {
-    cleanupContentFilters: (currentTimestamp: number = Date.now()) => {
-        return async (dispatch, getState: () => AppState) => {
+    cleanupContentFilters: (currentTimestamp: number = Date.now()): Thunk => {
+        return async (dispatch, getState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
                 filter ? filter.createdAt + filter.validUntil < currentTimestamp : false
             );
@@ -130,8 +131,8 @@ export const AsyncActions = {
             });
         };
     },
-    downloadFollowedFeedPosts: () => {
-        return async (dispatch, getState: () => AppState) => {
+    downloadFollowedFeedPosts: (): Thunk => {
+        return async (dispatch, getState) => {
             const feeds = getState()
                             .feeds
                             .filter(feed => feed.followed === true);
@@ -139,8 +140,8 @@ export const AsyncActions = {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         };
     },
-    downloadPostsFromFeeds: (feeds: Feed[]) => {
-        return async (dispatch, getState: () => AppState) => {
+    downloadPostsFromFeeds: (feeds: Feed[]): Thunk => {
+        return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''});
@@ -161,8 +162,8 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    createPost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    createPost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             dispatch(Actions.removeDraft());
             const { metadata, author } = getState();
             post._id = metadata.highestSeenPostId + 1;
@@ -172,13 +173,13 @@ export const AsyncActions = {
             Debug.log('Post saved and synced, ', post._id);
         };
     },
-    removePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    removePost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             dispatch(Actions.deletePost(post));
         };
     },
-    sharePost: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    sharePost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             const isQueueEmtpy = getState().postUploadQueue.length === 0;
             dispatch(InternalActions.queuePostForUpload(post));
             dispatch(Actions.updatePostIsUploading(post, true));
@@ -187,8 +188,8 @@ export const AsyncActions = {
             }
         };
     },
-    uploadPostsFromQueue: () => {
-        return async (dispatch, getState: () => AppState) => {
+    uploadPostsFromQueue: (): Thunk => {
+        return async (dispatch, getState) => {
             while (getState().postUploadQueue.length > 0) {
                 const post = getState().postUploadQueue[0];
                 await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
@@ -196,8 +197,8 @@ export const AsyncActions = {
             }
         };
     },
-    uploadPostFromQueue: (post: Post) => {
-        return async (dispatch, getState: () => AppState) => {
+    uploadPostFromQueue: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             try {
                 Debug.log('sharePost: ', post);
                 const ownFeeds = getState().ownFeeds;
@@ -259,8 +260,8 @@ export const AsyncActions = {
             }
         };
     },
-    chainActions: (thunks: ThunkTypes[], callback?: () => void) => {
-        return async (dispatch, getState: () => AppState) => {
+    chainActions: (thunks: ThunkTypes[], callback?: () => void): Thunk => {
+        return async (dispatch, getState) => {
             for (const thunk of thunks) {
                 if (isActionTypes(thunk)) {
                     dispatch(thunk);
@@ -273,13 +274,13 @@ export const AsyncActions = {
             }
         };
     },
-    createUserIdentity: () => {
+    createUserIdentity: (): Thunk => {
         return async (dispatch, getState: () => AppState) => {
             const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
-    restoreFromBackup: (backupText: string, secretHex: string) => {
+    restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
         return async (dispatch, getState: () => AppState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);

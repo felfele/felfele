@@ -5,7 +5,7 @@ import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts } from '../selectors/selectors';
 
-export const mapStateToProps = (state: AppState, ownProps): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const feedUrl = ownProps.navigation.state.params.feedUrl;
     const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl);
     // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
@@ -19,12 +19,11 @@ export const mapStateToProps = (state: AppState, ownProps): StateProps => {
         feedName: ownProps.navigation.state.params.name,
         posts: posts,
         feeds: selectedFeeds,
-        settings: state.settings,
         isOwnFeed: state.author.uri === feedUrl,
     };
 };
 
-export const mapDispatchToProps = (dispatch): DispatchProps => {
+export const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
@@ -41,7 +40,7 @@ export const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const FeedContainer = connect<StateProps, DispatchProps, {}>(
+export const FeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedView);
