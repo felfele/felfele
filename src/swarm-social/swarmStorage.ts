@@ -2,8 +2,12 @@ import {
     PostCommand,
     PostCommandLog,
     Storage,
-    getLatestPostsFromLog,
     StorageSyncer,
+    StorageSyncUpdate,
+    RecentPostFeed,
+    getLatestPostCommandEpochFromLog,
+    getPostCommandUpdatesSinceEpoch,
+    getLatestPostsFromLog,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
@@ -12,7 +16,6 @@ import { Utils } from '../Utils';
 import { PublicPost, Post, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
-import { RecentPostFeed } from '../social/api';
 import { syncPostCommandLogWithStorage } from '../social/sync';
 
 export interface SwarmHelpers {
@@ -29,7 +32,7 @@ const defaultSwarmHelpers: SwarmHelpers = {
     getLocalPath: (localPath) => localPath,
 };
 
-const DEFAULT_POST_COMMAND_LOG_TOPIC = 'posts';
+const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
 
 interface SwarmStorage extends Storage {
     readonly swarmApi: Swarm.Api;
@@ -68,12 +71,16 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
 });
 
 export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSyncer => ({
-    sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
+    sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed): Promise<StorageSyncUpdate> => {
+        const lastSeenEpoch = getLatestPostCommandEpochFromLog(postCommandLog);
         const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
-        const updatedRecentPostFeed = await uploadRecentPostFeed(swarmStorage.swarmApi, syncedPostCommandLog, recentPostFeed, swarmStorage.swarmHelpers);
+        const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
+        const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
+        const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
         return {
             postCommandLog: syncedPostCommandLog,
             recentPostFeed: updatedRecentPostFeed,
+            updatedPosts,
         };
     },
 });
@@ -367,9 +374,9 @@ const uploadRecentPostFeed = async (
             localPath: '',
         },
     };
-    Debug.log('sharePost: after uploadPosts');
+    Debug.log('uploadRecentPostFeed: after uploadPosts');
 
     const updatedRecentPostFeed = await updateRecentPostFeed(swarm, postFeed);
-    Debug.log('sharePost: after uploadPostFeed');
+    Debug.log('uploadRecentPostFeed: after uploadPostFeed');
     return updatedRecentPostFeed;
 };
