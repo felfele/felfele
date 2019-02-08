@@ -167,13 +167,13 @@ const downloadFeed = async (swarmGateway: string, feedUri: string, timeout: numb
     return text;
 };
 
-const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate: FeedTemplate, signFeedDigest: (digest: number[]) => string, data: string): Promise<FeedTemplate> => {
+const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate: FeedTemplate, signFeedDigest: FeedDigestSigner, data: string): Promise<FeedTemplate> => {
     const digest = feedUpdateDigest(feedTemplate, data);
     if (digest == null) {
         throw new Error('digest is null');
     }
     const addressPart = calculateFeedAddressQueryString(feedTemplate.feed);
-    const signature = signFeedDigest(digest);
+    const signature = await signFeedDigest(digest);
     const url = swarmGateway + `/bzz-feed:/?${addressPart}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
     Debug.log('updateFeed: ', url, data);
     const options: RequestInit = {
@@ -226,13 +226,15 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
     address,
 });
 
+type FeedDigestSigner = (digest: number[]) => string | Promise<string>;
+
 export interface WriteableFeedApi extends ReadableFeedApi {
     updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
     update: (data: string) => Promise<FeedTemplate>;
-    signFeedDigest: (digest: number[]) => string;
+    signFeedDigest: FeedDigestSigner;
 }
 
-export const makeFeedApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): WriteableFeedApi => {
+export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = DefaultGateway): WriteableFeedApi => {
     return {
         ...makeReadableFeedApi(address, swarmGateway),
 
@@ -270,7 +272,7 @@ export interface WriteableApi extends BaseApi {
 
 export type Api = WriteableApi;
 
-export const makeApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): Api => ({
+export const makeApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = DefaultGateway): Api => ({
     bzz: makeBzzApi(swarmGateway),
     feed: makeFeedApi(address, signFeedDigest, swarmGateway),
     swarmGateway,
