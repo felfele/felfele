@@ -6,29 +6,27 @@ import {
 
 // localSwarmStorage is a local storage that has the semantics of a Swarm storage
 // therefore it can be used for testing
-class LocalSwarmStorage implements PostCommandLogStorage {
-    private postCommandLog: PostCommandLog = {
+export const makeLocalSwarmStorage = (): PostCommandLogStorage => {
+    let postCommandLog: PostCommandLog = {
         commands: [],
     };
-    private time = 0;
-
-    public uploadPostCommand = async (postCommand: PostCommand) => {
-        const updatedPostCommand = {
-            ...postCommand,
-            epoch: {
-                time: this.time++,
-                level: 0,
-            },
-        };
-        this.postCommandLog = {
-            commands: [updatedPostCommand, ...this.postCommandLog.commands],
-        };
-        return updatedPostCommand;
-    }
-
-    public downloadPostCommandLog = async () => {
-        return this.postCommandLog;
-    }
-}
-
-export const makeLocalSwarmStorage = () => new LocalSwarmStorage();
+    let time = 0;
+    return {
+        uploadPostCommand: async (postCommand: PostCommand) => {
+            const updatedPostCommand = {
+                ...postCommand,
+                epoch: {
+                    time: time++,
+                    level: 0,
+                },
+            };
+            postCommandLog = {
+                commands: [updatedPostCommand, ...postCommandLog.commands],
+            };
+            return updatedPostCommand;
+        },
+        downloadPostCommandLog: async () => {
+            return postCommandLog;
+        },
+    };
+};
