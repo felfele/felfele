@@ -1,16 +1,20 @@
 import {
     PostCommand,
     PostCommandLog,
-    PostCommandLogStorage,
+    Storage,
+    getLatestPostsFromLog,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
-import { Post, Author } from '../models/Post';
+import { PublicPost, Post, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { ModelHelper } from '../models/ModelHelper';
 import { MockModelHelper } from '../models/__mocks__/ModelHelper';
+import { Feed } from '../models/Feed';
+import { RecentPostFeed } from '../social/api';
+import { syncPostCommandLogWithStorage } from '../social/sync';
 
 interface PostOptions {
     shareFeedAddress: boolean;
@@ -28,16 +32,58 @@ const defaultPostOptions: PostOptions = {
     modelHelper: new MockModelHelper(),
 };
 
-export const makeSwarmPostCommandLogStorage = (swarmApi: Swarm.Api): PostCommandLogStorage => ({
+const DEFAULT_POST_COMMAND_LOG_TOPIC = 'posts';
+
+interface SwarmStorage extends Storage {
+    readonly swarmApi: Swarm.Api;
+}
+
+export const makeSwarmStorage = (swarmApi: Swarm.Api): SwarmStorage => ({
+    swarmApi,
     uploadPostCommand: async (postCommand: PostCommand) => {
-        return await uploadPostCommandToSwarm(postCommand, swarmApi);
+        const postCommandLogFeedAddress = {
+            ...swarmApi.feed.address,
+            topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
+        };
+        const feedApi = Swarm.makeFeedApi(postCommandLogFeedAddress, swarmApi.feed.signFeedDigest, swarmApi.swarmGateway);
+        const newSwarmApi = {
+            ...swarmApi,
+            feed: feedApi,
+        };
+        return await uploadPostCommandToSwarm(postCommand, newSwarmApi);
     },
-    fetchPostCommandLog: async () => {
-        return fetchSwarmPostCommandLog(swarmApi.feed);
+    downloadPostCommandLog: async () => {
+        const postCommandLogFeedAddress = {
+            ...swarmApi.feed.address,
+            topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
+        };
+        const feedApi = Swarm.makeReadableFeedApi(postCommandLogFeedAddress, swarmApi.swarmGateway);
+        return await fetchSwarmPostCommandLog(feedApi);
+    },
+    uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
+        return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed);
+    },
+    downloadRecentPostFeed: async (url: string, timeout: number = 0) => {
+        return await downloadRecentPostFeed(swarmApi, url, timeout);
     },
 });
 
-const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.WriteableFeedApi): Promise<PostCommandLog> => {
+export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage) => ({
+    sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
+        const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
+        const updatedRecentPostFeed = await uploadRecentPostFeed(swarmStorage.swarmApi, syncedPostCommandLog, recentPostFeed);
+        return {
+            postCommandLog: syncedPostCommandLog,
+            recentPostFeed: updatedRecentPostFeed,
+        };
+    },
+});
+
+export const isPostFeedUrl = (url: string): boolean => {
+    return url.startsWith(Swarm.DefaultFeedPrefix);
+};
+
+const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi): Promise<PostCommandLog> => {
     const postCommandLog: PostCommandLog = {
         commands: [],
     };
@@ -110,7 +156,7 @@ const isImageUploaded = (image: ImageData): boolean => {
     return false;
 };
 
-export const uploadImage = async (
+const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
@@ -146,7 +192,7 @@ const uploadImages = async (
     return updateImages;
 };
 
-export const uploadAuthor = async (
+const uploadAuthor = async (
     swarm: Swarm.BzzApi,
     author: Author,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
@@ -161,7 +207,7 @@ export const uploadAuthor = async (
     };
 };
 
-export const uploadPost = async (
+const uploadPost = async (
     swarm: Swarm.BzzApi,
     post: Post,
     imageResizer: (image: ImageData, path: string) => Promise<string>,
@@ -187,7 +233,7 @@ export const uploadPost = async (
     };
 };
 
-export const uploadPosts = async (
+const uploadPosts = async (
     swarm: Swarm.BzzApi,
     posts: Post[],
     imageResizer: (image: ImageData, path: string) => Promise<string>,
@@ -199,4 +245,127 @@ export const uploadPosts = async (
         uploadedPosts.push(uploadedPost);
     }
     return uploadedPosts;
+};
+
+const createRecentPostFeed = async (
+    swarm: Swarm.Api,
+    author: Author,
+    firstPost: PublicPost,
+    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    modelHelper: ModelHelper
+): Promise<RecentPostFeed> => {
+    const url = swarm.feed.getUri();
+    Debug.log('createPostFeed: ', author);
+    const uploadedImage = await uploadImage(swarm.bzz, author.image, imageResizer, modelHelper);
+    const uploadedPost = await uploadPost(swarm.bzz, firstPost, imageResizer, modelHelper);
+    const postFeed: RecentPostFeed = {
+        name: author.name,
+        url,
+        feedUrl: url,
+        favicon: uploadedImage.localPath || '',
+        posts: [uploadedPost],
+        authorImage: uploadedImage,
+    };
+    return await updateRecentPostFeed(swarm, postFeed);
+};
+
+const updateRecentPostFeed = async (swarm: Swarm.Api, postFeed: RecentPostFeed): Promise<RecentPostFeed> => {
+    try {
+        const postFeedJson = JSON.stringify(postFeed);
+        const contentHash = await swarm.bzz.upload(postFeedJson);
+        await swarm.feed.update(contentHash);
+        const url = swarm.feed.getUri();
+        return {
+            ...postFeed,
+            url,
+            feedUrl: url,
+        };
+    } catch (e) {
+        Debug.log('updatePostFeed failed, ', e);
+        return postFeed;
+    }
+};
+
+export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: string, timeout: number = 5000): Promise<RecentPostFeed> => {
+    try {
+        const contentHash = await swarm.feed.downloadFeed(url, timeout);
+        Debug.log('downloadPostFeed: contentHash: ', contentHash);
+
+        const content = await swarm.bzz.download(contentHash, timeout);
+        Debug.log('downloadPostFeed: content: ', content);
+
+        const postFeed = JSON.parse(content) as RecentPostFeed;
+        const authorImage = {
+            uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+        };
+        const author: Author = {
+            name: postFeed.name,
+            uri: postFeed.url,
+            faviconUri: authorImage.uri,
+            image: authorImage,
+        };
+        const postFeedWithGatewayImageLinks = {
+            ...postFeed,
+            posts: postFeed.posts.map(post => ({
+                ...post,
+                author,
+                images: post.images.map(image => ({
+                    ...image,
+                    uri: Swarm.getSwarmGatewayUrl(image.uri!),
+                })),
+            })),
+            favicon: authorImage.uri,
+        };
+        return postFeedWithGatewayImageLinks;
+    } catch (e) {
+        Debug.log('downloadPostFeed failed: ', e);
+        return {
+            posts: [],
+            name: '',
+            url: '',
+            feedUrl: '',
+            favicon: '',
+            authorImage: {
+                localPath: '',
+            },
+        };
+    }
+};
+
+export const loadRecentPosts = async (swarm: Swarm.ReadableApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
+    const loadFeedPromises = postFeeds.map(feed => downloadRecentPostFeed(swarm, feed.feedUrl));
+    const feeds = await Promise.all(loadFeedPromises);
+    let posts: PublicPost[] = [];
+    for (const feed of feeds) {
+        posts = posts.concat(feed.posts);
+    }
+    return posts;
+};
+
+const uploadRecentPostFeed = async (swarm: Swarm.Api, postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed): Promise<RecentPostFeed> => {
+    const feedPosts = getLatestPostsFromLog(postCommandLog, 20);
+    const posts = feedPosts
+        .map(p => ({
+            ...p,
+            images: p.images.map(image => ({
+                ...image,
+                localPath: undefined,
+            })),
+        }))
+        ;
+
+    const uploadedPosts = await uploadPosts(swarm.bzz, posts, defaultImageResizer, new MockModelHelper());
+    const postFeed = {
+        ...recentPostFeed,
+        posts: uploadedPosts,
+        authorImage: {
+            ...recentPostFeed.authorImage,
+            localPath: '',
+        },
+    };
+    Debug.log('sharePost: after uploadPosts');
+
+    const updatedRecentPostFeed = await updateRecentPostFeed(swarm, postFeed);
+    Debug.log('sharePost: after uploadPostFeed');
+    return updatedRecentPostFeed;
 };

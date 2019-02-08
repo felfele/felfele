@@ -1,4 +1,6 @@
-import { Post } from '../models/Post';
+import { PublicPost, Post } from '../models/Post';
+import { Feed } from '../models/Feed';
+import { ImageData } from '../models/ImageData';
 import * as Swarm from '../swarm/Swarm';
 
 type PostCommandType = 'update' | 'remove';
@@ -33,9 +35,30 @@ export interface PostCommandLog {
     readonly commands: PostCommand[];
 }
 
+export interface RecentPostFeed extends Feed {
+    posts: PublicPost[];
+    authorImage: ImageData;
+}
+
 export interface PostCommandLogStorage {
     uploadPostCommand: (postCommand: PostCommand) => Promise<PostCommand>;
-    fetchPostCommandLog: () => Promise<PostCommandLog>;
+    downloadPostCommandLog: () => Promise<PostCommandLog>;
+}
+
+export interface RecentPostFeedStorage {
+    uploadRecentPostFeed: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<RecentPostFeed>;
+    downloadRecentPostFeed: (url: string, timeout: number) => Promise<RecentPostFeed>;
+}
+
+export interface UpdatedStorage {
+    postCommandLog: PostCommandLog;
+    recentPostFeed: RecentPostFeed;
+}
+
+export type Storage = PostCommandLogStorage & RecentPostFeedStorage;
+
+export interface StorageSyncer extends PostCommandLogStorage, RecentPostFeedStorage {
+    sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<UpdatedStorage>;
 }
 
 export const arePostCommandsEqual = (a: PostCommand, b: PostCommand): boolean =>

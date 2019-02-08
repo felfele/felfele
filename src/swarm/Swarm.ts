@@ -6,7 +6,7 @@ import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 
-export const DefaultGateway = 'http://swarm-local:8500';
+export const DefaultGateway = 'http://localhost:8500';
 export const DefaultUrlScheme = '/bzz-raw:/';
 export const DefaultPrefix = 'bzz://';
 export const DefaultFeedPrefix = 'bzz-feed:/';
@@ -57,6 +57,11 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
         return DefaultGateway + DefaultUrlScheme + swarmUrl;
     }
     return swarmUrl;
+};
+
+export const calculateTopic = (topic: string): string => {
+    const prefixedTopic = `felfele:${topic}`;
+    return '0x' + keccak256.hex(prefixedTopic);
 };
 
 const imageMimeTypeFromPath = (path: string): string => {
@@ -132,23 +137,44 @@ interface FeedTemplate {
     protocolVersion: number;
 }
 
-const downloadUserFeedTemplate = async (address: FeedAddress): Promise<FeedTemplate> => {
-    const url = DefaultGateway + `/bzz-feed:/?user=${address.user}&meta=1`;
-    Debug.log('downloadUserFeedTemplate: ', url);
-    const response = await safeFetch(url);
-    const feedUpdateResponse = await response.json() as FeedTemplate;
+const calculateFeedAddressQueryString = (address: FeedAddress): string => {
+    return `user=${address.user}` + (address.topic === '' ? '' : `&topic=${address.topic}`);
+};
+
+const downloadUserFeedTemplate = async (swarmGateway: string, address: FeedAddress): Promise<FeedTemplate> => {
+    const addressPart = calculateFeedAddressQueryString(address);
+    const response = await downloadFeed(swarmGateway, `bzz-feed:/?${addressPart}&meta=1`);
+    const feedUpdateResponse = JSON.parse(response) as FeedTemplate;
     Debug.log('downloadUserFeedTemplate: ', feedUpdateResponse);
     return feedUpdateResponse;
 };
 
+const downloadUserFeed = async (swarmGateway: string, address: FeedAddress): Promise<string> => {
+    const addressPart = calculateFeedAddressQueryString(address);
+    return await downloadFeed(swarmGateway, `bzz-feed:/?${addressPart}`);
+};
+
+const downloadUserFeedPreviousVersion = async (swarmGateyay: string, address: FeedAddress, epoch: Epoch): Promise<string> => {
+    const addressPart = calculateFeedAddressQueryString(address);
+    return await downloadFeed(swarmGateyay, `bzz-feed:/?${addressPart}&time=${epoch.time}`);
+};
+
+const downloadFeed = async (swarmGateway: string, feedUri: string, timeout: number = 0): Promise<string> => {
+    const url = swarmGateway + '/' + feedUri;
+    Debug.log('downloadFeed: ', url);
+    const response = await safeFetchWithTimeout(url, undefined, timeout);
+    const text = await response.text();
+    return text;
+};
+
 const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate: FeedTemplate, signFeedDigest: (digest: number[]) => string, data: string): Promise<FeedTemplate> => {
     const digest = feedUpdateDigest(feedTemplate, data);
-
     if (digest == null) {
         throw new Error('digest is null');
     }
+    const addressPart = calculateFeedAddressQueryString(feedTemplate.feed);
     const signature = signFeedDigest(digest);
-    const url = swarmGateway + `/bzz-feed:/?topic=${feedTemplate.feed.topic}&user=${feedTemplate.feed.user}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
+    const url = swarmGateway + `/bzz-feed:/?${addressPart}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
     Debug.log('updateFeed: ', url, data);
     const options: RequestInit = {
         method: 'POST',
@@ -161,28 +187,14 @@ const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate
     return feedTemplate;
 };
 
-const downloadUserFeed = async (address: FeedAddress): Promise<string> => {
-    return await downloadFeed(`bzz-feed:/?user=${address.user}`);
-};
-
-const downloadUserFeedPreviousVersion = async (address: FeedAddress, epoch: Epoch): Promise<string> => {
-    return await downloadFeed(`bzz-feed:/?user=${address.user}&time=${epoch.time}`);
-};
-
-const downloadFeed = async (feedUri: string, timeout: number = 0): Promise<string> => {
-    const url = DefaultGateway + '/' + feedUri;
-    Debug.log('downloadFeed: ', url);
-    const response = await safeFetchWithTimeout(url, undefined, timeout);
-    const text = await response.text();
-    return text;
-};
-
 export interface ReadableFeedApi {
     download: () => Promise<string>;
     downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
     downloadFeedTemplate: () => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string, timeout: number) => Promise<string>;
     getUri: () => string;
+
+    readonly address: FeedAddress;
 }
 
 export const makeFeedAddressFromBzzFeedUrl = (bzzFeedUrl: string): FeedAddress => {
@@ -206,16 +218,18 @@ export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity
 };
 
 export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string = DefaultGateway): ReadableFeedApi => ({
-    download: async (): Promise<string> => downloadUserFeed(address),
-    downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(address, epoch),
-    downloadFeedTemplate: async () => downloadUserFeedTemplate(address),
-    downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(feedUri, timeout),
-    getUri: () => `bzz-feed:/?user=${address}`,
+    download: async (): Promise<string> => downloadUserFeed(swarmGateway, address),
+    downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(swarmGateway, address, epoch),
+    downloadFeedTemplate: async () => downloadUserFeedTemplate(swarmGateway, address),
+    downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(swarmGateway, feedUri, timeout),
+    getUri: () => `bzz-feed:/?${calculateFeedAddressQueryString(address)}`,
+    address,
 });
 
 export interface WriteableFeedApi extends ReadableFeedApi {
     updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
     update: (data: string) => Promise<FeedTemplate>;
+    signFeedDigest: (digest: number[]) => string;
 }
 
 export const makeFeedApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): WriteableFeedApi => {
@@ -224,9 +238,10 @@ export const makeFeedApi = (address: FeedAddress, signFeedDigest: (digest: numbe
 
         updateWithFeedTemplate: async (feedTemplate: FeedTemplate, data) => await updateUserFeedWithSignFunction(swarmGateway, feedTemplate, signFeedDigest, data),
         update: async (data: string): Promise<FeedTemplate> => {
-            const feedTemplate = await downloadUserFeedTemplate(address);
+            const feedTemplate = await downloadUserFeedTemplate(swarmGateway, address);
             return await updateUserFeedWithSignFunction(swarmGateway, feedTemplate, signFeedDigest, data);
         },
+        signFeedDigest,
     };
 };
 
@@ -244,9 +259,13 @@ export const makeBzzApi = (swarmGateway: string = DefaultGateway): BzzApi => {
     };
 };
 
-export interface WriteableApi {
-    bzz: BzzApi;
-    feed: WriteableFeedApi;
+export interface BaseApi {
+    readonly swarmGateway: string;
+}
+
+export interface WriteableApi extends BaseApi {
+    readonly bzz: BzzApi;
+    readonly feed: WriteableFeedApi;
 }
 
 export type Api = WriteableApi;
@@ -254,9 +273,10 @@ export type Api = WriteableApi;
 export const makeApi = (address: FeedAddress, signFeedDigest: (digest: number[]) => string, swarmGateway: string = DefaultGateway): Api => ({
     bzz: makeBzzApi(swarmGateway),
     feed: makeFeedApi(address, signFeedDigest, swarmGateway),
+    swarmGateway,
 });
 
-export interface ReadableApi {
+export interface ReadableApi extends BaseApi {
     bzz: BzzApi;
     feed: ReadableFeedApi;
 }
@@ -265,6 +285,7 @@ export const makeReadableApi = (address: FeedAddress, swarmGateway: string = Def
     return {
         bzz: makeBzzApi(swarmGateway),
         feed: makeReadableFeedApi(address, swarmGateway),
+        swarmGateway,
     };
 };
 

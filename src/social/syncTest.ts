@@ -1,9 +1,10 @@
 import {
-    makeSwarmPostCommandLogStorage,
+    makeSwarmStorage,
 } from '../swarm-social/swarmStorage';
 import * as Swarm from '../swarm/Swarm';
 import {
     PostCommandLog,
+    PostCommandLogStorage,
     removePost,
     getLatestPostsFromLog,
 } from './api';
@@ -33,9 +34,9 @@ export const defaultSwarmApi = Swarm.makeApi(
 
 export const defaultSwarmFeedApi = defaultSwarmApi.feed;
 
-export const defaultStorage = makeSwarmPostCommandLogStorage(defaultSwarmApi);
+export const defaultStorage = makeSwarmStorage(defaultSwarmApi);
 
-const testSharePostStorage = async (id: number, postCommandLog: PostCommandLog, source = 'storage', storage = defaultStorage): Promise<PostCommandLog> => {
+const testSharePostStorage = async (id: number, postCommandLog: PostCommandLog, source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const postCommandLogAfterShare = await testSharePost(id, postCommandLog, source);
     const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfterShare, storage);
     Debug.log('testSharePostStorage', 'syncedCommandLog', syncedCommandLog);
@@ -44,7 +45,7 @@ const testSharePostStorage = async (id: number, postCommandLog: PostCommandLog, 
     return syncedCommandLog;
 };
 
-const testSharePostsStorage = async (source = 'storage', storage = defaultStorage): Promise<PostCommandLog> => {
+const testSharePostsStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
     const postCommandLogAfter2 = await testSharePost(2, postCommandLogAfter1, source);
     const postCommandLogAfter3 = await testSharePost(3, postCommandLogAfter2, source);
@@ -57,7 +58,7 @@ const testSharePostsStorage = async (source = 'storage', storage = defaultStorag
     return syncedCommandLog;
 };
 
-const testSharePostsWithRemoveOnStorage = async (source = '', storage = defaultStorage): Promise<PostCommandLog> => {
+const testSharePostsWithRemoveOnStorage = async (source = '', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const postCommandLogAfter3 = await testSharePostsStorage(source, storage);
     const post3 = postCommandLogAfter3.commands[2].post;
     const postCommandLogAfter4 = await removePost(post3, source, postCommandLogAfter3);
@@ -66,7 +67,7 @@ const testSharePostsWithRemoveOnStorage = async (source = '', storage = defaultS
     Debug.log('testSharePostsStorage', 'syncedCommandLog', syncedCommandLog);
     assertPostCommandLogInvariants(syncedCommandLog);
 
-    const storagePostCommandLog = await storage.fetchPostCommandLog();
+    const storagePostCommandLog = await storage.downloadPostCommandLog();
     const posts = getLatestPostsFromLog(storagePostCommandLog, 3);
     Debug.log('testSharePostsWithRemove', 'posts', posts);
     assertPostCommandLogInvariants(storagePostCommandLog);
@@ -76,19 +77,19 @@ const testSharePostsWithRemoveOnStorage = async (source = '', storage = defaultS
     return storagePostCommandLog;
 };
 
-const testListAllPosts = async (storage = defaultStorage): Promise<PostCommandLog> => {
-    return await storage.fetchPostCommandLog();
+const testListAllPosts = async (storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    return await storage.downloadPostCommandLog();
 };
 
-const testFetchLastThreePosts = async (storage = defaultStorage): Promise<PostCommandLog> => {
-    const swarmPostCommandLog = await storage.fetchPostCommandLog();
+const testFetchLastThreePosts = async (storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    const swarmPostCommandLog = await storage.downloadPostCommandLog();
     const posts = await getLatestPostsFromLog(swarmPostCommandLog, 3);
     Debug.log('fetchLastTwoPosts', 'posts', posts);
     return swarmPostCommandLog;
 };
 
-const testSyncLocalEmptyPostCommandLogWithStorage = async (source = 'storage', storage = defaultStorage): Promise<PostCommandLog> => {
-    await testSharePostsStorage(source);
+const testSyncLocalEmptyPostCommandLogWithStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    await testSharePostsStorage(source, storage);
     const syncedPostCommandLog = await syncPostCommandLogWithStorage(emptyPostCommandFeed, storage);
     Debug.log('testSyncLocalEmptyPostCommandLogWithStorage', 'syncedPostCommandLog', syncedPostCommandLog);
     assertPostCommandLogInvariants(syncedPostCommandLog);
@@ -96,9 +97,9 @@ const testSyncLocalEmptyPostCommandLogWithStorage = async (source = 'storage', s
     return syncedPostCommandLog;
 };
 
-const testSyncLocalPostCommandLogWithStorage = async (storage = defaultStorage): Promise<PostCommandLog> => {
+const testSyncLocalPostCommandLogWithStorage = async (storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const storageSource = 'storage';
-    const storagePostCommandFeed = await testSharePostsStorage(storageSource);
+    const storagePostCommandFeed = await testSharePostsStorage(storageSource, storage);
     assertPostCommandLogInvariants(storagePostCommandFeed);
 
     const localPostCommandFeed = await testSharePosts('local');
@@ -114,7 +115,7 @@ const testSyncLocalPostCommandLogWithStorage = async (storage = defaultStorage):
     return syncedPostCommandLog;
 };
 
-const testResyncLocalPostCommandLogWithStorage = async (storage = defaultStorage): Promise<PostCommandLog> => {
+const testResyncLocalPostCommandLogWithStorage = async (storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const storagePostCommandLog = await testSharePostsStorage('storage', storage);
 
     const localPostCommandLog = await testSharePosts('local');
@@ -135,10 +136,10 @@ const testResyncLocalPostCommandLogWithStorage = async (storage = defaultStorage
     return resyncedPostCommandLog;
 };
 
-const testSyncConcurrentPostCommandLogWithStorage = async (storage = defaultStorage): Promise<PostCommandLog> => {
+const testSyncConcurrentPostCommandLogWithStorage = async (storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const storageSource = 'storage';
     const localSource = 'local';
-    const storagePostCommandLog = await testSharePostsStorage(storageSource);
+    const storagePostCommandLog = await testSharePostsStorage(storageSource, storage);
 
     const localPostCommandLog = await testSharePosts(localSource);
     const syncedPostCommandLog = await syncPostCommandLogWithStorage(localPostCommandLog, storage);
@@ -152,7 +153,7 @@ const testSyncConcurrentPostCommandLogWithStorage = async (storage = defaultStor
     const localPostCommandLogAfterUpdate = await testSharePost(4, syncedPostCommandLog, localSource);
     assertPostCommandLogInvariants(localPostCommandLogAfterUpdate);
 
-    const remotePostCommandLogAfterUpdate = await testSharePostStorage(4, syncedPostCommandLog, storageSource);
+    const remotePostCommandLogAfterUpdate = await testSharePostStorage(4, syncedPostCommandLog, storageSource, storage);
     assertPostCommandLogInvariants(remotePostCommandLogAfterUpdate);
 
     const resyncedPostCommandLog = await syncPostCommandLogWithStorage(localPostCommandLogAfterUpdate, storage);

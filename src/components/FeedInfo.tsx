@@ -18,7 +18,7 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors } from '../styles';
 import * as Swarm from '../swarm/Swarm';
-import { downloadRecentPostFeed } from '../swarm-social/RecentPostFeed';
+import { downloadRecentPostFeed, makeSwarmStorage } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';

@@ -7,16 +7,13 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadRecentPosts, createRecentPostFeed, updateRecentPostFeed, RecentPostFeed } from '../swarm-social/RecentPostFeed';
+import { RecentPostFeed, PostCommandLog, shareNewPost } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 import { generateSecureRandom } from 'react-native-securerandom';
-import { resizeImageIfNeeded } from '../ImageUtils';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { uploadPost, uploadPosts } from '../swarm-social/swarmStorage';
-
-const modelHelper = new ReactNativeModelHelper();
+import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer } from '../swarm-social/swarmStorage';
+import { isPostFeedUrl } from '../swarm-social/swarmStorage';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -210,65 +207,43 @@ export const AsyncActions = {
                     }
                     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
                     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
+                    const swarmStorage = makeSwarmStorage(swarm);
+                    const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
 
                     dispatch(Actions.updatePostIsUploading(post, true));
-
-                    const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
-                    Debug.log('sharePost: after uploadedPost');
 
                     const localFeedPosts = getState().localPosts.filter(localPost =>
                         localPost.link === feed.url
                     );
-                    const feedPosts = [...localFeedPosts, uploadedPost];
-                    const posts = feedPosts
-                        .sort((a, b) => b.createdAt - a.createdAt)
-                        .slice(0, 20)
-                        .map(p => ({
-                            ...p,
-                            images: p.images.map(image => ({
-                                ...image,
-                                localPath: undefined,
-                            })),
-                        }))
-                        ;
-
-                    const uploadedPosts = await uploadPosts(swarm.bzz, posts, resizeImageIfNeeded, modelHelper);
-                    const postFeed = {
-                        ...feed,
-                        posts: uploadedPosts,
-                        authorImage: {
-                            ...feed.authorImage,
-                            localPath: '',
-                        },
+                    const localPostCommandLog: PostCommandLog = {
+                        commands: localFeedPosts.map(p => shareNewPost(p, 'local', {commands: []}).commands[0]),
                     };
-                    Debug.log('sharePost: after uploadPosts');
-
-                    await updateRecentPostFeed(swarm, postFeed);
-                    Debug.log('sharePost: after uploadPostFeed');
+                    const updatedStorage = swarmStorageSyncer.sync(localPostCommandLog, feed);
+                    // TODO await updateRecentPostFeed(swarm, postFeed);
 
                     dispatch(Actions.updatePostLink(post, feed.url));
                     dispatch(Actions.updatePostIsUploading(post, undefined));
 
-                    const mergedImages = mergeImages(post.images, uploadedPost.images);
-                    dispatch(Actions.updatePostImages(post, mergedImages));
-                } else {
-                    Debug.log('sharePost: create feed');
+                    // const mergedImages = mergeImages(post.images, uploadedPost.images);
+                    // dispatch(Actions.updatePostImages(post, mergedImages));
+                // } else {
+                //     Debug.log('sharePost: create feed');
 
-                    const author = getState().author;
-                    dispatch(Actions.updatePostIsUploading(post, true));
+                //     const author = getState().author;
+                //     dispatch(Actions.updatePostIsUploading(post, true));
 
-                    const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
-                    const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
-                    const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
+                //     const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
+                //     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
+                //     const uploadedPost = await uploadPost(swarm.bzz, post, resizeImageIfNeeded, modelHelper);
 
-                    const feed = await createRecentPostFeed(swarm, author, uploadedPost, resizeImageIfNeeded, modelHelper);
+                //     const feed = await createRecentPostFeed(swarm, author, uploadedPost, resizeImageIfNeeded, modelHelper);
 
-                    dispatch(InternalActions.addOwnFeed(feed));
-                    dispatch(Actions.updatePostLink(post, feed.url));
-                    dispatch(Actions.updatePostIsUploading(post, undefined));
+                //     dispatch(InternalActions.addOwnFeed(feed));
+                //     dispatch(Actions.updatePostLink(post, feed.url));
+                //     dispatch(Actions.updatePostIsUploading(post, undefined));
 
-                    const mergedImages = mergeImages(post.images, uploadedPost.images);
-                    dispatch(Actions.updatePostImages(post, mergedImages));
+                //     const mergedImages = mergeImages(post.images, uploadedPost.images);
+                //     dispatch(Actions.updatePostImages(post, mergedImages));
                 }
             } catch (e) {
                 Debug.log('sharePost: ', 'error', e);
@@ -330,7 +305,6 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
 const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
     const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-
     const allPostsCombined = await Promise.all([
         RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
         loadRecentPosts(swarm, postFeeds),

@@ -100,7 +100,7 @@ export const testSharePosts = async (source = ''): Promise<PostCommandLog> => {
     return postCommandLogAfter3;
 };
 
-const testSharePostsWithUpdate = async () => {
+export const testSharePostsWithUpdate = async () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -118,7 +118,7 @@ const testSharePostsWithUpdate = async () => {
     Debug.log('testSharePostsWithUpdate', postCommandLogAfter4);
 };
 
-const testSharePostsWithRemove = async () => {
+export const testSharePostsWithRemove = async () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -133,7 +133,7 @@ const testSharePostsWithRemove = async () => {
     Debug.log('testSharePostsWithRemove', 'posts', posts);
 };
 
-const testMergeTwoLocalPostCommandLogs = async () => {
+export const testMergeTwoLocalPostCommandLogs = async () => {
     const localSource1 = 'local1';
     const localPostCommandFeed1 = await testSharePosts(localSource1);
     assertPostCommandLogInvariants(localPostCommandFeed1);
