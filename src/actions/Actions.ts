@@ -12,8 +12,12 @@ import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 import { generateSecureRandom } from 'react-native-securerandom';
-import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer } from '../swarm-social/swarmStorage';
+import { loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmPostOptions } from '../swarm-social/swarmStorage';
 import { isPostFeedUrl } from '../swarm-social/swarmStorage';
+import { resizeImageIfNeeded } from '../ImageUtils';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+
+const modelHelper = new ReactNativeModelHelper();
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -207,7 +211,11 @@ export const AsyncActions = {
                     }
                     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
                     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
-                    const swarmStorage = makeSwarmStorage(swarm);
+                    const postOptions: SwarmPostOptions = {
+                        imageResizer: resizeImageIfNeeded,
+                        modelHelper,
+                    };
+                    const swarmStorage = makeSwarmStorage(swarm, postOptions);
                     const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
 
                     dispatch(Actions.updatePostIsUploading(post, true));

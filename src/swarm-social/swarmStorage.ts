@@ -16,8 +16,7 @@ import { Feed } from '../models/Feed';
 import { RecentPostFeed } from '../social/api';
 import { syncPostCommandLogWithStorage } from '../social/sync';
 
-interface PostOptions {
-    shareFeedAddress: boolean;
+export interface SwarmPostOptions {
     imageResizer: (image: ImageData, path: string) => Promise<string>;
     modelHelper: ModelHelper;
 }
@@ -26,8 +25,7 @@ const defaultImageResizer = (image: ImageData, path: string): Promise<string> =>
     return Promise.resolve(path);
 };
 
-const defaultPostOptions: PostOptions = {
-    shareFeedAddress: false,
+const defaultPostOptions: SwarmPostOptions = {
     imageResizer: defaultImageResizer,
     modelHelper: new MockModelHelper(),
 };
@@ -38,7 +36,7 @@ interface SwarmStorage extends Storage {
     readonly swarmApi: Swarm.Api;
 }
 
-export const makeSwarmStorage = (swarmApi: Swarm.Api): SwarmStorage => ({
+export const makeSwarmStorage = (swarmApi: Swarm.Api, postOptions: SwarmPostOptions = defaultPostOptions): SwarmStorage => ({
     swarmApi,
     uploadPostCommand: async (postCommand: PostCommand) => {
         const postCommandLogFeedAddress = {
