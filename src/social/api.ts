@@ -59,15 +59,16 @@ export interface RecentPostFeedStorage {
     downloadRecentPostFeed: (url: string, timeout: number) => Promise<RecentPostFeed>;
 }
 
-export interface UpdatedStorage {
+export interface StorageSyncUpdate {
     postCommandLog: PostCommandLog;
     recentPostFeed: RecentPostFeed;
+    updatedPosts: Post[];
 }
 
 export type Storage = PostCommandLogStorage & RecentPostFeedStorage;
 
 export interface StorageSyncer {
-    sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<UpdatedStorage>;
+    sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<StorageSyncUpdate>;
 }
 
 export const arePostCommandIdsEqual = (a: PostCommandId, b: PostCommandId): boolean =>
@@ -292,4 +293,22 @@ const getLatestUpdatePostCommandsFromLog = (postCommandLog: PostCommandLog, coun
         return true;
     });
     return updatePostCommands.slice(0, count);
+};
+
+export const getPostCommandUpdatesSinceEpoch = (postCommandLog: PostCommandLog, epoch?: Swarm.Epoch): PostCommandLog => {
+    const postCommandUpdates: PostCommand[] = [];
+    for (const command of postCommandLog.commands) {
+        if (command.epoch == null) {
+            continue;
+        }
+
+        if (epochCompare(epoch, command.epoch) < 0) {
+            postCommandUpdates.push(command);
+            continue;
+        }
+    }
+    return {
+        ...postCommandLog,
+        commands: postCommandUpdates,
+    };
 };
