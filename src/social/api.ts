@@ -57,7 +57,7 @@ export interface UpdatedStorage {
 
 export type Storage = PostCommandLogStorage & RecentPostFeedStorage;
 
-export interface StorageSyncer extends PostCommandLogStorage, RecentPostFeedStorage {
+export interface StorageSyncer {
     sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<UpdatedStorage>;
 }
 
