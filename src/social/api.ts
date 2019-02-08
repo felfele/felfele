@@ -7,15 +7,24 @@ type PostCommandType = 'update' | 'remove';
 
 export const PostCommandProtocolVersion = 1;
 
+interface PostCommandId {
+    timestamp: number;
+    source: string;
+}
+
+const defaultPostCommandId = {
+    timestamp: 0,
+    source: '',
+};
+
 export interface PostCommand {
     protocolVersion: number;
 
-    timestamp: number;
-    parentTimestamp: number;
+    id: PostCommandId;
+    parentId: PostCommandId;
 
     type: PostCommandType;
     post: Post;
-    source: string;
 
     epoch?: Swarm.Epoch;
     previousEpoch?: Swarm.Epoch;
@@ -61,14 +70,14 @@ export interface StorageSyncer {
     sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<UpdatedStorage>;
 }
 
-export const arePostCommandsEqual = (a: PostCommand, b: PostCommand): boolean =>
+export const arePostCommandIdsEqual = (a: PostCommandId, b: PostCommandId): boolean =>
     a.timestamp === b.timestamp && a.source === b.source;
 
 export const getHighestSeenTimestampFromLog = (postCommandLog: PostCommandLog): number => {
     if (postCommandLog.commands.length === 0) {
         return 0;
     }
-    return postCommandLog.commands[0].timestamp;
+    return postCommandLog.commands[0].id.timestamp;
 };
 
 export const getPreviousCommandEpochFromLog = (postCommandLog: PostCommandLog): Swarm.Epoch | undefined => {
@@ -78,13 +87,13 @@ export const getPreviousCommandEpochFromLog = (postCommandLog: PostCommandLog): 
     return postCommandLog.commands[0].epoch;
 };
 
-export const getParentUpdateTimestampFromLog = (post: Post, postCommandLog: PostCommandLog): number => {
+export const getParentIdFromLog = (post: Post, postCommandLog: PostCommandLog): PostCommandId => {
     for (const postCommand of postCommandLog.commands) {
         if (postCommand.post._id === post._id) {
-            return postCommand.timestamp;
+            return postCommand.id;
         }
     }
-    return 0;
+    return defaultPostCommandId;
 };
 
 export const getLatestPostCommandEpochFromLog = (postCommandLog: PostCommandLog): Swarm.Epoch | undefined => {
@@ -96,9 +105,9 @@ export const getLatestPostCommandEpochFromLog = (postCommandLog: PostCommandLog)
     return undefined;
 };
 
-const getPostCommandFromLogByTimestamp = (postCommandLog: PostCommandLog, timestamp: number): PostCommand | undefined => {
+const getPostCommandFromLogById = (postCommandLog: PostCommandLog, id: PostCommandId): PostCommand | undefined => {
     for (const postCommand of postCommandLog.commands) {
-        if (postCommand.timestamp === timestamp) {
+        if (arePostCommandIdsEqual(postCommand.id, id)) {
             return postCommand;
         }
     }
@@ -106,11 +115,11 @@ const getPostCommandFromLogByTimestamp = (postCommandLog: PostCommandLog, timest
 };
 
 const timestampCompare = (a: PostCommand, b: PostCommand) => {
-    return a.timestamp - b.timestamp;
+    return a.id.timestamp - b.id.timestamp;
 };
 
 const sourceCompare = (a: PostCommand, b: PostCommand) => {
-    return a.source.localeCompare(b.source);
+    return a.id.source.localeCompare(b.id.source);
 };
 
 export const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
@@ -133,13 +142,13 @@ export const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
 export const sortAndFilterPostCommands = (commands: PostCommand[]): PostCommand[] => {
     const sortedCommands = [...commands].sort((a, b) =>
             // reversed time ordering
-            epochCompare(b.epoch, a.epoch) || timestampCompare(b, a)
+            epochCompare(b.epoch, a.epoch) || timestampCompare(b, a) || sourceCompare(b, a)
         )
         .filter((value, index, cmds) =>
             // filter out doubles
             index === 0
             ? true
-            : arePostCommandsEqual(value, cmds[index - 1]) === false
+            : arePostCommandIdsEqual(value.id, cmds[index - 1].id) === false
         );
 
     return sortedCommands;
@@ -162,11 +171,16 @@ export const shareNewPost = (
     const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
-        timestamp,
-        parentTimestamp: 0,
+        id: {
+            timestamp,
+            source,
+        },
+        parentId: {
+            timestamp: 0,
+            source: '',
+        },
         post,
         type: 'update',
-        source,
         previousEpoch,
         epoch: undefined,
     };
@@ -181,19 +195,21 @@ export const updatePost = (
     source: string,
     postCommandLog: PostCommandLog,
 ): PostCommandLog => {
-    const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
-    if (parentTimestamp === 0) {
+    const parentId = getParentIdFromLog(post, postCommandLog);
+    if (parentId.timestamp === 0) {
         throw new Error('updatePost failed, no previous post with the same id: ' + post._id);
     }
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
     const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
         protocolVersion: PostCommandProtocolVersion,
-        timestamp,
-        parentTimestamp,
+        id: {
+            timestamp,
+            source,
+        },
+        parentId,
         post: post,
         type: 'update',
-        source,
         previousEpoch,
         epoch: undefined,
     };
@@ -208,8 +224,8 @@ export const removePost = (
     source: string,
     postCommandLog: PostCommandLog,
 ) => {
-    const parentTimestamp = getParentUpdateTimestampFromLog(post, postCommandLog);
-    if (parentTimestamp === 0) {
+    const parentId = getParentIdFromLog(post, postCommandLog);
+    if (parentId.timestamp === 0) {
         throw new Error('removePost failed, no previous post with the same id: ' + post._id);
     }
     const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
@@ -225,9 +241,11 @@ export const removePost = (
         protocolVersion: PostCommandProtocolVersion,
         post: removedPost,
         type: 'remove',
-        source,
-        timestamp,
-        parentTimestamp,
+        id: {
+            timestamp,
+            source,
+        },
+        parentId,
         previousEpoch,
     };
     return {
@@ -260,15 +278,15 @@ export const getLatestPostsFromLog = (postCommandLog: PostCommandLog, count: num
 };
 
 const getLatestUpdatePostCommandsFromLog = (postCommandLog: PostCommandLog, count: number | undefined = undefined): PostCommand[] => {
-    const skipPostCommandSet = new Set<number>();
+    const skipPostCommandSet = new Set<PostCommandId>();
     const updatePostCommands = postCommandLog.commands.filter(postCommand => {
-        if (postCommand.parentTimestamp !== 0) {
-            skipPostCommandSet.add(postCommand.parentTimestamp);
+        if (postCommand.parentId.timestamp !== 0) {
+            skipPostCommandSet.add(postCommand.parentId);
         }
         if (postCommand.type === 'remove') {
             return false;
         }
-        if (skipPostCommandSet.has(postCommand.timestamp)) {
+        if (skipPostCommandSet.has(postCommand.parentId)) {
             return false;
         }
         return true;

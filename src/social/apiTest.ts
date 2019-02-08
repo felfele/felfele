@@ -2,7 +2,7 @@ import {
     PostCommand,
     PostCommandLog,
     sortAndFilterPostCommands,
-    arePostCommandsEqual,
+    arePostCommandIdsEqual,
     getHighestSeenTimestampFromLog,
     shareNewPost,
     updatePost,
@@ -19,8 +19,8 @@ const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => 
         throw new Error(`assertPostCommandsAreSortedAndUnique failed: length: ${sortedCommands.length} !== ${commands.length}`);
     }
     for (let i = 0; i < sortedCommands.length; i++) {
-        if (arePostCommandsEqual(sortedCommands[i], commands[i]) === false) {
-            throw new Error(`assertPostCommandsAreSortedAndUnique failed: diff ${i}: ${sortedCommands[i].timestamp} ${commands[i].timestamp}`);
+        if (arePostCommandIdsEqual(sortedCommands[i].id, commands[i].id) === false) {
+            throw new Error(`assertPostCommandsAreSortedAndUnique failed: diff ${i}: ${sortedCommands[i].id.timestamp} ${commands[i].id.timestamp}`);
         }
     }
 };
@@ -28,7 +28,7 @@ const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => 
 const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLog): void => {
     const highestTimestampFromLog = getHighestSeenTimestampFromLog(postCommandLog);
     const firstCommandTimestamp = postCommandLog.commands.length > 0
-        ? postCommandLog.commands[0].timestamp
+        ? postCommandLog.commands[0].id.timestamp
         : 0
         ;
 
@@ -37,8 +37,8 @@ const assertFirstPostCommandHasHighestTimestamp = (postCommandLog: PostCommandLo
     }
 
     for (const command of postCommandLog.commands) {
-        if (command.timestamp > highestTimestampFromLog) {
-            throw new Error(`assertFirstPostCommandHasHighestTimestamp failed: ${command.timestamp} > ${highestTimestampFromLog}, ${JSON.stringify(postCommandLog.commands)}`);
+        if (command.id.timestamp > highestTimestampFromLog) {
+            throw new Error(`assertFirstPostCommandHasHighestTimestamp failed: ${command.id.timestamp} > ${highestTimestampFromLog}, ${JSON.stringify(postCommandLog.commands)}`);
         }
     }
 };
@@ -66,7 +66,7 @@ export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, p
         throw new Error(`assertPostCommandLogsAreEqual failed: ${postCommandLogA.commands.length} != ${postCommandLogB.commands.length}`);
     }
     for (let i = 0; i < postCommandLogA.commands.length; i++) {
-        if (arePostCommandsEqual(postCommandLogA.commands[i], postCommandLogB.commands[i]) === false) {
+        if (arePostCommandIdsEqual(postCommandLogA.commands[i].id, postCommandLogB.commands[i].id) === false) {
             throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}`);
         }
     }
