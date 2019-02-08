@@ -2,7 +2,6 @@ import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
-import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,7 +14,6 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
-    settings: Settings;
 }
 
 type Props = StateProps & DispatchProps;

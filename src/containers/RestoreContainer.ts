@@ -3,13 +3,13 @@ import { AppState } from '../reducers/index';
 import * as Actions from '../actions/Actions';
 import { StateProps, DispatchProps, Restore } from '../components/Restore';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         navigation: ownProps.navigation,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRestoreData: (data: string, secretHex: string) => {
             dispatch(Actions.AsyncActions.restoreFromBackup(data, secretHex));
@@ -17,7 +17,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const RestoreContainer = connect<StateProps, DispatchProps, {}>(
+export const RestoreContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(Restore);

@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, NewsFeedView } from '../components/NewsFeedView';
 import { getFollowedNewsPosts, getFollowedFeeds } from '../selectors/selectors';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const followedFeeds = getFollowedFeeds(state);
     const filteredPosts = getFollowedNewsPosts(state);
 
@@ -16,11 +16,10 @@ const mapStateToProps = (state: AppState, ownProps): StateProps => {
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: followedFeeds,
-        settings: state.settings,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
@@ -28,7 +27,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const NewsFeedContainer = connect<StateProps, DispatchProps, {}>(
+export const NewsFeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(NewsFeedView);

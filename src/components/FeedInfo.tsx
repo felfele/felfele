@@ -9,7 +9,7 @@ import {
     Clipboard,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
 import { Utils } from '../Utils';
@@ -46,7 +46,9 @@ export interface StateProps {
     navigation: any;
 }
 
-export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedInfoState> {
+type Props = DispatchProps & StateProps;
+
+export class FeedInfo extends React.Component<Props, FeedInfoState> {
     public state: FeedInfoState = {
         url: '',
         loading: false,
@@ -54,7 +56,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         activityText: '',
     };
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
         this.state.url = this.props.feed.feedUrl;
     }
@@ -168,7 +170,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         );
     }
 
-    private NewItemView = (props) => {
+    private NewItemView = (props: { showQRCamera: boolean }) => {
         if (props.showQRCamera) {
             return (
                 <View>
@@ -188,7 +190,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         }
     }
 
-    private ExistingItemView = (props) => {
+    private ExistingItemView = () => {
         const qrCodeValue = this.props.feed.url;
         return (
             <View>
@@ -286,7 +288,7 @@ export class FeedInfo extends React.Component<DispatchProps & StateProps, FeedIn
         this.goBack();
     }
 
-    private onScanSuccess = async (event) => {
+    private onScanSuccess = async (event: ScanEvent) => {
         try {
             Debug.log(event);
             const feedUri = event.data;

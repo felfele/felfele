@@ -3,14 +3,14 @@ import { AppState } from '../reducers/index';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, SettingsEditor } from '../components/SettingsEditor';
 
-const mapStateToProps = (state: AppState, ownProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         navigation: ownProps.navigation,
         settings: state.settings,
     };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onSaveToCameraRollValueChange: (value: boolean) => {
             dispatch(Actions.changeSettingSaveToCameraRoll(value));
@@ -24,7 +24,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     };
 };
 
-export const SettingsEditorContainer = connect<StateProps, DispatchProps, {}>(
+export const SettingsEditorContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(SettingsEditor);

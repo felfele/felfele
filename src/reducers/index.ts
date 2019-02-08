@@ -6,7 +6,15 @@ import {
 } from 'redux';
 import { AsyncStorage } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { persistStore, persistReducer, PersistedState, createMigrate, getStoredState, KEY_PREFIX } from 'redux-persist';
+import {
+    persistStore,
+    persistReducer,
+    PersistedState,
+    createMigrate,
+    getStoredState,
+    KEY_PREFIX,
+    PersistConfig,
+} from 'redux-persist';
 
 import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
@@ -423,16 +431,18 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
     }
 };
 
-export const persistConfig = {
-    transforms: [immutableTransformHack({
+class FelfelePersistConfig implements PersistConfig {
+    public transforms = [immutableTransformHack({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
-    })],
-    blacklist: ['currentTimestamp'],
-    key: 'root',
-    storage: AsyncStorage,
-    version: currentAppStateVersion,
-    migrate: createMigrate(migrateAppState, { debug: false}),
-};
+    })];
+    public blacklist = ['currentTimestamp'];
+    public key = 'root';
+    public storage = AsyncStorage;
+    public version = currentAppStateVersion;
+    public migrate = createMigrate(migrateAppState, { debug: false});
+}
+
+export const persistConfig = new FelfelePersistConfig();
 
 export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
@@ -482,9 +492,9 @@ export const getAppStateFromSerialized = async (serializedAppState: string): Pro
     const storagePersistConfig = {
         ...persistConfig,
         storage: {
-            getItem: (key) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
-            setItem: (key, value) => { /* do nothing */ },
-            removeItem: (key) => { /* do nothing */ },
+            getItem: (key: string) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
+            setItem: (key: string, value: any) => { /* do nothing */ },
+            removeItem: (key: string) => { /* do nothing */ },
         },
     };
     const appState = await getStoredState(storagePersistConfig) as AppState;

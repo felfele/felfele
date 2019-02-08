@@ -475,7 +475,7 @@ export const testSyncPostCommandLogWithSwarm = async () => {
     await syncPostCommandLogWithSwarm(emptyPostCommandFeed, swarmApi);
 };
 
-export const allTests = {
+export const allTests: { [ index: string]: () => void } = {
     testSharePost,
     testSharePosts,
     testSharePostsWithUpdate,

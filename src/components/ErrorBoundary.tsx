@@ -3,15 +3,15 @@ import { Text } from 'react-native';
 import { Debug } from '../Debug';
 
 export class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
-    public static getDerivedStateFromError(error) {
+    public static getDerivedStateFromError(error: any) {
         // Update state so the next render will show the fallback UI.
         return { hasError: true };
     }
 
     public state = { hasError: false };
 
-    public componentDidCatch(error, info) {
-        Debug.log(error, info);
+    public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        Debug.log(error, errorInfo);
     }
 
     public render() {

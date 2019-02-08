@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from 'react-native';
 
 export const TouchableViewDefaultHitSlop = {
     top: 20,
@@ -8,7 +8,11 @@ export const TouchableViewDefaultHitSlop = {
     right: 30,
 };
 
-export const TouchableView = (props) => (
+interface TouchableViewProps extends TouchableWithoutFeedbackProps {
+    children: React.ReactNode;
+}
+
+export const TouchableView = (props: TouchableViewProps) => (
     <TouchableWithoutFeedback
         onPress={props.onPress}
         onLongPress={props.onLongPress}
