@@ -212,11 +212,11 @@ export const AsyncActions = {
                     }
                     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
                     const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
-                    const postOptions: SwarmHelpers = {
+                    const swarmHelpers: SwarmHelpers = {
                         imageResizer: resizeImageIfNeeded,
                         getLocalPath: modelHelper.getLocalPath,
                     };
-                    const swarmStorage = makeSwarmStorage(swarm, postOptions);
+                    const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);
                     const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
 
                     dispatch(Actions.updatePostIsUploading(post, true));
@@ -227,14 +227,16 @@ export const AsyncActions = {
                     const localPostCommandLog: PostCommandLog = {
                         commands: localFeedPosts.map(p => shareNewPost(p, 'local', {commands: []}).commands[0]),
                     };
-                    const updatedStorage = swarmStorageSyncer.sync(localPostCommandLog, feed);
-                    // TODO await updateRecentPostFeed(swarm, postFeed);
+                    const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, feed);
+                    Debug.log('uploadPostFromQueue', 'storageSyncUpdate', storageSyncUpdate);
 
-                    dispatch(Actions.updatePostLink(post, feed.url));
-                    dispatch(Actions.updatePostIsUploading(post, undefined));
-
-                    // const mergedImages = mergeImages(post.images, uploadedPost.images);
-                    // dispatch(Actions.updatePostImages(post, mergedImages));
+                    storageSyncUpdate.updatedPosts.map(updatedPost => {
+                        dispatch(Actions.updatePostLink(updatedPost, feed.url));
+                        dispatch(Actions.updatePostIsUploading(updatedPost, undefined));
+                        const mergedImages = mergeImages(post.images, updatedPost.images);
+                        dispatch(Actions.updatePostImages(updatedPost, mergedImages));
+                        return updatedPost;
+                    });
                 // } else {
                 //     Debug.log('sharePost: create feed');
 
