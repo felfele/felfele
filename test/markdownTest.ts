@@ -1,6 +1,6 @@
 import { markdownEscape, markdownUnescape } from '../src/markdown';
 
-test('Basic markdown escape', () => {
+test('markdown should escape words starting with a hashtag with two backslash', () => {
     const markdownText = '#hashtag';
     const escapedText = '\\' + markdownText;
     const result = markdownEscape(markdownText);
@@ -8,7 +8,7 @@ test('Basic markdown escape', () => {
     expect(result).toEqual(escapedText);
 });
 
-test('double markdown escape', () => {
+test('markdown should not escape words starting with two backslashes and a hashtag', () => {
     const markdownText = '#hashtag';
     const escapedText = '\\' + markdownText;
     const preResult = markdownEscape(markdownText);
@@ -18,7 +18,7 @@ test('double markdown escape', () => {
 });
 
 // why equal?
-test('Basic markdown unescape', () => {
+test('markdown should not unescape hashtag preceded by one backslash', () => {
     const markdownText = '\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -26,7 +26,7 @@ test('Basic markdown unescape', () => {
     expect(result).not.toEqual(unescapedText);
 });
 
-test('Basic markdown unescape', () => {
+test('markdown should unescape hashtag preceded by two backslash', () => {
     const markdownText = '\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -35,7 +35,7 @@ test('Basic markdown unescape', () => {
 });
 
 // why equal?
-test('Does not unescape other starting text', () => {
+test('markdown should not unescape hashtag preceded by three backslash', () => {
     const markdownText = '\\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -43,7 +43,7 @@ test('Does not unescape other starting text', () => {
     expect(result).not.toEqual(unescapedText);
 });
 
-test('Does not unescape other starting text', () => {
+test('markdown should not unescape hashtag preceded by four backslash', () => {
     const markdownText = '\\\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
