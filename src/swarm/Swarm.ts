@@ -61,8 +61,7 @@ export const getSwarmGatewayUrl = (swarmUrl: string): string => {
 };
 
 export const calculateTopic = (topic: string): string => {
-    const prefixedTopic = `felfele:${topic}`;
-    return '0x' + keccak256.hex(prefixedTopic);
+    return '0x' + keccak256.hex(topic);
 };
 
 const imageMimeTypeFromPath = (path: string): string => {
