@@ -31,6 +31,7 @@ import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
+import { BugReportView } from './components/BugReportView';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -152,6 +153,11 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     FilterListEditorContainer: {
         screen: FilterListEditorContainer,
+    },
+    BugReportView: {
+        screen: ({navigation}: NavigationScreenProps) => (
+            <BugReportView navigation={navigation} />
+        ),
     },
 };
 

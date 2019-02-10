@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, FlatList, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Platform, Dimensions, Linking } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 import { NavigationHeader } from './NavigationHeader';
@@ -20,6 +20,8 @@ export type Props = StateProps & DispatchProps;
 
 type LogItem = [string, string];
 const logData: LogItem[] = [];
+const BUG_REPORT_EMAIL_ADDRESS = 'mark@felfele.com';
+
 let logFilter = '';
 
 export const appendToLog = (logLine: string) => {
@@ -36,6 +38,15 @@ const filteredLog = (): LogItem[] => {
     return logData
         .filter(logItem => logItem[1].indexOf('TIME-TICK') === -1)
         .filter(logItem => logItem[1].toLowerCase().indexOf(logFilter) !== -1 || logItem[0].indexOf(logFilter) !== -1)
+        ;
+};
+
+export const getBugReportBody = (): string => {
+    return filteredLog()
+        .map((logItem: LogItem) => {
+            return `${logItem[0]} ${logItem[1]}`;
+        })
+        .join('\n')
         ;
 };
 
