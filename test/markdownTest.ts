@@ -1,6 +1,6 @@
 import { markdownEscape, markdownUnescape } from '../src/markdown';
 
-test('markdown should escape words starting with a hashtag with two backslash', () => {
+test('Basic markdown escape', () => {
     const markdownText = '#hashtag';
     const escapedText = '\\' + markdownText;
     const result = markdownEscape(markdownText);
@@ -8,7 +8,7 @@ test('markdown should escape words starting with a hashtag with two backslash', 
     expect(result).toEqual(escapedText);
 });
 
-test('markdown should not escape words starting with two backslashes and a hashtag', () => {
+test('double markdown escape', () => {
     const markdownText = '#hashtag';
     const escapedText = '\\' + markdownText;
     const preResult = markdownEscape(markdownText);
@@ -18,7 +18,7 @@ test('markdown should not escape words starting with two backslashes and a hasht
 });
 
 // why equal?
-test('markdown should not unescape hashtag preceded by one backslash', () => {
+test('Basic markdown unescape', () => {
     const markdownText = '\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -26,7 +26,7 @@ test('markdown should not unescape hashtag preceded by one backslash', () => {
     expect(result).not.toEqual(unescapedText);
 });
 
-test('markdown should unescape hashtag preceded by two backslash', () => {
+test('Basic markdown unescape', () => {
     const markdownText = '\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -35,7 +35,7 @@ test('markdown should unescape hashtag preceded by two backslash', () => {
 });
 
 // why equal?
-test('markdown should not unescape hashtag preceded by three backslash', () => {
+test('Does not unescape other starting text', () => {
     const markdownText = '\\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
@@ -43,7 +43,7 @@ test('markdown should not unescape hashtag preceded by three backslash', () => {
     expect(result).not.toEqual(unescapedText);
 });
 
-test('markdown should not unescape hashtag preceded by four backslash', () => {
+test('Does not unescape other starting text', () => {
     const markdownText = '\\\\#hashtag';
     const unescapedText = '#hashtag';
     const result = markdownUnescape(markdownText);
