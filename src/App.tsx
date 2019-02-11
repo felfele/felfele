@@ -32,6 +32,7 @@ import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { BugReportView } from './components/BugReportView';
+import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -156,7 +157,7 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     BugReportView: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <BugReportView navigation={navigation} />
+            <BugReportView navigation={navigation} errorView={false}/>
         ),
     },
 };
@@ -308,11 +309,13 @@ const InitialNavigator = createSwitchNavigator({
 export default class App extends React.Component {
     public render() {
         return (
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    <InitialNavigator/>
-                </PersistGate>
-            </Provider>
+            <TopLevelErrorBoundary>
+                <Provider store={store}>
+                    <PersistGate loading={null} persistor={persistor}>
+                        <InitialNavigator/>
+                    </PersistGate>
+                </Provider>
+            </TopLevelErrorBoundary>
         );
     }
 }
