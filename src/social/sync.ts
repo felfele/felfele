@@ -4,7 +4,6 @@ import {
     PostCommandLogStorage,
     getUnsyncedPostCommandLog,
     getLatestPostCommandEpochFromLog,
-    epochCompare,
     mergePostCommandLogs,
 } from './api';
 import { Debug } from '../Debug';
