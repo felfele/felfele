@@ -3,6 +3,7 @@ package com.postmodern;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.avishayil.rnrestart.ReactNativeRestartPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.horcrux.svg.SvgPackage;
 import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
@@ -31,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativeRestartPackage(),
             new ImageResizerPackage(),
             new SvgPackage(),
             new RNSecureRandomPackage(),

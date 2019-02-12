@@ -4,6 +4,8 @@ import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, Text, StyleSheet, Linking } from 'react-native';
 import { getBugReportBody } from './LogViewer';
+import { Button } from './Button';
+import { restartApp } from '../helpers/restart';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'attila@felfele.com';
 
@@ -40,6 +42,9 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     It can be reviewed by you before sending it in your email client.{'\n\n'}
                     Tap on the Send button to continue.
                 </Text>
+                {props.errorView &&
+                    <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
+                }
             </View>
         </View>
     );
@@ -56,6 +61,9 @@ const styles = StyleSheet.create({
     text: {
         textAlign: 'center',
         maxWidth: '80%',
+        paddingTop: 50,
+    },
+    restartButton: {
         paddingTop: 50,
     },
 });
