@@ -300,10 +300,10 @@ export class EditPost extends React.Component<Props, State> {
             ...this.state.post,
             text: markdownEscape(this.state.post.text),
            },
+        }, () => {
+            Debug.log(this.state.post);
+            this.props.onPost(this.state.post);
         });
-
-        Debug.log(this.state.post);
-        this.props.onPost(this.state.post);
     }
 
     private renderActivityIndicator() {
