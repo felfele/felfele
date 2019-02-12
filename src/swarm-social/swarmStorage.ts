@@ -61,7 +61,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
             topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
         };
         const feedApi = Swarm.makeReadableFeedApi(postCommandLogFeedAddress, swarmApi.swarmGateway);
-        return await fetchSwarmPostCommandLog(feedApi);
+        return await fetchSwarmPostCommandLog(feedApi, until);
     },
     uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
         return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, swarmHelpers);
