@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, FlatList, Platform, Dimensions, Linking } from 'react-native';
+import { View,
+    Text,
+    StyleSheet,
+    FlatList,
+    Platform,
+    Dimensions,
+} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 import { NavigationHeader } from './NavigationHeader';
@@ -20,8 +26,6 @@ export type Props = StateProps & DispatchProps;
 
 type LogItem = [string, string];
 const logData: LogItem[] = [];
-const BUG_REPORT_EMAIL_ADDRESS = 'mark@felfele.com';
-
 let logFilter = '';
 
 export const appendToLog = (logLine: string) => {

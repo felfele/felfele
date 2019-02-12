@@ -7,7 +7,7 @@ import { getBugReportBody } from './LogViewer';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
 
-const BUG_REPORT_EMAIL_ADDRESS = 'attila@felfele.com';
+const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
