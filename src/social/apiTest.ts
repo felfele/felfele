@@ -9,6 +9,7 @@ import {
     removePost,
     mergePostCommandLogs,
     getLatestPostsFromLog,
+    getPostCommandFromLogById,
 } from './api';
 import { Post} from '../models/Post';
 import { Debug } from '../Debug';
@@ -55,10 +56,34 @@ const assertThereAreNoUnsyncedCommandsAfterSyncedCommands = (postCommandLog: Pos
     }
 };
 
+const assertParentsKeepCasualOrdering = (postCommandLog: PostCommandLog) => {
+    for (let i = 0; i < postCommandLog.commands.length; i++) {
+        const command = postCommandLog.commands[i];
+        if (command.parentId.timestamp !== 0) {
+            if (command.parentId.timestamp >= command.id.timestamp) {
+                throw new Error(`assertParentsKeepCasualOrdering failed: command ${i} has timestamp ${command.id.timestamp} parent has ${command.parentId.timestamp}}`);
+            }
+        }
+    }
+};
+
+const assertNoDanglingReferences = (postCommandLog: PostCommandLog) => {
+    for (const command of postCommandLog.commands) {
+        if (command.parentId.timestamp !== 0) {
+            const parent = getPostCommandFromLogById(postCommandLog, command.parentId);
+            if (parent == null) {
+                throw new Error(`assertNoDanglingReferences failed: command ${command.id.timestamp} has dangling parent ${command.parentId.timestamp}}`);
+            }
+        }
+    }
+};
+
 export const assertPostCommandLogInvariants = (postCommandLog: PostCommandLog): void => {
     assertPostCommandsAreSortedAndUnique(postCommandLog.commands);
     assertFirstPostCommandHasHighestTimestamp(postCommandLog);
     assertThereAreNoUnsyncedCommandsAfterSyncedCommands(postCommandLog);
+    assertParentsKeepCasualOrdering(postCommandLog);
+    assertNoDanglingReferences(postCommandLog);
 };
 
 export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, postCommandLogB: PostCommandLog) => {
@@ -69,6 +94,14 @@ export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, p
         if (arePostCommandIdsEqual(postCommandLogA.commands[i].id, postCommandLogB.commands[i].id) === false) {
             throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}`);
         }
+    }
+};
+
+export const assertEquals = <T>(expected: T, actual: T) => {
+    if (expected !== actual) {
+        console.log('expected: ', expected);
+        console.log('actual: ', actual);
+        throw new Error(`assertEquals failed: expected: ${expected}, actual: ${actual}`);
     }
 };
 

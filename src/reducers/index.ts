@@ -21,8 +21,9 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
+import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
-import { RecentPostFeed } from '../social/api';
+import { LocalFeed } from '../social/api';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -33,7 +34,7 @@ const modelHelper = new ReactNativeModelHelper();
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
     feeds: Feed[];
-    ownFeeds: RecentPostFeed[];
+    ownFeeds: LocalFeed[];
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -42,10 +43,6 @@ export interface AppState extends PersistedState {
     draft: Post | null;
     metadata: Metadata;
     postUploadQueue: Post[];
-}
-
-interface Metadata {
-    highestSeenPostId: number;
 }
 
 const defaultSettings: Settings = {
@@ -247,10 +244,21 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
     }
 };
 
-const ownFeedsReducer = (ownFeeds: RecentPostFeed[] = [], action: Actions): RecentPostFeed[] => {
+const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed[] => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
             return [...ownFeeds, action.payload.feed];
+        }
+        case 'UPDATE-OWN-FEED': {
+            const ind = ownFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return ownFeeds;
+            }
+            return updateArrayItem(ownFeeds, ind, (feed) => ({
+                ...feed,
+                ...action.payload.feed,
+            }));
+
         }
         default: {
             return ownFeeds;
@@ -433,7 +441,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 class FelfelePersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue', 'postCommandLog'],
     })];
     public blacklist = ['currentTimestamp'];
     public key = 'root';
@@ -473,7 +481,12 @@ const initStore = () => {
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     // @ts-ignore
-    store.dispatch(AsyncActions.uploadPostsFromQueue());
+    for (const ownFeed of store.getState().ownFeeds) {
+        store.dispatch(Actions.updateOwnFeed({
+            ...ownFeed,
+            isSyncing: false,
+        }));
+    }
     store.dispatch(Actions.timeTick());
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };

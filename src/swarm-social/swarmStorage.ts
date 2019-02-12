@@ -8,6 +8,7 @@ import {
     getLatestPostCommandEpochFromLog,
     getPostCommandUpdatesSinceEpoch,
     getLatestPostsFromLog,
+    epochCompare,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
@@ -54,7 +55,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
         };
         return await uploadPostCommandToSwarm(postCommand, newSwarmApi, swarmHelpers);
     },
-    downloadPostCommandLog: async () => {
+    downloadPostCommandLog: async (until?: Swarm.Epoch) => {
         const postCommandLogFeedAddress = {
             ...swarmApi.feed.address,
             topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
@@ -76,6 +77,7 @@ export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSynce
         const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
         const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
         const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
+        console.log('swarmStorage.sync', 'syncedPostCommandLog', syncedPostCommandLog, 'lastSeenEpoch', lastSeenEpoch, 'postCommandUpdates', postCommandUpdates);
         const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
         return {
             postCommandLog: syncedPostCommandLog,
@@ -89,7 +91,7 @@ export const isPostFeedUrl = (url: string): boolean => {
     return url.startsWith(Swarm.DefaultFeedPrefix);
 };
 
-const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi): Promise<PostCommandLog> => {
+const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, until?: Swarm.Epoch): Promise<PostCommandLog> => {
     const postCommandLog: PostCommandLog = {
         commands: [],
     };
@@ -102,6 +104,10 @@ const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi): Pr
             const previousEpoch = postCommand.previousEpoch;
             if (previousEpoch == null) {
                 Debug.log('fetchSwarmPostCommandLog', 'finished');
+                break;
+            }
+            if (until != null && epochCompare(until, previousEpoch) === 0) {
+                Debug.log('fetchSwarmPostCommandLog', 'finished until');
                 break;
             }
             postCommandJSON = await swarmFeedApi.downloadPreviousVersion(previousEpoch);
@@ -348,6 +354,16 @@ export const loadRecentPosts = async (swarm: Swarm.ReadableApi, postFeeds: Feed[
     return posts;
 };
 
+const getPostAuthor = (author?: Author): Author | undefined => {
+    if (author == null) {
+        return undefined;
+    }
+    return {
+        ...author,
+        identity: undefined,
+    };
+};
+
 const uploadRecentPostFeed = async (
     swarm: Swarm.Api,
     postCommandLog: PostCommandLog,
@@ -358,6 +374,7 @@ const uploadRecentPostFeed = async (
     const posts = feedPosts
         .map(p => ({
             ...p,
+            author: getPostAuthor(p.author),
             images: p.images.map(image => ({
                 ...image,
                 localPath: undefined,

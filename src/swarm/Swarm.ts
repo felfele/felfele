@@ -226,7 +226,7 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
     address,
 });
 
-type FeedDigestSigner = (digest: number[]) => string | Promise<string>;
+export type FeedDigestSigner = (digest: number[]) => string | Promise<string>;
 
 export interface WriteableFeedApi extends ReadableFeedApi {
     updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;

@@ -10,6 +10,12 @@ beforeEach(() => localSwarmStorage = makeLocalSwarmStorage());
 test('Test sharing posts to storage', async () =>
     syncTests.testSharePostsStorage(source, localSwarmStorage));
 
+test('Test latest posts after first sync', async () =>
+    syncTests.testLatestPostsAfterFirstSync(source, localSwarmStorage));
+
+test('Test merging the same commandlog with one uploaded', async () =>
+    syncTests.testMergeTheSamePostWithOneUploadedStorage(source, localSwarmStorage));
+
 test('Test sharing posts with remove on storage', async () =>
     syncTests.testSharePostsWithRemoveOnStorage(source, localSwarmStorage));
 

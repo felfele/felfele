@@ -7,6 +7,8 @@ import {
     PostCommandLogStorage,
     removePost,
     getLatestPostsFromLog,
+    mergePostCommandLogs,
+    getPostCommandUpdatesSinceEpoch,
 } from './api';
 import {
     emptyPostCommandFeed,
@@ -14,6 +16,7 @@ import {
     testSharePosts,
     assertPostCommandLogInvariants,
     assertPostCommandLogsAreEqual,
+    assertEquals,
 } from './apiTest';
 import { Debug } from '../Debug';
 import {
@@ -54,6 +57,39 @@ const testSharePostsStorage = async (source = 'storage', storage: PostCommandLog
     const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter3, storage);
     Debug.log('testSharePostsStorage', 'syncedCommandLog', syncedCommandLog);
     assertPostCommandLogInvariants(syncedCommandLog);
+
+    return syncedCommandLog;
+};
+
+const testLatestPostsAfterFirstSync = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    const lastSeenEpoch = undefined;
+    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
+
+    const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter1, storage);
+    assertPostCommandLogInvariants(syncedCommandLog);
+
+    console.log('testLatestPostsAfterFirstSync', 'syncedCommandLog', syncedCommandLog.commands);
+
+    const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedCommandLog, lastSeenEpoch);
+    const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
+
+    assertEquals(1, updatedPosts.length);
+    assertEquals(updatedPosts[0]._id, postCommandLogAfter1.commands[0].post._id);
+
+    return syncedCommandLog;
+};
+
+const testMergeTheSamePostWithOneUploadedStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
+
+    const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter1, storage);
+
+    const mergedCommandLog = mergePostCommandLogs(postCommandLogAfter1, syncedCommandLog);
+
+    assertPostCommandLogInvariants(mergedCommandLog);
+
+    expect(mergedCommandLog.commands).toHaveLength(1);
+    expect(mergedCommandLog).toEqual(syncedCommandLog);
 
     return syncedCommandLog;
 };
@@ -176,6 +212,8 @@ const testDownloadFeedTemplate = async () => {
 export const syncTests = {
     testSharePostStorage,
     testSharePostsStorage,
+    testLatestPostsAfterFirstSync,
+    testMergeTheSamePostWithOneUploadedStorage,
     testSharePostsWithRemoveOnStorage,
     testListAllPosts,
     testFetchLastThreePosts,

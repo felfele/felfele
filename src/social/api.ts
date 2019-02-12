@@ -44,14 +44,23 @@ export interface PostCommandLog {
     readonly commands: PostCommand[];
 }
 
+export const emptyPostCommandLog: PostCommandLog = {
+    commands: [],
+};
+
 export interface RecentPostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
 }
 
+export interface LocalFeed extends RecentPostFeed {
+    postCommandLog: PostCommandLog;
+    isSyncing: boolean;
+}
+
 export interface PostCommandLogStorage {
     uploadPostCommand: (postCommand: PostCommand) => Promise<PostCommand>;
-    downloadPostCommandLog: () => Promise<PostCommandLog>;
+    downloadPostCommandLog: (until?: Swarm.Epoch) => Promise<PostCommandLog>;
 }
 
 export interface RecentPostFeedStorage {
@@ -71,6 +80,10 @@ export interface StorageSyncer {
     sync: (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => Promise<StorageSyncUpdate>;
 }
 
+export const isAlreadyUploaded = (postCommand: PostCommand): boolean => {
+    return postCommand.epoch != null;
+};
+
 export const arePostCommandIdsEqual = (a: PostCommandId, b: PostCommandId): boolean =>
     a.timestamp === b.timestamp && a.source === b.source;
 
@@ -78,7 +91,24 @@ export const getHighestSeenTimestampFromLog = (postCommandLog: PostCommandLog): 
     if (postCommandLog.commands.length === 0) {
         return 0;
     }
-    return postCommandLog.commands[0].id.timestamp;
+    if (postCommandLog.commands[0].epoch != null) {
+        return postCommandLog.commands[0].id.timestamp;
+    }
+    const highestUnsyncedTimestamp = postCommandLog.commands[0].id.timestamp;
+    if (highestUnsyncedTimestamp === postCommandLog.commands.length) {
+        // never synced
+        return highestUnsyncedTimestamp;
+    }
+    for (const command of postCommandLog.commands) {
+        if (command.epoch != null) {
+            if (command.id.timestamp > highestUnsyncedTimestamp) {
+                return command.id.timestamp;
+            } else {
+                break;
+            }
+        }
+    }
+    return highestUnsyncedTimestamp;
 };
 
 export const getPreviousCommandEpochFromLog = (postCommandLog: PostCommandLog): Swarm.Epoch | undefined => {
@@ -106,7 +136,7 @@ export const getLatestPostCommandEpochFromLog = (postCommandLog: PostCommandLog)
     return undefined;
 };
 
-const getPostCommandFromLogById = (postCommandLog: PostCommandLog, id: PostCommandId): PostCommand | undefined => {
+export const getPostCommandFromLogById = (postCommandLog: PostCommandLog, id: PostCommandId): PostCommand | undefined => {
     for (const postCommand of postCommandLog.commands) {
         if (arePostCommandIdsEqual(postCommand.id, id)) {
             return postCommand;
@@ -147,9 +177,9 @@ export const sortAndFilterPostCommands = (commands: PostCommand[]): PostCommand[
         )
         .filter((value, index, cmds) =>
             // filter out doubles
-            index === 0
-            ? true
-            : arePostCommandIdsEqual(value.id, cmds[index - 1].id) === false
+            index + 1 < cmds.length
+            ? arePostCommandIdsEqual(value.id, cmds[index + 1].id) === false
+            : true
         );
 
     return sortedCommands;
@@ -287,7 +317,7 @@ const getLatestUpdatePostCommandsFromLog = (postCommandLog: PostCommandLog, coun
         if (postCommand.type === 'remove') {
             return false;
         }
-        if (skipPostCommandSet.has(postCommand.parentId)) {
+        if (skipPostCommandSet.has(postCommand.id)) {
             return false;
         }
         return true;
@@ -302,7 +332,7 @@ export const getPostCommandUpdatesSinceEpoch = (postCommandLog: PostCommandLog, 
             continue;
         }
 
-        if (epochCompare(epoch, command.epoch) < 0) {
+        if (epoch == null || epochCompare(epoch, command.epoch) < 0) {
             postCommandUpdates.push(command);
             continue;
         }
