@@ -58,6 +58,11 @@ export const SettingsEditor = (props: Props) => {
                     title='Show square images'
                 />
                 <SettingsList.Item
+                    hasNavArrow={true}
+                    title='Send bug report'
+                    onPress={() => props.navigation.navigate('BugReportView')}
+                    />
+                <SettingsList.Item
                     hasNavArrow={false}
                     title={version}
                     onLongPress={() => props.onShowDebugMenuValueChange(!props.settings.showDebugMenu)}
