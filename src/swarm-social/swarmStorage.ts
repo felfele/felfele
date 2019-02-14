@@ -19,6 +19,9 @@ import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
 import { syncPostCommandLogWithStorage } from '../social/sync';
 
+const NUMBER_OF_RECENT_POSTS = 20;
+const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
+
 export interface SwarmHelpers {
     imageResizer: (image: ImageData, path: string) => Promise<string>;
     getLocalPath: (localPath: string) => string;
@@ -32,8 +35,6 @@ const defaultSwarmHelpers: SwarmHelpers = {
     imageResizer: defaultImageResizer,
     getLocalPath: (localPath) => localPath,
 };
-
-const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
 
 interface SwarmStorage extends Storage {
     readonly swarmApi: Swarm.Api;
@@ -370,7 +371,7 @@ const uploadRecentPostFeed = async (
     recentPostFeed: RecentPostFeed,
     swarmHelpers: SwarmHelpers,
 ): Promise<RecentPostFeed> => {
-    const feedPosts = getLatestPostsFromLog(postCommandLog, 20);
+    const feedPosts = getLatestPostsFromLog(postCommandLog, NUMBER_OF_RECENT_POSTS);
     const posts = feedPosts
         .map(p => ({
             ...p,
