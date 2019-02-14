@@ -88,7 +88,7 @@ export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSynce
 });
 
 export const isPostFeedUrl = (url: string): boolean => {
-    return url.startsWith(Swarm.DefaultFeedPrefix);
+    return url.startsWith(Swarm.defaultFeedPrefix);
 };
 
 const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, until?: Swarm.Epoch): Promise<PostCommandLog> => {
@@ -237,7 +237,7 @@ const uploadPost = async (
 
     const uploadedPostJSON = serialize(uploadedPost);
     const postContentHash = await swarm.upload(uploadedPostJSON);
-    const postLink = Swarm.DefaultPrefix + postContentHash;
+    const postLink = Swarm.defaultPrefix + postContentHash;
 
     return {
         ...uploadedPost,

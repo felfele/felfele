@@ -194,13 +194,14 @@ export const AsyncActions = {
                 if (ownFeeds.length === 0) {
                     const identity = getState().author.identity!;
                     const address = Swarm.makeFeedAddressFromPublicIdentity(identity);
+                    const feedUrl = Swarm.makeBzzFeedUrl(address);
                     const author = getState().author;
                     const ownFeed: LocalFeed = {
                         posts: [],
                         authorImage: author.image,
                         name: author.name,
-                        url: `bzz-feed:/?user=${address.user}`,
-                        feedUrl: `bzz-feed:/?user=${address.user}`,
+                        url: feedUrl,
+                        feedUrl,
                         favicon: author.image.uri || '',
                         postCommandLog: {
                             commands: [],
@@ -249,6 +250,9 @@ export const AsyncActions = {
                 Debug.log('uploadPostFromQueue', 'storageSyncUpdate', storageSyncUpdate);
 
                 storageSyncUpdate.updatedPosts.map(updatedPost => {
+                    // TODO also check for:
+                    // - deleted posts
+                    // - not uploaded posts
                     dispatch(Actions.updatePostLink(updatedPost, localFeed.url));
                     dispatch(Actions.updatePostIsUploading(updatedPost, undefined));
                     const localPosts = getState().localPosts;
@@ -303,13 +307,13 @@ export const AsyncActions = {
         };
     },
     createUserIdentity: (): Thunk => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState) => {
             const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
     restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
-        return async (dispatch, getState: () => AppState) => {
+        return async (dispatch, getState) => {
             const serializedAppState = await restoreBackupToString(backupText, secretHex);
             const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);

@@ -7,13 +7,13 @@ import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 import { Buffer } from 'buffer';
 
-export const DefaultGateway = 'http://localhost:8500';
-export const DefaultUrlScheme = '/bzz-raw:/';
-export const DefaultPrefix = 'bzz://';
-export const DefaultFeedPrefix = 'bzz-feed:/';
-export const HashLength = 64;
+export const defaultGateway = 'https://swarm-gateways.net';
+export const defaultUrlScheme = '/bzz-raw:/';
+export const defaultPrefix = 'bzz://';
+export const defaultFeedPrefix = 'bzz-feed:/';
+const hashLength = 64;
 
-const upload = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+const upload = async (data: string, swarmGateway: string = defaultGateway): Promise<string> => {
     Debug.log('upload: to Swarm: ', data);
     try {
         const hash = await uploadData(data, swarmGateway);
@@ -26,10 +26,10 @@ const upload = async (data: string, swarmGateway: string = DefaultGateway): Prom
 };
 
 export const getUrlFromHash = (hash: string): string => {
-    return DefaultGateway + DefaultUrlScheme + hash;
+    return defaultGateway + defaultUrlScheme + hash;
 };
 
-const uploadForm = async (data: FormData, swarmGateway: string = DefaultGateway): Promise<string> => {
+const uploadForm = async (data: FormData, swarmGateway: string = defaultGateway): Promise<string> => {
     Debug.log('uploadForm: ', data);
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
@@ -47,15 +47,15 @@ const uploadForm = async (data: FormData, swarmGateway: string = DefaultGateway)
 };
 
 export const isSwarmLink = (link: string): boolean => {
-    return link.startsWith(DefaultPrefix);
+    return link.startsWith(defaultPrefix);
 };
 
 export const getSwarmGatewayUrl = (swarmUrl: string): string => {
     if (isSwarmLink(swarmUrl)) {
-        return DefaultGateway + DefaultUrlScheme + swarmUrl.slice(DefaultPrefix.length);
+        return defaultGateway + defaultUrlScheme + swarmUrl.slice(defaultPrefix.length);
     }
-    if (swarmUrl.length === HashLength) {
-        return DefaultGateway + DefaultUrlScheme + swarmUrl;
+    if (swarmUrl.length === hashLength) {
+        return defaultGateway + defaultUrlScheme + swarmUrl;
     }
     return swarmUrl;
 };
@@ -77,7 +77,7 @@ const imageMimeTypeFromPath = (path: string): string => {
     return 'unknown';
 };
 
-const uploadPhoto = async (localPath: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+const uploadPhoto = async (localPath: string, swarmGateway: string = defaultGateway): Promise<string> => {
     Debug.log('uploadPhoto: ', localPath);
     const data = new FormData();
     const imageMimeType = imageMimeTypeFromPath(localPath);
@@ -90,10 +90,10 @@ const uploadPhoto = async (localPath: string, swarmGateway: string = DefaultGate
     data.append('title', 'photo');
 
     const hash = await uploadForm(data, swarmGateway);
-    return DefaultPrefix + hash + '/' + name;
+    return defaultPrefix + hash + '/' + name;
 };
 
-const uploadData = async (data: string, swarmGateway: string = DefaultGateway): Promise<string> => {
+const uploadData = async (data: string, swarmGateway: string = defaultGateway): Promise<string> => {
     Debug.log('uploadData: ', data);
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
@@ -108,7 +108,7 @@ const uploadData = async (data: string, swarmGateway: string = DefaultGateway): 
     return text;
 };
 
-const downloadData = async (hash: string, timeout: number = 0, swarmGateway: string = DefaultGateway): Promise<string> => {
+const downloadData = async (hash: string, timeout: number = 0, swarmGateway: string = defaultGateway): Promise<string> => {
     const url = swarmGateway + '/bzz:/' + hash + '/';
     Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
@@ -197,6 +197,11 @@ export interface ReadableFeedApi {
     readonly address: FeedAddress;
 }
 
+export const makeBzzFeedUrl = (address: FeedAddress): string => {
+    const addressPart = calculateFeedAddressQueryString(address);
+    return defaultFeedPrefix + '?' + addressPart;
+};
+
 export const makeFeedAddressFromBzzFeedUrl = (bzzFeedUrl: string): FeedAddress => {
     if (bzzFeedUrl.startsWith('bzz-feed:/?user=')) {
         return {
@@ -217,7 +222,7 @@ export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity
     };
 };
 
-export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string = DefaultGateway): ReadableFeedApi => ({
+export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string = defaultGateway): ReadableFeedApi => ({
     download: async (): Promise<string> => downloadUserFeed(swarmGateway, address),
     downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(swarmGateway, address, epoch),
     downloadFeedTemplate: async () => downloadUserFeedTemplate(swarmGateway, address),
@@ -234,7 +239,7 @@ export interface WriteableFeedApi extends ReadableFeedApi {
     signFeedDigest: FeedDigestSigner;
 }
 
-export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = DefaultGateway): WriteableFeedApi => {
+export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): WriteableFeedApi => {
     return {
         ...makeReadableFeedApi(address, swarmGateway),
 
@@ -253,7 +258,7 @@ export interface BzzApi {
     uploadPhoto: (localPath: string) => Promise<string>;
 }
 
-export const makeBzzApi = (swarmGateway: string = DefaultGateway): BzzApi => {
+export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
     return {
         download: (hash: string, timeout: number = 0) => downloadData(hash, timeout, swarmGateway),
         upload: (data: string) => upload(data, swarmGateway),
@@ -272,7 +277,7 @@ export interface WriteableApi extends BaseApi {
 
 export type Api = WriteableApi;
 
-export const makeApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = DefaultGateway): Api => ({
+export const makeApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): Api => ({
     bzz: makeBzzApi(swarmGateway),
     feed: makeFeedApi(address, signFeedDigest, swarmGateway),
     swarmGateway,
@@ -283,7 +288,7 @@ export interface ReadableApi extends BaseApi {
     feed: ReadableFeedApi;
 }
 
-export const makeReadableApi = (address: FeedAddress, swarmGateway: string = DefaultGateway): ReadableApi => {
+export const makeReadableApi = (address: FeedAddress, swarmGateway: string = defaultGateway): ReadableApi => {
     return {
         bzz: makeBzzApi(swarmGateway),
         feed: makeReadableFeedApi(address, swarmGateway),

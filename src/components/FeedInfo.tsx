@@ -222,7 +222,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        if (url.startsWith(Swarm.DefaultFeedPrefix)) {
+        if (url.startsWith(Swarm.defaultFeedPrefix)) {
             const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
             const swarm = Swarm.makeReadableApi(feedAddress);
             const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);

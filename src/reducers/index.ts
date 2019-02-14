@@ -441,7 +441,7 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
 
 class FelfelePersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue', 'postCommandLog'],
+        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })];
     public blacklist = ['currentTimestamp'];
     public key = 'root';
