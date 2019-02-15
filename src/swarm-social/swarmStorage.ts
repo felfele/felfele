@@ -384,8 +384,11 @@ const uploadRecentPostFeed = async (
         ;
 
     const uploadedPosts = await uploadPosts(swarm.bzz, posts, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
-    const postFeed = {
-        ...recentPostFeed,
+    const postFeed: RecentPostFeed = {
+        name: recentPostFeed.name,
+        url: recentPostFeed.url,
+        feedUrl: recentPostFeed.feedUrl,
+        favicon: recentPostFeed.favicon,
         posts: uploadedPosts,
         authorImage: {
             ...recentPostFeed.authorImage,
