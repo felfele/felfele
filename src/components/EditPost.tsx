@@ -183,7 +183,7 @@ export class EditPost extends React.Component<Props, State> {
     private onChangeText = (text: string) => {
         const post: Post = {
             ...this.state.post,
-            text: markdownEscape(text),
+            text: text,
         };
         this.setState({
             post,
@@ -296,10 +296,14 @@ export class EditPost extends React.Component<Props, State> {
     private sendUpdate = () => {
         this.setState({
            isLoading: true,
+           post: {
+            ...this.state.post,
+            text: markdownEscape(this.state.post.text),
+           },
+        }, () => {
+            Debug.log(this.state.post);
+            this.props.onPost(this.state.post);
         });
-
-        Debug.log(this.state.post);
-        this.props.onPost(this.state.post);
     }
 
     private renderActivityIndicator() {
