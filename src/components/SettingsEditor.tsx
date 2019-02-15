@@ -27,14 +27,9 @@ export const SettingsEditor = (props: Props) => {
     return (
         <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
             <NavigationHeader
-                leftButtonText=''
                 title='Settings'
             />
             <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
-                <SettingsList.Item
-                    title='Identity'
-                    onPress={() => props.navigation.navigate('IdentitySettingsContainer')}
-                />
                 <SettingsList.Item
                     title='Feeds'
                     onPress={() => props.navigation.navigate('FeedListEditorContainer')}

@@ -23,7 +23,6 @@ export const NewsFeedView = (props: Props) => {
         <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
-                                leftButtonText=''
                                 title='News'
                                 rightButtonText1={
                                     <Icon

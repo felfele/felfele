@@ -23,7 +23,6 @@ export const FavoritesFeedView = (props: Props) => {
         <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
-                                leftButtonText=''
                                 title='Favorites'
                                 rightButtonText1={
                                     <Icon

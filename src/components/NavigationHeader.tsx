@@ -32,7 +32,7 @@ const Header = (props: Props) => (
         <TouchableView onPress={props.onPressLeftButton} style={styles.leftContainer}>
             <Text style={styles.headerLeftButtonText}>
                 {
-                    props.leftButtonText != null
+                    props.leftButtonText != null || props.onPressLeftButton == null
                     ? props.leftButtonText
                     : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
                 }

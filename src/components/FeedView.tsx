@@ -41,8 +41,8 @@ export const FeedView = (props: Props) => {
                                           size={20}
                                           color={Colors.DARK_GRAY}
                                       /> : undefined}
-                                      rightButtonText2={!props.isOwnFeed ? <MaterialIcon
-                                          name={'favorite'}
+                                      rightButtonText2={!props.isOwnFeed ? <Icon
+                                          name={'star'}
                                           size={20}
                                           color={isFollowedFeed
                                               ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_RED : Colors.DARK_GRAY

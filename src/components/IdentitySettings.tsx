@@ -39,7 +39,7 @@ export interface StateProps {
 
 const tooltip = 'The name to author your posts';
 const namePlaceholder = 'Space Cowboy';
-const screenTitle = 'Identity';
+const screenTitle = 'Profile';
 const modelHelper = new ReactNativeModelHelper();
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
@@ -72,10 +72,6 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView>
             <NavigationHeader
-                onPressLeftButton={() => {
-                    // null is needed otherwise it does not work with switchnavigator backbehavior property
-                    props.navigation.goBack(null);
-                }}
                 rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                 title={screenTitle}

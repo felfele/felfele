@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Platform, YellowBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -146,9 +147,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     FeedInfo: {
         screen: FeedInfoContainer,
     },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
-    },
     EditFilter: {
         screen: EditFilterContainer,
     },
@@ -174,16 +172,16 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 
 const Root = createBottomTabNavigator(
     {
-        YourTab: {
-            screen: YourFeedNavigator,
-            path: '/your',
+        NewsTab: {
+            screen: NewsFeedNavigator,
+            path: '/news',
             navigationOptions: {
-                title: 'Your story',
-                tabBarLabel: 'Your story',
+                title: 'New stories',
+                tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <MaterialIcon
-                        name={focused ? 'rss-feed' : 'rss-feed'}
-                        size={20}
+                    <FontAwesomeIcon
+                        name={'newspaper-o'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
@@ -196,24 +194,40 @@ const Root = createBottomTabNavigator(
                 title: 'Favorites',
                 tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <MaterialIcon
-                        name={focused ? 'favorite' : 'favorite'}
-                        size={20}
+                    <Icon
+                        name={'star'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
             },
         },
-        NewsTab: {
-            screen: NewsFeedNavigator,
-            path: '/news',
+        PostTab: {
+            screen: EditPostContainer,
+            path: '/post',
             navigationOptions: {
-                title: 'New stories',
-                tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <FontAwesomeIcon
-                        name={focused ? 'newspaper-o' : 'newspaper-o'}
-                        size={20}
+                    <Icon
+                        name={'plus-box-outline'}
+                        size={24}
+                        color={'#873fff'}
+                    />
+                ),
+                tabBarOnPress: ({ navigation }: NavigationScreenProps) => {
+                    navigation.navigate('Post');
+                },
+            },
+        },
+        ProfileTab: {
+            screen: IdentitySettingsContainer,
+            path: '/settings',
+            navigationOptions: {
+                header: undefined,
+                title: 'Settings',
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
+                    <Icon
+                        name={'account'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
@@ -227,8 +241,8 @@ const Root = createBottomTabNavigator(
                 title: 'Settings',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
-                        name={focused ? 'settings' : 'settings'}
-                        size={20}
+                        name={'settings'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
