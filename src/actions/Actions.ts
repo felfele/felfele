@@ -11,6 +11,7 @@ import { Utils } from '../Utils';
 import {
     LocalFeed,
     shareNewPost,
+    removePost,
     mergePostCommandLogs,
     getPreviousCommandEpochFromLog,
 } from '../social/api';
@@ -180,6 +181,16 @@ export const AsyncActions = {
     },
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
+            const ownFeeds = getState().ownFeeds;
+            if (ownFeeds.length > 0) {
+                const localFeed = ownFeeds[0];
+                const updatedPostCommandLog = removePost(post, '', localFeed.postCommandLog);
+                dispatch(Actions.updateOwnFeed({
+                    ...localFeed,
+                    postCommandLog: updatedPostCommandLog,
+                }));
+                dispatch(AsyncActions.syncPostCommandLogs(localFeed));
+            }
             dispatch(Actions.deletePost(post));
         };
     },
