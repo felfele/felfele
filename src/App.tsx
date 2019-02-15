@@ -179,8 +179,6 @@ const Root = createBottomTabNavigator(
             screen: NewsFeedNavigator,
             path: '/news',
             navigationOptions: {
-                title: 'New stories',
-                tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <FontAwesomeIcon
                         name={'newspaper-o'}
@@ -194,8 +192,6 @@ const Root = createBottomTabNavigator(
             screen: FavoriteFeedNavigator,
             path: '/favorites',
             navigationOptions: {
-                title: 'Favorites',
-                tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
                         name={'star'}
@@ -213,7 +209,7 @@ const Root = createBottomTabNavigator(
                     <Icon
                         name={'plus-box-outline'}
                         size={24}
-                        color={'#873fff'}
+                        color={Colors.BRAND_PURPLE}
                     />
                 ),
                 tabBarOnPress: ({ navigation }: NavigationScreenProps) => {
@@ -225,8 +221,6 @@ const Root = createBottomTabNavigator(
             screen: ProfileNavigator,
             path: '/settings',
             navigationOptions: {
-                header: undefined,
-                title: 'Settings',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
                         name={'account'}
@@ -240,8 +234,6 @@ const Root = createBottomTabNavigator(
             screen: SettingsNavigator,
             path: '/settings',
             navigationOptions: {
-                header: undefined,
-                title: 'Settings',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
                         name={'settings'}
@@ -277,7 +269,6 @@ const Root = createBottomTabNavigator(
                     activeTintColor: 'gray',
                     inactiveTintColor: 'lightgray',
                     style: {
-                        backgroundColor: Colors.BACKGROUND_COLOR,
                         opacity: 0.96,
                     },
                 },

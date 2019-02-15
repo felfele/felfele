@@ -9,8 +9,10 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
     Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {
-       navigation: ownProps.navigation,
-       draft: post != null ? post : state.draft,
+        name: state.author.name,
+        avatar: state.author.image,
+        navigation: ownProps.navigation,
+        draft: post != null ? post : state.draft,
    };
 };
 

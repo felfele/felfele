@@ -4,7 +4,6 @@ import {
     Text,
     TouchableOpacity,
     Keyboard,
-    Button,
     Platform,
     ActivityIndicator,
     Alert,
@@ -21,10 +20,14 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Colors } from '../styles';
 
 export interface StateProps {
     navigation: any;
     draft: Post | null;
+    name: string;
+    avatar: ImageData;
 }
 
 export interface DispatchProps {
@@ -122,10 +125,23 @@ export class EditPost extends React.Component<Props, State> {
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                 <NavigationHeader
-                    leftButtonText='Cancel'
+                    leftButtonText={
+                        <Icon
+                            name={'close'}
+                            size={20}
+                            color={Colors.DARK_GRAY}
+                        />
+                    }
                     onPressLeftButton={this.onCancelConfirmation}
-                    rightButtonText1='Post'
+                    rightButtonText1={
+                        <Icon
+                            name={'send'}
+                            size={20}
+                            color={Colors.BRAND_PURPLE}
+                        />
+                    }
                     onPressRightButton1={this.onPressSubmit}
+                    title={this.props.name}
                 />
                 <View style={{flex: 14, flexDirection: 'column'}}>
                     <SimpleTextInput

@@ -3,7 +3,6 @@ import { Colors } from '../../styles';
 import {
     StyleSheet,
     Text,
-    View,
 } from 'react-native';
 import { TouchableView } from '../../components/TouchableView';
 import Icon from 'react-native-vector-icons/MaterialIcons';

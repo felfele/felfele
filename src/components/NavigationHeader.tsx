@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet, Platform, SafeAreaView } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 
 export interface StateProps {
-    leftButtonText?: string;
+    leftButtonText?: string | React.ReactNode;
     rightButtonText1?: string | React.ReactNode;
     rightButtonText2?: string | React.ReactNode;
     title?: string;
@@ -24,8 +24,7 @@ export type Props = StateProps & DispatchProps;
 export interface State {
 }
 
-const BACK_ICON_NAME = Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back';
-const BUTTON_COLOR = Platform.OS === 'ios' ? Colors.DEFAULT_ACTION_COLOR : Colors.DARK_GRAY;
+const BUTTON_COLOR = Colors.DARK_GRAY;
 
 const Header = (props: Props) => (
     <View style={styles.headerContainer}>
@@ -34,7 +33,7 @@ const Header = (props: Props) => (
                 {
                     props.leftButtonText != null || props.onPressLeftButton == null
                     ? props.leftButtonText
-                    : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
+                    : <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />
                 }
             </Text>
         </TouchableView>
@@ -88,9 +87,8 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
         flexDirection: 'column',
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: Colors.WHITE,
     },
     headerContainer: {
         width: '100%',
@@ -107,7 +105,7 @@ const styles = StyleSheet.create({
         marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: Colors.WHITE,
     },
     headerLeftButtonText: {
         color: BUTTON_COLOR,
@@ -127,7 +125,6 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 16,
-        fontWeight: 'bold',
         color: Colors.DARK_GRAY,
         textAlign: 'center',
     },
