@@ -32,7 +32,7 @@ export const FavoritesFeedView = (props: Props) => {
                                     />
                                 }
                                 onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
-                        />,
+                            />,
             }}
         </RefreshableFeed>
     );

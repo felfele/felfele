@@ -4,7 +4,6 @@ import {
     TextStyle,
     StyleProp,
     ReturnKeyTypeOptions,
-    TextInputProps,
 } from 'react-native';
 
 interface SimpleTextInputProps {

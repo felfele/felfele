@@ -69,6 +69,9 @@ const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
 );
 
 const yourTabScenes: NavigationRouteConfigMap = {
+    Profile: {
+        screen: IdentitySettingsContainer,
+    },
     YourTab: {
         screen: ({navigation}: NavigationScreenProps) => (
             <YourFeedContainer navigation={navigation}/>
@@ -78,13 +81,13 @@ const yourTabScenes: NavigationRouteConfigMap = {
         screen: FeedContainer,
     },
 };
-const YourFeedNavigator = createStackNavigator(yourTabScenes,
+const ProfileNavigator = createStackNavigator(yourTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'YourTab',
+        initialRouteName: 'Profile',
     },
 );
 
@@ -219,7 +222,7 @@ const Root = createBottomTabNavigator(
             },
         },
         ProfileTab: {
-            screen: IdentitySettingsContainer,
+            screen: ProfileNavigator,
             path: '/settings',
             navigationOptions: {
                 header: undefined,
