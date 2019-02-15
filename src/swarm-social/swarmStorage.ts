@@ -284,7 +284,7 @@ const createRecentPostFeed = async (
 
 const updateRecentPostFeed = async (swarm: Swarm.Api, postFeed: RecentPostFeed): Promise<RecentPostFeed> => {
     try {
-        const postFeedJson = JSON.stringify(postFeed);
+        const postFeedJson = serialize(postFeed);
         const contentHash = await swarm.bzz.upload(postFeedJson);
         await swarm.feed.update(contentHash);
         const url = swarm.feed.getUri();
@@ -307,7 +307,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
         const content = await swarm.bzz.download(contentHash, timeout);
         Debug.log('downloadPostFeed: content: ', content);
 
-        const postFeed = JSON.parse(content) as RecentPostFeed;
+        const postFeed = deserialize(content) as RecentPostFeed;
         const authorImage = {
             uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
         };
