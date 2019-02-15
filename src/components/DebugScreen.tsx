@@ -103,6 +103,13 @@ export const DebugScreen = (props: Props) => (
                 />
                 <SettingsList.Item
                     icon={
+                        <MaterialCommunityIcon name='server-network' />
+                    }
+                    title='Swarm settings'
+                    onPress={async () => props.navigation.navigate('SwarmSettingsContainer')}
+                />
+                <SettingsList.Item
+                    icon={
                         <IonIcon name='md-list' />
                     }
                     title='View logs'

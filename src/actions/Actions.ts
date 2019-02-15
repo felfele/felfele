@@ -56,6 +56,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
+    CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
 }
 
 const InternalActions = {
@@ -116,6 +117,8 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SHOW_SQUARE_IMAGES, { value }),
     changeSettingShowDebugMenu: (value: boolean) =>
         createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
+    changeSettingSwarmGatewayAddress: (value: string) =>
+        createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
     updateOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
 };
@@ -236,7 +239,8 @@ export const AsyncActions = {
 
                 const identity = getState().author.identity!;
                 const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
-                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeed);
+                const swarmGateway = getState().settings.swarmGatewayAddress;
+                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeed, swarmGateway);
 
                 const localPostCommandLog = localFeed.postCommandLog;
                 const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeed);
@@ -350,9 +354,9 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
     return allPosts;
 };
 
-const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed) => {
+const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed, swarmGateway: string) => {
     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
-    const swarm = Swarm.makeApi(feedAddress, signFeedDigest);
+    const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
     const swarmHelpers: SwarmHelpers = {
         imageResizer: resizeImageIfNeeded,
         getLocalPath: modelHelper.getLocalPath,

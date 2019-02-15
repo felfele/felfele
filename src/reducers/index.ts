@@ -28,6 +28,7 @@ import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
+import * as Swarm from '../swarm/Swarm';
 
 const modelHelper = new ReactNativeModelHelper();
 
@@ -48,6 +49,7 @@ const defaultSettings: Settings = {
     saveToCameraRoll: true,
     showSquareImages: true,
     showDebugMenu: false,
+    swarmGatewayAddress: Swarm.defaultGateway,
 };
 
 const defaultAuthor: Author = {
@@ -282,6 +284,12 @@ const settingsReducer = (settings = defaultSettings, action: Actions): Settings 
             return {
                 ...settings,
                 showDebugMenu: action.payload.value,
+            };
+        }
+        case 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS': {
+            return {
+                ...settings,
+                swarmGatewayAddress: action.payload.value,
             };
         }
     }
