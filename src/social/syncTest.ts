@@ -88,8 +88,8 @@ const testMergeTheSamePostWithOneUploadedStorage = async (source = 'storage', st
 
     assertPostCommandLogInvariants(mergedCommandLog);
 
-    expect(mergedCommandLog.commands).toHaveLength(1);
-    expect(mergedCommandLog).toEqual(syncedCommandLog);
+    assertEquals(1, mergedCommandLog.commands.length);
+    assertPostCommandLogsAreEqual(mergedCommandLog, syncedCommandLog);
 
     return syncedCommandLog;
 };
