@@ -7,9 +7,8 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
+import { Utils } from '../Utils';
 import {
-    RecentPostFeed,
-    PostCommandLog,
     LocalFeed,
     shareNewPost,
     mergePostCommandLogs,
@@ -57,8 +56,6 @@ export enum ActionTypes {
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
-    QUEUE_POST_FOR_UPLOAD = 'QUEUE-POST-FOR-UPLOAD',
-    REMOVE_POST_FOR_UPLOAD = 'REMOVE-POST-FOR-UPLOAD',
 }
 
 const InternalActions = {
@@ -70,10 +67,6 @@ const InternalActions = {
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
-    queuePostForUpload: (post: Post) =>
-        createAction(ActionTypes.QUEUE_POST_FOR_UPLOAD, { post }),
-    removePostForUpload: (post: Post) =>
-        createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
@@ -284,10 +277,12 @@ export const AsyncActions = {
                 }));
 
                 if (getPreviousCommandEpochFromLog(mergedPostCommandLog) == null) {
+                    Debug.log('syncPostCommandLogs', 'waiting for resyncing');
+                    await Utils.waitMillisec(30 * 1000);
                     dispatch(AsyncActions.syncPostCommandLogs(localFeedAfterUpdate));
                 }
             } catch (e) {
-                Debug.log('sharePost: ', 'error', e);
+                Debug.log('syncPostCommandLogs: ', 'error', e);
                 // dispatch(Actions.updatePostIsUploading(post, undefined));
             }
         };

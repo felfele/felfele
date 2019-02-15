@@ -42,7 +42,6 @@ export interface AppState extends PersistedState {
     localPosts: Post[];
     draft: Post | null;
     metadata: Metadata;
-    postUploadQueue: Post[];
 }
 
 const defaultSettings: Settings = {
@@ -148,7 +147,6 @@ export const defaultState: AppState = {
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
-    postUploadQueue: [],
 };
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
@@ -401,22 +399,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
-const postUploadQueueReducer = (postUploadQueue: Post[] = [], action: Actions): Post[] => {
-    switch (action.type) {
-        case 'QUEUE-POST-FOR-UPLOAD': {
-            return [...postUploadQueue, action.payload.post];
-        }
-        case 'REMOVE-POST-FOR-UPLOAD': {
-            const ind = postUploadQueue.findIndex(post => post != null && action.payload.post._id === post._id);
-            if (ind === -1) {
-                return postUploadQueue;
-            }
-            return removeFromArray(postUploadQueue, ind);
-        }
-    }
-    return postUploadQueue;
-};
-
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
@@ -463,7 +445,6 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
-    postUploadQueue: postUploadQueueReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
