@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../reducers';
 import { AsyncActions, Actions } from '../actions/Actions';
-import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
+import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 
@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
    };
 };
 
-export const EditPostContainer = connect(
+export const PostEditorContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
-)(EditPost);
+)(PostEditor);

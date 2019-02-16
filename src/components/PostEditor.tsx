@@ -47,7 +47,7 @@ interface State {
     post: Post;
 }
 
-export class EditPost extends React.Component<Props, State> {
+export class PostEditor extends React.Component<Props, State> {
     public state: State;
 
     private keyboardDidShowListener: EmitterSubscription | null = null;

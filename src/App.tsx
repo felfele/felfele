@@ -17,7 +17,7 @@ import { NewsFeedContainer } from './containers/NewsFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
-import { EditPostContainer } from './containers/EditPostContainer';
+import { PostEditorContainer } from './containers/PostEditorContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
@@ -202,7 +202,7 @@ const Root = createBottomTabNavigator(
             },
         },
         PostTab: {
-            screen: EditPostContainer,
+            screen: PostEditorContainer,
             path: '/post',
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
@@ -280,7 +280,7 @@ const Scenes: NavigationRouteConfigMap = {
         screen: Root,
     },
     Post: {
-        screen: EditPostContainer,
+        screen: PostEditorContainer,
     },
 };
 
