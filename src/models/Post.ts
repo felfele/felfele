@@ -15,10 +15,18 @@ export interface Author {
     identity?: PrivateIdentity;
 }
 
+type PostLink = string;
+
+interface PostReferences {
+    parent: PostLink;
+    original: PostLink;
+}
+
 export interface PublicPost extends Model {
     images: ImageData[];
     text: string;
     createdAt: number;
+    references?: PostReferences;
 }
 
 export interface Post extends PublicPost {
