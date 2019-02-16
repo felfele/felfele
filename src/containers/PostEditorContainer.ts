@@ -6,7 +6,7 @@ import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
+    Debug.log('PostEditorContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {
         name: state.author.name,

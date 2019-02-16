@@ -162,7 +162,7 @@ export class PostEditor extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
-                        testID='EditPost/TextInput'
+                        testID='PostEditor/TextInput'
                     />
                     <ImagePreviewGrid
                         columns={4}
