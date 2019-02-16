@@ -36,7 +36,7 @@ export const Colors = {
     IOS_GREEN: '#44DB5E',
     IOS_RED: '#FF3824',
     IOS_GRAY: '#8E8E93',
-    BACKGROUND_COLOR: '#EFEFF4',
+    BACKGROUND_COLOR: '#DDDDDD',
 };
 
 export const DefaultFont = 'Helvetica Neue';

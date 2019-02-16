@@ -9,6 +9,7 @@ import {
     Alert,
     AlertIOS,
     EmitterSubscription,
+    SafeAreaView,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -121,7 +122,7 @@ export class EditPost extends React.Component<Props, State> {
         }
 
         return (
-            <View
+            <SafeAreaView
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                 <NavigationHeader
@@ -157,7 +158,7 @@ export class EditPost extends React.Component<Props, State> {
                         numberOfLines={4}
                         onChangeText={this.onChangeText}
                         defaultValue={this.state.post.text}
-                        placeholder="What's your story?"
+                        placeholder="What's up?"
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
@@ -181,7 +182,7 @@ export class EditPost extends React.Component<Props, State> {
                 }}>
                     {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
                 </View>
-            </View>
+            </SafeAreaView>
         );
     }
 

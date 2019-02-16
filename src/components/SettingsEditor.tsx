@@ -25,7 +25,7 @@ type Props = StateProps & DispatchProps;
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
     return (
-        <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+        <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader
                 title='Settings'
             />

@@ -11,12 +11,18 @@ const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
-        <View>
+        <View style={styles.mainContainer}>
             <NavigationHeader
                 leftButtonText={props.navigation ? undefined : ''}
                 onPressLeftButton={() => props.navigation.goBack(null)}
                 title='Bug Report'
-                rightButtonText1='Send'
+                rightButtonText1={
+                    <Icon
+                        name={'send'}
+                        size={20}
+                        color={Colors.BRAND_PURPLE}
+                    />
+                }
                 onPressRightButton1={() => {
                     Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody()}`);
                 }}
@@ -51,6 +57,10 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        backgroundColor: Colors.WHITE,
+        flex: 1,
+    },
     contentContainer: {
         paddingTop: 25,
         flexDirection: 'column',

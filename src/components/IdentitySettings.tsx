@@ -74,7 +74,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentitySettings: ', qrCodeValue);
     return (
-        <KeyboardAvoidingView>
+        <KeyboardAvoidingView style={styles.mainContainer}>
             <NavigationHeader
                 rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
@@ -134,6 +134,10 @@ const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) 
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        backgroundColor: '#DDDDDD',
+        flex: 1,
+    },
     row: {
         width: '100%',
         backgroundColor: 'white',
