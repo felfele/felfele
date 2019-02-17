@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
     Alert,
     StyleSheet,
-    Button,
     View,
     Text,
     Slider,
@@ -140,7 +139,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#EFEFF4',
+        backgroundColor: Colors.BACKGROUND_COLOR,
         flex: 1,
         flexDirection: 'column',
     },
@@ -153,8 +152,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
-        borderTopColor: 'lightgray',
-        borderTopWidth: 1,
         paddingHorizontal: 8,
         paddingVertical: 8,
         color: 'gray',

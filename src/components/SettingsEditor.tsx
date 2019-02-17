@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { View } from 'react-native';
-// @ts-ignore
-import SettingsList from 'react-native-settings-list';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
 import { Colors, DefaultTabBarHeight } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
+import { RowItem } from '../ui/misc/RowButton';
 
 export interface StateProps {
     navigation: any;
@@ -22,6 +21,8 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
+const PREFERENCES_LABEL = 'PREFERENCES';
+
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
     return (
@@ -29,54 +30,51 @@ export const SettingsEditor = (props: Props) => {
             <NavigationHeader
                 title='Settings'
             />
-            <SettingsList borderColor='#c8c7cc' defaultItemSize={44}>
-                <SettingsList.Item
+            <ScrollView>
+                <Text style={styles.tooltip}>{PREFERENCES_LABEL}</Text>
+                <RowItem
                     title='Feeds'
+                    buttonStyle='none'
                     onPress={() => props.navigation.navigate('FeedListEditorContainer')}
                 />
-                <SettingsList.Item
+                <RowItem
                     title='Filters'
+                    buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('FilterListEditorContainer')}
                 />
-                <SettingsList.Item
-                    hasNavArrow={false}
-                    switchState={props.settings.saveToCameraRoll}
-                    switchOnValueChange={props.onSaveToCameraRollValueChange}
-                    hasSwitch={true}
+                <RowItem
                     title='Save to Camera Roll'
+                    switchState={props.settings.saveToCameraRoll}
+                    onSwitchValueChange={props.onSaveToCameraRollValueChange}
+                    buttonStyle='switch'
                 />
-                <SettingsList.Item
-                    hasNavArrow={false}
-                    switchState={props.settings.showSquareImages}
-                    switchOnValueChange={props.onShowSquareImagesValueChange}
-                    hasSwitch={true}
+                <RowItem
                     title='Show square images'
+                    switchState={props.settings.showSquareImages}
+                    onSwitchValueChange={props.onShowSquareImagesValueChange}
+                    buttonStyle='switch'
                 />
-                <SettingsList.Item
-                    hasNavArrow={true}
+                <RowItem
                     title='Send bug report'
+                    buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('BugReportView')}
                     />
-                <SettingsList.Item
-                    hasNavArrow={false}
+                <RowItem
                     title={version}
+                    buttonStyle='none'
                     onLongPress={() => props.onShowDebugMenuValueChange(!props.settings.showDebugMenu)}
-                    style={{
-                        color: Colors.GRAY,
-                    }}
                 />
                 { props.settings.showDebugMenu &&
-                <SettingsList.Item
+                <RowItem
                     icon={
-                        <SettingsIcon>
-                            <Ionicons name='md-bug' size={24} color={Colors.GRAY} />
-                        </SettingsIcon>
+                        <Ionicons name='md-bug' size={24} color={Colors.GRAY}/>
                     }
                     title='Debug menu'
+                    buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('Debug')}
                 />
                 }
-            </SettingsList>
+            </ScrollView>
             <View
                 style={{
                     height: DefaultTabBarHeight,
@@ -87,11 +85,11 @@ export const SettingsEditor = (props: Props) => {
     );
 };
 
-const SettingsIcon = (props: { children: React.ReactNode}) => (
-    <View style={{
-        paddingVertical: 10,
-        paddingLeft: 5,
-    }}>
-        {props.children}
-    </View>
-);
+const styles = StyleSheet.create({
+    tooltip: {
+        paddingHorizontal: 10,
+        paddingTop: 20,
+        paddingBottom: 7,
+        color: Colors.GRAY,
+    },
+});

@@ -25,7 +25,7 @@ const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { RowButton } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/misc/RowButton';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -107,9 +107,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 onSubmitEditing={props.onUpdateAuthor}
             />
             <Text style={styles.tooltip}>{ACTIVITY_LABEL}</Text>
-            <RowButton
-                label={VIEW_POSTS_LABEL}
-                navigate={true}
+            <RowItem
+                title={VIEW_POSTS_LABEL}
+                buttonStyle='navigate'
                 onPress={() => props.navigation.navigate('YourTab')}
             />
             { props.ownFeed &&
