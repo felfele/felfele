@@ -18,6 +18,7 @@ interface Props {
     onLongPress?: (event?: GestureResponderEvent) => void;
     onSwitchValueChange?: (value: boolean) => void;
     switchState?: boolean;
+    switchDisabled?: boolean;
     buttonStyle: 'none' | 'switch' | 'navigate';
 }
 
@@ -83,6 +84,7 @@ const RowSwitchButton = (props: Props) => {
                 onValueChange={props.onSwitchValueChange}
                 value={props.switchState}
                 style={styles.rightContainer}
+                disabled={props.switchDisabled}
             />
         </View>
     );

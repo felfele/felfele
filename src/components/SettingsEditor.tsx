@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -7,10 +7,15 @@ import { Version } from '../Version';
 import { Colors, DefaultTabBarHeight } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
+import { SuperGridSectionList, FlatGrid } from 'react-native-super-grid';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { PostFeed } from '../PostFeed';
+import { TouchableView } from './TouchableView';
 
 export interface StateProps {
     navigation: any;
     settings: Settings;
+    ownFeeds: PostFeed[];
 }
 
 export interface DispatchProps {
@@ -21,7 +26,10 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
+const YOUR_FEEDS = 'YOUR FEEDS';
 const PREFERENCES_LABEL = 'PREFERENCES';
+
+const modelHelper = new ReactNativeModelHelper();
 
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
@@ -31,16 +39,49 @@ export const SettingsEditor = (props: Props) => {
                 title='Settings'
             />
             <ScrollView>
-                <Text style={styles.tooltip}>{PREFERENCES_LABEL}</Text>
+                <SuperGridSectionList
+                    style={{ flex: 1 }}
+                    spacing={10}
+                    fixed={true}
+                    itemDimension={170}
+                    sections={[{
+                        title: YOUR_FEEDS,
+                        data: props.ownFeeds,
+                    }]}
+                    renderItem={({ item }) => {
+                        return (
+                            <TouchableView style={styles.feedCard} onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}>
+                                <Image
+                                    source={{
+                                        uri: modelHelper.getImageUri(item.authorImage),
+                                    }}
+                                    style={{
+                                        width: 170,
+                                        height: 170,
+                                    }}
+                                    resizeMode='cover'
+                                />
+                                <View style={styles.feedCardTextContainer}>
+                                    <Text style={styles.feedCardText}>{item.name}</Text>
+                                </View>
+                            </TouchableView>
+                        );
+                    }}
+                    renderSectionHeader={({ section }) => (
+                        <Text style={styles.label}>{section.title}</Text>
+                    )}
+                />
+                <Text
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    style={styles.label}
+                >
+                    {PREFERENCES_LABEL}
+                </Text>
                 <RowItem
                     title='Feeds'
                     buttonStyle='none'
                     onPress={() => props.navigation.navigate('FeedListEditorContainer')}
-                />
-                <RowItem
-                    title='Filters'
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FilterListEditorContainer')}
                 />
                 <RowItem
                     title='Save to Camera Roll'
@@ -53,6 +94,11 @@ export const SettingsEditor = (props: Props) => {
                     switchState={props.settings.showSquareImages}
                     onSwitchValueChange={props.onShowSquareImagesValueChange}
                     buttonStyle='switch'
+                />
+                <RowItem
+                    title='Filters'
+                    buttonStyle='navigate'
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer')}
                 />
                 <RowItem
                     title='Send bug report'
@@ -86,10 +132,22 @@ export const SettingsEditor = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-    tooltip: {
+    label: {
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.GRAY,
+    },
+    feedCard: {
+        backgroundColor: Colors.WHITE,
+    },
+    feedCardText: {
+        color: Colors.DARK_GRAY,
+        fontSize: 14,
+    },
+    feedCardTextContainer: {
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });

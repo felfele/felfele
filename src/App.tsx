@@ -9,7 +9,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
@@ -34,6 +33,7 @@ import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContaine
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
+import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -146,6 +146,9 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     Feed: {
         screen: SettingsFeedViewContainer,
+    },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
     },
     FeedInfo: {
         screen: FeedInfoContainer,
