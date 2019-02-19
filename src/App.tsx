@@ -12,7 +12,7 @@ import { Debug } from './Debug';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
-import { NewsFeedContainer } from './containers/NewsFeedContainer';
+import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
@@ -91,10 +91,10 @@ const ProfileNavigator = createStackNavigator(yourTabScenes,
     },
 );
 
-const newsTabScenes: NavigationRouteConfigMap = {
-    NewsTab: {
+const allFeedTabScenes: NavigationRouteConfigMap = {
+    AllFeed: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <NewsFeedContainer
+            <AllFeedContainer
                 navigation={navigation}
             />
         ),
@@ -110,13 +110,13 @@ const newsTabScenes: NavigationRouteConfigMap = {
     },
 };
 
-const NewsFeedNavigator = createStackNavigator(newsTabScenes,
+const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'NewsTab',
+        initialRouteName: 'AllFeed',
     },
 );
 
@@ -178,13 +178,12 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 
 const Root = createBottomTabNavigator(
     {
-        NewsTab: {
-            screen: NewsFeedNavigator,
-            path: '/news',
+        AllFeedTab: {
+            screen: AllFeedNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <FontAwesomeIcon
-                        name={'newspaper-o'}
+                        name={'home'}
                         size={24}
                         color={tintColor}
                     />
@@ -193,7 +192,6 @@ const Root = createBottomTabNavigator(
         },
         FavoriteTab: {
             screen: FavoriteFeedNavigator,
-            path: '/favorites',
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
@@ -206,7 +204,6 @@ const Root = createBottomTabNavigator(
         },
         PostTab: {
             screen: PostEditorContainer,
-            path: '/post',
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
@@ -222,7 +219,6 @@ const Root = createBottomTabNavigator(
         },
         ProfileTab: {
             screen: ProfileNavigator,
-            path: '/settings',
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
@@ -235,7 +231,6 @@ const Root = createBottomTabNavigator(
         },
         SettingsTab: {
             screen: SettingsNavigator,
-            path: '/settings',
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon

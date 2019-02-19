@@ -104,7 +104,7 @@ const FeedListFooter = (props: {}) => (
     }} />
 );
 
-export class FeedList extends React.Component<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
+export class FeedList extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
         return (
             <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
@@ -134,7 +134,7 @@ export class FeedList extends React.Component<DispatchProps & StateProps & { chi
     }
 }
 
-export class FeedListEditor extends React.Component<DispatchProps & StateProps> {
+export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
             <FeedList {...this.props}>
@@ -162,16 +162,15 @@ export class FeedListEditor extends React.Component<DispatchProps & StateProps> 
     }
 }
 
-export class FeedListViewer extends React.Component<DispatchProps & StateProps> {
+export class FeedListViewer extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
             <FeedList {...this.props}>
                 <NavigationHeader
                     onPressLeftButton={() => {
-                        // null is needed otherwise it does not work with switchnavigator backbehavior property
-                        this.props.navigation.goBack(null);
+                        this.props.navigation.goBack();
                     }}
-                    title='News Feeds'
+                    title='All feeds'
                 />
             </FeedList>
         );

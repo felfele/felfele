@@ -18,12 +18,18 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
 };
 
 const getFeeds = (state: AppState) => state.feeds;
+const getOwnFeeds = (state: AppState) => state.ownFeeds;
+
 const getRssPosts = (state: AppState) => state.rssPosts;
+const getOwnPosts = (state: AppState) => state.localPosts;
 
 const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
     return state.rssPosts
         .concat(state.localPosts)
-        .filter(post => post != null && post.author != null && post.author.uri === feedUrl);
+        .filter(post => {
+            // TODO: author / profile / associated feed cleanup
+            return post != null && post.author != null && (post.author.uri === feedUrl || post.author.name === state.author.name);
+        });
 };
 
 export const getFollowedFeeds = createSelector([ getFeeds ], (feeds) => {
@@ -34,8 +40,16 @@ export const getFavoriteFeeds = createSelector([ getFeeds ], (feeds) => {
     return feeds.filter(feed => feed.favorite === true);
 });
 
+export const getAllFeeds = createSelector([ getFeeds, getOwnFeeds ], (feeds, ownFeeds) => {
+    return feeds.concat(ownFeeds);
+});
+
 export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFeeds ], (rssPosts, followedFeeds) => {
     return rssPosts.filter(post => isPostFromFollowedFeed(post, followedFeeds));
+});
+
+export const getAllPostsSorted = createSelector([ getFollowedNewsPosts, getOwnPosts ], (followedNewsPosts, ownPosts) => {
+    return followedNewsPosts.concat(ownPosts).sort((a, b) => b.createdAt - a.createdAt);
 });
 
 export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFeeds ], (rssPosts, favoriteFeeds) => {

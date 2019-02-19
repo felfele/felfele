@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { AppState } from '../reducers';
-import { StateProps, DispatchProps, FeedListViewer } from '../components/FeedListEditor';
+import { StateProps, FeedListViewer } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { sortFeeds, updateFavicons, mapDispatchToProps } from './FeedListEditorContainer';
 
