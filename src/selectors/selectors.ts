@@ -36,6 +36,10 @@ export const getFollowedFeeds = createSelector([ getFeeds ], (feeds) => {
     return feeds.filter(feed => feed.followed === true);
 });
 
+export const getKnownFeeds = createSelector([ getFeeds ], (feeds) => {
+    return feeds.filter(feed => feed.followed !== true);
+});
+
 export const getFavoriteFeeds = createSelector([ getFeeds ], (feeds) => {
     return feeds.filter(feed => feed.favorite === true);
 });

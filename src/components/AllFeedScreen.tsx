@@ -3,8 +3,8 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Colors } from '../styles';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -18,12 +18,12 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-export const FavoritesFeedView = (props: Props) => {
+export const AllFeedScreen = (props: Props) => {
     return (
         <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
-                                title='Favorites'
+                                title='All feeds'
                                 rightButtonText1={
                                     <Icon
                                         name={'view-grid'}
@@ -31,7 +31,7 @@ export const FavoritesFeedView = (props: Props) => {
                                         color={Colors.DARK_GRAY}
                                     />
                                 }
-                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
+                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer')}
                             />,
             }}
         </RefreshableFeed>

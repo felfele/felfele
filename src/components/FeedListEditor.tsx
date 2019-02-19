@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Image, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
@@ -7,15 +7,22 @@ import { Colors, DefaultStyle, IconSize, DefaultTabBarHeight } from '../styles';
 import { TouchableView } from './TouchableView';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
+import { SuperGridSectionList } from 'react-native-super-grid';
+import { GridCard } from '../ui/misc/GridCard';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
 }
 
 export interface StateProps {
     navigation: any;
-    feeds: Feed[];
+    ownFeeds: Feed[];
+    followedFeeds: Feed[];
+    knownFeeds: Feed[];
     onPressFeed: (navigation: any, feed: Feed) => void;
 }
+
+const modelHelper = new ReactNativeModelHelper();
 
 const FAVICON_PADDING_LEFT = 5;
 const FAVICON_PADDING_VERTICAL = 20;
@@ -100,34 +107,55 @@ const FeedListItemSeparator = (props: {}) => (
 const FeedListFooter = (props: {}) => (
     <View style={{
         paddingBottom: DefaultTabBarHeight,
-        backgroundColor: Colors.LIGHTER_GRAY,
+        backgroundColor: Colors.BACKGROUND_COLOR,
     }} />
 );
 
-export class FeedList extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
+export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
+        const sections: Array<{ title: string, data: Feed[] }> = [];
+        if (this.props.ownFeeds.length > 0) {
+            sections.push({
+                title: `Your feeds ${this.props.ownFeeds.length}`,
+                data: this.props.ownFeeds,
+            });
+        }
+        if (this.props.followedFeeds.length > 0) {
+            sections.push({
+                title: `Public feeds you follow  ${this.props.followedFeeds.length}`,
+                data: this.props.followedFeeds,
+            });
+        }
+        if (this.props.knownFeeds.length > 0) {
+            sections.push({
+                title: `Other feeds  ${this.props.knownFeeds.length}`,
+                data: this.props.knownFeeds,
+            });
+        }
         return (
-            <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+            <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
-                <FlatList
-                    data={this.props.feeds}
-                    renderItem={({item}) => (
-                        <FeedListItem
-                            feed={item}
-                            onPress={() => {
-                                this.props.onPressFeed(this.props.navigation, item);
-                            }}
-                        />
+                <SuperGridSectionList
+                    style={{ flex: 1 }}
+                    spacing={10}
+                    fixed={true}
+                    itemDimension={170}
+                    sections={sections}
+                    renderItem={({ item }: any) => {
+                        const imageUri = item.authorImage ? modelHelper.getImageUri(item.authorImage) : item.favicon;
+                        return (
+                            <GridCard
+                                title={item.name}
+                                imageUri={imageUri}
+                                onPress={() => this.props.onPressFeed(this.props.navigation, item)}
+                            />
+                        );
+                    }}
+                    renderSectionHeader={({ section }) => (
+                        <Text style={styles.sectionHeader}>{section.title}</Text>
                     )}
-                    ItemSeparatorComponent={FeedListItemSeparator}
+                    // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={FeedListFooter}
-                    keyExtractor={(item) => item.feedUrl}
-                    style={{
-                        backgroundColor: Colors.LIGHTER_GRAY,
-                    }}
-                    contentContainerStyle={{
-                        backgroundColor: Colors.WHITE,
-                    }}
                 />
             </View>
         );
@@ -137,7 +165,7 @@ export class FeedList extends React.PureComponent<DispatchProps & StateProps & {
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <FeedList {...this.props}>
+            <FeedGrid {...this.props}>
                 <NavigationHeader
                     onPressLeftButton={() => {
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
@@ -147,7 +175,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                     onPressRightButton1={this.onAddFeed}
                     title='Feed list'
                 />
-            </FeedList>
+            </FeedGrid>
         );
     }
 
@@ -165,14 +193,24 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
 export class FeedListViewer extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <FeedList {...this.props}>
+            <FeedGrid {...this.props}>
                 <NavigationHeader
                     onPressLeftButton={() => {
                         this.props.navigation.goBack();
                     }}
                     title='All feeds'
                 />
-            </FeedList>
+            </FeedGrid>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    sectionHeader: {
+        paddingHorizontal: 10,
+        paddingTop: 20,
+        paddingBottom: 7,
+        color: Colors.DARK_GRAY,
+        backgroundColor: Colors.BACKGROUND_COLOR,
+    },
+});

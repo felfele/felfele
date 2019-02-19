@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { StateProps, FeedSettingsScreen } from './FeedSettingsScreen';
-import { AppState } from '../../reducers';
+import { AppState } from '../../../reducers';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {

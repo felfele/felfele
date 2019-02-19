@@ -7,10 +7,10 @@ import { Version } from '../Version';
 import { Colors, DefaultTabBarHeight } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
-import { SuperGridSectionList, FlatGrid } from 'react-native-super-grid';
+import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PostFeed } from '../PostFeed';
-import { TouchableView } from './TouchableView';
+import { GridCard } from '../ui/misc/GridCard';
 
 export interface StateProps {
     navigation: any;
@@ -45,26 +45,16 @@ export const SettingsEditor = (props: Props) => {
                     fixed={true}
                     itemDimension={170}
                     sections={[{
-                        title: YOUR_FEEDS,
+                        title: `YOUR_FEEDS ${props.ownFeeds.length}`,
                         data: props.ownFeeds,
                     }]}
                     renderItem={({ item }) => {
                         return (
-                            <TouchableView style={styles.feedCard} onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}>
-                                <Image
-                                    source={{
-                                        uri: modelHelper.getImageUri(item.authorImage),
-                                    }}
-                                    style={{
-                                        width: 170,
-                                        height: 170,
-                                    }}
-                                    resizeMode='cover'
+                                <GridCard
+                                    title={item.name}
+                                    imageUri={modelHelper.getImageUri(item.authorImage)}
+                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
                                 />
-                                <View style={styles.feedCardTextContainer}>
-                                    <Text style={styles.feedCardText}>{item.name}</Text>
-                                </View>
-                            </TouchableView>
                         );
                     }}
                     renderSectionHeader={({ section }) => (
@@ -80,7 +70,7 @@ export const SettingsEditor = (props: Props) => {
                 </Text>
                 <RowItem
                     title='Feeds'
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('FeedListEditorContainer')}
                 />
                 <RowItem
@@ -137,17 +127,5 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.GRAY,
-    },
-    feedCard: {
-        backgroundColor: Colors.WHITE,
-    },
-    feedCardText: {
-        color: Colors.DARK_GRAY,
-        fontSize: 14,
-    },
-    feedCardTextContainer: {
-        height: 30,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
 });
