@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
@@ -133,7 +133,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
             });
         }
         return (
-            <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
                 <SuperGridSectionList
                     style={{ flex: 1 }}
@@ -157,7 +157,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={FeedListFooter}
                 />
-            </View>
+            </SafeAreaView>
         );
     }
 }
