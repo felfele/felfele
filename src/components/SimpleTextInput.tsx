@@ -4,6 +4,7 @@ import {
     TextStyle,
     StyleProp,
     ReturnKeyTypeOptions,
+    StyleSheet,
 } from 'react-native';
 
 interface SimpleTextInputProps {
@@ -38,7 +39,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
     public render() {
         return (
             <TextInput
-                style={this.props.style}
+                style={[styles.defaultInput, this.props.style]}
                 onChangeText={(text) => {
                     this.setState({text});
                     if (this.props.onChangeText != null) {
@@ -76,3 +77,9 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
         }
     }
 }
+
+const styles = StyleSheet.create({
+    defaultInput: {
+        fontFamily: 'Roboto-Regular',
+    },
+});

@@ -26,6 +26,7 @@ import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/misc/RowButton';
+import { RegularText } from '../ui/misc/text';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -94,7 +95,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     style={styles.imagePicker}
                 />
             </TouchableOpacity>
-            <Text style={styles.tooltip}>{NAME_LABEL}</Text>
+            <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
             <SimpleTextInput
                 style={styles.row}
                 defaultValue={props.author.name}
@@ -106,7 +107,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 returnKeyType={'done'}
                 onSubmitEditing={props.onUpdateAuthor}
             />
-            <Text style={styles.tooltip}>{ACTIVITY_LABEL}</Text>
+            <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
             <RowItem
                 title={VIEW_POSTS_LABEL}
                 buttonStyle='navigate'
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.GRAY,
+        fontSize: 12,
     },
     imagePickerContainer: {
         flexDirection: 'row',

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Text } from 'react-native';
 import { Debug } from '../Debug';
+import { RegularText } from '../ui/misc/text';
 
 export class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     public static getDerivedStateFromError(error: any) {
@@ -16,7 +16,7 @@ export class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
 
     public render() {
         if (this.state.hasError) {
-            return <Text>Something went wrong.</Text>;
+            return <RegularText style={{}}>Something went wrong.</RegularText>;
         }
         return this.props.children;
     }
