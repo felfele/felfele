@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -11,6 +11,7 @@ import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PostFeed } from '../PostFeed';
 import { GridCard } from '../ui/misc/GridCard';
+import { RegularText, MediumText } from '../ui/misc/text';
 
 export interface StateProps {
     navigation: any;
@@ -58,16 +59,16 @@ export const SettingsEditor = (props: Props) => {
                         );
                     }}
                     renderSectionHeader={({ section }) => (
-                        <Text style={styles.label}>{section.title}</Text>
+                        <MediumText style={styles.label}>{section.title}</MediumText>
                     )}
                 />
-                <Text
+                <RegularText
                     numberOfLines={1}
                     ellipsizeMode='tail'
                     style={styles.label}
                 >
                     {PREFERENCES_LABEL}
-                </Text>
+                </RegularText>
                 <RowItem
                     title='Feeds'
                     buttonStyle='navigate'

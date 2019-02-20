@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { MediumText, RegularText } from '../ui/misc/text';
 
 export interface StateProps {
     leftButtonText?: string | React.ReactNode;
@@ -29,22 +30,22 @@ const BUTTON_COLOR = Colors.DARK_GRAY;
 const Header = (props: Props) => (
     <View style={styles.headerContainer}>
         <TouchableView onPress={props.onPressLeftButton} style={styles.leftContainer}>
-            <Text style={styles.headerLeftButtonText}>
+            <RegularText style={styles.headerLeftButtonText}>
                 {
                     props.leftButtonText != null || props.onPressLeftButton == null
                     ? props.leftButtonText
                     : <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />
                 }
-            </Text>
+            </RegularText>
         </TouchableView>
         <View style={styles.middleContainer}>
-            <Text
+            <MediumText
                 style={styles.titleText}
                 ellipsizeMode='tail'
                 numberOfLines={1}
             >
                 {props.title ? props.title : ''}
-            </Text>
+            </MediumText>
         </View>
         <View style={styles.rightContainer}>
             {props.rightButtonText1 &&
@@ -78,9 +79,9 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
-            <Text style={styles.headerRightButtonText}>
+            <RegularText style={styles.headerRightButtonText}>
                 {props.text ? props.text : ''}
-            </Text>
+            </RegularText>
         </TouchableView>
     );
 };

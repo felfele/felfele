@@ -6,9 +6,11 @@ import {
     Switch,
     View,
     GestureResponderEvent,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableView } from '../../components/TouchableView';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RegularText } from './text';
 
 interface Props {
     title: string;
@@ -41,30 +43,32 @@ export const RowItem = React.memo((props: Props) => {
 
 const RowButton = (props: Props) => {
     return (
-        <TouchableView
+        <TouchableWithoutFeedback
             style={styles.container}
             onPress={props.onPress}
             onLongPress={props.onLongPress}
         >
-            {props.icon &&
-            <RowIcon>
-                {props.icon}
-            </RowIcon>
-            }
-            <Text style={styles.title}>{props.title}</Text>
-            <View style={styles.rightContainer}>
-            {props.description &&
-            <Text style={styles.description}>{props.description}</Text>
-            }
-            {props.buttonStyle === 'navigate' &&
-            <Icon
-                name='chevron-right'
-                size={24}
-                color={Colors.DARK_GRAY}
-            />
-            }
+            <View style={styles.container}>
+                {props.icon &&
+                <RowIcon>
+                    {props.icon}
+                </RowIcon>
+                }
+                <RegularText style={styles.title}>{props.title}</RegularText>
+                <View style={styles.rightContainer}>
+                    {props.description &&
+                    <RegularText style={styles.description}>{props.description}</RegularText>
+                    }
+                    {props.buttonStyle === 'navigate' &&
+                    <Icon
+                        name='chevron-right'
+                        size={24}
+                        color={Colors.DARK_GRAY}
+                    />
+                    }
+                </View>
             </View>
-        </TouchableView>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -76,9 +80,9 @@ const RowSwitchButton = (props: Props) => {
                 {props.icon}
             </RowIcon>
             }
-            <Text style={styles.title}>{props.title}</Text>
+            <RegularText style={styles.title}>{props.title}</RegularText>
             {props.description &&
-            <Text style={styles.description}>{props.description}</Text>
+            <RegularText style={styles.description}>{props.description}</RegularText>
             }
             <Switch
                 onValueChange={props.onSwitchValueChange}

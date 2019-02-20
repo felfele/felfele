@@ -10,6 +10,7 @@ import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { MediumText } from '../ui/misc/text';
 
 export interface DispatchProps {
 }
@@ -152,7 +153,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                         );
                     }}
                     renderSectionHeader={({ section }) => (
-                        <Text style={styles.sectionHeader}>{section.title}</Text>
+                        <MediumText style={styles.sectionHeader}>{section.title}</MediumText>
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={FeedListFooter}
@@ -218,5 +219,6 @@ const styles = StyleSheet.create({
         paddingBottom: 7,
         color: Colors.DARK_GRAY,
         backgroundColor: Colors.BACKGROUND_COLOR,
+        fontSize: 14,
     },
 });

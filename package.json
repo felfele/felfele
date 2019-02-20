@@ -88,6 +88,11 @@
     "util": "=0.10.4",
     "vm-browserify": "=1.1.0"
   },
+  "rnpm": {
+    "assets": [
+      "fonts"
+    ]
+  },
   "detox": {
     "configurations": {
       "ios.sim.debug": {

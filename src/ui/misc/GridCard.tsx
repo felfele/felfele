@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TouchableView } from '../../components/TouchableView';
 import { Image, View, Text, GestureResponderEvent, StyleSheet } from 'react-native';
 import { Colors } from '../../styles';
+import { MediumText } from './text';
 
 interface Props {
     title: string;
@@ -22,7 +23,7 @@ export const GridCard = React.memo((props: Props) => (
             resizeMode='cover'
         />
         <View style={styles.feedCardTextContainer}>
-            <Text style={styles.feedCardText}>{props.title}</Text>
+            <MediumText style={styles.feedCardText}>{props.title}</MediumText>
         </View>
     </TouchableView>
 ));
