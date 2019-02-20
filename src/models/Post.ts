@@ -17,9 +17,10 @@ export interface Author {
 
 type PostLink = string;
 
-interface PostReferences {
+export interface PostReferences {
     parent: PostLink;
     original: PostLink;
+    originalAuthor: Author;
 }
 
 export interface PublicPost extends Model {

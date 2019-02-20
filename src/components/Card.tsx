@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Post, Author } from '../models/Post';
+import { Post, PostReferences, Author } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultStyle } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
@@ -174,6 +174,29 @@ const CardTopIcon = (props: { post: Post }) => {
     }
 };
 
+const CardTopOriginalAuthorText = (props: {
+    references: PostReferences | undefined,
+    navigate: (view: string, {}) => void,
+}) => {
+    if (props.references == null || props.references.originalAuthor == null) {
+        return null;
+    } else {
+        const feedUrl = props.references.originalAuthor.uri;
+        const name = props.references.originalAuthor.name;
+        return (
+            <TouchableView
+                style={{flexDirection: 'row'}}
+                onPress={() => props.navigate('Feed', {
+                    feedUrl,
+                    name,
+                })}
+            >
+                <Text style={styles.originalAuthor}> via {props.references.originalAuthor.name}</Text>
+            </TouchableView>
+            );
+    }
+};
+
 const CardTop = (props: {
     post: Post,
     currentTimestamp: number,
@@ -196,7 +219,13 @@ const CardTop = (props: {
         >
             <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
-                <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
+                    <CardTopOriginalAuthorText
+                        references={props.post.references}
+                        navigate={props.navigate}
+                    />
+                </View>
                 <Text style={styles.location}>{printableTime}{hostnameText}</Text>
             </View>
         </TouchableOpacity>
@@ -347,6 +376,10 @@ const styles = StyleSheet.create({
     username: {
         fontWeight: 'bold',
         color: Colors.DARK_GRAY,
+    },
+    originalAuthor: {
+        fontWeight: 'normal',
+        color: Colors.GRAY,
     },
     text: {
         fontSize: 12,

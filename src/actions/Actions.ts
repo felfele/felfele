@@ -196,6 +196,56 @@ export const AsyncActions = {
     },
     sharePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('sharePost', 'post', post);
+            const author = getState().author;
+            if (post.author != null &&
+                post.author.identity != null &&
+                post.author.identity.publicKey === author.identity!.publicKey
+            ) {
+                dispatch(AsyncActions.shareOwnPost(post));
+            }
+            else {
+                dispatch(AsyncActions.shareOthersPost(post));
+            }
+        };
+    },
+    shareOthersPost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
+            const { metadata, author } = getState();
+            const id = metadata.highestSeenPostId + 1;
+            const newPost: Post = {
+                ...post,
+                _id: id,
+                author,
+                references: {
+                    parent: post.link ? post.link : '',
+                    original: post.references != null
+                        ? post.references.original
+                        : post.link != null
+                            ? post.link
+                            : ''
+                    ,
+                    originalAuthor: post.references != null
+                        ? post.references.originalAuthor
+                        : post.author != null
+                            ? post.author
+                            : {
+                                name: '',
+                                uri: '',
+                                faviconUri: '',
+                                image: {},
+                            }
+                    ,
+                },
+            };
+
+            dispatch(InternalActions.addPost(newPost));
+            dispatch(InternalActions.increaseHighestSeenPostId());
+            dispatch(AsyncActions.shareOwnPost(newPost));
+        };
+    },
+    shareOwnPost: (post: Post): Thunk => {
+        return async (dispatch, getState) => {
             const getOrCreateOwnFeed = (): LocalFeed => {
                 const ownFeeds = getState().ownFeeds;
                 if (ownFeeds.length === 0) {
