@@ -133,7 +133,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
             });
         }
         return (
-            <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+            <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
                 <SuperGridSectionList
                     style={{ flex: 1 }}
@@ -157,7 +157,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={FeedListFooter}
                 />
-            </SafeAreaView>
+            </View>
         );
     }
 }
@@ -165,17 +165,20 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <FeedGrid {...this.props}>
-                <NavigationHeader
-                    onPressLeftButton={() => {
-                        // null is needed otherwise it does not work with switchnavigator backbehavior property
-                        this.props.navigation.goBack(null);
-                    }}
-                    rightButtonText1='Add'
-                    onPressRightButton1={this.onAddFeed}
-                    title='Feed list'
-                />
-            </FeedGrid>
+            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+                <FeedGrid {...this.props}>
+                    <NavigationHeader
+                        withoutSafeArea={true}
+                        onPressLeftButton={() => {
+                            // null is needed otherwise it does not work with switchnavigator backbehavior property
+                            this.props.navigation.goBack(null);
+                        }}
+                        rightButtonText1='Add'
+                        onPressRightButton1={this.onAddFeed}
+                        title='Feed list'
+                    />
+                </FeedGrid>
+            </SafeAreaView>
         );
     }
 
@@ -193,14 +196,17 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
 export class FeedListViewer extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <FeedGrid {...this.props}>
-                <NavigationHeader
-                    onPressLeftButton={() => {
-                        this.props.navigation.goBack();
-                    }}
-                    title='All feeds'
-                />
-            </FeedGrid>
+            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+                <FeedGrid {...this.props}>
+                    <NavigationHeader
+                        withoutSafeArea={true}
+                        onPressLeftButton={() => {
+                            this.props.navigation.goBack();
+                        }}
+                        title='All feeds'
+                    />
+                </FeedGrid>
+            </SafeAreaView>
         );
     }
 }
