@@ -40,21 +40,35 @@ export const FeedView = (props: Props) => {
                                           size={20}
                                           color={Colors.DARK_GRAY}
                                       /> : undefined}
-                                      rightButtonText1={!props.isOwnFeed ? <Icon
-                                          name={'star'}
-                                          size={20}
-                                          color={isFollowedFeed
-                                              ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_PURPLE : Colors.DARK_GRAY
-                                              : 'transparent'
-                                          }
-                                      /> : undefined}
+                                      rightButtonText1={!props.isOwnFeed
+                                        ? <Icon
+                                              name={'star'}
+                                              size={20}
+                                              color={isFollowedFeed
+                                                  ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_PURPLE : Colors.DARK_GRAY
+                                                  : 'transparent'
+                                              }
+                                          />
+                                        : <Icon
+                                              name={'settings-box'}
+                                              size={20}
+                                              color={Colors.DARK_GRAY}
+                                          />
+                                      }
                                       onPressRightButton2={async () => {
                                           return !props.isOwnFeed && await onFollowPressed(props.feedUrl,
                                                                                            props.feeds,
                                                                                            props.onUnfollowFeed,
                                                                                            props.onFollowFeed);
                                       }}
-                                      onPressRightButton1={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(props.feedUrl)}
+                                      onPressRightButton1={() => {
+                                          if (!props.isOwnFeed && isFollowedFeed) {
+                                              props.onToggleFavorite(props.feedUrl);
+                                          } else {
+                                              props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
+                                          }
+
+                                      }}
                                       title={props.feedName}
                                   />,
             }}

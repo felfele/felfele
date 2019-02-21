@@ -80,6 +80,9 @@ const yourTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
+    },
 };
 const ProfileNavigator = createStackNavigator(yourTabScenes,
     {
@@ -107,6 +110,9 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
+    },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
     },
 };
 
