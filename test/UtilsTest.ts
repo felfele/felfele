@@ -110,4 +110,3 @@ test('Test getLinkFromText with bzz link', () => {
 
     expect(result).toBe(link);
 });
-

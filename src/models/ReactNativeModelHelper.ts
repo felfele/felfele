@@ -4,7 +4,7 @@ import * as RNFS from 'react-native-fs';
 import { ModelHelper } from './ModelHelper';
 import { Author } from './Post';
 import { ImageData } from './ImageData';
-import { getSwarmGatewayUrl } from '../Swarm';
+import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
 export class ReactNativeModelHelper implements ModelHelper {
     public getAuthorImageUri(author: Author): string {

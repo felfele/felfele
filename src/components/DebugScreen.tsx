@@ -10,8 +10,8 @@ import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
-import * as Swarm from '../Swarm';
 import { RowItem } from '../ui/misc/RowButton';
+import * as Swarm from '../swarm/Swarm';
 
 export interface StateProps {
     appState: AppState;
@@ -96,6 +96,14 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Backup & Restore'
                     onPress={() => props.navigation.navigate('BackupRestore')}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='server-network' />
+                    }
+                    title='Swarm settings'
+                    onPress={async () => props.navigation.navigate('SwarmSettingsContainer')}
                     buttonStyle='none'
                 />
                 <RowItem

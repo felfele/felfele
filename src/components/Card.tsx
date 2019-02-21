@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Post, Author } from '../models/Post';
+import { Post, PostReferences, Author } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultStyle } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
@@ -7,7 +7,7 @@ import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
 import { ImageView } from './ImageView';
-import { isSwarmLink } from '../Swarm';
+import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
 // @ts-ignore
 import Markdown from 'react-native-easy-markdown';
@@ -170,6 +170,29 @@ const CardTopIcon = (props: { post: Post }) => {
     }
 };
 
+const CardTopOriginalAuthorText = (props: {
+    references: PostReferences | undefined,
+    navigate: (view: string, {}) => void,
+}) => {
+    if (props.references == null || props.references.originalAuthor == null) {
+        return null;
+    } else {
+        const feedUrl = props.references.originalAuthor.uri;
+        const name = props.references.originalAuthor.name;
+        return (
+            <TouchableView
+                style={{flexDirection: 'row'}}
+                onPress={() => props.navigate('Feed', {
+                    feedUrl,
+                    name,
+                })}
+            >
+                <RegularText style={styles.originalAuthor}> via {props.references.originalAuthor.name}</RegularText>
+            </TouchableView>
+            );
+    }
+};
+
 const CardTop = (props: {
     post: Post,
     currentTimestamp: number,
@@ -192,7 +215,13 @@ const CardTop = (props: {
         >
             <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
-                <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
+                <View style={{flexDirection: 'row'}}>
+                    <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
+                    <CardTopOriginalAuthorText
+                        references={props.post.references}
+                        navigate={props.navigate}
+                    />
+                </View>
                 <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
         </TouchableOpacity>
@@ -344,6 +373,10 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 14,
         color: Colors.DARK_GRAY,
+    },
+    originalAuthor: {
+        fontWeight: 'normal',
+        color: Colors.GRAY,
     },
     text: {
         fontSize: 12,

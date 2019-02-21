@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import { AppState } from '../reducers';
 import { StateProps, FeedListEditor } from '../components/FeedListEditor';
-import { getSwarmGatewayUrl } from '../Swarm';
+import { getSwarmGatewayUrl } from '../swarm/Swarm';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 

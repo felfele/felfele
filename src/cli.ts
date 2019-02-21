@@ -1,8 +1,9 @@
 import { keccak256 } from 'js-sha3';
 
 import { Version } from './Version';
-import { allTests } from './social/api';
-import * as Swarm from './Swarm';
+import { apiTests } from './social/apiTest';
+import { syncTests } from './social/syncTest';
+import * as Swarm from './swarm/Swarm';
 import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
 
@@ -27,8 +28,19 @@ const main = async () => {
             case 'api': {
                 if (process.argv.length > 3) {
                     const testName = process.argv[3];
-                    const test = allTests[testName];
-                    await test();
+                    const allTests: any = {
+                        ...apiTests,
+                        ...syncTests,
+                    };
+                    if (testName === 'allTests') {
+                        for (const test of Object.keys(allTests)) {
+                            console.log('\nRunning test: ', test);
+                            await allTests[test]();
+                        }
+                    } else {
+                        const test = allTests[testName];
+                        await test();
+                    }
                 }
                 break;
             }
@@ -38,7 +50,8 @@ const main = async () => {
                         case 'get': {
                             if (process.argv.length > 4) {
                                 const bzzHash = process.argv[4];
-                                const data = await Swarm.download(bzzHash);
+                                const bzz = Swarm.makeBzzApi();
+                                const data = await bzz.download(bzzHash, 0);
                                 console.log(data);
                             } else {
                                 console.log('usage: cli swarm get <bzz-hash>');

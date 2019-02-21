@@ -31,6 +31,7 @@ import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
+import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
@@ -164,6 +165,9 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     FilterListEditorContainer: {
         screen: FilterListEditorContainer,
+    },
+    SwarmSettingsContainer: {
+        screen: SwarmSettingsContainer,
     },
     BugReportView: {
         screen: ({navigation}: NavigationScreenProps) => (

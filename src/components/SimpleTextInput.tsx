@@ -27,6 +27,7 @@ interface SimpleTextInputProps {
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
+    onEndEditing?: () => void;
 }
 
 export class SimpleTextInput extends React.Component<SimpleTextInputProps, { text: string }> {
@@ -64,7 +65,7 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 }
                 returnKeyType={this.props.returnKeyType}
                 testID={this.props.testID}
-                onEndEditing={this.onSubmitEditing}
+                onEndEditing={this.props.onEndEditing ? this.props.onEndEditing : this.onSubmitEditing}
                 clearButtonMode={this.props.clearButtonMode}
                 editable={this.props.editable}
             />

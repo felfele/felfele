@@ -1,5 +1,6 @@
 import { keccak256 } from 'js-sha3';
 import nacl from 'ecma-nacl';
+// @ts-ignore
 import * as base64 from 'base64-arraybuffer';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
