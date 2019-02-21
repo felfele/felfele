@@ -17,8 +17,8 @@ import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors } from '../styles';
-import * as Swarm from '../Swarm';
-import { downloadPostFeed } from '../PostFeed';
+import * as Swarm from '../swarm/Swarm';
+import { downloadRecentPostFeed, makeSwarmStorage } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -222,8 +222,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        if (url.startsWith(Swarm.DefaultFeedPrefix)) {
-            const feed: Feed = await downloadPostFeed(url, 60 * 1000);
+        if (url.startsWith(Swarm.defaultFeedPrefix)) {
+            const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
+            const swarm = Swarm.makeReadableApi(feedAddress);
+            const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
             return feed;
         } else {
             const canonicalUrl = Utils.getCanonicalUrl(this.state.url);
@@ -292,8 +294,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         try {
             Debug.log(event);
             const feedUri = event.data;
-            const feed = await downloadPostFeed(feedUri);
-            this.onAdd(feed);
+            this.setState({
+                url: feedUri,
+            });
+            await this.fetchFeed();
         } catch (e) {
             Debug.log(e);
         }

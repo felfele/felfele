@@ -21,19 +21,21 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post, Author } from '../models/Post';
+import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
-import { PostFeed } from '../PostFeed';
+import { LocalFeed } from '../social/api';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
+import * as Swarm from '../swarm/Swarm';
 
 const modelHelper = new ReactNativeModelHelper();
 
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
     feeds: Feed[];
-    ownFeeds: PostFeed[];
+    ownFeeds: LocalFeed[];
     settings: Settings;
     author: Author;
     currentTimestamp: number;
@@ -41,17 +43,13 @@ export interface AppState extends PersistedState {
     localPosts: Post[];
     draft: Post | null;
     metadata: Metadata;
-    postUploadQueue: Post[];
-}
-
-interface Metadata {
-    highestSeenPostId: number;
 }
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
     showSquareImages: true,
     showDebugMenu: false,
+    swarmGatewayAddress: Swarm.defaultGateway,
 };
 
 const defaultAuthor: Author = {
@@ -151,7 +149,6 @@ export const defaultState: AppState = {
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
-    postUploadQueue: [],
 };
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
@@ -247,10 +244,21 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
     }
 };
 
-const ownFeedsReducer = (ownFeeds: PostFeed[] = [], action: Actions): PostFeed[] => {
+const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed[] => {
     switch (action.type) {
         case 'ADD-OWN-FEED': {
             return [...ownFeeds, action.payload.feed];
+        }
+        case 'UPDATE-OWN-FEED': {
+            const ind = ownFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            if (ind === -1) {
+                return ownFeeds;
+            }
+            return updateArrayItem(ownFeeds, ind, (feed) => ({
+                ...feed,
+                ...action.payload.feed,
+            }));
+
         }
         default: {
             return ownFeeds;
@@ -276,6 +284,12 @@ const settingsReducer = (settings = defaultSettings, action: Actions): Settings 
             return {
                 ...settings,
                 showDebugMenu: action.payload.value,
+            };
+        }
+        case 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS': {
+            return {
+                ...settings,
+                swarmGatewayAddress: action.payload.value,
             };
         }
     }
@@ -393,22 +407,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
-const postUploadQueueReducer = (postUploadQueue: Post[] = [], action: Actions): Post[] => {
-    switch (action.type) {
-        case 'QUEUE-POST-FOR-UPLOAD': {
-            return [...postUploadQueue, action.payload.post];
-        }
-        case 'REMOVE-POST-FOR-UPLOAD': {
-            const ind = postUploadQueue.findIndex(post => post != null && action.payload.post._id === post._id);
-            if (ind === -1) {
-                return postUploadQueue;
-            }
-            return removeFromArray(postUploadQueue, ind);
-        }
-    }
-    return postUploadQueue;
-};
-
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
@@ -455,7 +453,6 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
-    postUploadQueue: postUploadQueueReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
@@ -473,7 +470,12 @@ const initStore = () => {
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     // @ts-ignore
-    store.dispatch(AsyncActions.uploadPostsFromQueue());
+    for (const ownFeed of store.getState().ownFeeds) {
+        store.dispatch(Actions.updateOwnFeed({
+            ...ownFeed,
+            isSyncing: false,
+        }));
+    }
     store.dispatch(Actions.timeTick());
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };

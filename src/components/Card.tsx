@@ -7,7 +7,7 @@ import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
 import { ImageView } from './ImageView';
-import { isSwarmLink } from '../Swarm';
+import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
 // @ts-ignore
 import Markdown from 'react-native-easy-markdown';

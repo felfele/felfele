@@ -8,7 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { RSSPostManager } from './RSSPostManager';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
@@ -31,6 +30,7 @@ import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
+import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 
@@ -154,6 +154,9 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     FilterListEditorContainer: {
         screen: FilterListEditorContainer,
+    },
+    SwarmSettingsContainer: {
+        screen: SwarmSettingsContainer,
     },
     BugReportView: {
         screen: ({navigation}: NavigationScreenProps) => (

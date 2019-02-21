@@ -7,13 +7,20 @@ import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { isPostFeedUrl, loadPosts, createPostFeed, updatePostFeed, downloadPostFeed, PostFeed } from '../PostFeed';
-import { makeFeedApi, generateSecureIdentity, downloadFeed } from '../Swarm';
-import { uploadPost, uploadPosts } from '../PostUpload';
+import { Utils } from '../Utils';
+import {
+    LocalFeed,
+    shareNewPost,
+    removePost,
+    mergePostCommandLogs,
+    getPreviousCommandEpochFromLog,
+} from '../social/api';
+import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 import { restoreBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
+import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
@@ -30,6 +37,7 @@ export enum ActionTypes {
     TOGGLE_FEED_FAVORITE = 'TOGGLE-FEED-FAVORITE',
     UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
     ADD_OWN_FEED = 'ADD-OWN-FEED',
+    UPDATE_OWN_FEED = 'UPDATE-OWN-FEED',
     TIME_TICK = 'TIME-TICK',
     UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
     REMOVE_POST = 'REMOVE-POST',
@@ -49,8 +57,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
-    QUEUE_POST_FOR_UPLOAD = 'QUEUE-POST-FOR-UPLOAD',
-    REMOVE_POST_FOR_UPLOAD = 'REMOVE-POST-FOR-UPLOAD',
+    CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
 }
 
 const InternalActions = {
@@ -58,14 +65,10 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
-    addOwnFeed: (feed: PostFeed) =>
+    addOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
-    queuePostForUpload: (post: Post) =>
-        createAction(ActionTypes.QUEUE_POST_FOR_UPLOAD, { post }),
-    removePostForUpload: (post: Post) =>
-        createAction(ActionTypes.REMOVE_POST_FOR_UPLOAD, { post }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
@@ -115,6 +118,10 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SHOW_SQUARE_IMAGES, { value }),
     changeSettingShowDebugMenu: (value: boolean) =>
         createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
+    changeSettingSwarmGatewayAddress: (value: string) =>
+        createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
+    updateOwnFeed: (feed: LocalFeed) =>
+        createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
 };
 
 export const AsyncActions = {
@@ -142,7 +149,9 @@ export const AsyncActions = {
     downloadPostsFromFeeds: (feeds: Feed[]): Thunk => {
         return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
-            const downloadedPosts = await loadPostsFromFeeds(feeds);
+            // TODO this is a hack, because we don't need a feed address
+            const swarm = Swarm.makeReadableApi({user: '', topic: ''});
+            const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const uniqueAuthors = new Map<string, Author>();
             downloadedPosts.map(post => {
                 if (post.author != null) {
@@ -172,99 +181,124 @@ export const AsyncActions = {
     },
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
+            const ownFeeds = getState().ownFeeds;
+            if (ownFeeds.length > 0) {
+                const localFeed = ownFeeds[0];
+                const updatedPostCommandLog = removePost(post, '', localFeed.postCommandLog);
+                dispatch(Actions.updateOwnFeed({
+                    ...localFeed,
+                    postCommandLog: updatedPostCommandLog,
+                }));
+                dispatch(AsyncActions.syncPostCommandLogs(localFeed));
+            }
             dispatch(Actions.deletePost(post));
         };
     },
     sharePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
-            const isQueueEmtpy = getState().postUploadQueue.length === 0;
-            dispatch(InternalActions.queuePostForUpload(post));
+            const getOrCreateOwnFeed = (): LocalFeed => {
+                const ownFeeds = getState().ownFeeds;
+                if (ownFeeds.length === 0) {
+                    const identity = getState().author.identity!;
+                    const address = Swarm.makeFeedAddressFromPublicIdentity(identity);
+                    const feedUrl = Swarm.makeBzzFeedUrl(address);
+                    const author = getState().author;
+                    const ownFeed: LocalFeed = {
+                        posts: [],
+                        authorImage: author.image,
+                        name: author.name,
+                        url: feedUrl,
+                        feedUrl,
+                        favicon: author.image.uri || '',
+                        postCommandLog: {
+                            commands: [],
+                        },
+                        isSyncing: false,
+                    };
+                    dispatch(InternalActions.addOwnFeed(ownFeed));
+                    return ownFeed;
+                } else {
+                    return ownFeeds[0];
+                }
+            };
+            const localFeed = getOrCreateOwnFeed();
+            const updatedPostCommandLog = shareNewPost(post, '', localFeed.postCommandLog);
+            dispatch(Actions.updateOwnFeed({
+                ...localFeed,
+                postCommandLog: updatedPostCommandLog,
+            }));
             dispatch(Actions.updatePostIsUploading(post, true));
-            if (isQueueEmtpy) {
-                dispatch(AsyncActions.uploadPostsFromQueue());
-            }
+            dispatch(AsyncActions.syncPostCommandLogs(localFeed));
         };
     },
-    uploadPostsFromQueue: (): Thunk => {
-        return async (dispatch, getState) => {
-            while (getState().postUploadQueue.length > 0) {
-                const post = getState().postUploadQueue[0];
-                await AsyncActions.uploadPostFromQueue(post)(dispatch, getState);
-                dispatch(InternalActions.removePostForUpload(post));
-            }
-        };
-    },
-    uploadPostFromQueue: (post: Post): Thunk => {
+    syncPostCommandLogs: (feed: LocalFeed): Thunk => {
         return async (dispatch, getState) => {
             try {
-                Debug.log('sharePost: ', post);
-                const ownFeeds = getState().ownFeeds;
-                const swarmFeedApi = makeFeedApi(getState().author.identity!);
-                if (ownFeeds.length > 0) {
-                    const feed = ownFeeds[0];
-                    if (post.link === feed.url) {
-                        return;
+                Debug.log('syncPostCommandLogs', 'feed', feed);
+                const localFeed = getLocalFeed(getState(), feed);
+                if (localFeed == null) {
+                    return;
+                }
+                if (localFeed.isSyncing === true) {
+                    return;
+                }
+
+                dispatch(Actions.updateOwnFeed({
+                    ...localFeed,
+                    isSyncing: true,
+                }));
+
+                const identity = getState().author.identity!;
+                const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+                const swarmGateway = getState().settings.swarmGatewayAddress;
+                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeed, swarmGateway);
+
+                const localPostCommandLog = localFeed.postCommandLog;
+                const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeed);
+                Debug.log('uploadPostFromQueue', 'storageSyncUpdate', storageSyncUpdate);
+
+                storageSyncUpdate.updatedPosts.map(updatedPost => {
+                    // TODO also check for:
+                    // - deleted posts
+                    // - not uploaded posts
+                    dispatch(Actions.updatePostLink(updatedPost, localFeed.url));
+                    dispatch(Actions.updatePostIsUploading(updatedPost, undefined));
+                    const localPosts = getState().localPosts;
+                    const originalPost = localPosts.find(p => p._id === updatedPost.author);
+                    if (originalPost != null) {
+                        const mergedImages = mergeImages(originalPost.images, updatedPost.images);
+                        dispatch(Actions.updatePostImages(updatedPost, mergedImages));
                     }
+                    return updatedPost;
+                });
 
-                    dispatch(Actions.updatePostIsUploading(post, true));
+                // Re-check if there were an update to the command log during syncing
+                const localFeedAfterUpdate = getLocalFeed(getState(), localFeed);
+                if (localFeedAfterUpdate == null) {
+                    return;
+                }
+                const localPostCommandLogAfterUpdate = localFeedAfterUpdate.postCommandLog;
+                const mergedPostCommandLog = mergePostCommandLogs(
+                    localPostCommandLogAfterUpdate,
+                    storageSyncUpdate.postCommandLog,
+                );
 
-                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
-                    Debug.log('sharePost: after uploadedPost');
+                Debug.log('syncPostCommandLogs', 'mergedPostCommandLog', mergedPostCommandLog);
 
-                    const localFeedPosts = getState().localPosts.filter(localPost =>
-                        localPost.link === feed.url
-                    );
-                    const feedPosts = [...localFeedPosts, uploadedPost];
-                    const posts = feedPosts
-                        .sort((a, b) => b.createdAt - a.createdAt)
-                        .slice(0, 20)
-                        .map(p => ({
-                            ...p,
-                            images: p.images.map(image => ({
-                                ...image,
-                                localPath: undefined,
-                            })),
-                        }))
-                        ;
+                dispatch(Actions.updateOwnFeed({
+                    ...localFeedAfterUpdate,
+                    postCommandLog: mergedPostCommandLog,
+                    isSyncing: false,
+                }));
 
-                    const uploadedPosts = await uploadPosts(posts, resizeImageIfNeeded, modelHelper);
-                    const postFeed = {
-                        ...feed,
-                        posts: uploadedPosts,
-                        authorImage: {
-                            ...feed.authorImage,
-                            localPath: '',
-                        },
-                    };
-                    Debug.log('sharePost: after uploadPosts');
-
-                    await updatePostFeed(swarmFeedApi, postFeed);
-                    Debug.log('sharePost: after uploadPostFeed');
-
-                    dispatch(Actions.updatePostLink(post, feed.url));
-                    dispatch(Actions.updatePostIsUploading(post, undefined));
-
-                    const mergedImages = mergeImages(post.images, uploadedPost.images);
-                    dispatch(Actions.updatePostImages(post, mergedImages));
-                } else {
-                    Debug.log('sharePost: create feed');
-
-                    const author = getState().author;
-                    dispatch(Actions.updatePostIsUploading(post, true));
-
-                    const uploadedPost = await uploadPost(post, resizeImageIfNeeded, modelHelper);
-                    const feed = await createPostFeed(swarmFeedApi, author, uploadedPost, resizeImageIfNeeded, modelHelper);
-
-                    dispatch(InternalActions.addOwnFeed(feed));
-                    dispatch(Actions.updatePostLink(post, feed.url));
-                    dispatch(Actions.updatePostIsUploading(post, undefined));
-
-                    const mergedImages = mergeImages(post.images, uploadedPost.images);
-                    dispatch(Actions.updatePostImages(post, mergedImages));
+                if (getPreviousCommandEpochFromLog(mergedPostCommandLog) == null) {
+                    Debug.log('syncPostCommandLogs', 'waiting for resyncing');
+                    await Utils.waitMillisec(30 * 1000);
+                    dispatch(AsyncActions.syncPostCommandLogs(localFeedAfterUpdate));
                 }
             } catch (e) {
-                Debug.log('sharePost: ', 'error', e);
-                dispatch(Actions.updatePostIsUploading(post, undefined));
+                Debug.log('syncPostCommandLogs: ', 'error', e);
+                // dispatch(Actions.updatePostIsUploading(post, undefined));
             }
         };
     },
@@ -284,21 +318,8 @@ export const AsyncActions = {
     },
     createUserIdentity: (): Thunk => {
         return async (dispatch, getState) => {
-            const privateIdentity = await generateSecureIdentity(generateSecureRandom);
+            const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
-        };
-    },
-    fixFeedFavicons: (): Thunk => {
-        return async (dispatch, getState) => {
-            const feeds = getState().feeds.filter(feed => isPostFeedUrl(feed.url));
-            for (const feed of feeds) {
-                if (feed.favicon == null || feed.favicon === '') {
-                    const downloadedFeed = await downloadPostFeed(feed.url);
-                    if (downloadedFeed.favicon !== '') {
-                        dispatch(InternalActions.updateFeedFavicon(feed, downloadedFeed.favicon));
-                    }
-                }
-            }
         };
     },
     restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
@@ -332,15 +353,30 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadPostsFromFeeds = async (feeds: Feed[]): Promise<Post[]> => {
+const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
     const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-
     const allPostsCombined = await Promise.all([
         RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
-        loadPosts(postFeeds),
+        loadRecentPosts(swarm, postFeeds),
     ]);
 
     const allPosts = allPostsCombined[0].concat(allPostsCombined[1]);
     return allPosts;
+};
+
+const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed, swarmGateway: string) => {
+    const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
+    const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
+    const swarmHelpers: SwarmHelpers = {
+        imageResizer: resizeImageIfNeeded,
+        getLocalPath: modelHelper.getLocalPath,
+    };
+    const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);
+    const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
+    return swarmStorageSyncer;
+};
+
+const getLocalFeed = (appState: AppState, feed: LocalFeed): LocalFeed | undefined => {
+    return appState.ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
 };
