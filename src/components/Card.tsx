@@ -14,6 +14,7 @@ import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { MediumText, RegularText } from '../ui/misc/text';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ReactNativeModelHelper();
@@ -38,12 +39,7 @@ type CardProps = StateProps & DispatchProps;
 export const Card = (props: CardProps) => {
     return (
         <View
-            style={[styles.container, {
-                margin: 0,
-                padding: 0,
-                paddingTop: 5,
-                borderWidth: 0,
-            }]}
+            style={styles.container}
             key={'card-' + props.post._id}
             testID={'YourFeed/Post' + props.post._id}
         >
@@ -196,8 +192,8 @@ const CardTop = (props: {
         >
             <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
-                <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
-                <Text style={styles.location}>{printableTime}{hostnameText}</Text>
+                <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
+                <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
         </TouchableOpacity>
     );
@@ -267,17 +263,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 38,
         alignSelf: 'stretch',
-        marginBottom: 5,
-        marginLeft: 5,
+        marginVertical: 14,
+        marginLeft: 10,
     },
     usernameContainer: {
         justifyContent: 'center',
         flexDirection: 'column',
+        marginLeft: 10,
         flex: 1,
     },
     location: {
-        fontSize: 10,
-        color: 'gray',
+        fontSize: 14,
+        color: Colors.DARK_GRAY,
     },
     itemImageContainer: {
         flexDirection: 'row',
@@ -345,7 +342,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     username: {
-        fontWeight: 'bold',
+        fontSize: 14,
         color: Colors.DARK_GRAY,
     },
     text: {

@@ -1,7 +1,7 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const IconSize = {
-    LARGE_LIST_ICON: 32,
+    LARGE_LIST_ICON: 40,
     MEDIUM_LIST_ICON: 24,
     SMALL_LIST_ICON: 10,
 };
@@ -49,11 +49,9 @@ export const DefaultStyle = StyleSheet.create({
         justifyContent: 'center',
     },
     favicon: {
-        borderRadius : 3,
+        borderRadius : 20,
         width: IconSize.LARGE_LIST_ICON,
         height: IconSize.LARGE_LIST_ICON,
-        marginHorizontal: 4,
-        marginVertical: 3,
     },
 });
 
