@@ -192,7 +192,7 @@ const Root = createBottomTabNavigator(
             screen: AllFeedNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <FontAwesomeIcon
+                    <Icon
                         name={'home'}
                         size={24}
                         color={tintColor}
