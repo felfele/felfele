@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Platform, YellowBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -11,11 +12,11 @@ import { Debug } from './Debug';
 import { store, persistor } from './reducers';
 import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
-import { NewsFeedContainer } from './containers/NewsFeedContainer';
+import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
-import { EditPostContainer } from './containers/EditPostContainer';
+import { PostEditorContainer } from './containers/PostEditorContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
@@ -33,6 +34,7 @@ import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
+import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -68,6 +70,9 @@ const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
 );
 
 const yourTabScenes: NavigationRouteConfigMap = {
+    Profile: {
+        screen: IdentitySettingsContainer,
+    },
     YourTab: {
         screen: ({navigation}: NavigationScreenProps) => (
             <YourFeedContainer navigation={navigation}/>
@@ -76,21 +81,24 @@ const yourTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
+    },
 };
-const YourFeedNavigator = createStackNavigator(yourTabScenes,
+const ProfileNavigator = createStackNavigator(yourTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'YourTab',
+        initialRouteName: 'Profile',
     },
 );
 
-const newsTabScenes: NavigationRouteConfigMap = {
-    NewsTab: {
+const allFeedTabScenes: NavigationRouteConfigMap = {
+    AllFeed: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <NewsFeedContainer
+            <AllFeedContainer
                 navigation={navigation}
             />
         ),
@@ -104,15 +112,18 @@ const newsTabScenes: NavigationRouteConfigMap = {
     FeedFromList: {
         screen: SettingsFeedViewContainer,
     },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
+    },
 };
 
-const NewsFeedNavigator = createStackNavigator(newsTabScenes,
+const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'NewsTab',
+        initialRouteName: 'AllFeed',
     },
 );
 
@@ -143,11 +154,11 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: SettingsFeedViewContainer,
     },
+    FeedSettings: {
+        screen: FeedSettingsContainer,
+    },
     FeedInfo: {
         screen: FeedInfoContainer,
-    },
-    IdentitySettingsContainer: {
-        screen: IdentitySettingsContainer,
     },
     EditFilter: {
         screen: EditFilterContainer,
@@ -177,16 +188,13 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 
 const Root = createBottomTabNavigator(
     {
-        YourTab: {
-            screen: YourFeedNavigator,
-            path: '/your',
+        AllFeedTab: {
+            screen: AllFeedNavigator,
             navigationOptions: {
-                title: 'Your story',
-                tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <MaterialIcon
-                        name={focused ? 'rss-feed' : 'rss-feed'}
-                        size={20}
+                    <Icon
+                        name={'home'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
@@ -194,29 +202,38 @@ const Root = createBottomTabNavigator(
         },
         FavoriteTab: {
             screen: FavoriteFeedNavigator,
-            path: '/favorites',
             navigationOptions: {
-                title: 'Favorites',
-                tabBarLabel: 'Your story',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <MaterialIcon
-                        name={focused ? 'favorite' : 'favorite'}
-                        size={20}
+                    <Icon
+                        name={'star'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
             },
         },
-        NewsTab: {
-            screen: NewsFeedNavigator,
-            path: '/news',
+        PostTab: {
+            screen: PostEditorContainer,
             navigationOptions: {
-                title: 'New stories',
-                tabBarLabel: 'New stories',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <FontAwesomeIcon
-                        name={focused ? 'newspaper-o' : 'newspaper-o'}
-                        size={20}
+                    <Icon
+                        name={'plus-box-outline'}
+                        size={24}
+                        color={Colors.BRAND_PURPLE}
+                    />
+                ),
+                tabBarOnPress: ({ navigation }: NavigationScreenProps) => {
+                    navigation.navigate('Post');
+                },
+            },
+        },
+        ProfileTab: {
+            screen: ProfileNavigator,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
+                    <Icon
+                        name={'account'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
@@ -224,14 +241,11 @@ const Root = createBottomTabNavigator(
         },
         SettingsTab: {
             screen: SettingsNavigator,
-            path: '/settings',
             navigationOptions: {
-                header: undefined,
-                title: 'Settings',
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialIcon
-                        name={focused ? 'settings' : 'settings'}
-                        size={20}
+                        name={'settings'}
+                        size={24}
                         color={tintColor}
                     />
                 ),
@@ -263,7 +277,6 @@ const Root = createBottomTabNavigator(
                     activeTintColor: 'gray',
                     inactiveTintColor: 'lightgray',
                     style: {
-                        backgroundColor: Colors.BACKGROUND_COLOR,
                         opacity: 0.96,
                     },
                 },
@@ -275,7 +288,7 @@ const Scenes: NavigationRouteConfigMap = {
         screen: Root,
     },
     Post: {
-        screen: EditPostContainer,
+        screen: PostEditorContainer,
     },
 };
 

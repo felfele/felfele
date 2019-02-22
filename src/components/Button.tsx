@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Text, StyleSheet, ViewProperties } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { BUTTON_COLOR, Colors } from '../styles';
+import { RegularText } from '../ui/misc/text';
 
 export interface StateProps extends ViewProperties {
     text?: string | React.ReactNode;
@@ -28,9 +29,9 @@ export const Button = (props: Props) => {
             style={styles.buttonContainer}
             {...props}
         >
-            <Text style={[styles.buttonText, {color: buttonColor}]}>
+            <RegularText style={[styles.buttonText, {color: buttonColor}]}>
                 {props.text ? props.text : ''}
-            </Text>
+            </RegularText>
         </TouchableView>
     );
 };

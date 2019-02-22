@@ -6,17 +6,24 @@ import { View, Text, StyleSheet, Linking } from 'react-native';
 import { getBugReportBody } from './LogViewer';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
+import { BoldText, RegularText } from '../ui/misc/text';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
-        <View>
+        <View style={styles.mainContainer}>
             <NavigationHeader
                 leftButtonText={props.navigation ? undefined : ''}
                 onPressLeftButton={() => props.navigation.goBack(null)}
                 title='Bug Report'
-                rightButtonText1='Send'
+                rightButtonText1={
+                    <Icon
+                        name={'send'}
+                        size={20}
+                        color={Colors.BRAND_PURPLE}
+                    />
+                }
                 onPressRightButton1={() => {
                     Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody()}`);
                 }}
@@ -30,18 +37,18 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     />
                 </View>
                 {props.errorView &&
-                    <Text style={styles.text}>
+                    <BoldText style={[styles.text, { fontSize: 18 }]}>
                         Yikes!{'\n\n'}
-                        We are sorry, an error has occurred.{'\n\n'}
-                        Please help us solve this issue by telling us what happened.{'\n\n'}
-                        This is necessarry because we don't collect any information about our users automatically.
-                    </Text>
+                        We are sorry, an error has occurred.{'\n'}
+                    </BoldText>
                 }
-                <Text style={styles.text}>
-                    By sending a bug report, you agree to share with us some of your data.{'\n\n'}
-                    It can be reviewed by you before sending it in your email client.{'\n\n'}
+                <RegularText style={[styles.text, { fontSize: 14 }]}>
+                    As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
+                </RegularText>
+                <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
+                    By sending a bug report, you will share some of your information with us. You can review everything in your email client before sending.{'\n\n'}
                     Tap on the Send button to continue.
-                </Text>
+                </RegularText>
                 {props.errorView &&
                     <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
                 }
@@ -51,6 +58,10 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        backgroundColor: Colors.WHITE,
+        flex: 1,
+    },
     contentContainer: {
         paddingTop: 25,
         flexDirection: 'column',

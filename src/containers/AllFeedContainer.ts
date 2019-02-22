@@ -3,12 +3,12 @@ import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
-import { StateProps, DispatchProps, NewsFeedView } from '../components/NewsFeedView';
-import { getFollowedNewsPosts, getFollowedFeeds } from '../selectors/selectors';
+import { StateProps, DispatchProps, AllFeedScreen } from '../components/AllFeedScreen';
+import { getAllFeeds, getAllPostsSorted } from '../selectors/selectors';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    const followedFeeds = getFollowedFeeds(state);
-    const filteredPosts = getFollowedNewsPosts(state);
+    const followedFeeds = getAllFeeds(state);
+    const filteredPosts = getAllPostsSorted(state);
 
     RSSPostManager.setContentFilters(state.contentFilters);
 
@@ -27,7 +27,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
     };
 };
 
-export const NewsFeedContainer = connect(
+export const AllFeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(NewsFeedView);
+)(AllFeedScreen);

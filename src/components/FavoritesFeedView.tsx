@@ -23,17 +23,16 @@ export const FavoritesFeedView = (props: Props) => {
         <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
-                                leftButtonText=''
                                 title='Favorites'
                                 rightButtonText1={
                                     <Icon
-                                        name={'format-list-bulleted'}
+                                        name={'view-grid'}
                                         size={20}
                                         color={Colors.DARK_GRAY}
                                     />
                                 }
                                 onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
-                        />,
+                            />,
             }}
         </RefreshableFeed>
     );

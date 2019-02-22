@@ -14,6 +14,7 @@ import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { MediumText, RegularText } from '../ui/misc/text';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ReactNativeModelHelper();
@@ -38,12 +39,7 @@ type CardProps = StateProps & DispatchProps;
 export const Card = (props: CardProps) => {
     return (
         <View
-            style={[styles.container, {
-                margin: 0,
-                padding: 0,
-                paddingTop: 5,
-                borderWidth: 0,
-            }]}
+            style={styles.container}
             key={'card-' + props.post._id}
             testID={'YourFeed/Post' + props.post._id}
         >
@@ -191,7 +187,7 @@ const CardTopOriginalAuthorText = (props: {
                     name,
                 })}
             >
-                <Text style={styles.originalAuthor}> via {props.references.originalAuthor.name}</Text>
+                <RegularText style={styles.originalAuthor}> via {props.references.originalAuthor.name}</RegularText>
             </TouchableView>
             );
     }
@@ -220,13 +216,13 @@ const CardTop = (props: {
             <CardTopIcon post={props.post}/>
             <View style={styles.usernameContainer}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.username} numberOfLines={1}>{authorName}</Text>
+                    <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
                     <CardTopOriginalAuthorText
                         references={props.post.references}
                         navigate={props.navigate}
                     />
                 </View>
-                <Text style={styles.location}>{printableTime}{hostnameText}</Text>
+                <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
         </TouchableOpacity>
     );
@@ -296,17 +292,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 38,
         alignSelf: 'stretch',
-        marginBottom: 5,
-        marginLeft: 5,
+        marginVertical: 14,
+        marginLeft: 10,
     },
     usernameContainer: {
         justifyContent: 'center',
         flexDirection: 'column',
+        marginLeft: 10,
         flex: 1,
     },
     location: {
-        fontSize: 10,
-        color: 'gray',
+        fontSize: 14,
+        color: Colors.DARK_GRAY,
     },
     itemImageContainer: {
         flexDirection: 'row',
@@ -374,7 +371,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     username: {
-        fontWeight: 'bold',
+        fontSize: 14,
         color: Colors.DARK_GRAY,
     },
     originalAuthor: {

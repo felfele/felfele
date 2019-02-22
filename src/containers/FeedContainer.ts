@@ -11,14 +11,17 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
     // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
     // see https://github.com/reduxjs/reselect/blob/master/README.md#accessing-react-props-in-selectors
     const posts = getFeedPosts(state, feedUrl);
-
     return {
         onBack: () => ownProps.navigation.goBack(null),
         navigation: ownProps.navigation,
         feedUrl: feedUrl,
         feedName: ownProps.navigation.state.params.name,
         posts: posts,
-        feeds: selectedFeeds,
+        // HACK
+        feeds: selectedFeeds.length === 0 ? [state.ownFeeds[0]] : selectedFeeds,
+        // TODO: we should have here state.ownFeeds.find(feed => feed.url === feedUrl) != null,
+        // but author.uri is empty, and the feedUrl from navparams is from post.author.uri (not real feedUrl)
+        // For the same reason feeds/selectedFeeds is empty (errounously)
         isOwnFeed: state.author.uri === feedUrl,
     };
 };

@@ -4,12 +4,12 @@ import {
     Text,
     TouchableOpacity,
     Keyboard,
-    Button,
     Platform,
     ActivityIndicator,
     Alert,
     AlertIOS,
     EmitterSubscription,
+    SafeAreaView,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -21,10 +21,14 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Colors } from '../styles';
 
 export interface StateProps {
     navigation: any;
     draft: Post | null;
+    name: string;
+    avatar: ImageData;
 }
 
 export interface DispatchProps {
@@ -43,7 +47,7 @@ interface State {
     post: Post;
 }
 
-export class EditPost extends React.Component<Props, State> {
+export class PostEditor extends React.Component<Props, State> {
     public state: State;
 
     private keyboardDidShowListener: EmitterSubscription | null = null;
@@ -118,14 +122,27 @@ export class EditPost extends React.Component<Props, State> {
         }
 
         return (
-            <View
+            <SafeAreaView
                 style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
             >
                 <NavigationHeader
-                    leftButtonText='Cancel'
+                    leftButtonText={
+                        <Icon
+                            name={'close'}
+                            size={20}
+                            color={Colors.DARK_GRAY}
+                        />
+                    }
                     onPressLeftButton={this.onCancelConfirmation}
-                    rightButtonText1='Post'
+                    rightButtonText1={
+                        <Icon
+                            name={'send'}
+                            size={20}
+                            color={Colors.BRAND_PURPLE}
+                        />
+                    }
                     onPressRightButton1={this.onPressSubmit}
+                    title={this.props.name}
                 />
                 <View style={{flex: 14, flexDirection: 'column'}}>
                     <SimpleTextInput
@@ -141,11 +158,11 @@ export class EditPost extends React.Component<Props, State> {
                         numberOfLines={4}
                         onChangeText={this.onChangeText}
                         defaultValue={this.state.post.text}
-                        placeholder="What's your story?"
+                        placeholder="What's up?"
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
-                        testID='EditPost/TextInput'
+                        testID='PostEditor/TextInput'
                     />
                     <ImagePreviewGrid
                         columns={4}
@@ -165,7 +182,7 @@ export class EditPost extends React.Component<Props, State> {
                 }}>
                     {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
                 </View>
-            </View>
+            </SafeAreaView>
         );
     }
 

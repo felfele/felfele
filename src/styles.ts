@@ -1,12 +1,13 @@
-import { StyleSheet, Platform, ViewStyle, ImageStyle } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const IconSize = {
-    LARGE_LIST_ICON: 32,
+    LARGE_LIST_ICON: 40,
     MEDIUM_LIST_ICON: 24,
     SMALL_LIST_ICON: 10,
 };
 
 export const Colors = {
+    BRAND_PURPLE: '#873FFF',
     BRAND_RED: '#FF4C65',
     BRAND_YELLOW: '#FFC33C',
     BRAND_BLUE: '#00C8F8',
@@ -23,7 +24,7 @@ export const Colors = {
     LIGHTER_GRAY: '#E6E6E6',
     VERY_LIGHT_GRAY: '#F8F8F8',
     GRAY: '#808080',
-    DARK_GRAY: '#303030',
+    DARK_GRAY: '#4A4A4A',
     DEFAULT_ACTION_COLOR: '#007AFF',
     STRONG_TEXT: '#303030',
     ATTENTION: '#D0021B',
@@ -35,7 +36,7 @@ export const Colors = {
     IOS_GREEN: '#44DB5E',
     IOS_RED: '#FF3824',
     IOS_GRAY: '#8E8E93',
-    BACKGROUND_COLOR: '#EFEFF4',
+    BACKGROUND_COLOR: '#DDDDDD',
 };
 
 export const DefaultFont = 'Helvetica Neue';
@@ -48,11 +49,9 @@ export const DefaultStyle = StyleSheet.create({
         justifyContent: 'center',
     },
     favicon: {
-        borderRadius : 3,
+        borderRadius : 20,
         width: IconSize.LARGE_LIST_ICON,
         height: IconSize.LARGE_LIST_ICON,
-        marginHorizontal: 4,
-        marginVertical: 3,
     },
 });
 

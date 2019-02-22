@@ -18,21 +18,20 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-export const NewsFeedView = (props: Props) => {
+export const AllFeedScreen = (props: Props) => {
     return (
         <RefreshableFeed {...props}>
             {{
                 listHeader: <NavigationHeader
-                                leftButtonText=''
-                                title='News'
+                                title='All feeds'
                                 rightButtonText1={
                                     <Icon
-                                        name={'format-list-bulleted'}
+                                        name={'view-grid'}
                                         size={20}
                                         color={Colors.DARK_GRAY}
                                     />
                                 }
-                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
+                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer')}
                             />,
             }}
         </RefreshableFeed>

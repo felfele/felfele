@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet, Platform, SafeAreaView } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { MediumText, RegularText } from '../ui/misc/text';
 
 export interface StateProps {
-    leftButtonText?: string;
+    leftButtonText?: string | React.ReactNode;
     rightButtonText1?: string | React.ReactNode;
     rightButtonText2?: string | React.ReactNode;
     title?: string;
@@ -24,28 +25,27 @@ export type Props = StateProps & DispatchProps;
 export interface State {
 }
 
-const BACK_ICON_NAME = Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back';
-const BUTTON_COLOR = Platform.OS === 'ios' ? Colors.DEFAULT_ACTION_COLOR : Colors.DARK_GRAY;
+const BUTTON_COLOR = Colors.DARK_GRAY;
 
 const Header = (props: Props) => (
     <View style={styles.headerContainer}>
         <TouchableView onPress={props.onPressLeftButton} style={styles.leftContainer}>
-            <Text style={styles.headerLeftButtonText}>
+            <RegularText style={styles.headerLeftButtonText}>
                 {
-                    props.leftButtonText != null
+                    props.leftButtonText != null || props.onPressLeftButton == null
                     ? props.leftButtonText
-                    : <Ionicons name={BACK_ICON_NAME} color={BUTTON_COLOR} size={24} />
+                    : <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />
                 }
-            </Text>
+            </RegularText>
         </TouchableView>
         <View style={styles.middleContainer}>
-            <Text
+            <MediumText
                 style={styles.titleText}
                 ellipsizeMode='tail'
                 numberOfLines={1}
             >
                 {props.title ? props.title : ''}
-            </Text>
+            </MediumText>
         </View>
         <View style={styles.rightContainer}>
             {props.rightButtonText1 &&
@@ -79,18 +79,17 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
-            <Text style={styles.headerRightButtonText}>
+            <RegularText style={styles.headerRightButtonText}>
                 {props.text ? props.text : ''}
-            </Text>
+            </RegularText>
         </TouchableView>
     );
 };
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
         flexDirection: 'column',
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: Colors.WHITE,
     },
     headerContainer: {
         width: '100%',
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
         marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: Colors.WHITE,
     },
     headerLeftButtonText: {
         color: BUTTON_COLOR,
@@ -126,8 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     titleText: {
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 15,
         color: Colors.DARK_GRAY,
         textAlign: 'center',
     },

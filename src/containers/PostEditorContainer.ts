@@ -1,16 +1,18 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../reducers';
 import { AsyncActions, Actions } from '../actions/Actions';
-import { StateProps, DispatchProps, EditPost } from '../components/EditPost';
+import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
 import { Debug } from '../Debug';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    Debug.log('EditPostContainer.mapStateToProps: ', ownProps.navigation);
+    Debug.log('PostEditorContainer.mapStateToProps: ', ownProps.navigation);
     const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
     return {
-       navigation: ownProps.navigation,
-       draft: post != null ? post : state.draft,
+        name: state.author.name,
+        avatar: state.author.image,
+        navigation: ownProps.navigation,
+        draft: post != null ? post : state.draft,
    };
 };
 
@@ -28,7 +30,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
    };
 };
 
-export const EditPostContainer = connect(
+export const PostEditorContainer = connect(
    mapStateToProps,
    mapDispatchToProps,
-)(EditPost);
+)(PostEditor);

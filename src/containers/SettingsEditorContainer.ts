@@ -7,6 +7,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
     return {
         navigation: ownProps.navigation,
         settings: state.settings,
+        ownFeeds: state.ownFeeds,
     };
 };
 

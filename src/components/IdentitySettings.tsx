@@ -25,6 +25,8 @@ const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { RowItem } from '../ui/misc/RowButton';
+import { RegularText } from '../ui/misc/text';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -37,9 +39,12 @@ export interface StateProps {
     navigation: any;
 }
 
-const tooltip = 'The name to author your posts';
-const namePlaceholder = 'Space Cowboy';
-const screenTitle = 'Identity';
+const NAME_LABEL = 'NAME';
+const NAME_PLACEHOLDER = 'Space Cowboy';
+const SCREEN_TITLE = 'Profile';
+const ACTIVITY_LABEL = 'ACTIVITY';
+const VIEW_POSTS_LABEL = 'View all your posts';
+
 const modelHelper = new ReactNativeModelHelper();
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
@@ -70,29 +75,12 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentitySettings: ', qrCodeValue);
     return (
-        <KeyboardAvoidingView>
+        <KeyboardAvoidingView style={styles.mainContainer}>
             <NavigationHeader
-                onPressLeftButton={() => {
-                    // null is needed otherwise it does not work with switchnavigator backbehavior property
-                    props.navigation.goBack(null);
-                }}
                 rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
-                title={screenTitle}
+                title={SCREEN_TITLE}
             />
-            <Text style={styles.tooltip}>{tooltip}</Text>
-            <SimpleTextInput
-                style={styles.row}
-                defaultValue={props.author.name}
-                placeholder={namePlaceholder}
-                autoCapitalize='none'
-                autoFocus={props.author.name === ''}
-                autoCorrect={false}
-                selectTextOnFocus={true}
-                returnKeyType={'done'}
-                onSubmitEditing={props.onUpdateAuthor}
-                />
-            <Text style={styles.tooltip}>Avatar</Text>
             <TouchableOpacity
                 onPress={async () => {
                     await openImagePicker(props.onUpdatePicture);
@@ -101,12 +89,30 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             >
                 <Image
                     source={authorImageUri === ''
-                    ? defaultUserImage
-                    : { uri: authorImageUri }
+                        ? defaultUserImage
+                        : { uri: authorImageUri }
                     }
                     style={styles.imagePicker}
                 />
             </TouchableOpacity>
+            <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
+            <SimpleTextInput
+                style={styles.row}
+                defaultValue={props.author.name}
+                placeholder={NAME_PLACEHOLDER}
+                autoCapitalize='none'
+                autoFocus={props.author.name === ''}
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                returnKeyType={'done'}
+                onSubmitEditing={props.onUpdateAuthor}
+            />
+            <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
+            <RowItem
+                title={VIEW_POSTS_LABEL}
+                buttonStyle='navigate'
+                onPress={() => props.navigation.navigate('YourTab')}
+            />
             { props.ownFeed &&
                 <View style={styles.qrCodeContainer}>
                     <QRCode
@@ -129,6 +135,10 @@ const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) 
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        backgroundColor: '#DDDDDD',
+        flex: 1,
+    },
     row: {
         width: '100%',
         backgroundColor: 'white',
@@ -136,25 +146,26 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderTopColor: 'lightgray',
         borderTopWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
         color: Colors.DARK_GRAY,
-        fontSize: 16,
+        fontSize: 14,
     },
     tooltip: {
-        paddingHorizontal: 8,
-        paddingTop: 8,
-        paddingBottom: 2,
+        paddingHorizontal: 10,
+        paddingTop: 20,
+        paddingBottom: 7,
         color: Colors.GRAY,
+        fontSize: 12,
     },
     imagePickerContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 8,
+        alignSelf: 'center',
     },
     imagePicker: {
-        borderRadius : 6,
-        width: 64,
-        height: 64,
+        borderRadius : 72.5,
+        width: 145,
+        height: 145,
         marginVertical: 10,
     },
     qrCodeContainer: {

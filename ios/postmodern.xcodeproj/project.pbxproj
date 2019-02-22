@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -48,6 +47,9 @@
 		EB923312C7284B908CCC3036 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF0427FA34DE437BB7A962DF /* FontAwesome.ttf */; };
 		FC76FEB6F34144F29C3EAC5B /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D91E6E646F9A446586AF3FB6 /* AntDesign.ttf */; };
 		FE8AB2163F7C407CA2233F63 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 492D2D7228B64A6785A6D8E5 /* libRNImagePicker.a */; };
+		B96EC6087B3A4BE79F0DF72D /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */; };
+		3A71C102C9F543238ED15939 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */; };
+		2AF1ED3028F34C3F8FAA9738 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -461,6 +463,9 @@
 		E064342914AF49558CD0B871 /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		EDEAC26023B94CD5B26D863A /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		F6F5F318AAC344DE97A5FF0F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; name = "Roboto-Bold.ttf"; path = "../fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; name = "Roboto-Medium.ttf"; path = "../fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; name = "Roboto-Regular.ttf"; path = "../fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -825,6 +830,9 @@
 				26AC1C5AFB364E60AA34A2FB /* FontAwesome5_Brands.ttf */,
 				25228633BBCC4AA08D3C34D8 /* FontAwesome5_Regular.ttf */,
 				C8AF205986984C049387326C /* FontAwesome5_Solid.ttf */,
+				3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */,
+				AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */,
+				8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1347,6 +1355,9 @@
 				7408AC3FEB814182B2E3FF49 /* FontAwesome5_Brands.ttf in Resources */,
 				A903CAF1E93E486CA233DFF2 /* FontAwesome5_Regular.ttf in Resources */,
 				DF4F9F98D92F4CE2A7CE51E9 /* FontAwesome5_Solid.ttf in Resources */,
+				B96EC6087B3A4BE79F0DF72D /* Roboto-Bold.ttf in Resources */,
+				3A71C102C9F543238ED15939 /* Roboto-Medium.ttf in Resources */,
+				2AF1ED3028F34C3F8FAA9738 /* Roboto-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

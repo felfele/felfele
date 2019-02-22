@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
-import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const modelHelper = new ReactNativeModelHelper();

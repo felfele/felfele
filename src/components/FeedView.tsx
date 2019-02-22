@@ -7,7 +7,6 @@ import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
 
 export interface DispatchProps {
@@ -36,26 +35,40 @@ export const FeedView = (props: Props) => {
             {{
                 navigationHeader: <NavigationHeader
                                       onPressLeftButton={ props.onBack }
-                                      rightButtonText1={!props.isOwnFeed ? <Icon
+                                      rightButtonText2={!props.isOwnFeed ? <Icon
                                           name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
                                           size={20}
                                           color={Colors.DARK_GRAY}
                                       /> : undefined}
-                                      rightButtonText2={!props.isOwnFeed ? <MaterialIcon
-                                          name={'favorite'}
-                                          size={20}
-                                          color={isFollowedFeed
-                                              ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_RED : Colors.DARK_GRAY
-                                              : 'transparent'
-                                          }
-                                      /> : undefined}
-                                      onPressRightButton1={async () => {
+                                      rightButtonText1={!props.isOwnFeed
+                                        ? <Icon
+                                              name={'star'}
+                                              size={20}
+                                              color={isFollowedFeed
+                                                  ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_PURPLE : Colors.DARK_GRAY
+                                                  : 'transparent'
+                                              }
+                                          />
+                                        : <Icon
+                                              name={'settings-box'}
+                                              size={20}
+                                              color={Colors.DARK_GRAY}
+                                          />
+                                      }
+                                      onPressRightButton2={async () => {
                                           return !props.isOwnFeed && await onFollowPressed(props.feedUrl,
                                                                                            props.feeds,
                                                                                            props.onUnfollowFeed,
                                                                                            props.onFollowFeed);
                                       }}
-                                      onPressRightButton2={() => !props.isOwnFeed && isFollowedFeed && props.onToggleFavorite(props.feedUrl)}
+                                      onPressRightButton1={() => {
+                                          if (!props.isOwnFeed && isFollowedFeed) {
+                                              props.onToggleFavorite(props.feedUrl);
+                                          } else {
+                                              props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
+                                          }
+
+                                      }}
                                       title={props.feedName}
                                   />,
             }}

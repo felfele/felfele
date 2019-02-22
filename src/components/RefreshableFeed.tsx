@@ -53,13 +53,10 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <SafeAreaView
+            <View
                 style={{
                     flexDirection: 'column',
-                    padding: 0,
                     flex: 1,
-                    height: '100%',
-                    opacity: 0.96,
                 }}
             >
                 <StatusBarView
@@ -96,7 +93,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                         backgroundColor: Colors.BACKGROUND_COLOR,
                     }}
                 />
-            </SafeAreaView>
+            </View>
         );
     }
 
