@@ -40,71 +40,19 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 interface State {
-    isKeyboardVisible: boolean;
     isLoading: boolean;
-    paddingBottom: number;
     post: Post;
 }
 
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
 
-    private keyboardDidShowListener: EmitterSubscription | null = null;
-    private keyboardWillShowListener: EmitterSubscription | null = null;
-    private keyboardDidHideListener: EmitterSubscription | null = null;
-
     constructor(props: Props) {
         super(props);
         this.state = {
-            isKeyboardVisible: false,
             isLoading: false,
-            paddingBottom: 0,
             post: this.getPostFromDraft(this.props.draft),
         };
-    }
-
-    public onKeyboardDidShow = (e: any) => {
-        Debug.log('onKeyboardDidShow');
-
-        this.setState({
-            isKeyboardVisible: true,
-        });
-    }
-
-    public onKeyboardWillShow = (e: any) => {
-        Debug.log('onKeyboardWillShow');
-    }
-
-    public onKeyboardDidHide = () => {
-        Debug.log('onKeyboardDidHide');
-        this.setState({
-            isKeyboardVisible: false,
-        });
-    }
-
-    public componentDidMount() {
-        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.onKeyboardDidShow);
-        this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.onKeyboardWillShow);
-        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.onKeyboardDidHide);
-    }
-
-    public unregisterListeners = () => {
-        if (this.keyboardDidShowListener) {
-            this.keyboardDidShowListener.remove();
-            this.keyboardDidShowListener = null;
-        }
-        if (this.keyboardWillShowListener) {
-            this.keyboardWillShowListener.remove();
-            this.keyboardWillShowListener = null;
-        }
-        if (this.keyboardDidHideListener) {
-            this.keyboardDidHideListener.remove();
-            this.keyboardDidHideListener = null;
-        }
-    }
-
-    public componentWillUnmount() {
-        this.unregisterListeners();
     }
 
     public render() {
@@ -201,7 +149,7 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onDiscard = () => {
         this.props.onDeleteDraft();
-        this.onCancel();
+        this.props.navigation.goBack();
     }
 
     private onSave = () => {
@@ -212,22 +160,7 @@ export class PostEditor extends React.Component<Props, State> {
         Debug.log(this.state.post);
 
         this.props.onSaveDraft(this.state.post);
-        this.onCancel();
-    }
-
-    private onCancel = () => {
-        this.hideKeyboard();
-        this.unregisterListeners();
         this.props.navigation.goBack();
-    }
-
-    private hideKeyboard = () => {
-        if (this.state.isKeyboardVisible) {
-            Keyboard.dismiss();
-            this.setState({
-                isKeyboardVisible: false,
-            });
-        }
     }
 
     private showCancelConfirmation = () => {
@@ -254,13 +187,11 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private onCancelConfirmation = () => {
-        Debug.log('onCancelConfirmation', this.state.isKeyboardVisible);
-        this.hideKeyboard();
         Debug.log('Cancel');
         if (this.state.post.text !== '' || this.state.post.images.length > 0) {
             this.showCancelConfirmation();
         } else {
-            this.onCancel();
+            this.props.navigation.goBack();
         }
     }
 
@@ -293,7 +224,7 @@ export class PostEditor extends React.Component<Props, State> {
         }
 
         this.sendUpdate();
-        this.onCancel();
+        this.props.navigation.goBack();
     }
 
     private sendUpdate = () => {
