@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     titleText: {
-        fontSize: 16,
+        fontSize: 15,
         color: Colors.DARK_GRAY,
         textAlign: 'center',
     },
