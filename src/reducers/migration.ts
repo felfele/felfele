@@ -65,6 +65,7 @@ const migrateVersion0ToVersion1 = (state: PersistedState): AppState => {
             ...appStateV0.settings,
             swarmGatewayAddress: Swarm.defaultGateway,
         },
+        postUploadQueue: undefined,
     };
     return version1AppState;
 };
