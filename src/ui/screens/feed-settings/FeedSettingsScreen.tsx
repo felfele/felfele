@@ -6,12 +6,12 @@ import { Colors, DefaultTabBarHeight } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { PostFeed } from '../../../PostFeed';
+import { RecentPostFeed } from '../../../social/api';
 
 export interface StateProps {
     navigation: any;
     settings: Settings;
-    feed: PostFeed;
+    feed: RecentPostFeed;
 }
 
 export interface DispatchProps { }

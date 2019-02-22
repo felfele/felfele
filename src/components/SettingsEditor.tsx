@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -9,14 +9,14 @@ import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { PostFeed } from '../PostFeed';
 import { GridCard } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
+import { RecentPostFeed } from '../social/api';
 
 export interface StateProps {
     navigation: any;
     settings: Settings;
-    ownFeeds: PostFeed[];
+    ownFeeds: RecentPostFeed[];
 }
 
 export interface DispatchProps {
