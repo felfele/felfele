@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     View,
-    Text,
     TouchableOpacity,
     Keyboard,
     Platform,
@@ -10,9 +9,10 @@ import {
     AlertIOS,
     EmitterSubscription,
     SafeAreaView,
+    KeyboardAvoidingView,
+    StyleSheet,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ImagePreviewGrid } from './ImagePreviewGrid';
 import { Post } from '../models/Post';
@@ -21,8 +21,8 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Colors } from '../styles';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export interface StateProps {
     navigation: any;
@@ -43,7 +43,6 @@ interface State {
     isKeyboardVisible: boolean;
     isLoading: boolean;
     paddingBottom: number;
-    keyboardHeight: number;
     post: Post;
 }
 
@@ -60,13 +59,12 @@ export class PostEditor extends React.Component<Props, State> {
             isKeyboardVisible: false,
             isLoading: false,
             paddingBottom: 0,
-            keyboardHeight: 0,
             post: this.getPostFromDraft(this.props.draft),
         };
     }
 
     public onKeyboardDidShow = (e: any) => {
-        Debug.log('onKeyboardDidShow', this.state.keyboardHeight);
+        Debug.log('onKeyboardDidShow');
 
         this.setState({
             isKeyboardVisible: true,
@@ -74,20 +72,13 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     public onKeyboardWillShow = (e: any) => {
-        const extraKeyboardHeight = 15;
-        const baseKeyboardHeight = e.endCoordinates ? e.endCoordinates.height : e.end.height;
-        this.setState({
-            keyboardHeight: baseKeyboardHeight + extraKeyboardHeight,
-        });
-
-        Debug.log('onKeyboardWillShow', this.state.keyboardHeight);
+        Debug.log('onKeyboardWillShow');
     }
 
     public onKeyboardDidHide = () => {
         Debug.log('onKeyboardDidHide');
         this.setState({
             isKeyboardVisible: false,
-            keyboardHeight: 0,
         });
     }
 
@@ -122,38 +113,34 @@ export class PostEditor extends React.Component<Props, State> {
         }
 
         return (
-            <SafeAreaView
-                style={{flexDirection: 'column', paddingBottom: this.state.keyboardHeight, flex: 1, height: '100%', backgroundColor: 'white'}}
-            >
-                <NavigationHeader
-                    leftButtonText={
-                        <Icon
-                            name={'close'}
-                            size={20}
-                            color={Colors.DARK_GRAY}
-                        />
-                    }
-                    onPressLeftButton={this.onCancelConfirmation}
-                    rightButtonText1={
-                        <Icon
-                            name={'send'}
-                            size={20}
-                            color={Colors.BRAND_PURPLE}
-                        />
-                    }
-                    onPressRightButton1={this.onPressSubmit}
-                    title={this.props.name}
-                />
-                <View style={{flex: 14, flexDirection: 'column'}}>
+            <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView
+                    enabled={Platform.OS === 'ios'}
+                    behavior='padding'
+                    style={styles.container}
+                >
+                    <NavigationHeader
+                        withoutSafeArea={true}
+                        leftButtonText={
+                            <Icon
+                                name={'close'}
+                                size={20}
+                                color={Colors.DARK_GRAY}
+                            />
+                        }
+                        onPressLeftButton={this.onCancelConfirmation}
+                        rightButtonText1={
+                            <Icon
+                                name={'send'}
+                                size={20}
+                                color={Colors.BRAND_PURPLE}
+                            />
+                        }
+                        onPressRightButton1={this.onPressSubmit}
+                        title={this.props.name}
+                    />
                     <SimpleTextInput
-                        style={{
-                            marginTop: 0,
-                            flex: 3,
-                            fontSize: 16,
-                            padding: 10,
-                            paddingVertical: 10,
-                            textAlignVertical: 'top',
-                        }}
+                        style={styles.textInput}
                         multiline={true}
                         numberOfLines={4}
                         onChangeText={this.onChangeText}
@@ -170,18 +157,8 @@ export class PostEditor extends React.Component<Props, State> {
                         onRemoveImage={this.onRemoveImage}
                         height={100}
                     />
-                </View>
-                <View style={{
-                    flexDirection: 'row',
-                    borderTopWidth: 1,
-                    borderTopColor: 'lightgray',
-                    padding: 5,
-                    margin: 0,
-                    height: 30,
-                    maxHeight: 30,
-                }}>
-                    {this.renderActionButton(this.openImagePicker, 'Photos/videos', 'md-photos', '#808080', true)}
-                </View>
+                    <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
+                </KeyboardAvoidingView>
             </SafeAreaView>
         );
     }
@@ -287,8 +264,17 @@ export class PostEditor extends React.Component<Props, State> {
         }
     }
 
+    private openCamera = async () => {
+        const imageData = await AsyncImagePicker.launchCamera();
+        this.updateStateWithImageData(imageData);
+    }
+
     private openImagePicker = async () => {
         const imageData = await AsyncImagePicker.launchImageLibrary();
+        this.updateStateWithImageData(imageData);
+    }
+
+    private updateStateWithImageData = (imageData: ImageData | null) => {
         if (imageData != null) {
             const images = this.state.post.images.concat([imageData]);
             const post = {
@@ -339,26 +325,50 @@ export class PostEditor extends React.Component<Props, State> {
             </View>
         );
     }
-
-    private renderActionButton(onPress: () => void, text: string, iconName: string, color: string, showText: boolean) {
-        const iconSize = showText ? 20 : 30;
-        const justifyContent = showText ? 'center' : 'space-around';
-        return (
-            <TouchableOpacity onPress={onPress} style={{margin: 0, padding: 0, flex: 1, justifyContent: justifyContent}}>
-                <View style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    margin: 0,
-                    padding: 0,
-                    alignItems: 'center',
-                    justifyContent: justifyContent,
-                }}>
-                    <View style={{flex: 1, justifyContent: 'center'}}><Ionicons name={iconName} size={iconSize} color={color} /></View>
-                    { showText &&
-                        <Text style={{fontSize: 14, flex: 10}}>{text}</Text>
-                    }
-                </View>
-            </TouchableOpacity>
-        );
-    }
 }
+
+const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInsert: () => void }) => {
+    return (
+        <View style={styles.photoWidget}
+        >
+            <TouchableOpacity onPress={props.onPressCamera}>
+                <Icon
+                    name={'camera'}
+                    size={24}
+                    color={Colors.DARK_GRAY}
+                />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={props.onPressInsert}>
+                <Icon
+                    name={'image-multiple'}
+                    size={24}
+                    color={Colors.DARK_GRAY}
+                />
+            </TouchableOpacity>
+        </View>
+    );
+});
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: 'white',
+    },
+    textInput: {
+        flex: 1,
+        fontSize: 16,
+        padding: 10,
+        paddingVertical: 10,
+        textAlignVertical: 'top',
+    },
+    photoWidget: {
+        flexDirection: 'row',
+        borderTopWidth: 1,
+        borderTopColor: 'lightgray',
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+});

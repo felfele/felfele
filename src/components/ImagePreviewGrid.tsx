@@ -21,6 +21,9 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
     private width = 0;
 
     public render() {
+        if (this.props.images.length === 0) {
+            return null;
+        }
         const columns = Math.max(this.props.columns, this.props.images.length);
         const maxWidth = Math.floor(this.width / columns);
         const maxHeight = this.notGreaterThan(maxWidth, this.props.height);

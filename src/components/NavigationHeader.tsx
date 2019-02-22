@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, Platform, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
