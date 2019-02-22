@@ -5,15 +5,19 @@ import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
+import { ImageData } from '../models/ImageData';
+import { FeedHeader } from './FeedHeader';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
+    onSavePost: (post: Post) => void;
 }
 
 export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
+    profileImage: ImageData;
 }
 
 type Props = StateProps & DispatchProps;
@@ -22,7 +26,7 @@ export const AllFeedScreen = (props: Props) => {
     return (
         <RefreshableFeed {...props}>
             {{
-                listHeader: <NavigationHeader
+                navigationHeader: <NavigationHeader
                                 title='All feeds'
                                 rightButtonText1={
                                     <Icon
@@ -32,6 +36,11 @@ export const AllFeedScreen = (props: Props) => {
                                     />
                                 }
                                 onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer')}
+                            />,
+                listHeader: <FeedHeader
+                                navigation={props.navigation}
+                                onSavePost={props.onSavePost}
+                                profileImage={props.profileImage}
                             />,
             }}
         </RefreshableFeed>

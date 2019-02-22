@@ -13,6 +13,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         navigation: ownProps.navigation,
         posts: filteredPosts,
         feeds: state.feeds.filter(feed => feed != null && feed.followed === true),
+        profileImage: state.author.image,
     };
 };
 
