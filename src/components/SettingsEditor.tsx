@@ -46,7 +46,7 @@ export const SettingsEditor = (props: Props) => {
                     fixed={true}
                     itemDimension={170}
                     sections={[{
-                        title: `YOUR_FEEDS ${props.ownFeeds.length}`,
+                        title: `${YOUR_FEEDS} ${props.ownFeeds.length}`,
                         data: props.ownFeeds,
                     }]}
                     renderItem={({ item }) => {
