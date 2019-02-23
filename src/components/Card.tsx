@@ -40,7 +40,6 @@ export const Card = (props: CardProps) => {
     return (
         <View
             style={styles.container}
-            key={'card-' + props.post._id}
             testID={'YourFeed/Post' + props.post._id}
         >
 
@@ -77,7 +76,7 @@ export const Card = (props: CardProps) => {
                     );
                 })}
                 { props.post.text === '' ||
-                    <CardMarkdown key={props.post._id} text={props.post.text}/>
+                    <CardMarkdown text={props.post.text}/>
                 }
                 <ButtonList {...props}/>
             </TouchableOpacity>
