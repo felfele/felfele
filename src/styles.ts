@@ -48,10 +48,15 @@ export const DefaultStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    favicon: {
+    faviconLarge: {
         borderRadius : 20,
         width: IconSize.LARGE_LIST_ICON,
         height: IconSize.LARGE_LIST_ICON,
+    },
+    faviconMedium: {
+        borderRadius : 12,
+        width: IconSize.MEDIUM_LIST_ICON,
+        height: IconSize.MEDIUM_LIST_ICON,
     },
 });
 

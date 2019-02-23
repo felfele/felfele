@@ -85,7 +85,7 @@ const ProfileIcon = (props: { profileImage: ImageData }) => {
         ? require('../../images/user_circle.png')
         : { uri: imageUri };
     return (
-        <Image source={imageSource} style={[DefaultStyle.favicon, { marginLeft: 10 }]}/>
+        <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
     );
 };
 const styles = StyleSheet.create({

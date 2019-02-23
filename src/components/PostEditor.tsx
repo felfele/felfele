@@ -20,6 +20,8 @@ import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Avatar } from '../ui/misc/Avatar';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface StateProps {
     navigation: any;
@@ -39,6 +41,8 @@ type Props = StateProps & DispatchProps;
 interface State {
     post: Post;
 }
+
+const modelHelper = new ReactNativeModelHelper();
 
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
@@ -76,6 +80,13 @@ export class PostEditor extends React.Component<Props, State> {
                             />
                         }
                         onPressRightButton1={this.onPressSubmit}
+                        titleImage={
+                            <Avatar
+                                size='medium'
+                                style={{ marginRight: 10 }}
+                                imageUri={modelHelper.getImageUri(this.props.avatar)}
+                            />
+                        }
                         title={this.props.name}
                     />
                     <SimpleTextInput

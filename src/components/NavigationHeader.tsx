@@ -10,6 +10,7 @@ export interface StateProps {
     leftButtonText?: string | React.ReactNode;
     rightButtonText1?: string | React.ReactNode;
     rightButtonText2?: string | React.ReactNode;
+    titleImage?: React.ReactNode;
     title?: string;
     withoutSafeArea?: boolean;
 }
@@ -39,6 +40,7 @@ const Header = (props: Props) => (
             </RegularText>
         </TouchableView>
         <View style={styles.middleContainer}>
+            {props.titleImage}
             <MediumText
                 style={styles.titleText}
                 ellipsizeMode='tail'
@@ -117,6 +119,8 @@ const styles = StyleSheet.create({
     },
     middleContainer: {
         maxWidth: '50%',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     rightContainer: {
         flex: 1,
