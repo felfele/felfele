@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent, Dimensions } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
@@ -17,8 +17,10 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
+const WINDOW_WIDTH = Dimensions.get('window').width;
+
 export class ImagePreviewGrid extends React.Component<Props, any> {
-    private width = 0;
+    private width = WINDOW_WIDTH;
 
     public render() {
         if (this.props.images.length === 0) {
