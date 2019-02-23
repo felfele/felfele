@@ -2,13 +2,14 @@ import * as React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 
 import { Feed } from '../models/Feed';
-import { Colors, DefaultTabBarHeight } from '../styles';
+import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText } from '../ui/misc/text';
+import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface DispatchProps {
 }
@@ -22,13 +23,6 @@ export interface StateProps {
 }
 
 const modelHelper = new ReactNativeModelHelper();
-
-const FeedListFooter = (props: {}) => (
-    <View style={{
-        paddingBottom: DefaultTabBarHeight,
-        backgroundColor: Colors.BACKGROUND_COLOR,
-    }} />
-);
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
@@ -74,7 +68,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                         <MediumText style={styles.sectionHeader}>{section.title}</MediumText>
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
-                    ListFooterComponent={FeedListFooter}
+                    ListFooterComponent={<TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>}
                 />
             </View>
         );
