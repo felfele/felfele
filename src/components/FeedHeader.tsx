@@ -10,8 +10,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
-import { Debug } from '../Debug';
-import { DefaultNavigationBarHeight, DefaultStyle, Colors } from '../styles';
+import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -22,7 +21,7 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-    onSavePost: (post: Post) => void;
+    onSaveDraft: (draft: Post) => void;
 }
 
 export type Props = StateProps & DispatchProps;
@@ -30,8 +29,8 @@ export type Props = StateProps & DispatchProps;
 const modelHelper = new ReactNativeModelHelper();
 
 export class FeedHeader extends React.PureComponent<Props> {
-    public openImagePicker = async () => {
-        const imageData = await AsyncImagePicker.showImagePicker();
+    public launchCamera = async () => {
+        const imageData = await AsyncImagePicker.launchCamera();
         if (imageData == null) {
             return;
         }
@@ -41,18 +40,8 @@ export class FeedHeader extends React.PureComponent<Props> {
             text: '',
             createdAt: Date.now(),
         };
-
-        try {
-            this.props.onSavePost(post);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Posting failed, try again later!',
-                [
-                    { text: 'OK', onPress: () => {Debug.log('OK pressed'); } },
-                ]
-            );
-        }
+        this.props.onSaveDraft(post);
+        this.props.navigation.navigate('Post');
     }
 
     public render() {
@@ -76,7 +65,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     <RegularText style={styles.headerText}>What's up?</RegularText>
                 </TouchableView>
                 <TouchableView
-                    onPress={this.openImagePicker}
+                    onPress={this.launchCamera}
                     style={styles.cameraIconContainer}
                 >
                     <Icon

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, YourFeedView } from '../components/YourFeedView';
 import { Post } from '../models/Post';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
@@ -23,8 +23,8 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             // workaround to finish refresh
             dispatch(Actions.timeTick());
         },
-        onSavePost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
+        onSaveDraft: (draft: Post) => {
+            dispatch(Actions.addDraft(draft));
         },
     };
 };

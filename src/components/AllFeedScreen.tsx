@@ -10,7 +10,7 @@ import { FeedHeader } from './FeedHeader';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
-    onSavePost: (post: Post) => void;
+    onSaveDraft: (post: Post) => void;
 }
 
 export interface StateProps {
@@ -39,7 +39,7 @@ export const AllFeedScreen = (props: Props) => {
                             />,
                 listHeader: <FeedHeader
                                 navigation={props.navigation}
-                                onSavePost={props.onSavePost}
+                                onSaveDraft={props.onSaveDraft}
                                 profileImage={props.profileImage}
                             />,
             }}

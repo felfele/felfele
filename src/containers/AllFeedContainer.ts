@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { AsyncActions } from '../actions/Actions';
+import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, AllFeedScreen } from '../components/AllFeedScreen';
 import { getAllFeeds, getAllPostsSorted } from '../selectors/selectors';
@@ -26,8 +26,8 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
-        onSavePost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
+        onSaveDraft: (draft: Post) => {
+            dispatch(Actions.addDraft(draft));
         },
     };
 };

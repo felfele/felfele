@@ -8,7 +8,7 @@ import { ImageData } from '../models/ImageData';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
-    onSavePost: (post: Post) => void;
+    onSaveDraft: (draft: Post) => void;
 }
 
 export interface StateProps {
@@ -30,7 +30,7 @@ export const YourFeedView = (props: Props) => {
                                 />,
                 listHeader: <FeedHeader
                                 navigation={props.navigation}
-                                onSavePost={props.onSavePost}
+                                onSaveDraft={props.onSaveDraft}
                                 profileImage={props.profileImage}
                             />,
             }}

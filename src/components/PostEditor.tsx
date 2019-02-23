@@ -2,12 +2,9 @@ import * as React from 'react';
 import {
     View,
     TouchableOpacity,
-    Keyboard,
     Platform,
-    ActivityIndicator,
     Alert,
     AlertIOS,
-    EmitterSubscription,
     SafeAreaView,
     KeyboardAvoidingView,
     StyleSheet,
