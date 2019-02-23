@@ -40,7 +40,6 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 interface State {
-    isLoading: boolean;
     post: Post;
 }
 
@@ -50,16 +49,11 @@ export class PostEditor extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            isLoading: false,
             post: this.getPostFromDraft(this.props.draft),
         };
     }
 
     public render() {
-        if (this.state.isLoading) {
-            return this.renderActivityIndicator();
-        }
-
         return (
             <SafeAreaView style={styles.container}>
                 <KeyboardAvoidingView
@@ -153,12 +147,7 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private onSave = () => {
-        this.setState({
-           isLoading: true,
-        });
-
         Debug.log(this.state.post);
-
         this.props.onSaveDraft(this.state.post);
         this.props.navigation.goBack();
     }
@@ -219,17 +208,12 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private onPressSubmit = () => {
-        if (this.state.isLoading) {
-            return;
-        }
-
         this.sendUpdate();
         this.props.navigation.goBack();
     }
 
     private sendUpdate = () => {
         this.setState({
-           isLoading: true,
            post: {
             ...this.state.post,
             text: markdownEscape(this.state.post.text),
@@ -238,23 +222,6 @@ export class PostEditor extends React.Component<Props, State> {
             Debug.log(this.state.post);
             this.props.onPost(this.state.post);
         });
-    }
-
-    private renderActivityIndicator() {
-        return (
-            <View
-                style={{
-                    flexDirection: 'column',
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    width: '100%',
-                }}
-            >
-                <ActivityIndicator style={{width: '100%', height: 120, flex: 5}} />
-            </View>
-        );
     }
 }
 
