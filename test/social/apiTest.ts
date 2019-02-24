@@ -5,6 +5,9 @@ import {
     testSharePostsWithRemove,
     testMergeTwoLocalPostCommandLogs,
 } from '../../src/social/apiTest';
+import { Debug } from '../../src/Debug';
+
+beforeAll(() => Debug.setDebug(false));
 
 test('Test sharing post', async () => testSharePost());
 test('Test sharing multiple posts', async () => testSharePosts());
