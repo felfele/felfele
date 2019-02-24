@@ -23,7 +23,13 @@ export const GridCard = React.memo((props: Props) => (
             resizeMode='cover'
         />
         <View style={styles.feedCardTextContainer}>
-            <MediumText style={styles.feedCardText}>{props.title}</MediumText>
+            <MediumText
+                style={styles.feedCardText}
+                ellipsizeMode='tail'
+                numberOfLines={1}
+            >
+                {props.title}
+            </MediumText>
         </View>
     </TouchableView>
 ));
@@ -45,6 +51,7 @@ const styles = StyleSheet.create({
     feedCardTextContainer: {
         height: 30,
         alignItems: 'center',
+        marginHorizontal: 10,
         justifyContent: 'center',
     },
 });
