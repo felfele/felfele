@@ -33,6 +33,7 @@ const testIdentity = {
 export const defaultSwarmApi = Swarm.makeApi(
     Swarm.makeFeedAddressFromPublicIdentity(testIdentity),
     (digest) => Swarm.signDigest(digest, testIdentity),
+    Swarm.defaultGateway,
 );
 
 export const defaultSwarmFeedApi = defaultSwarmApi.feed;

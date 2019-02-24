@@ -469,12 +469,16 @@ const initStore = () => {
     console.log('initStore: ', store.getState());
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
-    // @ts-ignore
     for (const ownFeed of store.getState().ownFeeds) {
         store.dispatch(Actions.updateOwnFeed({
             ...ownFeed,
             isSyncing: false,
         }));
+    }
+    for (const post of store.getState().localPosts) {
+        if (post.isUploading === true) {
+            store.dispatch(Actions.updatePostIsUploading(post, undefined));
+        }
     }
     store.dispatch(Actions.timeTick());
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);

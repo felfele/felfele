@@ -10,6 +10,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 
     return {
         feed: ownProps.navigation.state.params.feed,
+        swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
     };
 };

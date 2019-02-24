@@ -42,6 +42,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
+    swarmGateway: string;
     feed: Feed;
     navigation: any;
 }
@@ -224,7 +225,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         if (url.startsWith(Swarm.defaultFeedPrefix)) {
             const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-            const swarm = Swarm.makeReadableApi(feedAddress);
+            const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
             const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
             return feed;
         } else {

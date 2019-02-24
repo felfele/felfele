@@ -21,7 +21,7 @@ import { restoreBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
-import { resizeImageIfNeeded } from '../ImageUtils';
+import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const modelHelper = new ReactNativeModelHelper();
@@ -150,7 +150,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
-            const swarm = Swarm.makeReadableApi({user: '', topic: ''});
+            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const uniqueAuthors = new Map<string, Author>();
             downloadedPosts.map(post => {
@@ -419,7 +419,10 @@ const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: Loc
     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
     const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
     const swarmHelpers: SwarmHelpers = {
-        imageResizer: resizeImageIfNeeded,
+        imageResizer: {
+            resizeImage: resizeImageIfNeeded,
+            resizeImageForPlaceholder,
+        },
         getLocalPath: modelHelper.getLocalPath,
     };
     const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);

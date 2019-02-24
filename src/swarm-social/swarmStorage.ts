@@ -22,13 +22,23 @@ import { syncPostCommandLogWithStorage } from '../social/sync';
 const NUMBER_OF_RECENT_POSTS = 20;
 const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
 
+interface ImageResizer {
+    resizeImage: (image: ImageData, path: string) => Promise<string>;
+    resizeImageForPlaceholder: (image: ImageData, path: string) => Promise<string>;
+}
+
 export interface SwarmHelpers {
-    imageResizer: (image: ImageData, path: string) => Promise<string>;
+    imageResizer: ImageResizer;
     getLocalPath: (localPath: string) => string;
 }
 
-const defaultImageResizer = (image: ImageData, path: string): Promise<string> => {
+const defaultResizeImage = (image: ImageData, path: string): Promise<string> => {
     return Promise.resolve(path);
+};
+
+const defaultImageResizer = {
+    resizeImage: defaultResizeImage,
+    resizeImageForPlaceholder: defaultResizeImage,
 };
 
 const defaultSwarmHelpers: SwarmHelpers = {
@@ -172,7 +182,7 @@ const isImageUploaded = (image: ImageData): boolean => {
 const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
@@ -180,8 +190,12 @@ const uploadImage = async (
             return image;
         }
         const path = getLocalPath(image.localPath);
-        const resizedImagePath = await imageResizer(image, path);
-        const uri = await swarm.uploadPhoto(resizedImagePath);
+        const resizedImagePath = await imageResizer.resizeImage(image, path);
+        const placeholderPath = await imageResizer.resizeImageForPlaceholder(image, path);
+        const uri = await swarm.uploadPhotos([
+            {name: 'photo', localPath: resizedImagePath},
+            {name: 'placeholder', localPath: placeholderPath},
+        ]) + '/photo.' + Swarm.imageMimeTypeFromPath(resizedImagePath);
         return {
             ...image,
             localPath: undefined,
@@ -194,7 +208,7 @@ const uploadImage = async (
 const uploadImages = async (
     swarm: Swarm.BzzApi,
     images: ImageData[],
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
     const updateImages: ImageData[] = [];
@@ -208,7 +222,7 @@ const uploadImages = async (
 const uploadAuthor = async (
     swarm: Swarm.BzzApi,
     author: Author,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Author | undefined> => {
     const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, getLocalPath);
@@ -223,7 +237,7 @@ const uploadAuthor = async (
 const uploadPost = async (
     swarm: Swarm.BzzApi,
     post: Post,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Post> => {
     if (post.link != null && Swarm.isSwarmLink(post.link)) {
@@ -249,7 +263,7 @@ const uploadPost = async (
 const uploadPosts = async (
     swarm: Swarm.BzzApi,
     posts: Post[],
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Post[]> => {
     const uploadedPosts: Post[] = [];
@@ -264,7 +278,7 @@ const createRecentPostFeed = async (
     swarm: Swarm.Api,
     author: Author,
     firstPost: PublicPost,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<RecentPostFeed> => {
     const url = swarm.feed.getUri();
