@@ -16,8 +16,10 @@ import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
+import { Carousel } from '../ui/misc/Carousel';
+import { Rectangle } from '../models/ModelHelper';
 
-const WindowWidth = Dimensions.get('window').width;
+const WINDOW_WIDTH = Dimensions.get('window').width;
 const modelHelper = new ReactNativeModelHelper();
 
 export interface StateProps {
@@ -62,20 +64,7 @@ export const Card = (props: CardProps) => {
                     marginTop: 0,
                 }}
             >
-                {props.post.images.map((image, index) => {
-                    const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
-                    return (
-                        <ImageView
-                            testID={(image.uri || '') + index}
-                            key={(image.uri || '') + index}
-                            source={image}
-                            style={{
-                                width: width,
-                                height: height,
-                            }}
-                        />
-                    );
-                })}
+                <DisplayImage post={props.post} showSquareImages={props.showSquareImages}/>
                 { props.post.text === '' ||
                     <CardMarkdown text={props.post.text}/>
                 }
@@ -83,6 +72,34 @@ export const Card = (props: CardProps) => {
             </TouchableOpacity>
         </View>
     );
+};
+
+const DisplayImage = (props: { post: Post, showSquareImages: boolean }) => {
+    if (props.post.images.length === 0) {
+        return null;
+    } else if (props.post.images.length === 1) {
+        const image = props.post.images[0];
+        const { width, height } = calculateImageDimensions(image, WINDOW_WIDTH, props.showSquareImages);
+        return (
+            <ImageView
+                testID={(image.uri || '')}
+                key={(image.uri || '')}
+                source={image}
+                style={{
+                    width: width,
+                    height: height,
+                }}
+            />
+        );
+    } else {
+        return (
+            <Carousel
+                post={props.post}
+                showSquareImages={props.showSquareImages}
+                calculateImageDimensions={calculateImageDimensions}
+            />
+        );
+    }
 };
 
 export const MemoizedCard = React.memo(Card);
@@ -265,9 +282,12 @@ const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) =>
     );
 };
 
-const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): number[] => {
+const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): Rectangle => {
     if (showSquareImages) {
-        return [maxWidth, maxWidth];
+        return {
+            width: maxWidth,
+            height: maxWidth,
+        };
     }
     return modelHelper.calculateImageDimensions(image, maxWidth);
 };

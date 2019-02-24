@@ -21,7 +21,7 @@ const isImageExceedMaximumDimensions = (image: ImageData): boolean => {
 
 export const resizeImageIfNeeded = async (image: ImageData, path: string): Promise<string> => {
     if (isImageExceedMaximumDimensions(image)) {
-        const [width, height] = modelHelper.calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
+        const { width, height } = modelHelper.calculateImageDimensions(image, MAX_UPLOADED_IMAGE_DIMENSION);
         const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
         Debug.log('resizeImageIfNeeded: ', 'resizedImagePNG', resizedImagePNG);
         if (resizedImagePNG.size != null && resizedImagePNG.size < MAX_UPLOADED_IMAGE_SIZE) {

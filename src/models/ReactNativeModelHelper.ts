@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as RNFS from 'react-native-fs';
 
-import { ModelHelper } from './ModelHelper';
+import { ModelHelper, Rectangle } from './ModelHelper';
 import { Author } from './Post';
 import { ImageData } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
@@ -40,12 +40,18 @@ export class ReactNativeModelHelper implements ModelHelper {
         return '';
     }
 
-    public calculateImageDimensions(image: ImageData, maxWidth: number): number[] {
+    public calculateImageDimensions(image: ImageData, maxWidth: number): Rectangle {
         if (image.width == null || image.height == null) {
-            return [maxWidth, maxWidth];
+            return {
+                width: maxWidth,
+                height: maxWidth,
+            };
         }
         const ratio = image.width / maxWidth;
         const height = image.height / ratio;
-        return [maxWidth, height];
+        return {
+            width: maxWidth,
+            height: height,
+        };
     }
 }
