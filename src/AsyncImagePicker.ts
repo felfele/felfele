@@ -1,9 +1,8 @@
 import { ImageData } from './models/ImageData';
 import { Platform } from 'react-native';
 import { Debug } from './Debug';
+import ImagePicker from 'react-native-image-picker';
 
-// tslint:disable-next-line:no-var-requires
-const ImagePicker = require('react-native-image-picker'); // import is broken with this package
 // tslint:disable-next-line:no-var-requires
 const RNFS = require('react-native-fs');
 // tslint:disable-next-line:no-var-requires
@@ -93,6 +92,10 @@ export class AsyncImagePicker {
         return this.launchPicker(this.showImagePickerWithPromise);
     }
 
+    public static async launchCamera(): Promise<ImageData | null> {
+        return this.launchPicker(this.launchCameraWithPromise);
+    }
+
     private static async launchPicker(pickerFunction: (options: Options) => Promise<Response>): Promise<ImageData | null> {
         const response = await pickerFunction(defaultImagePickerOtions);
         if (response.error) {
@@ -117,6 +120,12 @@ export class AsyncImagePicker {
     private static launchImageLibraryWithPromise(options: Options): Promise<Response> {
         return new Promise((resolve, reject) => {
             ImagePicker.launchImageLibrary(options, resolve);
+        });
+    }
+
+    private static launchCameraWithPromise(options: Options): Promise<Response> {
+        return new Promise((resolve, reject) => {
+            ImagePicker.launchCamera(options, resolve);
         });
     }
 

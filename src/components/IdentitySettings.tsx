@@ -12,6 +12,7 @@ import {
     ShareContent,
     ShareOptions,
     Platform,
+    ScrollView,
 } from 'react-native';
 
 import { SimpleTextInput } from './SimpleTextInput';
@@ -27,6 +28,7 @@ import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/misc/RowButton';
 import { RegularText } from '../ui/misc/text';
+import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -81,48 +83,51 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                 title={SCREEN_TITLE}
             />
-            <TouchableOpacity
-                onPress={async () => {
-                    await openImagePicker(props.onUpdatePicture);
-                }}
-                style={styles.imagePickerContainer}
-            >
-                <Image
-                    source={authorImageUri === ''
-                        ? defaultUserImage
-                        : { uri: authorImageUri }
-                    }
-                    style={styles.imagePicker}
-                />
-            </TouchableOpacity>
-            <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
-            <SimpleTextInput
-                style={styles.row}
-                defaultValue={props.author.name}
-                placeholder={NAME_PLACEHOLDER}
-                autoCapitalize='none'
-                autoFocus={props.author.name === ''}
-                autoCorrect={false}
-                selectTextOnFocus={true}
-                returnKeyType={'done'}
-                onSubmitEditing={props.onUpdateAuthor}
-            />
-            <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
-            <RowItem
-                title={VIEW_POSTS_LABEL}
-                buttonStyle='navigate'
-                onPress={() => props.navigation.navigate('YourTab')}
-            />
-            { props.ownFeed &&
-                <View style={styles.qrCodeContainer}>
-                    <QRCode
-                        value={qrCodeValue}
-                        size={QRCodeWidth}
-                        color={Colors.DARK_GRAY}
-                        backgroundColor={Colors.BACKGROUND_COLOR}
+            <ScrollView>
+                <TouchableOpacity
+                    onPress={async () => {
+                        await openImagePicker(props.onUpdatePicture);
+                    }}
+                    style={styles.imagePickerContainer}
+                >
+                    <Image
+                        source={authorImageUri === ''
+                            ? defaultUserImage
+                            : { uri: authorImageUri }
+                        }
+                        style={styles.imagePicker}
                     />
-                </View>
-            }
+                </TouchableOpacity>
+                <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
+                <SimpleTextInput
+                    style={styles.row}
+                    defaultValue={props.author.name}
+                    placeholder={NAME_PLACEHOLDER}
+                    autoCapitalize='none'
+                    autoFocus={props.author.name === ''}
+                    autoCorrect={false}
+                    selectTextOnFocus={true}
+                    returnKeyType={'done'}
+                    onSubmitEditing={props.onUpdateAuthor}
+                />
+                <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
+                <RowItem
+                    title={VIEW_POSTS_LABEL}
+                    buttonStyle='navigate'
+                    onPress={() => props.navigation.navigate('YourTab')}
+                />
+                { props.ownFeed &&
+                    <View style={styles.qrCodeContainer}>
+                        <QRCode
+                            value={qrCodeValue}
+                            size={QRCodeWidth}
+                            color={Colors.DARK_GRAY}
+                            backgroundColor={Colors.BACKGROUND_COLOR}
+                        />
+                    </View>
+                }
+            </ScrollView>
+            <TabBarPlaceholder/>
         </KeyboardAvoidingView>
     );
 };
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     qrCodeContainer: {
-        marginTop: 10,
+        marginVertical: 10,
         width: QRCodeWidth,
         height: QRCodeWidth,
         padding: 0,

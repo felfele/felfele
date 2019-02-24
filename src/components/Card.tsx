@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Post, PostReferences, Author } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Colors, DefaultStyle } from '../styles';
+import { Colors } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
@@ -15,6 +15,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText, RegularText } from '../ui/misc/text';
+import { Avatar } from '../ui/misc/Avatar';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ReactNativeModelHelper();
@@ -158,11 +159,8 @@ const ButtonList = (props: CardProps) => {
 const CardTopIcon = (props: { post: Post }) => {
     if (props.post.author) {
         const imageUri = modelHelper.getAuthorImageUri(props.post.author);
-        const imageSource = imageUri === ''
-            ? require('../../images/user_circle.png')
-            : { uri: imageUri };
         return (
-            <Image source={imageSource} style={DefaultStyle.favicon} />
+            <Avatar imageUri={imageUri} size='large'/>
         );
     } else {
         return <View/>;

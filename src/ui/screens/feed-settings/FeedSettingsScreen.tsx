@@ -7,6 +7,7 @@ import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { RecentPostFeed } from '../../../social/api';
+import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 export interface StateProps {
     navigation: any;
@@ -60,12 +61,7 @@ export const FeedSettingsScreen = (props: Props) => {
                 />
                 <Text style={styles.explanation}>{UNLISTED_EXPLANATION}</Text>
             </ScrollView>
-            <View
-                style={{
-                    height: DefaultTabBarHeight,
-                    backgroundColor: Colors.BACKGROUND_COLOR,
-                }}
-            />
+            <TabBarPlaceholder/>
         </View>
     );
 };

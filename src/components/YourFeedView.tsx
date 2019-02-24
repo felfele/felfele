@@ -4,16 +4,18 @@ import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { FeedHeader } from './FeedHeader';
 import { NavigationHeader } from './NavigationHeader';
+import { ImageData } from '../models/ImageData';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
-    onSavePost: (post: Post) => void;
+    onSaveDraft: (draft: Post) => void;
 }
 
 export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
+    profileImage: ImageData;
 }
 
 type Props = StateProps & DispatchProps;
@@ -28,7 +30,8 @@ export const YourFeedView = (props: Props) => {
                                 />,
                 listHeader: <FeedHeader
                                 navigation={props.navigation}
-                                onSavePost={props.onSavePost}
+                                onSaveDraft={props.onSaveDraft}
+                                profileImage={props.profileImage}
                             />,
             }}
         </RefreshableFeed>

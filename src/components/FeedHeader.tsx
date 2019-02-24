@@ -1,31 +1,36 @@
 import * as React from 'react';
 import {
-    Text,
     View,
     Alert,
     StyleSheet,
+    Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
-import { Debug } from '../Debug';
-import { DefaultNavigationBarHeight } from '../styles';
+import { DefaultStyle, Colors } from '../styles';
+import { RegularText } from '../ui/misc/text';
+import { ImageData } from '../models/ImageData';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface StateProps {
     navigation: any;
+    profileImage: ImageData;
 }
 
 export interface DispatchProps {
-    onSavePost: (post: Post) => void;
+    onSaveDraft: (draft: Post) => void;
 }
 
 export type Props = StateProps & DispatchProps;
 
+const modelHelper = new ReactNativeModelHelper();
+
 export class FeedHeader extends React.PureComponent<Props> {
-    public openImagePicker = async () => {
-        const imageData = await AsyncImagePicker.showImagePicker();
+    public launchCamera = async () => {
+        const imageData = await AsyncImagePicker.launchCamera();
         if (imageData == null) {
             return;
         }
@@ -35,36 +40,17 @@ export class FeedHeader extends React.PureComponent<Props> {
             text: '',
             createdAt: Date.now(),
         };
-
-        try {
-            this.props.onSavePost(post);
-        } catch (e) {
-            Alert.alert(
-                'Error',
-                'Posting failed, try again later!',
-                [
-                    { text: 'OK', onPress: () => {Debug.log('OK pressed'); } },
-                ]
-            );
-        }
+        this.props.onSaveDraft(post);
+        this.props.navigation.navigate('Post');
     }
 
     public render() {
         return (
             <View
-                style={styles.headerContainer}
+                style={styles.container}
                 testID='welcome'
             >
-                <TouchableView
-                    onPress={this.openImagePicker}
-                    style={styles.cameraIconContainer}
-                >
-                    <Icon
-                        name='camera-alt'
-                        size={30}
-                        color='gray'
-                    />
-                </TouchableView>
+                <ProfileIcon profileImage={this.props.profileImage}/>
                 <TouchableView
                     onPress={() =>
                         this.props.navigation.navigate('Post')
@@ -76,36 +62,49 @@ export class FeedHeader extends React.PureComponent<Props> {
                     }}
                     testID='FeedHeader/TouchableHeaderText'
                 >
-                    <Text style={styles.headerText}
-                    >What's your story?</Text>
+                    <RegularText style={styles.headerText}>What's up?</RegularText>
+                </TouchableView>
+                <TouchableView
+                    onPress={this.launchCamera}
+                    style={styles.cameraIconContainer}
+                >
+                    <Icon
+                        name='camera-alt'
+                        size={30}
+                        color={Colors.BRAND_PURPLE}
+                    />
                 </TouchableView>
             </View>
         );
     }
 }
 
+const ProfileIcon = (props: { profileImage: ImageData }) => {
+    const imageUri = modelHelper.getImageUri(props.profileImage);
+    const imageSource = imageUri === ''
+        ? require('../../images/user_circle.png')
+        : { uri: imageUri };
+    return (
+        <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
+    );
+};
 const styles = StyleSheet.create({
-    headerContainer: {
+    container: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: 'lightgray',
-        alignContent: 'center',
-        paddingVertical: 6,
-        height: DefaultNavigationBarHeight,
+        alignItems: 'center',
+        height: 60,
+        backgroundColor: Colors.WHITE,
+        marginBottom: 10,
     },
     cameraIconContainer: {
-        alignItems: 'center',
         paddingHorizontal: 10,
     },
     headerTextContainer: {
-        alignItems: 'center',
+        flex: 1,
     },
     headerText: {
         color: 'gray',
-        fontSize: 14,
+        fontSize: 18,
         paddingLeft: 10,
-        paddingRight: 100,
-        marginRight: 15,
-        paddingTop: 5,
     },
 });

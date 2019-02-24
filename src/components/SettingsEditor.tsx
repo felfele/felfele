@@ -12,6 +12,7 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { GridCard } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
+import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface StateProps {
     navigation: any;
@@ -112,12 +113,7 @@ export const SettingsEditor = (props: Props) => {
                 />
                 }
             </ScrollView>
-            <View
-                style={{
-                    height: DefaultTabBarHeight,
-                    backgroundColor: Colors.BACKGROUND_COLOR,
-                }}
-            />
+            <TabBarPlaceholder/>
         </View>
     );
 };
