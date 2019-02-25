@@ -137,6 +137,15 @@ export const AsyncActions = {
             });
         };
     },
+    cleanUploadingPostState: (): Thunk => {
+        return async (dispatch, getState) => {
+            for (const post of getState().localPosts) {
+                if (post.isUploading === true) {
+                    dispatch(Actions.updatePostIsUploading(post, undefined));
+                }
+            }
+        };
+    },
     downloadFollowedFeedPosts: (): Thunk => {
         return async (dispatch, getState) => {
             const feeds = getState()
@@ -348,7 +357,7 @@ export const AsyncActions = {
                 }
             } catch (e) {
                 Debug.log('syncPostCommandLogs: ', 'error', e);
-                // dispatch(Actions.updatePostIsUploading(post, undefined));
+                dispatch(AsyncActions.cleanUploadingPostState());
             }
         };
     },

@@ -475,11 +475,8 @@ const initStore = () => {
             isSyncing: false,
         }));
     }
-    for (const post of store.getState().localPosts) {
-        if (post.isUploading === true) {
-            store.dispatch(Actions.updatePostIsUploading(post, undefined));
-        }
-    }
+    // @ts-ignore
+    store.dispatch(AsyncActions.cleanUploadingPostState());
     store.dispatch(Actions.timeTick());
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
