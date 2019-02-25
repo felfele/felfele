@@ -6,20 +6,18 @@ import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Di
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
-import { ImageView } from './ImageView';
+import { ImageDataView } from './ImageDataView';
 import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
 // @ts-ignore
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
-import { calculateImageDimensions } from '../models/ModelHelper';
+import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
-const modelHelper = new ReactNativeModelHelper();
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -27,6 +25,7 @@ export interface StateProps {
     post: Post;
     currentTimestamp: number;
     author: Author;
+    modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
     navigate: (view: string, {}) => void;
 }
@@ -49,6 +48,7 @@ export const Card = (props: CardProps) => {
                 post={props.post}
                 currentTimestamp={props.currentTimestamp}
                 author={props.author}
+                modelHelper={props.modelHelper}
                 navigate={props.navigate}
                 onSharePost={props.onSharePost}
             />
@@ -66,7 +66,7 @@ export const Card = (props: CardProps) => {
                 {props.post.images.map((image, index) => {
                     const [width, height] = calculateCardImageDimensions(image, WindowWidth, props.showSquareImages);
                     return (
-                        <ImageView
+                        <ImageDataView
                             testID={(image.uri || '') + index}
                             key={(image.uri || '') + index}
                             source={image}
@@ -74,6 +74,7 @@ export const Card = (props: CardProps) => {
                                 width: width,
                                 height: height,
                             }}
+                            modelHelper={props.modelHelper}
                         />
                     );
                 })}
@@ -157,9 +158,9 @@ const ButtonList = (props: CardProps) => {
     return <View/>;
 };
 
-const CardTopIcon = (props: { post: Post }) => {
+const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
     if (props.post.author) {
-        const imageUri = modelHelper.getAuthorImageUri(props.post.author);
+        const imageUri = props.modelHelper.getAuthorImageUri(props.post.author);
         return (
             <Avatar imageUri={imageUri} size='large'/>
         );
@@ -195,6 +196,7 @@ const CardTop = (props: {
     post: Post,
     currentTimestamp: number,
     author: Author,
+    modelHelper: ModelHelper,
     navigate: (view: string, {}) => void,
     onSharePost: (post: Post) => void,
 }) => {
@@ -211,7 +213,7 @@ const CardTop = (props: {
             })}
             style={styles.infoContainer}
         >
-            <CardTopIcon post={props.post}/>
+            <CardTopIcon post={props.post} modelHelper={props.modelHelper}/>
             <View style={styles.usernameContainer}>
                 <View style={{flexDirection: 'row'}}>
                     <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>

@@ -8,6 +8,8 @@ import { Colors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
+import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -30,8 +32,9 @@ type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
     const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
+    const modelHelper = new ReactNativeModelHelper();
     return (
-        <RefreshableFeed {...props}>
+        <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
                 navigationHeader: <NavigationHeader
                                       onPressLeftButton={ props.onBack }

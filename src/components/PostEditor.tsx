@@ -106,6 +106,7 @@ export class PostEditor extends React.Component<Props, State> {
                         images={this.state.post.images}
                         onRemoveImage={this.onRemoveImage}
                         height={100}
+                        modelHelper={modelHelper}
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>

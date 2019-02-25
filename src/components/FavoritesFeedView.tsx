@@ -5,6 +5,7 @@ import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -19,8 +20,9 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export const FavoritesFeedView = (props: Props) => {
+    const modelHelper = new ReactNativeModelHelper();
     return (
-        <RefreshableFeed {...props}>
+        <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
                 listHeader: <NavigationHeader
                                 title='Favorites'

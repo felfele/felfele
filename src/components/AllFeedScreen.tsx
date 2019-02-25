@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -23,8 +24,9 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export const AllFeedScreen = (props: Props) => {
+    const modelHelper = new ReactNativeModelHelper();
     return (
-        <RefreshableFeed {...props}>
+        <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
                 navigationHeader: <NavigationHeader
                                 title='All feeds'
