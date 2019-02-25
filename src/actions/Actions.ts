@@ -314,7 +314,7 @@ export const AsyncActions = {
 
                 const localPostCommandLog = localFeed.postCommandLog;
                 const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeed);
-                Debug.log('uploadPostFromQueue', 'storageSyncUpdate', storageSyncUpdate);
+                Debug.log('syncPostCommandLogs', 'storageSyncUpdate', storageSyncUpdate);
 
                 storageSyncUpdate.updatedPosts.map(updatedPost => {
                     // TODO also check for:

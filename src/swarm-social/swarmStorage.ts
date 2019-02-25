@@ -147,6 +147,7 @@ const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swa
 };
 
 const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api, postOptions: SwarmHelpers): Promise<PostCommand> => {
+    Debug.log('uploadPostCommandToSwarm', 'postCommand', postCommand);
     const postCommandAfterUploadPost = await uploadPostCommandPostToSwarm(postCommand, swarmApi.bzz, postOptions);
     const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
     const postCommandAfterRecentPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
