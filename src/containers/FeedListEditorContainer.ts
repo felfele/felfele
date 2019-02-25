@@ -10,11 +10,6 @@ const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 :
 
 const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
 
-export const updateFavicons = (feeds: Feed[]): Feed[] => feeds.map(feed => ({
-    ...feed,
-    favicon: getSwarmGatewayUrl(feed.favicon || ''),
-}));
-
 export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {

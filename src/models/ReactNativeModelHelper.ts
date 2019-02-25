@@ -4,7 +4,7 @@ import * as RNFS from 'react-native-fs';
 import { ModelHelper } from './ModelHelper';
 import { Author } from './Post';
 import { ImageData } from './ImageData';
-import { getSwarmGatewayUrl } from '../swarm/Swarm';
+import { getSwarmGatewayUrl, defaultGateway } from '../swarm/Swarm';
 
 export class ReactNativeModelHelper implements ModelHelper {
     public getAuthorImageUri(author: Author): string {
@@ -35,17 +35,8 @@ export class ReactNativeModelHelper implements ModelHelper {
             return this.getLocalPath(image.localPath);
         }
         if (image.uri != null) {
-            return getSwarmGatewayUrl(image.uri);
+            return getSwarmGatewayUrl(image.uri, defaultGateway);
         }
         return '';
-    }
-
-    public calculateImageDimensions(image: ImageData, maxWidth: number): number[] {
-        if (image.width == null || image.height == null) {
-            return [maxWidth, maxWidth];
-        }
-        const ratio = image.width / maxWidth;
-        const height = image.height / ratio;
-        return [maxWidth, height];
     }
 }

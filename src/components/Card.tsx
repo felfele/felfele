@@ -16,6 +16,7 @@ import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
+import { calculateImageDimensions } from '../models/ModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
 const modelHelper = new ReactNativeModelHelper();
@@ -63,7 +64,7 @@ export const Card = (props: CardProps) => {
                 }}
             >
                 {props.post.images.map((image, index) => {
-                    const [width, height] = calculateImageDimensions(image, WindowWidth, props.showSquareImages);
+                    const [width, height] = calculateCardImageDimensions(image, WindowWidth, props.showSquareImages);
                     return (
                         <ImageView
                             testID={(image.uri || '') + index}
@@ -265,11 +266,11 @@ const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) =>
     );
 };
 
-const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): number[] => {
+const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): number[] => {
     if (showSquareImages) {
         return [maxWidth, maxWidth];
     }
-    return modelHelper.calculateImageDimensions(image, maxWidth);
+    return calculateImageDimensions(image, maxWidth);
 };
 
 const HeaderOffset = 20;

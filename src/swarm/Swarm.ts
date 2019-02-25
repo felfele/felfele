@@ -13,7 +13,7 @@ export const defaultPrefix = 'bzz://';
 export const defaultFeedPrefix = 'bzz-feed:/';
 const hashLength = 64;
 
-const upload = async (data: string, swarmGateway: string = defaultGateway): Promise<string> => {
+const upload = async (data: string, swarmGateway: string): Promise<string> => {
     Debug.log('upload: to Swarm: ', data);
     try {
         const hash = await uploadData(data, swarmGateway);
@@ -25,11 +25,7 @@ const upload = async (data: string, swarmGateway: string = defaultGateway): Prom
     }
 };
 
-export const getUrlFromHash = (hash: string): string => {
-    return defaultGateway + defaultUrlScheme + hash;
-};
-
-const uploadForm = async (data: FormData, swarmGateway: string = defaultGateway): Promise<string> => {
+const uploadForm = async (data: FormData, swarmGateway: string): Promise<string> => {
     Debug.log('uploadForm: ', data);
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
@@ -50,12 +46,12 @@ export const isSwarmLink = (link: string): boolean => {
     return link.startsWith(defaultPrefix);
 };
 
-export const getSwarmGatewayUrl = (swarmUrl: string): string => {
+export const getSwarmGatewayUrl = (swarmUrl: string, gatewayAddress: string): string => {
     if (isSwarmLink(swarmUrl)) {
-        return defaultGateway + defaultUrlScheme + swarmUrl.slice(defaultPrefix.length);
+        return gatewayAddress + defaultUrlScheme + swarmUrl.slice(defaultPrefix.length);
     }
     if (swarmUrl.length === hashLength) {
-        return defaultGateway + defaultUrlScheme + swarmUrl;
+        return gatewayAddress + defaultUrlScheme + swarmUrl;
     }
     return swarmUrl;
 };
@@ -104,7 +100,7 @@ const uploadFiles = async (files: File[], swarmGateway: string): Promise<string>
     return defaultPrefix + hash;
 };
 
-const uploadData = async (data: string, swarmGateway: string = defaultGateway): Promise<string> => {
+const uploadData = async (data: string, swarmGateway: string): Promise<string> => {
     Debug.log('uploadData: ', data);
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
@@ -119,7 +115,7 @@ const uploadData = async (data: string, swarmGateway: string = defaultGateway): 
     return text;
 };
 
-const downloadData = async (hash: string, timeout: number = 0, swarmGateway: string = defaultGateway): Promise<string> => {
+const downloadData = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
     const url = swarmGateway + '/bzz:/' + hash + '/';
     Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
@@ -267,6 +263,7 @@ export interface BzzApi {
     download: (hash: string, timeout: number) => Promise<string>;
     upload: (data: string) => Promise<string>;
     uploadFiles: (files: File[]) => Promise<string>;
+    getGatewayUrl: (swarmUrl: string) => string;
 }
 
 export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
@@ -274,6 +271,7 @@ export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
         download: (hash: string, timeout: number = 0) => downloadData(hash, timeout, swarmGateway),
         upload: (data: string) => upload(data, swarmGateway),
         uploadFiles: (files: File[]) => uploadFiles(files, swarmGateway),
+        getGatewayUrl: (swarmUrl: string) => getSwarmGatewayUrl(swarmUrl, swarmGateway),
     };
 };
 

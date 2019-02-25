@@ -345,7 +345,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
 
         const postFeed = deserialize(content) as RecentPostFeed;
         const authorImage = {
-            uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+            uri: swarm.bzz.getGatewayUrl(postFeed.authorImage.uri || ''),
         };
         const author: Author = {
             name: postFeed.name,
@@ -360,7 +360,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
                 author,
                 images: post.images.map(image => ({
                     ...image,
-                    uri: Swarm.getSwarmGatewayUrl(image.uri!),
+                    uri: swarm.bzz.getGatewayUrl(image.uri!),
                 })),
             })),
             favicon: authorImage.uri,
