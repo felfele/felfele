@@ -24,8 +24,6 @@ import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSynce
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
-const modelHelper = new ReactNativeModelHelper();
-
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
     REMOVE_CONTENT_FILTER = 'REMOVE-CONTENT-FILTER',
@@ -427,6 +425,7 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
 const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed, swarmGateway: string) => {
     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
     const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
+    const modelHelper = new ReactNativeModelHelper(swarmGateway);
     const swarmHelpers: SwarmHelpers = {
         imageResizer: {
             resizeImage: resizeImageIfNeeded,

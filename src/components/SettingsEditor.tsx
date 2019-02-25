@@ -31,10 +31,9 @@ type Props = StateProps & DispatchProps;
 const YOUR_FEEDS = 'YOUR FEEDS';
 const PREFERENCES_LABEL = 'PREFERENCES';
 
-const modelHelper = new ReactNativeModelHelper();
-
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
+    const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     return (
         <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader

@@ -35,7 +35,7 @@ describe('card test', () => {
         author: testAuthor,
     };
 
-    const modelHelper = new ReactNativeModelHelper();
+    const modelHelper = new ReactNativeModelHelper('');
 
     it('should render unselected post without images with the following components: Post, CardTop, without CardButtonList', () => {
         const result = TestRenderer.create(

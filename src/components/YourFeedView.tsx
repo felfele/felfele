@@ -17,12 +17,13 @@ export interface StateProps {
     posts: Post[];
     feeds: Feed[];
     profileImage: ImageData;
+    gatewayAddress: string;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const YourFeedView = (props: Props) => {
-    const modelHelper = new ReactNativeModelHelper();
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
@@ -34,6 +35,7 @@ export const YourFeedView = (props: Props) => {
                                 navigation={props.navigation}
                                 onSaveDraft={props.onSaveDraft}
                                 profileImage={props.profileImage}
+                                gatewayAddress={props.gatewayAddress}
                             />,
             }}
         </RefreshableFeed>

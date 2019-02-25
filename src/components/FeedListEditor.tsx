@@ -12,6 +12,7 @@ import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface DispatchProps {
+    onPressFeed: (navigation: any, feed: Feed) => void;
 }
 
 export interface StateProps {
@@ -19,13 +20,12 @@ export interface StateProps {
     ownFeeds: Feed[];
     followedFeeds: Feed[];
     knownFeeds: Feed[];
-    onPressFeed: (navigation: any, feed: Feed) => void;
+    gatewayAddress: string;
 }
-
-const modelHelper = new ReactNativeModelHelper();
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
+        const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         const sections: Array<{ title: string, data: Feed[] }> = [];
         if (this.props.ownFeeds.length > 0) {
             sections.push({

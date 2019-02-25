@@ -15,12 +15,13 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
+    gatewayAddress: string;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const FavoritesFeedView = (props: Props) => {
-    const modelHelper = new ReactNativeModelHelper();
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{

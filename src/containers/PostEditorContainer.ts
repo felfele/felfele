@@ -13,6 +13,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         avatar: state.author.image,
         navigation: ownProps.navigation,
         draft: post != null ? post : state.draft,
+        gatewayAddress: state.settings.swarmGatewayAddress,
    };
 };
 

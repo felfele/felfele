@@ -22,12 +22,14 @@ import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { ModelHelper } from '../models/ModelHelper';
 
 export interface StateProps {
     navigation: any;
     draft: Post | null;
     name: string;
     avatar: ImageData;
+    gatewayAddress: string;
 }
 
 export interface DispatchProps {
@@ -42,16 +44,16 @@ interface State {
     post: Post;
 }
 
-const modelHelper = new ReactNativeModelHelper();
-
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
+    private modelHelper: ModelHelper;
 
     constructor(props: Props) {
         super(props);
         this.state = {
             post: this.getPostFromDraft(this.props.draft),
         };
+        this.modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
     }
 
     public render() {
@@ -84,7 +86,7 @@ export class PostEditor extends React.Component<Props, State> {
                             <Avatar
                                 size='medium'
                                 style={{ marginRight: 10 }}
-                                imageUri={modelHelper.getImageUri(this.props.avatar)}
+                                imageUri={this.modelHelper.getImageUri(this.props.avatar)}
                             />
                         }
                         title={this.props.name}
@@ -106,7 +108,7 @@ export class PostEditor extends React.Component<Props, State> {
                         images={this.state.post.images}
                         onRemoveImage={this.onRemoveImage}
                         height={100}
-                        modelHelper={modelHelper}
+                        modelHelper={this.modelHelper}
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>

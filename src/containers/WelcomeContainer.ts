@@ -8,6 +8,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
     return {
         navigation: ownProps.navigation,
         author: state.author,
+        gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
 

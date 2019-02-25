@@ -4,9 +4,12 @@ import * as RNFS from 'react-native-fs';
 import { ModelHelper } from './ModelHelper';
 import { Author } from './Post';
 import { ImageData } from './ImageData';
-import { getSwarmGatewayUrl, defaultGateway } from '../swarm/Swarm';
+import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
 export class ReactNativeModelHelper implements ModelHelper {
+    public constructor(private readonly gatewayAddress: string) {
+    }
+
     public getAuthorImageUri(author: Author): string {
         // this is here for compatibility with previous version where
         // image was optional
@@ -35,7 +38,7 @@ export class ReactNativeModelHelper implements ModelHelper {
             return this.getLocalPath(image.localPath);
         }
         if (image.uri != null) {
-            return getSwarmGatewayUrl(image.uri, defaultGateway);
+            return getSwarmGatewayUrl(image.uri, this.gatewayAddress);
         }
         return '';
     }

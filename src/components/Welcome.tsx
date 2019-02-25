@@ -17,6 +17,7 @@ export interface DispatchProps extends IdentityOnboardingDispatchProps {
 export interface StateProps {
     navigation: any;
     author: Author;
+    gatewayAddress: string;
 }
 
 type Props = DispatchProps & StateProps;
@@ -61,6 +62,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                             name: this.state.authorName,
                             image: this.state.authorImage,
                         }}
+                        gatewayAddress={this.props.gatewayAddress}
                     />,
                     title: 'Get Started',
                     subtitle: 'Pick a name and an avatar',

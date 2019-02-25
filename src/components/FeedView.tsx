@@ -2,13 +2,11 @@ import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
-import { Settings } from '../models/Settings';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { ModelHelper } from '../models/ModelHelper';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
@@ -26,13 +24,14 @@ export interface StateProps {
     posts: Post[];
     feeds: Feed[];
     isOwnFeed: boolean;
+    gatewayAddress: string;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
     const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
-    const modelHelper = new ReactNativeModelHelper();
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
