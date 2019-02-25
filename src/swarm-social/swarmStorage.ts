@@ -179,6 +179,24 @@ const isImageUploaded = (image: ImageData): boolean => {
     return false;
 };
 
+const fileExtensionByMimeType = (mimeType: Swarm.MimeType): string => {
+    switch (mimeType) {
+        case 'image/jpeg': return 'jpeg';
+        case 'image/png': return 'png';
+        default: return '';
+    }
+};
+
+const makeSwarmFile = (nameWithoutExtension: string, localPath: string): Swarm.File => {
+    const mimeType = Swarm.imageMimeTypeFromFilenameExtension(localPath);
+    const extension = fileExtensionByMimeType(mimeType);
+    return {
+        name: nameWithoutExtension + '.' + extension,
+        localPath,
+        mimeType,
+    };
+};
+
 const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
@@ -191,11 +209,14 @@ const uploadImage = async (
         }
         const path = getLocalPath(image.localPath);
         const resizedImagePath = await imageResizer.resizeImage(image, path);
-        const placeholderPath = await imageResizer.resizeImageForPlaceholder(image, path);
-        const uri = await swarm.uploadPhotos([
-            {name: 'photo', localPath: resizedImagePath},
-            {name: 'placeholder', localPath: placeholderPath},
-        ]) + '/photo.' + Swarm.imageMimeTypeFromPath(resizedImagePath);
+        const resizedImageFile = makeSwarmFile('image', resizedImagePath);
+        const placeholderImagePath = await imageResizer.resizeImageForPlaceholder(image, path);
+        const placeholderImageFile = makeSwarmFile('placeholder', placeholderImagePath);
+        const manifestUri = await swarm.uploadFiles([
+            resizedImageFile,
+            placeholderImageFile,
+        ]);
+        const uri = manifestUri + '/' + resizedImageFile.name;
         return {
             ...image,
             localPath: undefined,

@@ -64,41 +64,42 @@ export const calculateTopic = (topic: string): string => {
     return '0x' + keccak256.hex(topic);
 };
 
-export const imageMimeTypeFromPath = (path: string): string => {
+type DefaultMimeType = 'application/octet-stream';
+
+export type MimeType =
+    | 'image/jpeg'
+    | 'image/png'
+    | DefaultMimeType
+    ;
+
+export const imageMimeTypeFromFilenameExtension = (path: string): MimeType => {
     if (path.endsWith('jpg')) {
-        return 'jpeg';
+        return 'image/jpeg';
     }
     if (path.endsWith('jpeg')) {
-        return 'jpeg';
+        return 'image/jpeg';
     }
     if (path.endsWith('png')) {
-        return 'png';
+        return 'image/png';
     }
-    return 'unknown';
+    return 'application/octet-stream';
 };
 
-const uploadPhoto = async (localPath: string, swarmGateway: string = defaultGateway): Promise<string> => {
-    return uploadPhotos([{localPath, name: 'photo'}], swarmGateway);
-};
-
-interface Photo {
-    localPath: string;
+export interface File {
     name: string;
+    localPath: string;
+    mimeType: MimeType;
 }
 
-const uploadPhotos = async (photos: Photo[], swarmGateway: string): Promise<string> => {
+const uploadFiles = async (files: File[], swarmGateway: string): Promise<string> => {
     const data = new FormData();
-    for (const photo of photos) {
-        const imageMimeType = imageMimeTypeFromPath(photo.localPath);
-        const name = photo.name + '.' + imageMimeType;
-        data.append(photo.name, {
-            uri: photo.localPath,
-            type: 'image/' + imageMimeType,
-            name,
+    for (const file of files) {
+        data.append(file.name, {
+            uri: file.localPath,
+            type: file.mimeType,
+            name: file.name,
         } as any as Blob);
     }
-    data.append('title', 'photo');
-
     const hash = await uploadForm(data, swarmGateway);
     return defaultPrefix + hash;
 };
@@ -265,16 +266,14 @@ export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSign
 export interface BzzApi {
     download: (hash: string, timeout: number) => Promise<string>;
     upload: (data: string) => Promise<string>;
-    uploadPhoto: (localPath: string) => Promise<string>;
-    uploadPhotos: (photos: Photo[]) => Promise<string>;
+    uploadFiles: (files: File[]) => Promise<string>;
 }
 
 export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
     return {
         download: (hash: string, timeout: number = 0) => downloadData(hash, timeout, swarmGateway),
         upload: (data: string) => upload(data, swarmGateway),
-        uploadPhoto: (localPath: string) => uploadPhoto(localPath, swarmGateway),
-        uploadPhotos: (photos: Photo[]) => uploadPhotos(photos, swarmGateway),
+        uploadFiles: (files: File[]) => uploadFiles(files, swarmGateway),
     };
 };
 
