@@ -30,10 +30,12 @@ const testIdentity = {
     address: '0x8f24f61d21a6e3087a7f0b3e158a639a624036cf',
 };
 
+const defaultSwarmGateway = 'http://localhost:8500';
+
 export const defaultSwarmApi = Swarm.makeApi(
     Swarm.makeFeedAddressFromPublicIdentity(testIdentity),
     (digest) => Swarm.signDigest(digest, testIdentity),
-    Swarm.defaultGateway,
+    defaultSwarmGateway,
 );
 
 export const defaultSwarmFeedApi = defaultSwarmApi.feed;
