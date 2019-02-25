@@ -10,7 +10,7 @@ export class Debug {
     }
 
     public static log(...args: any[]) {
-        if (__DEV__) {
+        if (__DEV__ && Debug.isDebug) {
             console.log.call(console, ...args);
         }
         const maxLengthArgs = args.map((value) => {

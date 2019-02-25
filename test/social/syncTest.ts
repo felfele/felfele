@@ -1,10 +1,12 @@
 import { syncTests } from '../../src/social/syncTest';
 import { makeLocalSwarmStorage } from '../../src/swarm-social/localSwarmStorage';
 import { PostCommandLogStorage } from '../../src/social/api';
+import { Debug } from '../../src/Debug';
 
 let localSwarmStorage: PostCommandLogStorage;
 const source = 'storage';
 
+beforeAll(() => Debug.setDebug(false));
 beforeEach(() => localSwarmStorage = makeLocalSwarmStorage());
 
 test('Test sharing posts to storage', async () =>

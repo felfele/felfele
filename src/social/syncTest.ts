@@ -69,7 +69,7 @@ const testLatestPostsAfterFirstSync = async (source = 'storage', storage: PostCo
     const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter1, storage);
     assertPostCommandLogInvariants(syncedCommandLog);
 
-    console.log('testLatestPostsAfterFirstSync', 'syncedCommandLog', syncedCommandLog.commands);
+    Debug.log('testLatestPostsAfterFirstSync', 'syncedCommandLog', syncedCommandLog.commands);
 
     const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedCommandLog, lastSeenEpoch);
     const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
