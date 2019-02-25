@@ -18,6 +18,7 @@ interface Props {
     post: Post;
     showSquareImages: boolean;
     calculateImageDimensions: (image: ImageData, maxWidth: number, showSquareImages: boolean) => Rectangle;
+    testID?: string;
 }
 
 export class Carousel extends React.PureComponent<Props, { index: number }> {

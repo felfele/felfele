@@ -94,6 +94,7 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean }) => {
     } else {
         return (
             <Carousel
+                testID='carousel'
                 post={props.post}
                 showSquareImages={props.showSquareImages}
                 calculateImageDimensions={calculateImageDimensions}
