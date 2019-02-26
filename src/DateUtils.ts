@@ -27,6 +27,9 @@ export class DateUtils {
     }
 
     public static printableElapsedTime(timestamp: number, now: number = Date.now()): string {
+        if (now < timestamp) {
+            return 'few seconds';
+        }
         const diff = new Date(now - timestamp);
         const pluralize = (s: string, num: number) => num > 1 ? s + 's' : s;
 
