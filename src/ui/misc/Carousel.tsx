@@ -10,8 +10,6 @@ import { Rectangle } from '../../models/ModelHelper';
 import { ImageData } from '../../models/ImageData';
 import { Colors } from '../../styles';
 
-const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
-
 const WINDOW_WIDTH = Dimensions.get('window').width;
 
 interface Props {
@@ -29,9 +27,9 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
     public render() {
         return (
             <View>
-                <AutoPlaySwipeableViews autoplay={false} onChangeIndex={this.handleChangeIndex}>
+                <SwipeableViews onChangeIndex={this.handleChangeIndex}>
                     {this.props.post.images.map((image, index) => {
-                        const { width, height } = this.props.calculateImageDimensions(image, WINDOW_WIDTH, this.props.showSquareImages);
+                        const { width, height } = this.props.calculateImageDimensions(image, WINDOW_WIDTH, true);
                         return (
                             <ImageView
                                 testID={(image.uri || '') + index}
@@ -44,8 +42,8 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
                             />
                         );
                     })}
-            </AutoPlaySwipeableViews>
-             <Pagination dots={3} index={this.state.index}/>
+                </SwipeableViews>
+             <Pagination dots={this.props.post.images.length} index={this.state.index}/>
             </View>
         );
     }
