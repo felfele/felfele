@@ -189,7 +189,7 @@ export const AsyncActions = {
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
             const ownFeeds = getState().ownFeeds;
-            if (ownFeeds.length > 0) {
+            if (post.link != null && ownFeeds.length > 0) {
                 const localFeed = ownFeeds[0];
                 const updatedPostCommandLog = removePost(post, '', localFeed.postCommandLog);
                 dispatch(Actions.updateOwnFeed({
