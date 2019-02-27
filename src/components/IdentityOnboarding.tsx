@@ -21,14 +21,15 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
-const modelHelper = new ReactNativeModelHelper();
 
 export { DispatchProps };
 export interface StateProps {
     author: Author;
+    gatewayAddress: string;
 }
 
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentityOnboarding: ', authorImageUri);
     return (

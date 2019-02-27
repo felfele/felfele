@@ -3,6 +3,7 @@ import * as ShallowRenderer from 'react-test-renderer/shallow';
 import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
+import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper';
 
 jest.mock('../../src/models/ReactNativeModelHelper');
 
@@ -34,6 +35,8 @@ describe('card test', () => {
         author: testAuthor,
     };
 
+    const modelHelper = new ReactNativeModelHelper('');
+
     it('should render unselected post without images with the following components: Post, CardTop, without CardButtonList', () => {
         const result = TestRenderer.create(
             <Card
@@ -46,6 +49,7 @@ describe('card test', () => {
                 showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
+                modelHelper={modelHelper}
             />
         ).root;
         console.log(result.props);
@@ -66,6 +70,7 @@ describe('card test', () => {
                 showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
+                modelHelper={modelHelper}
             />
         ).root;
         console.log(result.props);
@@ -86,6 +91,7 @@ describe('card test', () => {
                 showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
+                modelHelper={modelHelper}
             />
         ).root;
         console.log(result.props);
@@ -107,6 +113,7 @@ describe('card test', () => {
                 showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
+                modelHelper={modelHelper}
             />
         ).root;
         console.log(result.props);

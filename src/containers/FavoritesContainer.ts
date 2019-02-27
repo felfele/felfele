@@ -14,6 +14,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         navigation: ownProps.navigation,
         posts: posts,
         feeds: favoriteFeeds,
+        gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
 

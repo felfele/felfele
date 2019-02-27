@@ -7,6 +7,9 @@ import { ImageData } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
 export class ReactNativeModelHelper implements ModelHelper {
+    public constructor(private readonly gatewayAddress: string) {
+    }
+
     public getAuthorImageUri(author: Author): string {
         // this is here for compatibility with previous version where
         // image was optional
@@ -35,17 +38,8 @@ export class ReactNativeModelHelper implements ModelHelper {
             return this.getLocalPath(image.localPath);
         }
         if (image.uri != null) {
-            return getSwarmGatewayUrl(image.uri);
+            return getSwarmGatewayUrl(image.uri, this.gatewayAddress);
         }
         return '';
-    }
-
-    public calculateImageDimensions(image: ImageData, maxWidth: number): number[] {
-        if (image.width == null || image.height == null) {
-            return [maxWidth, maxWidth];
-        }
-        const ratio = image.width / maxWidth;
-        const height = image.height / ratio;
-        return [maxWidth, height];
     }
 }

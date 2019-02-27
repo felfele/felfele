@@ -39,6 +39,7 @@ export interface StateProps {
     author: Author;
     ownFeed?: Feed;
     navigation: any;
+    gatewayAddress: string;
 }
 
 const NAME_LABEL = 'NAME';
@@ -46,8 +47,6 @@ const NAME_PLACEHOLDER = 'Space Cowboy';
 const SCREEN_TITLE = 'Profile';
 const ACTIVITY_LABEL = 'ACTIVITY';
 const VIEW_POSTS_LABEL = 'View all your posts';
-
-const modelHelper = new ReactNativeModelHelper();
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
@@ -74,6 +73,7 @@ const showShareDialog = async (feed?: Feed) => {
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentitySettings: ', qrCodeValue);
     return (

@@ -30,8 +30,6 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
 
-const modelHelper = new ReactNativeModelHelper();
-
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
     feeds: Feed[];
@@ -307,7 +305,7 @@ const authorReducer = (author = defaultAuthor, action: Actions): Author => {
         case 'UPDATE-AUTHOR-PICTURE-PATH': {
             return {
                 ...author,
-                faviconUri: modelHelper.getImageUri(action.payload.image),
+                faviconUri: action.payload.image.localPath != null ? action.payload.image.localPath : '',
                 image: action.payload.image,
             };
         }
@@ -469,13 +467,14 @@ const initStore = () => {
     console.log('initStore: ', store.getState());
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
-    // @ts-ignore
     for (const ownFeed of store.getState().ownFeeds) {
         store.dispatch(Actions.updateOwnFeed({
             ...ownFeed,
             isSyncing: false,
         }));
     }
+    // @ts-ignore
+    store.dispatch(AsyncActions.cleanUploadingPostState());
     store.dispatch(Actions.timeTick());
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };

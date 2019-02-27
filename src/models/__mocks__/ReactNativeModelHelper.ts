@@ -14,13 +14,4 @@ export class ReactNativeModelHelper implements ModelHelper {
     public getImageUri(image: ImageData): string {
         return 'mockpath__image';
     }
-
-    public calculateImageDimensions(image: ImageData, maxWidth: number): number[] {
-        if (image.width == null || image.height == null) {
-            return [maxWidth, maxWidth];
-        }
-        const ratio = image.width / maxWidth;
-        const height = image.height / ratio;
-        return [maxWidth, height];
-    }
 }

@@ -24,9 +24,8 @@ const PRIVACY_SHARING_LABEL = 'PRIVACY & SHARING';
 const ASSOCIATED_EXPLANATION = 'This feed is associated with a profile featuring the same name and picture.';
 const UNLISTED_EXPLANATION = 'Anyone with a link to your feed can follow it.';
 
-const modelHelper = new ReactNativeModelHelper();
-
 export const FeedSettingsScreen = (props: Props) => {
+    const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     return (
         <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader
