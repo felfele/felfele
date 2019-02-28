@@ -59,8 +59,6 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
     }
 }
 
-export const AutoPlayCarousel = autoPlay(Carousel);
-
 const Pagination = (props: { index: number, dots: number }) => {
     const children = [];
 
