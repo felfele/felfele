@@ -2,13 +2,12 @@ import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageProperties, ImageStyle } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-
-const modelHelper = new ReactNativeModelHelper();
+import { ModelHelper } from '../models/ModelHelper';
 
 export interface StateProps extends ImageProperties {
     source: ImageData;
     style: StyleProp<ImageStyle>;
+    modelHelper: ModelHelper;
 }
 
 export interface DispatchProps {
@@ -19,8 +18,8 @@ export type Props = StateProps & DispatchProps;
 export interface State {
 }
 
-export const ImageView = (props: Props) => {
-    const imageUri = modelHelper.getImageUri(props.source);
+export const ImageDataView = (props: Props) => {
+    const imageUri = props.modelHelper.getImageUri(props.source);
     const width = props.style
         ? StyleSheet.flatten(props.style).width != null
             ? StyleSheet.flatten(props.style).width
@@ -36,10 +35,10 @@ export const ImageView = (props: Props) => {
             source={{
                 uri: imageUri,
             }}
-            style={{
+            style={[props.style, {
                 width: width,
                 height: height,
-            }}
+            }]}
         />
     );
 };

@@ -3,12 +3,14 @@ import { View, StyleSheet, LayoutChangeEvent, Dimensions } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
-import { ImageView } from './ImageView';
+import { ImageDataView } from './ImageDataView';
+import { ModelHelper } from '../models/ModelHelper';
 
 export interface StateProps {
     columns: number;
     images: ImageData[];
     height: number;
+    modelHelper: ModelHelper;
 }
 
 export interface DispatchProps {
@@ -35,7 +37,7 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
                 onLongPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
                 key={image.localPath}
             >
-                <ImageView
+                <ImageDataView
                     source={image}
                     style={{
                         width: this.notGreaterThan(image.width, maxWidth),
@@ -43,6 +45,7 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
                         borderWidth: 1,
                         borderColor: 'white',
                     }}
+                    modelHelper={this.props.modelHelper}
                 />
             </TouchableView>
         );

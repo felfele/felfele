@@ -14,6 +14,7 @@ import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
+import { ModelHelper } from '../models/ModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -23,6 +24,7 @@ export interface StateProps {
     navigation: any;
     posts: Post[];
     feeds: Feed[];
+    modelHelper: ModelHelper;
     children: {
         // WARNING, type parameter included for reference, but it does not typecheck
         listHeader?: React.ReactElement<FeedHeaderProps>,
@@ -77,6 +79,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                             isSelected={this.isPostSelected(obj.item)}
                             navigate={this.props.navigation.navigate}
                             togglePostSelection={this.togglePostSelection}
+                            modelHelper={this.props.modelHelper}
                         />
                     )}
                     keyExtractor={(item) => '' + (item.link || '') + item._id}

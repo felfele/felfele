@@ -18,6 +18,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         posts: filteredPosts,
         feeds: followedFeeds,
         profileImage: state.author.image,
+        gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
 

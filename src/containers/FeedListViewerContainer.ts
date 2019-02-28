@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 
 import { AppState } from '../reducers';
-import { StateProps, FeedListViewer } from '../components/FeedListEditor';
+import { StateProps, DispatchProps, FeedListViewer } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
-import { getFollowedFeeds, getKnownFeeds, getFavoriteFeeds } from '../selectors/selectors';
+import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps & DispatchProps => {
     // TODO: update favicons?
     const ownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
         ? []
@@ -25,6 +25,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         knownFeeds: knownFeeds,
         navigation: ownProps.navigation,
         onPressFeed: onPressFeed,
+        gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
 

@@ -12,6 +12,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
         author: state.author,
         navigation: ownProps.navigation,
         ownFeed,
+        gatewayAddress: state.settings.swarmGatewayAddress,
    };
 };
 

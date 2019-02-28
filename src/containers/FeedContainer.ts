@@ -24,6 +24,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
         // HACK
         feeds: selectedFeeds.length === 0 ? [state.ownFeeds[0]] : selectedFeeds,
         isOwnFeed: isOwnFeed,
+        gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
 

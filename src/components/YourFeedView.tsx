@@ -5,6 +5,7 @@ import { Post } from '../models/Post';
 import { FeedHeader } from './FeedHeader';
 import { NavigationHeader } from './NavigationHeader';
 import { ImageData } from '../models/ImageData';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -16,13 +17,15 @@ export interface StateProps {
     posts: Post[];
     feeds: Feed[];
     profileImage: ImageData;
+    gatewayAddress: string;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const YourFeedView = (props: Props) => {
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
-        <RefreshableFeed {...props}>
+        <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
                 navigationHeader: <NavigationHeader
                                       title='All your posts'
@@ -32,6 +35,7 @@ export const YourFeedView = (props: Props) => {
                                 navigation={props.navigation}
                                 onSaveDraft={props.onSaveDraft}
                                 profileImage={props.profileImage}
+                                gatewayAddress={props.gatewayAddress}
                             />,
             }}
         </RefreshableFeed>
