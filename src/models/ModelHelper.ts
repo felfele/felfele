@@ -10,5 +10,19 @@ export interface ModelHelper {
     getAuthorImageUri: (author: Author) => string;
     getLocalPath: (localPath: string) => string;
     getImageUri: (image: ImageData) => string;
-    calculateImageDimensions(image: ImageData, maxWidth: number): Rectangle;
 }
+
+export const calculateImageDimensions = (image: ImageData, maxWidth: number): Rectangle => {
+    if (image.width == null || image.height == null) {
+        return {
+            width: maxWidth,
+            height: maxWidth,
+        };
+    }
+    const ratio = image.width / maxWidth;
+    const height = image.height / ratio;
+    return {
+        width: maxWidth,
+        height: height,
+    };
+};

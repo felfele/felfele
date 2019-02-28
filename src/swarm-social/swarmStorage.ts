@@ -22,13 +22,23 @@ import { syncPostCommandLogWithStorage } from '../social/sync';
 const NUMBER_OF_RECENT_POSTS = 20;
 const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
 
+interface ImageResizer {
+    resizeImage: (image: ImageData, path: string) => Promise<string>;
+    resizeImageForPlaceholder: (image: ImageData, path: string) => Promise<string>;
+}
+
 export interface SwarmHelpers {
-    imageResizer: (image: ImageData, path: string) => Promise<string>;
+    imageResizer: ImageResizer;
     getLocalPath: (localPath: string) => string;
 }
 
-const defaultImageResizer = (image: ImageData, path: string): Promise<string> => {
+const defaultResizeImage = (image: ImageData, path: string): Promise<string> => {
     return Promise.resolve(path);
+};
+
+const defaultImageResizer = {
+    resizeImage: defaultResizeImage,
+    resizeImageForPlaceholder: defaultResizeImage,
 };
 
 const defaultSwarmHelpers: SwarmHelpers = {
@@ -137,6 +147,7 @@ const uploadPostCommandPostToSwarm = async (postCommand: PostCommand, swarm: Swa
 };
 
 const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swarm.Api, postOptions: SwarmHelpers): Promise<PostCommand> => {
+    Debug.log('uploadPostCommandToSwarm', 'postCommand', postCommand);
     const postCommandAfterUploadPost = await uploadPostCommandPostToSwarm(postCommand, swarmApi.bzz, postOptions);
     const postCommandAfterFeedUpdated = await addPostCommandToFeed(postCommandAfterUploadPost, swarmApi.feed);
     const postCommandAfterRecentPostFeedUpdated = /* TODO */ postCommandAfterFeedUpdated;
@@ -169,10 +180,28 @@ const isImageUploaded = (image: ImageData): boolean => {
     return false;
 };
 
+const fileExtensionByMimeType = (mimeType: Swarm.MimeType): string => {
+    switch (mimeType) {
+        case 'image/jpeg': return 'jpeg';
+        case 'image/png': return 'png';
+        default: return '';
+    }
+};
+
+const makeSwarmFile = (nameWithoutExtension: string, localPath: string): Swarm.File => {
+    const mimeType = Swarm.imageMimeTypeFromFilenameExtension(localPath);
+    const extension = fileExtensionByMimeType(mimeType);
+    return {
+        name: nameWithoutExtension + '.' + extension,
+        localPath,
+        mimeType,
+    };
+};
+
 const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
@@ -180,8 +209,15 @@ const uploadImage = async (
             return image;
         }
         const path = getLocalPath(image.localPath);
-        const resizedImagePath = await imageResizer(image, path);
-        const uri = await swarm.uploadPhoto(resizedImagePath);
+        const resizedImagePath = await imageResizer.resizeImage(image, path);
+        const resizedImageFile = makeSwarmFile('image', resizedImagePath);
+        const placeholderImagePath = await imageResizer.resizeImageForPlaceholder(image, path);
+        const placeholderImageFile = makeSwarmFile('placeholder', placeholderImagePath);
+        const manifestUri = await swarm.uploadFiles([
+            resizedImageFile,
+            placeholderImageFile,
+        ]);
+        const uri = manifestUri + '/' + resizedImageFile.name;
         return {
             ...image,
             localPath: undefined,
@@ -194,7 +230,7 @@ const uploadImage = async (
 const uploadImages = async (
     swarm: Swarm.BzzApi,
     images: ImageData[],
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
     const updateImages: ImageData[] = [];
@@ -208,7 +244,7 @@ const uploadImages = async (
 const uploadAuthor = async (
     swarm: Swarm.BzzApi,
     author: Author,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Author | undefined> => {
     const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, getLocalPath);
@@ -223,7 +259,7 @@ const uploadAuthor = async (
 const uploadPost = async (
     swarm: Swarm.BzzApi,
     post: Post,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Post> => {
     if (post.link != null && Swarm.isSwarmLink(post.link)) {
@@ -249,7 +285,7 @@ const uploadPost = async (
 const uploadPosts = async (
     swarm: Swarm.BzzApi,
     posts: Post[],
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Post[]> => {
     const uploadedPosts: Post[] = [];
@@ -264,7 +300,7 @@ const createRecentPostFeed = async (
     swarm: Swarm.Api,
     author: Author,
     firstPost: PublicPost,
-    imageResizer: (image: ImageData, path: string) => Promise<string>,
+    imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<RecentPostFeed> => {
     const url = swarm.feed.getUri();
@@ -309,7 +345,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
 
         const postFeed = deserialize(content) as RecentPostFeed;
         const authorImage = {
-            uri: Swarm.getSwarmGatewayUrl(postFeed.authorImage.uri || ''),
+            uri: swarm.bzz.getGatewayUrl(postFeed.authorImage.uri || ''),
         };
         const author: Author = {
             name: postFeed.name,
@@ -324,7 +360,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
                 author,
                 images: post.images.map(image => ({
                     ...image,
-                    uri: Swarm.getSwarmGatewayUrl(image.uri!),
+                    uri: swarm.bzz.getGatewayUrl(image.uri!),
                 })),
             })),
             favicon: authorImage.uri,

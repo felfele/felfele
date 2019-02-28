@@ -18,6 +18,7 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 export interface StateProps {
     navigation: any;
     profileImage: ImageData;
+    gatewayAddress: string;
 }
 
 export interface DispatchProps {
@@ -25,8 +26,6 @@ export interface DispatchProps {
 }
 
 export type Props = StateProps & DispatchProps;
-
-const modelHelper = new ReactNativeModelHelper();
 
 export class FeedHeader extends React.PureComponent<Props> {
     public launchCamera = async () => {
@@ -50,7 +49,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                 style={styles.container}
                 testID='welcome'
             >
-                <ProfileIcon profileImage={this.props.profileImage}/>
+                <ProfileIcon profileImage={this.props.profileImage} gatewayAddress={this.props.gatewayAddress}/>
                 <TouchableView
                     onPress={() =>
                         this.props.navigation.navigate('Post')
@@ -79,7 +78,8 @@ export class FeedHeader extends React.PureComponent<Props> {
     }
 }
 
-const ProfileIcon = (props: { profileImage: ImageData }) => {
+const ProfileIcon = (props: { profileImage: ImageData, gatewayAddress: string }) => {
+    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const imageUri = modelHelper.getImageUri(props.profileImage);
     const imageSource = imageUri === ''
         ? require('../../images/user_circle.png')

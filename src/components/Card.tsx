@@ -6,21 +6,22 @@ import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Di
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import { Utils } from '../Utils';
-import { ImageView } from './ImageView';
+import { ImageDataView } from './ImageDataView';
 import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
 // @ts-ignore
 import Markdown from 'react-native-easy-markdown';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
 import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
-const modelHelper = new ReactNativeModelHelper();
+import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
+
+const WindowWidth = Dimensions.get('window').width;
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -28,6 +29,7 @@ export interface StateProps {
     post: Post;
     currentTimestamp: number;
     author: Author;
+    modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
     navigate: (view: string, {}) => void;
 }
@@ -50,6 +52,7 @@ export const Card = (props: CardProps) => {
                 post={props.post}
                 currentTimestamp={props.currentTimestamp}
                 author={props.author}
+                modelHelper={props.modelHelper}
                 navigate={props.navigate}
                 onSharePost={props.onSharePost}
             />
@@ -64,7 +67,11 @@ export const Card = (props: CardProps) => {
                     marginTop: 0,
                 }}
             >
-                <DisplayImage post={props.post} showSquareImages={props.showSquareImages}/>
+                <DisplayImage
+                    post={props.post}
+                    showSquareImages={props.showSquareImages}
+                    modelHelper={props.modelHelper}
+                />
                 { props.post.text === '' ||
                     <CardMarkdown text={props.post.text}/>
                 }
@@ -74,14 +81,14 @@ export const Card = (props: CardProps) => {
     );
 };
 
-const DisplayImage = (props: { post: Post, showSquareImages: boolean }) => {
+const DisplayImage = (props: { post: Post, showSquareImages: boolean, modelHelper: ModelHelper }) => {
     if (props.post.images.length === 0) {
         return null;
     } else if (props.post.images.length === 1) {
         const image = props.post.images[0];
-        const { width, height } = calculateImageDimensions(image, WINDOW_WIDTH, props.showSquareImages);
+        const { width, height } = calculateCardImageDimensions(image, WINDOW_WIDTH, props.showSquareImages);
         return (
-            <ImageView
+            <ImageDataView
                 testID={(image.uri || '')}
                 key={(image.uri || '')}
                 source={image}
@@ -89,6 +96,7 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean }) => {
                     width: width,
                     height: height,
                 }}
+                modelHelper={props.modelHelper}
             />
         );
     } else {
@@ -98,6 +106,7 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean }) => {
                 post={props.post}
                 showSquareImages={props.showSquareImages}
                 calculateImageDimensions={calculateImageDimensions}
+                modelHelper={props.modelHelper}
             />
         );
     }
@@ -174,9 +183,9 @@ const ButtonList = (props: CardProps) => {
     return <View/>;
 };
 
-const CardTopIcon = (props: { post: Post }) => {
+const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
     if (props.post.author) {
-        const imageUri = modelHelper.getAuthorImageUri(props.post.author);
+        const imageUri = props.modelHelper.getAuthorImageUri(props.post.author);
         return (
             <Avatar imageUri={imageUri} size='large'/>
         );
@@ -212,6 +221,7 @@ const CardTop = (props: {
     post: Post,
     currentTimestamp: number,
     author: Author,
+    modelHelper: ModelHelper,
     navigate: (view: string, {}) => void,
     onSharePost: (post: Post) => void,
 }) => {
@@ -228,7 +238,7 @@ const CardTop = (props: {
             })}
             style={styles.infoContainer}
         >
-            <CardTopIcon post={props.post}/>
+            <CardTopIcon post={props.post} modelHelper={props.modelHelper}/>
             <View style={styles.usernameContainer}>
                 <View style={{flexDirection: 'row'}}>
                     <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
@@ -283,14 +293,14 @@ const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) =>
     );
 };
 
-const calculateImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): Rectangle => {
+const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): Rectangle => {
     if (showSquareImages) {
         return {
             width: maxWidth,
             height: maxWidth,
         };
     }
-    return modelHelper.calculateImageDimensions(image, maxWidth);
+    return calculateImageDimensions(image, maxWidth);
 };
 
 const HeaderOffset = 20;

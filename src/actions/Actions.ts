@@ -21,10 +21,8 @@ import { restoreBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
-import { resizeImageIfNeeded } from '../ImageUtils';
+import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-
-const modelHelper = new ReactNativeModelHelper();
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -137,6 +135,15 @@ export const AsyncActions = {
             });
         };
     },
+    cleanUploadingPostState: (): Thunk => {
+        return async (dispatch, getState) => {
+            for (const post of getState().localPosts) {
+                if (post.isUploading === true) {
+                    dispatch(Actions.updatePostIsUploading(post, undefined));
+                }
+            }
+        };
+    },
     downloadFollowedFeedPosts: (): Thunk => {
         return async (dispatch, getState) => {
             const feeds = getState()
@@ -150,7 +157,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
-            const swarm = Swarm.makeReadableApi({user: '', topic: ''});
+            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const uniqueAuthors = new Map<string, Author>();
             downloadedPosts.map(post => {
@@ -182,7 +189,7 @@ export const AsyncActions = {
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
             const ownFeeds = getState().ownFeeds;
-            if (ownFeeds.length > 0) {
+            if (post.link != null && ownFeeds.length > 0) {
                 const localFeed = ownFeeds[0];
                 const updatedPostCommandLog = removePost(post, '', localFeed.postCommandLog);
                 dispatch(Actions.updateOwnFeed({
@@ -305,7 +312,7 @@ export const AsyncActions = {
 
                 const localPostCommandLog = localFeed.postCommandLog;
                 const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeed);
-                Debug.log('uploadPostFromQueue', 'storageSyncUpdate', storageSyncUpdate);
+                Debug.log('syncPostCommandLogs', 'storageSyncUpdate', storageSyncUpdate);
 
                 storageSyncUpdate.updatedPosts.map(updatedPost => {
                     // TODO also check for:
@@ -348,7 +355,7 @@ export const AsyncActions = {
                 }
             } catch (e) {
                 Debug.log('syncPostCommandLogs: ', 'error', e);
-                // dispatch(Actions.updatePostIsUploading(post, undefined));
+                dispatch(AsyncActions.cleanUploadingPostState());
             }
         };
     },
@@ -418,8 +425,12 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
 const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed, swarmGateway: string) => {
     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
     const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
+    const modelHelper = new ReactNativeModelHelper(swarmGateway);
     const swarmHelpers: SwarmHelpers = {
-        imageResizer: resizeImageIfNeeded,
+        imageResizer: {
+            resizeImage: resizeImageIfNeeded,
+            resizeImageForPlaceholder,
+        },
         getLocalPath: modelHelper.getLocalPath,
     };
     const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);

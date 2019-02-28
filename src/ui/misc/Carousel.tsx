@@ -5,10 +5,10 @@ import SwipeableViews from 'react-swipeable-views-native';
 import { autoPlay } from 'react-swipeable-views-utils';
 import { View, Dimensions, StyleSheet } from 'react-native';
 import { Post } from '../../models/Post';
-import { ImageView } from '../../components/ImageView';
-import { Rectangle } from '../../models/ModelHelper';
+import { Rectangle, ModelHelper } from '../../models/ModelHelper';
 import { ImageData } from '../../models/ImageData';
 import { Colors } from '../../styles';
+import { ImageDataView } from '../../components/ImageDataView';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 
@@ -17,6 +17,7 @@ interface Props {
     showSquareImages: boolean;
     calculateImageDimensions: (image: ImageData, maxWidth: number, showSquareImages: boolean) => Rectangle;
     testID?: string;
+    modelHelper: ModelHelper;
 }
 
 export class Carousel extends React.PureComponent<Props, { index: number }> {
@@ -31,7 +32,7 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
                     {this.props.post.images.map((image, index) => {
                         const { width, height } = this.props.calculateImageDimensions(image, WINDOW_WIDTH, true);
                         return (
-                            <ImageView
+                            <ImageDataView
                                 testID={(image.uri || '') + index}
                                 key={(image.uri || '') + index}
                                 source={image}
@@ -39,6 +40,7 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
                                     width: width,
                                     height: height,
                                 }}
+                                modelHelper={this.props.modelHelper}
                             />
                         );
                     })}
