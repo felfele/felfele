@@ -20,6 +20,8 @@ interface Props {
     modelHelper: ModelHelper;
 }
 
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
+
 export class Carousel extends React.PureComponent<Props, { index: number }> {
     public state = {
         index: 0,
@@ -28,7 +30,7 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
     public render() {
         return (
             <View>
-                <SwipeableViews onChangeIndex={this.handleChangeIndex}>
+                <AutoPlaySwipeableViews disabled onChangeIndex={this.handleChangeIndex}>
                     {this.props.post.images.map((image, index) => {
                         const { width, height } = this.props.calculateImageDimensions(image, WINDOW_WIDTH, true);
                         return (
@@ -44,7 +46,7 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
                             />
                         );
                     })}
-                </SwipeableViews>
+                </AutoPlaySwipeableViews>
              <Pagination dots={this.props.post.images.length} index={this.state.index}/>
             </View>
         );
@@ -56,6 +58,8 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
         });
     }
 }
+
+export const AutoPlayCarousel = autoPlay(Carousel);
 
 const Pagination = (props: { index: number, dots: number }) => {
     const children = [];
