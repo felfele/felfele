@@ -23,7 +23,7 @@ export const resizeImageIfNeeded = async (image: ImageData, path: string): Promi
 };
 
 export const resizeImageForPlaceholder = async (image: ImageData, path: string): Promise<string> => {
-    const [width, height] = calculateImageDimensions(image, MAX_PLACEHOLDER_DIMENSION);
+    const { width, height } = calculateImageDimensions(image, MAX_PLACEHOLDER_DIMENSION);
     const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
     Debug.log('resizeImageForPlaceholder: ', 'resizedImagePNG', resizedImagePNG);
     return resizedImagePNG.uri;
@@ -36,7 +36,7 @@ const resizeImage = async (
     maxImageSize: number,
 ): Promise<string> => {
     if (isImageExceedMaximumDimensions(image)) {
-        const [width, height] = calculateImageDimensions(image, maxDimension);
+        const { width, height } = calculateImageDimensions(image, maxDimension);
         const resizedImagePNG = await ImageResizer.createResizedImage(path, width, height, 'PNG', 100);
         Debug.log('resizeImageIfNeeded: ', 'resizedImagePNG', resizedImagePNG);
         if (resizedImagePNG.size != null && resizedImagePNG.size < maxImageSize) {

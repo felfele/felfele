@@ -15,6 +15,10 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
+import { Carousel } from '../ui/misc/Carousel';
+import { Rectangle } from '../models/ModelHelper';
+
+const WINDOW_WIDTH = Dimensions.get('window').width;
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 
 const WindowWidth = Dimensions.get('window').width;
@@ -63,21 +67,11 @@ export const Card = (props: CardProps) => {
                     marginTop: 0,
                 }}
             >
-                {props.post.images.map((image, index) => {
-                    const [width, height] = calculateCardImageDimensions(image, WindowWidth, props.showSquareImages);
-                    return (
-                        <ImageDataView
-                            testID={(image.uri || '') + index}
-                            key={(image.uri || '') + index}
-                            source={image}
-                            style={{
-                                width: width,
-                                height: height,
-                            }}
-                            modelHelper={props.modelHelper}
-                        />
-                    );
-                })}
+                <DisplayImage
+                    post={props.post}
+                    showSquareImages={props.showSquareImages}
+                    modelHelper={props.modelHelper}
+                />
                 { props.post.text === '' ||
                     <CardMarkdown text={props.post.text}/>
                 }
@@ -85,6 +79,37 @@ export const Card = (props: CardProps) => {
             </TouchableOpacity>
         </View>
     );
+};
+
+const DisplayImage = (props: { post: Post, showSquareImages: boolean, modelHelper: ModelHelper }) => {
+    if (props.post.images.length === 0) {
+        return null;
+    } else if (props.post.images.length === 1) {
+        const image = props.post.images[0];
+        const { width, height } = calculateCardImageDimensions(image, WINDOW_WIDTH, props.showSquareImages);
+        return (
+            <ImageDataView
+                testID={(image.uri || '')}
+                key={(image.uri || '')}
+                source={image}
+                style={{
+                    width: width,
+                    height: height,
+                }}
+                modelHelper={props.modelHelper}
+            />
+        );
+    } else {
+        return (
+            <Carousel
+                testID='carousel'
+                post={props.post}
+                showSquareImages={props.showSquareImages}
+                calculateImageDimensions={calculateImageDimensions}
+                modelHelper={props.modelHelper}
+            />
+        );
+    }
 };
 
 export const MemoizedCard = React.memo(Card);
@@ -268,9 +293,12 @@ const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) =>
     );
 };
 
-const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): number[] => {
+const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSquareImages: boolean): Rectangle => {
     if (showSquareImages) {
-        return [maxWidth, maxWidth];
+        return {
+            width: maxWidth,
+            height: maxWidth,
+        };
     }
     return calculateImageDimensions(image, maxWidth);
 };
