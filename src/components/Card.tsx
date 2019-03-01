@@ -230,13 +230,17 @@ const CardTop = (props: {
     const authorName = props.post.author ? props.post.author.name : 'Space Cowboy';
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
+    const onPress = props.post.author && props.post.author.uri !== ''
+        ? () => props.navigate('Feed', {
+            feedUrl: props.post.author!.uri,
+            name: authorName,
+        })
+        : undefined
+        ;
     return (
         <TouchableOpacity
             testID={'CardTop'}
-            onPress={() => props.navigate('Feed', {
-                feedUrl: props.post.author && props.post.author.uri,
-                name: authorName,
-            })}
+            onPress={onPress}
             style={styles.infoContainer}
         >
             <CardTopIcon post={props.post} modelHelper={props.modelHelper}/>
