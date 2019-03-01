@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
 import { Colors } from '../styles';
@@ -86,7 +87,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                             // null is needed otherwise it does not work with switchnavigator backbehavior property
                             this.props.navigation.goBack(null);
                         }}
-                        rightButtonText1='Add'
+                        rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
                         onPressRightButton1={this.onAddFeed}
                         title='Feed list'
                     />

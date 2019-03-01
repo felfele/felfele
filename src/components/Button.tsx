@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Text, StyleSheet, ViewProperties } from 'react-native';
+import { StyleSheet, ViewProperties } from 'react-native';
 import { TouchableView } from './TouchableView';
-import { BUTTON_COLOR, Colors } from '../styles';
+import { Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 
 export interface StateProps extends ViewProperties {
@@ -22,7 +22,7 @@ export const Button = (props: Props) => {
     const isButtonEnabled = props.enabled != null
                                 ? props.enabled
                                 : true;
-    const buttonColor = isButtonEnabled ? BUTTON_COLOR : Colors.LIGHT_GRAY;
+    const buttonColor = isButtonEnabled ? Colors.BUTTON_COLOR : Colors.LIGHT_GRAY;
     return (
         <TouchableView
             onPress={isButtonEnabled ? props.onPress : undefined}
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 18,
-        color: BUTTON_COLOR,
+        color: Colors.BUTTON_COLOR,
     },
 });
