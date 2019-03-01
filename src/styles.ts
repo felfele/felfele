@@ -39,7 +39,16 @@ export const Colors = {
     BACKGROUND_COLOR: '#DDDDDD',
 };
 
-export const DefaultFont = 'Helvetica Neue';
+export const defaultBoldFont = 'Roboto-Bold';
+export const defaultRegularFont = 'Roboto-Regular';
+export const defaultMediumFont = 'Roboto-Medium';
+export const defaultFont = defaultRegularFont;
+export const defaultTextProps = {
+    style: {
+      fontFamily: defaultFont,
+      fontSize: 15,
+    },
+};
 
 export const DefaultStyle = StyleSheet.create({
     container: {
