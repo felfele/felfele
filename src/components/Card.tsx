@@ -403,6 +403,7 @@ const styles = StyleSheet.create({
         color: Colors.DARK_GRAY,
     },
     originalAuthor: {
+        fontSize: 14,
         fontWeight: 'normal',
         color: Colors.GRAY,
     },
