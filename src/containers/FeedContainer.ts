@@ -22,7 +22,9 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
         feedName: ownProps.navigation.state.params.name,
         posts: posts,
         // HACK
-        feeds: selectedFeeds.length === 0 ? [state.ownFeeds[0]] : selectedFeeds,
+        feeds: selectedFeeds.length === 0
+            ? state.ownFeeds[0] ? state.ownFeeds : []
+            : selectedFeeds,
         isOwnFeed: isOwnFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };
