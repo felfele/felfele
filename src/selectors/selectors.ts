@@ -51,8 +51,21 @@ export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFee
     return rssPosts.filter(post => isPostFromFollowedFeed(post, followedFeeds));
 });
 
+const postUpdateTime = (post: Post): number => {
+    return post.updatedAt != null
+        ? post.updatedAt
+        : post.createdAt
+        ;
+};
+
+const postTimeCompare = (a: Post, b: Post): number => {
+    const aUpdateTime = postUpdateTime(a);
+    const bUpdateTime = postUpdateTime(b);
+    return bUpdateTime - aUpdateTime;
+};
+
 export const getAllPostsSorted = createSelector([ getFollowedNewsPosts, getLocalPosts ], (followedNewsPosts, ownPosts) => {
-    return followedNewsPosts.concat(ownPosts).sort((a, b) => b.createdAt - a.createdAt);
+    return followedNewsPosts.concat(ownPosts).sort(postTimeCompare);
 });
 
 export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFeeds ], (rssPosts, favoriteFeeds) => {

@@ -225,7 +225,8 @@ const CardTop = (props: {
     navigate: (view: string, {}) => void,
     onSharePost: (post: Post) => void,
 }) => {
-    const printableTime = DateUtils.printableElapsedTime(props.post.createdAt, props.currentTimestamp) + ' ago';
+    const postUpdateTime = props.post.updatedAt || props.post.createdAt;
+    const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
     const authorName = props.post.author ? props.post.author.name : 'Space Cowboy';
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);

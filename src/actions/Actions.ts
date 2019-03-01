@@ -224,6 +224,7 @@ export const AsyncActions = {
                 ...post,
                 _id: id,
                 author,
+                updatedAt: Date.now(),
                 references: {
                     parent: post.link ? post.link : '',
                     original: post.references != null
