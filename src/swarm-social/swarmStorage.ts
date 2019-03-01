@@ -9,6 +9,7 @@ import {
     getPostCommandUpdatesSinceEpoch,
     getLatestPostsFromLog,
     epochCompare,
+    PostCommandProtocolVersion,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
@@ -20,7 +21,7 @@ import { Feed } from '../models/Feed';
 import { syncPostCommandLogWithStorage } from '../social/sync';
 
 const NUMBER_OF_RECENT_POSTS = 20;
-const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
+const DEFAULT_POST_COMMAND_LOG_TOPIC = `felfele:posts:v${PostCommandProtocolVersion}`;
 
 interface ImageResizer {
     resizeImage: (image: ImageData, path: string) => Promise<string>;
