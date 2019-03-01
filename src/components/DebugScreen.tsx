@@ -135,9 +135,15 @@ const onAppStateReset = async (props: Props) => {
 };
 
 const onCreateIdentity = async (props: Props) => {
-    const confirmed = await AreYouSureDialog.show('Are you sure you want to create new identity?');
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to create new identity?',
+        'This will delete your current identity and there is no undo!'
+    );
+    Debug.log('onCreateIdentity: ', confirmed);
     if (confirmed) {
         props.onCreateIdentity();
+        await Utils.waitMillisec(3 * 1000);
+        restartApp();
     }
 };
 
