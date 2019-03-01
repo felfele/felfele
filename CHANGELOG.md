@@ -1,4 +1,4 @@
-## v0.9.29 (2019-03-01)
+## v0.9.30 (2019-03-01)
 
 This release adds the following new features and fixes:
 
