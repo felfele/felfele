@@ -37,7 +37,7 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   
-  [RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
+  [RNSplashScreen show];
   return YES;
 }
 

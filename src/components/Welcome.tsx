@@ -8,6 +8,7 @@ import {
 import { IdentityOnboarding, DispatchProps as IdentityOnboardingDispatchProps  } from '../components/IdentityOnboarding';
 import { ImageData } from '../models/ImageData';
 import { Author } from '../models/Post';
+import SplashScreen from 'react-native-splash-screen';
 
 export interface DispatchProps extends IdentityOnboardingDispatchProps {
     onCreateIdentity: () => void;
@@ -32,6 +33,10 @@ export class Welcome extends React.PureComponent<Props, State> {
         authorName: 'Space Cowboy',
         authorImage: {},
     };
+
+    public componentDidMount() {
+        SplashScreen.hide();
+    }
 
     public render() {
         return (

@@ -3,7 +3,6 @@ import {
     View,
 } from 'react-native';
 import { Author } from '../models/Post';
-import SplashScreen from 'react-native-splash-screen';
 
 export interface DispatchProps { }
 
@@ -13,7 +12,6 @@ export interface StateProps {
 }
 
 export const LoadingScreen = (props: DispatchProps & StateProps) => {
-    SplashScreen.hide();
     return (
         <View>
             {props.author.name === '' ? props.navigation.navigate('Welcome') : props.navigation.navigate('App')}
