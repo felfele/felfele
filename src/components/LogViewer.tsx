@@ -48,7 +48,7 @@ const filteredLog = (): LogItem[] => {
 export const getBugReportBody = (): string => {
     return filteredLog()
         .map((logItem: LogItem) => {
-            return `${logItem[0]} ${logItem[1]}`;
+            return `${logItem[0]} ${logItem[1].replace(/("privateKey":")([a-zA-Z0-9])+(")/g, '$1OMITTED$3')}`;
         })
         .join('\n')
         ;
