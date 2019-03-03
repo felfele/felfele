@@ -10,8 +10,8 @@ import { ImageData } from '../models/ImageData';
 import { Author } from '../models/Post';
 
 export interface DispatchProps extends IdentityOnboardingDispatchProps {
-    onCreateIdentity: () => void;
     onDownloadPosts: () => void;
+    onCreateFeed: () => void;
 }
 
 export interface StateProps {
@@ -71,7 +71,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                 onDone={() => {
                     this.props.onUpdateAuthor(this.state.authorName);
                     this.props.onUpdatePicture(this.state.authorImage);
-                    this.props.onCreateIdentity();
+                    this.props.onCreateFeed();
                     this.props.onDownloadPosts();
                     this.props.navigation.navigate('Loading');
                 }}

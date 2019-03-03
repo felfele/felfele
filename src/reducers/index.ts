@@ -26,7 +26,6 @@ import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
 

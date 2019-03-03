@@ -33,6 +33,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
     onUpdatePicture: (image: ImageData) => void;
+    onChangeText?: (text: string) => void;
 }
 
 export interface StateProps {

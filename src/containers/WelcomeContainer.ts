@@ -14,9 +14,6 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onCreateIdentity: () => {
-            dispatch(AsyncActions.createUserIdentity());
-        },
         onUpdateAuthor: (text: string) => {
             dispatch(Actions.updateAuthorName(text));
         },
@@ -25,6 +22,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onDownloadPosts: () => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
+        },
+        onCreateFeed: () => {
+            dispatch(AsyncActions.chainActions([AsyncActions.createUserIdentity(), AsyncActions.createOwnFeed()]));
         },
     };
 };
