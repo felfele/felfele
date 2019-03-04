@@ -275,7 +275,7 @@ export const AsyncActions = {
     },
     shareOwnPost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
-            if (getState().ownFeeds[0]) {
+            if (getState().ownFeeds[0] == null) {
                 await dispatch(AsyncActions.createOwnFeed());
             }
             const localFeed = getState().ownFeeds[0];
