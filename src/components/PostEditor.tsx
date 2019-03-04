@@ -117,7 +117,7 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private onRemoveImage = (removedImage: ImageData) => {
-        const images = this.state.post.images.filter(image => image != null && image.uri !== removedImage.uri);
+        const images = this.state.post.images.filter(image => image.localPath !== removedImage.localPath);
         const post = {
             ...this.state.post,
             images,
