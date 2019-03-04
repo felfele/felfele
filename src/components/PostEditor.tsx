@@ -23,6 +23,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
+import { TouchableViewDefaultHitSlop } from './TouchableView';
 
 export interface StateProps {
     navigation: any;
@@ -240,14 +241,20 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
     return (
         <View style={styles.photoWidget}
         >
-            <TouchableOpacity onPress={props.onPressCamera}>
+            <TouchableOpacity
+                onPress={props.onPressCamera}
+                hitSlop={TouchableViewDefaultHitSlop}
+            >
                 <Icon
                     name={'camera'}
                     size={24}
                     color={Colors.DARK_GRAY}
                 />
             </TouchableOpacity>
-            <TouchableOpacity onPress={props.onPressInsert}>
+            <TouchableOpacity
+                onPress={props.onPressInsert}
+                hitSlop={TouchableViewDefaultHitSlop}
+            >
                 <Icon
                     name={'image-multiple'}
                     size={24}
