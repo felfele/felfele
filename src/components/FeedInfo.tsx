@@ -118,7 +118,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             : isExistingFeed
                 ? isFollowed
                     ? this.onUnfollowFeed
-                    : async () => await this.onDelete()
+                    : () => this.onDelete()
                 : async () => await this.fetchFeed()
         ;
 
@@ -132,7 +132,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         ;
         const rightButtonAction2 = this.state.loading || !isExistingFeed
             ? undefined
-            : async () => await this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
+            : () => this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
         ;
         return (
             <View style={styles.container}>
@@ -156,6 +156,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     autoFocus={true}
                     autoCorrect={false}
                     editable={!isExistingFeed}
+                    returnKeyType='done'
+                    onSubmitEditing={async () => await this.fetchFeed()}
+                    onEndEditing={() => {}}
                 />
                 { this.state.loading
                 ?
@@ -260,7 +263,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
     private onDelete = () => {
         const options: any[] = [
-            { text: 'Yes', onPress: async () => await this.deleteFeedAndGoBack() },
+            { text: 'Yes', onPress: () => this.deleteFeedAndGoBack() },
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 

@@ -159,9 +159,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     FeedSettings: {
         screen: FeedSettingsContainer,
     },
-    FeedInfo: {
-        screen: FeedInfoContainer,
-    },
     EditFilter: {
         screen: EditFilterContainer,
     },
@@ -291,6 +288,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: PostEditorContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
     },
 };
 
