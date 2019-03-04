@@ -45,10 +45,18 @@ const filteredLog = (): LogItem[] => {
         ;
 };
 
-export const getBugReportBody = (): string => {
+const escapePII = (text: string, filterFields: string[]): string => {
+    const fieldsToEscape = filterFields
+        .map(field => `"${field}":"`)
+        .join('|');
+    const regexp = new RegExp(`(${fieldsToEscape})([a-zA-Z0-9])+(")`, 'g');
+    return text.replace(regexp, '$1OMITTED$3');
+};
+
+export const getBugReportBody = (filterFields: string[]): string => {
     return filteredLog()
         .map((logItem: LogItem) => {
-            return `${logItem[0]} ${logItem[1].replace(/("privateKey":")([a-zA-Z0-9])+(")/g, '$1OMITTED$3')}`;
+            return `${logItem[0]} ${escapePII(logItem[1], filterFields)}`;
         })
         .join('\n')
         ;

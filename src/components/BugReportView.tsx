@@ -9,6 +9,8 @@ import { restartApp } from '../helpers/restart';
 import { BoldText, RegularText } from '../ui/misc/text';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
+// personally identifiable information
+const PII = [ 'privateKey', 'publicKey', 'address' ];
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
@@ -25,7 +27,7 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     />
                 }
                 onPressRightButton1={() => {
-                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody()}`);
+                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody(PII)}`);
                 }}
             />
             <View style={styles.contentContainer}>
