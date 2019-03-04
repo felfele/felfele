@@ -181,6 +181,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                             containerStyle={styles.qrCameraStyle}
                             cameraStyle={styles.qrCameraStyle}
                             fadeIn={false}
+                            cameraProps={{ratio: '1:1'}}
                         />
                     </View>
                     <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
