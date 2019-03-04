@@ -97,7 +97,7 @@ const defaultPost3: Post = {
     author: onboardingAuthor,
 };
 
-const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
+export const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
 
 const defaultCurrentTimestamp = 0;
 
