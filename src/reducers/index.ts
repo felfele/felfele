@@ -59,10 +59,49 @@ const defaultAuthor: Author = {
     identity: undefined,
 };
 
+const onboardingAuthor: Author = {
+    faviconUri: '',
+    name: 'Felfele Assistant',
+    uri: '',
+    image: {},
+};
+
+const defaultPost1: Post = {
+    _id: 0,
+    createdAt: Date.now(),
+    images: [],
+    text: `Basic features:.
+
+Post text and images privately, and later add the posts to your public feed.
+
+Follow the public feed of others, or add your favorite RSS/Atom feeds.
+
+If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
+    author: onboardingAuthor,
+};
+
+const defaultPost2: Post = {
+    _id: 1,
+    createdAt: Date.now(),
+    images: [],
+    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    author: onboardingAuthor,
+};
+
+const defaultPost3: Post = {
+    _id: 2,
+    createdAt: Date.now(),
+    images: [],
+    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
+    author: onboardingAuthor,
+};
+
+const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
+
 const defaultCurrentTimestamp = 0;
 
 const defaultMetadata = {
-    highestSeenPostId: 1,
+    highestSeenPostId: defaultLocalPosts.length - 1,
 };
 
 const defaultFeeds: Feed[] = [
@@ -70,13 +109,6 @@ const defaultFeeds: Feed[] = [
         name: 'Felfele Foundation',
         url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
         feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        favicon: '',
-        followed: true,
-    },
-    {
-        name: 'Felfele Assistant',
-        url: 'bzz-feed:/?user=0x2fe5e5d4d1a7606db546391fd38d1fb8b9fa0725',
-        feedUrl: 'bzz-feed:/?user=0x2fe5e5d4d1a7606db546391fd38d1fb8b9fa0725',
         favicon: '',
         followed: true,
     },
@@ -118,7 +150,7 @@ export const defaultState: AppState = {
     author: defaultAuthor,
     currentTimestamp: defaultCurrentTimestamp,
     rssPosts: [],
-    localPosts: [],
+    localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
 };
@@ -313,9 +345,12 @@ const rssPostsReducer = (rssPosts: Post[] = [], action: Actions): Post[] => {
     return rssPosts;
 };
 
-const localPostsReducer = (localPosts: Post[] = [], action: Actions): Post[] => {
+const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Post[] => {
     switch (action.type) {
         case 'ADD-POST': {
+            if (action.payload.post._id === defaultLocalPosts.length) {
+                return [action.payload.post];
+            }
             return insertInArray(localPosts, action.payload.post, 0);
         }
         case 'DELETE-POST': {
