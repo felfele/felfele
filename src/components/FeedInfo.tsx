@@ -125,7 +125,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 ? isFollowed
                     ? this.onUnfollowFeed
                     : () => this.onDelete()
-                : async () => await this.onScanSuccess('https://www.wired.com/feed/category/photo/latest/rss')
+                : async () => await this.fetchFeed()
         ;
 
         const rightButtonText2 = this.state.loading || !isExistingFeed
