@@ -48,6 +48,7 @@
     "buffer": "=5.2.1",
     "ecma-nacl": "=2.4.2",
     "elliptic": "=6.4.1",
+    "he": "=1.2.0",
     "js-sha3": "=0.8.0",
     "node-libs-browser": "=2.1.0",
     "node-libs-react-native": "=1.0.3",
