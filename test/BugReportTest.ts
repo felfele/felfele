@@ -19,6 +19,15 @@ test('escapePII does omit filtered fields: privateKey', () => {
     expect(result).toEqual(expected);
 });
 
+test('escapePII does omit filtered fields when incomplete: privateKey', () => {
+    const text = '{"privateKey":"sec';
+    const expected = '{"privateKey":"OMITTED"';
+
+    const result = escapePII(text, PIIKeys);
+
+    expect(result).toEqual(expected);
+});
+
 test('escapePII does omit filtered fields: name', () => {
     const text = '{"name":"secret"}';
     const expected = '{"name":"OMITTED"}';
@@ -85,6 +94,16 @@ test('escapePII does omit local file path in other fields', () => {
     expect(result).toEqual(expected);
 });
 
+test('escapePII does omit local file path in other fields when incomplete', () => {
+    const text = '{"favicon":"file:///Docum';
+    const filterFields: string[] = [];
+    const expected = '{"favicon":"OMITTED"';
+
+    const result = escapePII(text, filterFields);
+
+    expect(result).toEqual(expected);
+});
+
 test('escapePII does omit local file path in other fields with other path format', () => {
     const text = '{"favicon":"/Documents/id"}';
     const filterFields: string[] = [];
@@ -109,6 +128,16 @@ test('escapePII does omit bzz-feed gateway url in other fields', () => {
     const text = '{"feedUrl":"https://swarm-gateways.net/bzz-feed:/?user=0x663865c36a8a6e28631757e77105e51d8ef378f9"}';
     const filterFields: string[] = [];
     const expected = '{"feedUrl":"https://swarm-gateways.net/OMITTED"}';
+
+    const result = escapePII(text, filterFields);
+
+    expect(result).toEqual(expected);
+});
+
+test('escapePII does omit bzz-feed gateway url in other fields when incomplete', () => {
+    const text = '{"feedUrl":"https://swarm-gateways.net/bzz-feed:/?user=0x663865c3';
+    const filterFields: string[] = [];
+    const expected = '{"feedUrl":"https://swarm-gateways.net/OMITTED"';
 
     const result = escapePII(text, filterFields);
 

@@ -15,9 +15,10 @@ export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPat
 export const escapePII = (text: string, filterFields: string[]): string => {
     const fieldsToEscape = filterFields
         .join('|');
-    const fieldRegexp = new RegExp(`"(${fieldsToEscape})":".+?"`, 'g');
-    const localPathRegexp = new RegExp('"(file:///.+?|/.+?/.+?)"', 'g');
-    const bzzFeedRegexp = new RegExp('(".*?)(bzz-feed:/.+?)"', 'g');
+    const quoteOrLineEnd = '("|$)';
+    const fieldRegexp = new RegExp(`"(${fieldsToEscape})":".+?${quoteOrLineEnd}`, 'g');
+    const localPathRegexp = new RegExp(`"(file:///.+?|/.+?/.+?)${quoteOrLineEnd}`, 'g');
+    const bzzFeedRegexp = new RegExp(`(".*?)(bzz-feed:/.+?)${quoteOrLineEnd}`, 'g');
     return text
         .replace(fieldRegexp, '"$1":"OMITTED"')
         .replace(localPathRegexp, '"OMITTED"')
