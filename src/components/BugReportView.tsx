@@ -10,14 +10,19 @@ import { filteredLog, LogItem } from '../log';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 // personally identifiable information
-const PII = [ 'privateKey', 'publicKey', 'address' ];
+export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath' ];
 
 export const escapePII = (text: string, filterFields: string[]): string => {
     const fieldsToEscape = filterFields
-        .map(field => `"${field}":"`)
         .join('|');
-    const regexp = new RegExp(`(${fieldsToEscape})(.)+?(")`, 'g');
-    return text.replace(regexp, '$1OMITTED$3');
+    const fieldRegexp = new RegExp(`"(${fieldsToEscape})":".+?"`, 'g');
+    const localPathRegexp = new RegExp('"(file:///.+?|/.+?/.+?)"', 'g');
+    const bzzFeedRegexp = new RegExp('(".*?)(bzz-feed:/.+?)"', 'g');
+    return text
+        .replace(fieldRegexp, '"$1":"OMITTED"')
+        .replace(localPathRegexp, '"OMITTED"')
+        .replace(bzzFeedRegexp, '$1OMITTED"')
+        ;
 };
 
 const getBugReportBody = (filterFields: string[]): string => {
@@ -44,7 +49,7 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     />
                 }
                 onPressRightButton1={() => {
-                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody(PII)}`);
+                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody(PIIKeys)}`);
                 }}
             />
             <View style={styles.contentContainer}>
