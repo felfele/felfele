@@ -64,6 +64,15 @@ test('escapePII does omit filtered fields: localPath', () => {
     expect(result).toEqual(expected);
 });
 
+test('escapePII does omit filtered fields: user', () => {
+    const text = '{"user":"secret"}';
+    const expected = '{"user":"OMITTED"}';
+
+    const result = escapePII(text, PIIKeys);
+
+    expect(result).toEqual(expected);
+});
+
 test('escapePII does omit filtered fields with unicode', () => {
     const text = '{"name":"☺"}';
     const filterFields = ['name'];

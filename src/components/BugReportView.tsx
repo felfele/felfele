@@ -10,7 +10,7 @@ import { filteredLog, LogItem } from '../log';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 // personally identifiable information
-export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath' ];
+export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath', 'user' ];
 
 export const escapePII = (text: string, filterFields: string[]): string => {
     const fieldsToEscape = filterFields
