@@ -135,6 +135,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-splash-screen')
     compile project(':react-native-restart')
     compile project(':react-native-image-resizer')
     compile project(':react-native-svg')
