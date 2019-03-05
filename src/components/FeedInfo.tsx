@@ -227,7 +227,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     url: link,
                 });
                 const clearClipboard = () => Clipboard.setString('');
-                await this.fetchFeed(clearClipboard);
+                await this.fetchFeed(clearClipboard, link);
             }
         }
     }
