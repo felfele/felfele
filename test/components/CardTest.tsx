@@ -35,6 +35,16 @@ describe('card test', () => {
         author: testAuthor,
     };
 
+    const testPostWithMultipleImages: Post = {
+        _id: 0,
+        createdAt: Date.now(),
+        images: [{ uri: 'test-image-uri-1' }, { uri: 'test-image-uri-2' }, { uri: 'test-image-uri-3' }],
+        text: `This is a basic test post:
+
+    Let's see if we can assert something useful.`,
+        author: testAuthor,
+    };
+
     const modelHelper = new ReactNativeModelHelper('');
 
     it('should render unselected post without images with the following components: Post, CardTop, without CardButtonList', () => {
@@ -79,7 +89,7 @@ describe('card test', () => {
         expect(result.findAllByProps({ testID: 'CardButtonList' }));
     });
 
-    it('should render unselected post with images with the following components: Post, CardTop, Image, without CardButtonList', () => {
+    it('should render unselected post with image with the following components: Post, CardTop, Image, without CardButtonList', () => {
         const result = TestRenderer.create(
             <Card
                 post={testPostWithImage}
@@ -97,11 +107,33 @@ describe('card test', () => {
         console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
-        expect(result.findByProps({ testID: 'test-image-uri' + '0'}));
+        expect(result.findByProps({ testID: 'test-image-uri' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }).length).toEqual(0);
     });
 
-    it('should render selected post with images with the following components: Post, CardTop, Image, CardButtonList', () => {
+    it('should render unselected post with multiple images with the following components: Post, CardTop, Carousel, without CardButtonList', () => {
+        const result = TestRenderer.create(
+            <Card
+                post={testPostWithMultipleImages}
+                isSelected={false}
+                navigate={(_) => {}}
+                onDeletePost={(_) => {}}
+                onSharePost={(_) => {}}
+                togglePostSelection={(_) => {}}
+                showSquareImages={true}
+                currentTimestamp={0}
+                author={testAuthor}
+                modelHelper={modelHelper}
+            />
+        ).root;
+        console.log(result.props);
+        expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
+        expect(result.findByProps({ testID: 'CardTop' }));
+        expect(result.findByProps({ testID: 'carousel' }));
+        expect(result.findAllByProps({ testID: 'CardButtonList' }).length).toEqual(0);
+    });
+
+    it('should render selected post with image with the following components: Post, CardTop, Image, CardButtonList', () => {
         const result = TestRenderer.create(
             <Card
                 post={testPostWithImage}
@@ -119,7 +151,7 @@ describe('card test', () => {
         console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
-        expect(result.findByProps({ testID: 'test-image-uri' + '0'}));
+        expect(result.findByProps({ testID: 'test-image-uri' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }).length).toEqual(0);
     });
 

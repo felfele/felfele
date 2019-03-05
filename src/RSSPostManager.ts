@@ -7,6 +7,8 @@ import { Utils } from './Utils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 import { Debug } from './Debug';
+// tslint:disable-next-line:no-var-requires
+const he = require('he');
 
 interface RSSEnclosure {
     url: string;
@@ -357,8 +359,8 @@ class _RSSPostManager {
         return ++this.id;
     }
 
-    public formatDescription(description: string): string {
-        return description
+    public htmlToMarkdown(description: string): string {
+        const strippedHtml = description
             // strip spaces at the beginning of lines
             .replace(/^( *)/gm, '')
             // strip newlines
@@ -375,19 +377,11 @@ class _RSSPostManager {
             .replace(/<(\/?[a-z]+.*?>)/gi, '')
             // strip html comments
             .replace(/<!--.*?-->/g, '')
-            // replace html ellipses
-            .replace(/&hellip;/g, '...')
-            // replace html ampersands
-            .replace(/&amp;/g, '&')
-            // replace html quotes
-            .replace(/&quot;/g, '"')
-            // replace html non-breaking spaces
-            .replace(/&nbsp;/g, ' ')
-            // strip html keycodes
-            .replace(/&#[0-9]+;/g, '')
             // replace multiple space with one space
             .replace(/ +/g, ' ')
             ;
+
+        return he.decode(strippedHtml);
     }
 
     public extractTextAndImagesFromMarkdown(markdown: string, baseUri: string): [string, ImageData[]] {
@@ -448,8 +442,8 @@ class _RSSPostManager {
         const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
-            const description = this.formatDescription(item.description);
-            const [text, markdownImages] = this.extractTextAndImagesFromMarkdown(description, '');
+            const markdown = this.htmlToMarkdown(item.description);
+            const [text, markdownImages] = this.extractTextAndImagesFromMarkdown(markdown, '');
             const mediaImages = this.extractImagesFromMedia(item.media);
             const enclosureImages = this.extractImagesFromEnclosures(item.enclosures);
             const images = markdownImages

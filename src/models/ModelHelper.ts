@@ -1,17 +1,28 @@
 import { Author } from './Post';
 import { ImageData } from './ImageData';
 
+export interface Rectangle {
+    width: number;
+    height: number;
+}
+
 export interface ModelHelper {
     getAuthorImageUri: (author: Author) => string;
     getLocalPath: (localPath: string) => string;
     getImageUri: (image: ImageData) => string;
 }
 
-export const calculateImageDimensions = (image: ImageData, maxWidth: number): number[] => {
+export const calculateImageDimensions = (image: ImageData, maxWidth: number): Rectangle => {
     if (image.width == null || image.height == null) {
-        return [maxWidth, maxWidth];
+        return {
+            width: maxWidth,
+            height: maxWidth,
+        };
     }
     const ratio = image.width / maxWidth;
     const height = image.height / ratio;
-    return [maxWidth, height];
+    return {
+        width: maxWidth,
+        height: height,
+    };
 };

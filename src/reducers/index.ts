@@ -97,7 +97,7 @@ const defaultPost3: Post = {
     author: onboardingAuthor,
 };
 
-const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
+export const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
 
 const defaultCurrentTimestamp = 0;
 
@@ -110,21 +110,21 @@ const defaultFeeds: Feed[] = [
         name: 'The Verge',
         url: 'https://theverge.com/',
         feedUrl: 'https://www.theverge.com/rss/index.xml',
-        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395361/favicon-64x64.0.ico',
+        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png',
         followed: true,
     },
     {
         name: 'Wired Photos',
         url: 'https://www.wired.com/',
         feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: '',
+        favicon: 'https://static.savings-united.com/image_setting/132/logo/wired_coupons_logo.png',
         followed: true,
     },
     {
         name: '500px Blog',
         url: 'https://iso.500px.com',
         feedUrl: 'https://iso.500px.com/feed',
-        favicon: 'https://iso.500px.com/wp-content/themes/photoform/favicon.ico',
+        favicon: 'https://iso.500px.com/wp-content/uploads/2017/10/cropped-FAVICON-180x180.png',
         followed: true,
     },
     {

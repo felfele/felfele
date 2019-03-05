@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
@@ -22,7 +23,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                 <NavigationHeader
                     title='Filters'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
-                    rightButtonText1='Add'
+                    rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
                     onPressRightButton1={this.onAddFilter}
                 />
                 <ScrollView>

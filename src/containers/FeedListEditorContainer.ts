@@ -19,6 +19,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         navigation: ownProps.navigation,
         onPressFeed: onPressFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
+        title: 'Feed list',
     };
 };
 

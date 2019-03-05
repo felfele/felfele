@@ -12,6 +12,8 @@ import * as AreYouSureDialog from './AreYouSureDialog';
 import { Colors } from '../styles';
 import { RowItem } from '../ui/misc/RowButton';
 import * as Swarm from '../swarm/Swarm';
+import { restartApp } from '../helpers/restart';
+import { Utils } from '../Utils';
 
 export interface StateProps {
     appState: AppState;
@@ -120,17 +122,28 @@ export const DebugScreen = (props: Props) => (
 );
 
 const onAppStateReset = async (props: Props) => {
-    const confirmed = await AreYouSureDialog.show('Are you sure you want to reset the app state?');
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to reset the app state?',
+        'This will delete all your data and there is no undo!'
+    );
     Debug.log('onAppStateReset: ', confirmed);
     if (confirmed) {
         props.onAppStateReset();
+        await Utils.waitMillisec(3 * 1000);
+        restartApp();
     }
 };
 
 const onCreateIdentity = async (props: Props) => {
-    const confirmed = await AreYouSureDialog.show('Are you sure you want to create new identity?');
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to create new identity?',
+        'This will delete your current identity and there is no undo!'
+    );
+    Debug.log('onCreateIdentity: ', confirmed);
     if (confirmed) {
         props.onCreateIdentity();
+        await Utils.waitMillisec(3 * 1000);
+        restartApp();
     }
 };
 

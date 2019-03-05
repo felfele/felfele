@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Platform, YellowBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+// @ts-ignore
+import { setCustomText } from 'react-native-global-props';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
@@ -21,9 +22,9 @@ import { IdentitySettingsContainer } from './containers/IdentitySettingsContaine
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { WelcomeContainer } from './containers/WelcomeContainer';
-import { appendToLog } from './components/LogViewer';
+import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
-import { Colors } from './styles';
+import { Colors, defaultTextProps } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
@@ -42,6 +43,7 @@ YellowBox.ignoreWarnings([
 ]);
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
+setCustomText(defaultTextProps);
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
@@ -156,9 +158,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     FeedSettings: {
         screen: FeedSettingsContainer,
-    },
-    FeedInfo: {
-        screen: FeedInfoContainer,
     },
     EditFilter: {
         screen: EditFilterContainer,
@@ -289,6 +288,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: PostEditorContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
     },
 };
 

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState, defaultLocalPosts } from '../reducers';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
@@ -7,23 +7,38 @@ import { getFeedPosts, getYourPosts } from '../selectors/selectors';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const feedUrl = ownProps.navigation.state.params.feedUrl;
-    const selectedFeeds = state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl);
-    // TODO: we should have here state.ownFeeds.find(feed => feed.url === feedUrl) != null,
-    // but author.uri is empty, and the feedUrl from navparams is from post.author.uri (not real feedUrl)
-    // For the same reason feeds/selectedFeeds is empty (errounously)
-    const isOwnFeed = state.author.uri === feedUrl;
+    const feedName = ownProps.navigation.state.params.name;
+
+    const isOwnFeed = feedName === state.author.name;
+    const isAssistantFeed = feedName === 'Felfele Assistant';
+    const hasOwnFeed = state.ownFeeds.length > 0;
+    const ownFeed = hasOwnFeed ? state.ownFeeds[0] : undefined;
+    const selectedFeeds = isOwnFeed
+        ? hasOwnFeed
+            ? [ownFeed!]
+            : []
+        : isAssistantFeed
+            ? []
+            : state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl)
+        ;
     // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
     // see https://github.com/reduxjs/reselect/blob/master/README.md#accessing-react-props-in-selectors
-    const posts = isOwnFeed ? getYourPosts(state) : getFeedPosts(state, feedUrl);
+    const feedPosts = getFeedPosts(state, feedUrl);
+    const ownPosts = getYourPosts(state);
+    const posts = isOwnFeed
+        ? ownPosts
+        : isAssistantFeed
+            ? defaultLocalPosts
+            : feedPosts
+        ;
     return {
         onBack: () => ownProps.navigation.goBack(null),
         navigation: ownProps.navigation,
-        feedUrl: feedUrl,
-        feedName: ownProps.navigation.state.params.name,
-        posts: posts,
-        // HACK
-        feeds: selectedFeeds.length === 0 ? [state.ownFeeds[0]] : selectedFeeds,
-        isOwnFeed: isOwnFeed,
+        feedUrl,
+        feedName,
+        posts,
+        feeds: selectedFeeds,
+        isOwnFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };

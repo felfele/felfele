@@ -4,6 +4,7 @@ import {
     StyleSheet,
     TextProps,
 } from 'react-native';
+import { defaultRegularFont, defaultBoldFont, defaultMediumFont } from '../../styles';
 
 export const BoldText = (props: TextProps) => {
     const { style, ...rest } = props;
@@ -28,12 +29,12 @@ export const RegularText = (props: TextProps) => {
 
 const styles = StyleSheet.create({
     boldFont: {
-        fontFamily: 'Roboto-Bold',
+        fontFamily: defaultBoldFont,
     },
     regularFont: {
-        fontFamily: 'Roboto-Regular',
+        fontFamily: defaultRegularFont,
     },
     mediumFont: {
-        fontFamily: 'Roboto-Medium',
+        fontFamily: defaultMediumFont,
     },
 });

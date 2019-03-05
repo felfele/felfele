@@ -18,7 +18,7 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors } from '../styles';
 import * as Swarm from '../swarm/Swarm';
-import { downloadRecentPostFeed, makeSwarmStorage } from '../swarm-social/swarmStorage';
+import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -77,13 +77,19 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.props.navigation.goBack();
     }
 
-    public async fetchFeed(onSuccess?: () => void) {
+    public async fetchFeed(onSuccess?: () => void, feedUrl?: string) {
+        Debug.log('fetchFeed', 'this.state', this.state);
+        if (this.state.loading === true) {
+            return;
+        }
+
         this.setState({
             loading: true,
             activityText: 'Loading feed',
         });
 
-        const feed = await this.fetchFeedFromUrl(this.state.url);
+        const url = feedUrl != null ? feedUrl : this.state.url;
+        const feed = await this.fetchFeedFromUrl(url);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
                 loading: false,
@@ -118,7 +124,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             : isExistingFeed
                 ? isFollowed
                     ? this.onUnfollowFeed
-                    : async () => await this.onDelete()
+                    : () => this.onDelete()
                 : async () => await this.fetchFeed()
         ;
 
@@ -132,7 +138,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         ;
         const rightButtonAction2 = this.state.loading || !isExistingFeed
             ? undefined
-            : async () => await this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
+            : () => this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
         ;
         return (
             <View style={styles.container}>
@@ -156,6 +162,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     autoFocus={true}
                     autoCorrect={false}
                     editable={!isExistingFeed}
+                    returnKeyType='done'
+                    onSubmitEditing={async () => await this.fetchFeed()}
+                    onEndEditing={() => {}}
                 />
                 { this.state.loading
                 ?
@@ -177,10 +186,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 <View>
                     <View style={styles.qrCameraContainer}>
                         <QRCodeScanner
-                            onRead={async (event) => await this.onScanSuccess(event)}
+                            onRead={async (event) => await this.onScanSuccess(event.data)}
                             containerStyle={styles.qrCameraStyle}
                             cameraStyle={styles.qrCameraStyle}
                             fadeIn={false}
+                            cameraProps={{ratio: '1:1'}}
                         />
                     </View>
                     <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
@@ -192,7 +202,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private ExistingItemView = () => {
-        const qrCodeValue = this.props.feed.url;
+        const qrCodeValue = this.props.feed.feedUrl;
         return (
             <View>
                 <View style={styles.qrCodeContainer}>
@@ -229,10 +239,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
             return feed;
         } else {
-            const canonicalUrl = Utils.getCanonicalUrl(this.state.url);
-            Debug.log('fetchFeed: url: ', canonicalUrl);
+            Debug.log('fetchFeedFromUrl', 'url', url);
+            const canonicalUrl = Utils.getCanonicalUrl(url);
+            Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
             const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
-            Debug.log('fetchFeed: feed: ', feed);
+            Debug.log('fetchFeedFromUrl', 'feed', feed);
             return feed;
         }
     }
@@ -259,7 +270,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
     private onDelete = () => {
         const options: any[] = [
-            { text: 'Yes', onPress: async () => await this.deleteFeedAndGoBack() },
+            { text: 'Yes', onPress: () => this.deleteFeedAndGoBack() },
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
@@ -291,14 +302,14 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.goBack();
     }
 
-    private onScanSuccess = async (event: ScanEvent) => {
+    private onScanSuccess = async (data: any) => {
         try {
-            Debug.log(event);
-            const feedUri = event.data;
+            Debug.log('FeedInfo.onScanSuccess', 'data', data);
+            const feedUrl = data;
             this.setState({
-                url: feedUri,
+                url: feedUrl,
             });
-            await this.fetchFeed();
+            await this.fetchFeed(undefined, feedUrl);
         } catch (e) {
             Debug.log(e);
         }
@@ -307,7 +318,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#EFEFF4',
+        backgroundColor: Colors.BACKGROUND_COLOR,
         flex: 1,
         flexDirection: 'column',
     },
@@ -341,7 +352,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'column',
         height: 100,
-        backgroundColor: '#EFEFF4',
+        backgroundColor: Colors.BACKGROUND_COLOR,
         paddingTop: 50,
     },
     qrCodeContainer: {

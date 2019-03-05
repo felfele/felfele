@@ -5,7 +5,7 @@ test('Parse CDATA descriptions from RSS', async () => {
     const description = `<![CDATA[${text}]]>`;
     const expectedResult = text;
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });
@@ -15,7 +15,7 @@ test('Parse image from RSS', async () => {
     const description = `<img src="${link}" alt="">`;
     const expectedResult = `![](${link})`;
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });
@@ -25,7 +25,7 @@ test('Parse CDATA descriptions containing an image from RSS', async () => {
     const description = `<![CDATA[<img src="${link}" alt="">]]>`;
     const expectedResult = `![](${link})`;
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });
@@ -35,7 +35,7 @@ test('Parse html with image', () => {
     const description = `<div><img src="${link}" alt=""></div>`;
     const expectedResult = `![](${link})`;
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });
@@ -56,7 +56,7 @@ test('Parse link', () => {
     const description = `<a href="${link}">description</a>`;
     const expectedResult = `[description](${link})`;
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });
@@ -69,7 +69,7 @@ test('Parse description with multiline CDATA', () => {
     `;
     const expectedResult = 'a';
 
-    const result = RSSPostManager.formatDescription(description);
+    const result = RSSPostManager.htmlToMarkdown(description);
 
     expect(result).toBe(expectedResult);
 });

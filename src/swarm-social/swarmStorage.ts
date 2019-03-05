@@ -9,6 +9,7 @@ import {
     getPostCommandUpdatesSinceEpoch,
     getLatestPostsFromLog,
     epochCompare,
+    PostCommandProtocolVersion,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
@@ -17,10 +18,10 @@ import { Utils } from '../Utils';
 import { PublicPost, Post, Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
-import { syncPostCommandLogWithStorage } from '../social/sync';
+import { syncPostCommandLogWithStorage, uploadUnsyncedPostCommandsToStorage } from '../social/sync';
 
 const NUMBER_OF_RECENT_POSTS = 20;
-const DEFAULT_POST_COMMAND_LOG_TOPIC = 'felfele:posts';
+const DEFAULT_POST_COMMAND_LOG_TOPIC = `felfele:posts:v${PostCommandProtocolVersion}`;
 
 interface ImageResizer {
     resizeImage: (image: ImageData, path: string) => Promise<string>;
@@ -85,7 +86,7 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
 export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSyncer => ({
     sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed): Promise<StorageSyncUpdate> => {
         const lastSeenEpoch = getLatestPostCommandEpochFromLog(postCommandLog);
-        const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
+        const syncedPostCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLog, swarmStorage);
         const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
         const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
         console.log('swarmStorage.sync', 'syncedPostCommandLog', syncedPostCommandLog, 'lastSeenEpoch', lastSeenEpoch, 'postCommandUpdates', postCommandUpdates);

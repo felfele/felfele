@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
 import { Colors } from '../styles';
@@ -21,6 +22,7 @@ export interface StateProps {
     followedFeeds: Feed[];
     knownFeeds: Feed[];
     gatewayAddress: string;
+    title: string;
 }
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
@@ -86,9 +88,9 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                             // null is needed otherwise it does not work with switchnavigator backbehavior property
                             this.props.navigation.goBack(null);
                         }}
-                        rightButtonText1='Add'
+                        rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
                         onPressRightButton1={this.onAddFeed}
-                        title='Feed list'
+                        title={this.props.title}
                     />
                 </FeedGrid>
             </SafeAreaView>
@@ -103,24 +105,6 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             url: '',
         };
         this.props.navigation.navigate('FeedInfo', { feed: feed });
-    }
-}
-
-export class FeedListViewer extends React.PureComponent<DispatchProps & StateProps> {
-    public render() {
-        return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-                <FeedGrid {...this.props}>
-                    <NavigationHeader
-                        withoutSafeArea={true}
-                        onPressLeftButton={() => {
-                            this.props.navigation.goBack();
-                        }}
-                        title='All feeds'
-                    />
-                </FeedGrid>
-            </SafeAreaView>
-        );
     }
 }
 
