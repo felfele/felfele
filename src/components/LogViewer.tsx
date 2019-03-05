@@ -9,7 +9,7 @@ import { View,
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 import { NavigationHeader } from './NavigationHeader';
-import { DateUtils } from '../DateUtils';
+import { clearLog, filteredLog, setLogFilter } from '../log';
 import { Colors, DefaultTabBarHeight } from '../styles';
 import { SimpleTextInput } from './SimpleTextInput';
 
@@ -23,44 +23,6 @@ export interface DispatchProps {
 }
 
 export type Props = StateProps & DispatchProps;
-
-type LogItem = [string, string];
-const logData: LogItem[] = [];
-let logFilter = '';
-
-export const appendToLog = (logLine: string) => {
-    const dateString = DateUtils.timestampToDateString(Date.now(), true).replace('T', ' ').replace('Z', '');
-    logData.splice(0, 0, [dateString, logLine]);
-};
-
-const clearLog = (props: Props) => {
-    logData.splice(0, logData.length);
-    props.onTickTime();
-};
-
-const filteredLog = (): LogItem[] => {
-    return logData
-        .filter(logItem => logItem[1].indexOf('TIME-TICK') === -1)
-        .filter(logItem => logItem[1].toLowerCase().indexOf(logFilter) !== -1 || logItem[0].indexOf(logFilter) !== -1)
-        ;
-};
-
-const escapePII = (text: string, filterFields: string[]): string => {
-    const fieldsToEscape = filterFields
-        .map(field => `"${field}":"`)
-        .join('|');
-    const regexp = new RegExp(`(${fieldsToEscape})([a-zA-Z0-9])+(")`, 'g');
-    return text.replace(regexp, '$1OMITTED$3');
-};
-
-export const getBugReportBody = (filterFields: string[]): string => {
-    return filteredLog()
-        .map((logItem: LogItem) => {
-            return `${logItem[0]} ${escapePII(logItem[1], filterFields)}`;
-        })
-        .join('\n')
-        ;
-};
 
 export class LogViewer extends React.PureComponent<Props> {
     private tickInterval: any = null;
@@ -79,7 +41,10 @@ export class LogViewer extends React.PureComponent<Props> {
             <NavigationHeader
                 onPressLeftButton={() => this.props.navigation.goBack(null)}
                 rightButtonText1='Clear'
-                onPressRightButton1={() => clearLog(this.props)}
+                onPressRightButton1={() => {
+                    clearLog();
+                    this.props.onTickTime();
+                }}
                 title='Log viewer'
             />
             { Platform.OS === 'ios' &&
@@ -92,7 +57,10 @@ export class LogViewer extends React.PureComponent<Props> {
                             autoCorrect={false}
                             placeholder='Filter logs'
                             placeholderTextColor={Colors.LIGHT_GRAY}
-                            onChangeText={(text) => (logFilter = text.toLowerCase()) && this.props.onTickTime()}
+                            onChangeText={(text) => {
+                                setLogFilter(text.toLowerCase());
+                                this.props.onTickTime();
+                            }}
                         />
                     </View>
                 </View>

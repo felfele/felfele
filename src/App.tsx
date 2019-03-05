@@ -22,7 +22,7 @@ import { IdentitySettingsContainer } from './containers/IdentitySettingsContaine
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { WelcomeContainer } from './containers/WelcomeContainer';
-import { appendToLog } from './components/LogViewer';
+import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { Colors, defaultTextProps } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
