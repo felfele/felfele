@@ -42,7 +42,9 @@
     "tsc": "tsc --skipLibCheck",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
-    "clean": "rm -rf build"
+    "clean": "rm -rf build",
+    "build:android": "scripts/build_signed_android_release.sh",
+    "build:ios": "scripts/build_xcode_archive.sh"
   },
   "dependencies": {
     "base64-arraybuffer": "=0.1.5",
@@ -110,5 +112,8 @@
       }
     },
     "test-runner": "mocha"
+  },
+  "jest": {
+    "preset": "react-native"
   }
 }

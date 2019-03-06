@@ -1,18 +1,40 @@
-language: android
-node_js: "node"
-before_install:
-  - nvm install 6
-  - node --version
-install:
-  - npm install
-android:
-  components:
-  - build-tools-23.0.1
-  - android-23
-  - extra-android-m2repository
-  - extra-google-google_play_services
-  - extra-google-m2repository
-  - addon-google_apis-google-16
-script:
-  - npm run check
-  - cd android && ./gradlew assembleRelease
+matrix:
+  include:
+    - language: node_js
+      node_js: "node"
+      script: npm run check
+
+    - os: osx
+      language: objective-c
+      osx_image: xcode9.4
+      env:
+        - JOB_NAME=IOS
+      script:
+        - npm run check
+        - ./scripts/build_xcode_archive.sh
+
+    - os: linux
+      language: android
+      jdk: oraclejdk8
+      sudo: required
+      android:
+        components:
+          - platform-tools
+          - tools
+          - build-tools-26.0.3
+          - android-21
+          - android-26
+          - sys-img-armeabi-v7a-android-21
+          - extra-android-m2repository
+          - extra-google-m2repository
+          - extra-google-google_play_services
+      env:
+        - JOB_NAME=ANDROID
+      before_install:
+        - nvm install 6
+        - node --version
+      install:
+        - npm install
+      script:
+        - npm run check
+        - ./scripts/build_signed_android_release.sh
