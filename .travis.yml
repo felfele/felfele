@@ -17,7 +17,7 @@ matrix:
         - npm run link
       script:
         - npm run check
-        - ./scripts/build_xcode_archive.sh
+        - npm run build:ios
 
     - os: linux
       language: android
@@ -44,4 +44,4 @@ matrix:
         - npm run link
       script:
         - npm run check
-        - ./scripts/build_signed_android_release.sh
+        - npm run build:android
