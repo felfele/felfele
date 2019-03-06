@@ -4,8 +4,12 @@ import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper';
+import { Debug } from '../../src/Debug';
 
+Debug.setDebug(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
+jest.mock('../../src/components/CardMarkdown');
+jest.mock('../../src/ui/misc/Carousel');
 
 describe('card test', () => {
     const testAuthor: Author = {
@@ -62,7 +66,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }).length).toEqual(0);
@@ -83,7 +86,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }));
@@ -104,7 +106,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'test-image-uri' }));
@@ -126,7 +127,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'carousel' }));
@@ -148,7 +148,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'test-image-uri' }));

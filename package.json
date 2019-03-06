@@ -38,10 +38,14 @@
     "test": "node node_modules/jest/bin/jest.js",
     "watchTest": "node node_modules/jest/bin/jest.js --watch",
     "check": "npm run tsc && npm run lint && npm run test",
+    "extended-check": "npm run tsc && npm run lint && npm run test && cd android && ./gradlew assembleRelease",
     "tsc": "tsc --skipLibCheck",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
-    "clean": "rm -rf build"
+    "clean": "rm -rf build",
+    "build:android": "scripts/build_signed_android_release.sh",
+    "build:ios": "scripts/build_xcode_archive.sh build",
+    "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
   "dependencies": {
     "base64-arraybuffer": "=0.1.5",
@@ -109,5 +113,8 @@
       }
     },
     "test-runner": "mocha"
+  },
+  "jest": {
+    "preset": "react-native"
   }
 }

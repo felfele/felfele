@@ -9,14 +9,12 @@ import { Utils } from '../Utils';
 import { ImageDataView } from './ImageDataView';
 import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
-// @ts-ignore
-import Markdown from 'react-native-easy-markdown';
-import { ErrorBoundary } from './ErrorBoundary';
 import { Debug } from '../Debug';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
 import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
+import { CardMarkdown } from './CardMarkdown';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
@@ -258,26 +256,6 @@ const CardTop = (props: {
     );
 };
 
-const CardMarkdown = (props: { text: string }) => (
-    <ErrorBoundary>
-        <Markdown
-            style={styles.markdownStyle}
-            renderLink={(href: string, title: string, children: React.ReactNode) => {
-                return (
-                    <TouchableWithoutFeedback
-                        key={'linkWrapper_' + href + Date.now()}
-                        onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
-                    >
-                        <Text key={'linkWrapper_' + href + Date.now()} style={{textDecorationLine: 'underline'}}>
-                            {children}
-                        </Text>
-                    </TouchableWithoutFeedback>
-                );
-            }}
-        >{props.text}</Markdown>
-    </ErrorBoundary>
-);
-
 const openPost = async (post: Post) => {
     if (post.link) {
         if (!isSwarmLink(post.link)) {
@@ -421,10 +399,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    markdownStyle: {
-        marginVertical: 10,
-        marginHorizontal: 10,
     },
     translucentBar: {
         height: TranslucentBarHeight,
