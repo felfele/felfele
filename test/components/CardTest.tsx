@@ -9,6 +9,7 @@ import { Debug } from '../../src/Debug';
 Debug.setDebug(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
 jest.mock('../../src/components/CardMarkdown');
+jest.mock('../../src/ui/misc/Carousel');
 
 describe('card test', () => {
     const testAuthor: Author = {
