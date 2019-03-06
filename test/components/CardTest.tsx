@@ -4,8 +4,11 @@ import { Card } from '../../src/components/Card';
 import { Author, Post } from '../../src/models/Post';
 import TestRenderer from 'react-test-renderer';
 import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper';
+import { Debug } from '../../src/Debug';
 
+Debug.setDebug(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
+jest.mock('../../src/components/CardMarkdown');
 
 describe('card test', () => {
     const testAuthor: Author = {
