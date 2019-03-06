@@ -1,9 +1,7 @@
+env:
 matrix:
-  include:
-    - language: node_js
-      node_js: "node"
-      script: npm run check
-
+  fast_finish: true
+  allow_failures:
     - os: osx
       language: objective-c
       osx_image: xcode10.1
@@ -18,6 +16,10 @@ matrix:
       script:
         - npm run check
         - npm run build:ios
+  include:
+    - language: node_js
+      node_js: "node"
+      script: npm run check
 
     - os: linux
       language: android
