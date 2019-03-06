@@ -62,7 +62,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }).length).toEqual(0);
@@ -83,7 +82,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findAllByProps({ testID: 'CardButtonList' }));
@@ -104,7 +102,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'test-image-uri' }));
@@ -126,7 +123,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'carousel' }));
@@ -148,7 +144,6 @@ describe('card test', () => {
                 modelHelper={modelHelper}
             />
         ).root;
-        console.log(result.props);
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
         expect(result.findByProps({ testID: 'CardTop' }));
         expect(result.findByProps({ testID: 'test-image-uri' }));
