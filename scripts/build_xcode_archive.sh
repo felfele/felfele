@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
 cd ios
-xcodebuild -scheme postmodern archive
+xcodebuild -quiet -scheme postmodern archive
 cd ..
