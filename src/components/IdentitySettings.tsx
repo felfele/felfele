@@ -14,6 +14,7 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author } from '../models/Post';
@@ -79,7 +80,14 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     return (
         <KeyboardAvoidingView style={styles.mainContainer}>
             <NavigationHeader
-                rightButtonText1={props.ownFeed != null ? 'Share' : undefined}
+                rightButtonText1={props.ownFeed != null
+                    ? <MaterialCommunityIcon
+                        name={'share'}
+                        size={20}
+                        color={Colors.DARK_GRAY}
+                    />
+                    : undefined
+                }
                 onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                 title={SCREEN_TITLE}
             />
