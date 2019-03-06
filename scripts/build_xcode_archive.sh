@@ -6,5 +6,5 @@ if [ "$1" != "" ]; then
 fi
 
 cd ios
-xcodebuild -quiet -scheme postmodern $TARGET
+xcodebuild -allowProvisioningUpdates -quiet -scheme postmodern $TARGET
 cd ..
