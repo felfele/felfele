@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
+import { ContentFilter } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
@@ -30,7 +30,9 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                     {this.props.filters.map(filter => (
                         <RowItem
                             title={filter.text}
-                            description={filterValidUntilToText(filter.validUntil) + ' from ' + DateUtils.printableElapsedTime(filter.createdAt) + ' ago'}
+                            description={
+                                'Expires in ' +
+                                DateUtils.printableElapsedTime(Date.now(), filter.createdAt + filter.validUntil)}
                             key={filter.text}
                             buttonStyle='navigate'
                             onPress={() => {

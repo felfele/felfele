@@ -27,10 +27,10 @@ export class DateUtils {
     }
 
     public static printableElapsedTime(timestamp: number, now: number = Date.now()): string {
-        if (now < timestamp) {
-            return 'few seconds';
-        }
-        const diff = new Date(now - timestamp);
+        const diff = now >= timestamp
+            ? new Date(now - timestamp)
+            : new Date(timestamp - now)
+            ;
         const pluralize = (s: string, num: number) => num > 1 ? s + 's' : s;
 
         const years = diff.getUTCFullYear() - 1970;
