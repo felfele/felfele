@@ -26,10 +26,14 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export class AllFeedScreen extends React.Component<Props> {
+    private ref?: RefreshableFeed = undefined;
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <RefreshableFeed modelHelper={modelHelper} {...this.props}>
+            <RefreshableFeed
+                modelHelper={modelHelper} {...this.props}
+                ref={value => this.ref = value || undefined}
+            >
                 {{
                     navigationHeader: <NavigationHeader
                                     title='All feeds'
@@ -41,6 +45,7 @@ export class AllFeedScreen extends React.Component<Props> {
                                         />
                                     }
                                     onPressRightButton1={() => this.props.navigation.navigate('FeedListViewerContainer')}
+                                    onPressTitle={this.ref && this.ref.scrollToTop}
                                 />,
                     listHeader: <FeedHeader
                                     navigation={this.props.navigation}
