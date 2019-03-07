@@ -77,14 +77,13 @@ const WIDTH = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     mainContainer: {
         width: WIDTH,
-        height: WIDTH,
+        height: WIDTH - 30,
     },
     textInput: {
         paddingHorizontal: 8,
         paddingVertical: 8,
         color: Colors.WHITE,
         fontSize: 20,
-        fontStyle: 'italic',
         alignItems: 'center',
         textAlign: 'center',
     },
@@ -109,8 +108,8 @@ const styles = StyleSheet.create({
     },
     faviconPicker: {
         borderRadius : 6,
-        width: 0.6 * WIDTH,
-        height: 0.6 * WIDTH,
+        width: 0.5 * WIDTH,
+        height: 0.5 * WIDTH,
         marginVertical: 10,
     },
     cameraIconContainer: {
