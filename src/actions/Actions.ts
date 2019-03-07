@@ -279,13 +279,14 @@ export const AsyncActions = {
                     return ownFeeds[0];
                 }
             };
+            dispatch(Actions.updatePostIsUploading(post, true));
+
             const localFeed = getOrCreateOwnFeed();
             const updatedPostCommandLog = shareNewPost(post, '', localFeed.postCommandLog);
             dispatch(Actions.updateOwnFeed({
                 ...localFeed,
                 postCommandLog: updatedPostCommandLog,
             }));
-            dispatch(Actions.updatePostIsUploading(post, true));
             dispatch(AsyncActions.syncPostCommandLogs(localFeed));
         };
     },

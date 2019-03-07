@@ -2,6 +2,7 @@ import { PublicPost, Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
 import * as Swarm from '../swarm/Swarm';
+import { Debug } from '../Debug';
 
 type PostCommandType = 'update' | 'remove';
 
@@ -203,6 +204,11 @@ export const shareNewPost = (
     source: string,
     postCommandLog: PostCommandLog,
 ): PostCommandLog => {
+    const parentId = getParentIdFromLog(post, postCommandLog);
+    if (parentId.timestamp !== 0) {
+        Debug.log('shareNewPost found a post with the same id: ' + post._id);
+        return postCommandLog;
+    }
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);
     const timestamp = getHighestSeenTimestampFromLog(postCommandLog) + 1;
     const postCommand: PostCommand = {
