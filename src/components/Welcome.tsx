@@ -11,9 +11,9 @@ import { Author } from '../models/Post';
 import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
 
-export interface DispatchProps extends IdentityOnboardingDispatchProps {
-    onDownloadPosts: () => void;
-    onCreateFeed: () => void;
+export interface DispatchProps {
+    onStartDownloadFeeds: () => void;
+    onCreateUser: (name: string, image: ImageData, navigation: any) => void;
 }
 
 export interface StateProps {
@@ -37,6 +37,7 @@ export class Welcome extends React.PureComponent<Props, State> {
 
     public componentDidMount() {
         SplashScreen.hide();
+        this.props.onStartDownloadFeeds();
     }
 
     public render() {
@@ -78,11 +79,11 @@ export class Welcome extends React.PureComponent<Props, State> {
                 },
                 ]}
                 onDone={() => {
-                    this.props.onUpdateAuthor(this.state.authorName);
-                    this.props.onUpdatePicture(this.state.authorImage);
-                    this.props.onCreateFeed();
-                    this.props.onDownloadPosts();
-                    this.props.navigation.navigate('Loading');
+                    this.props.onCreateUser(
+                        this.state.authorName,
+                        this.state.authorImage,
+                        this.props.navigation,
+                    );
                 }}
                 showSkip={false}
             />

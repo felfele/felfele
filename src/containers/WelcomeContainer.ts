@@ -14,17 +14,17 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onUpdateAuthor: (text: string) => {
-            dispatch(Actions.updateAuthorName(text));
-        },
-        onUpdatePicture: (image: ImageData) => {
-            dispatch(Actions.updateAuthorPicturePath(image));
-        },
-        onDownloadPosts: () => {
+        onStartDownloadFeeds: () => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
-        onCreateFeed: () => {
-            dispatch(AsyncActions.chainActions([AsyncActions.createUserIdentity(), AsyncActions.createOwnFeed()]));
+        onCreateUser: async (name: string, image: ImageData, navigation: any) => {
+            await dispatch(AsyncActions.chainActions([
+                Actions.updateAuthorName(name),
+                Actions.updateAuthorPicturePath(image),
+                AsyncActions.createUserIdentity(),
+                AsyncActions.createOwnFeed(),
+            ]));
+            navigation.navigate('Loading');
         },
     };
 };
