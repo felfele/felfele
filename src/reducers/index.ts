@@ -44,7 +44,7 @@ export interface AppState extends PersistedState {
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
-    showSquareImages: true,
+    showSquareImages: false,
     showDebugMenu: false,
     swarmGatewayAddress: Swarm.defaultGateway,
 };
