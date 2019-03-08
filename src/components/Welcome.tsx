@@ -42,6 +42,9 @@ export class Welcome extends React.PureComponent<Props, State> {
     public render() {
         return (
             <Onboarding
+                flatlistProps={{
+                    keyboardShouldPersistTaps: 'handled',
+                }}
                 pages={[{
                     backgroundColor: Colors.BRAND_PURPLE,
                     image: <Image source={require('../../images/icon-white-transparent.png')} style={{
