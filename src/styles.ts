@@ -6,11 +6,9 @@ export const IconSize = {
     SMALL_LIST_ICON: 10,
 };
 
-const BaseColors = {
-};
-
 export const Colors = {
-    WHITE: '#FFFF',
+    BLACK: '#000000',
+    WHITE: '#FFFFFF',
     LIGHTISH_GRAY: '#9B9B9B',
     LIGHT_GRAY: '#D3D3D3',
     LIGHTER_GRAY: '#E6E6E6',

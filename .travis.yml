@@ -18,9 +18,9 @@ matrix:
         - npm run build:ios
   include:
     - language: node_js
-      node_js: "node"
+      node_js:
+        - "9"
       script:
-        - npm list
         - npm run check
 
     - os: linux
@@ -41,7 +41,7 @@ matrix:
       env:
         - JOB_NAME=ANDROID
       before_install:
-        - nvm install 11
+        - nvm install 9
         - node --version
       install:
         - npm install

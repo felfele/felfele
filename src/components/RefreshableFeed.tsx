@@ -45,6 +45,14 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
         isRefreshing: false,
     };
 
+    private flatList?: FlatList<Post> = undefined;
+
+    public scrollToTop = () => {
+        if (this.flatList != null) {
+            this.flatList.scrollToOffset({offset: 0});
+        }
+    }
+
     public componentDidUpdate(prevProps: Props) {
         if (this.props.posts !== prevProps.posts) {
             this.setState({
@@ -95,6 +103,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                     style={{
                         backgroundColor: Colors.BACKGROUND_COLOR,
                     }}
+                    ref={value => this.flatList = value || undefined}
                 />
             </View>
         );
