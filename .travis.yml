@@ -19,10 +19,8 @@ matrix:
   include:
     - language: node_js
       node_js:
-        - "node"
         - "9"
       script:
-        - npm list
         - npm run check
 
     - os: linux
