@@ -6,6 +6,7 @@ import {
     Text,
     Slider,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
 import { Colors } from '../styles';
@@ -16,14 +17,16 @@ import { NavigationHeader } from './NavigationHeader';
 
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
 
+const FOREVER = 0;
+
 const sliderValueToDateDiff = (value: SliderValue): number => {
     switch (value) {
-        case 0: return 0;
+        case 0: return FOREVER;
         case 1: return HOUR;
         case 2: return DAY;
         case 3: return WEEK;
         case 4: return MONTH31;
-        case 5: return 0;
+        case 5: return FOREVER;
     }
 };
 
@@ -38,7 +41,7 @@ const filterValidUntilToSliderValue = (dateDiff: number): SliderValue => {
         case DAY: return 2;
         case WEEK: return 3;
         case MONTH31: return 4;
-        default: return 0;
+        default: return FOREVER;
     }
 };
 
@@ -70,7 +73,18 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
     public render() {
         const sliderText = 'Filter until: ' + sliderValueToText(this.state.filterSliderValue);
         const isDelete = this.props.filter.text.length > 0;
-        const rightButtonText = isDelete ? 'Delete' : 'Add';
+        const rightButtonText = isDelete
+            ? <Icon
+                name='delete'
+                size={20}
+                color={Colors.DARK_GRAY}
+            />
+            : <Icon
+                name='add-box'
+                size={20}
+                color={Colors.DARK_GRAY}
+            />
+            ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
             <View style={styles.container}>

@@ -22,6 +22,7 @@ export interface StateProps {
     followedFeeds: Feed[];
     knownFeeds: Feed[];
     gatewayAddress: string;
+    title: string;
 }
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
@@ -89,7 +90,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         }}
                         rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
                         onPressRightButton1={this.onAddFeed}
-                        title='Feed list'
+                        title={this.props.title}
                     />
                 </FeedGrid>
             </SafeAreaView>
@@ -104,24 +105,6 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             url: '',
         };
         this.props.navigation.navigate('FeedInfo', { feed: feed });
-    }
-}
-
-export class FeedListViewer extends React.PureComponent<DispatchProps & StateProps> {
-    public render() {
-        return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-                <FeedGrid {...this.props}>
-                    <NavigationHeader
-                        withoutSafeArea={true}
-                        onPressLeftButton={() => {
-                            this.props.navigation.goBack();
-                        }}
-                        title='All feeds'
-                    />
-                </FeedGrid>
-            </SafeAreaView>
-        );
     }
 }
 

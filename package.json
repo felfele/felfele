@@ -38,16 +38,21 @@
     "test": "node node_modules/jest/bin/jest.js",
     "watchTest": "node node_modules/jest/bin/jest.js --watch",
     "check": "npm run tsc && npm run lint && npm run test",
+    "extended-check": "npm run tsc && npm run lint && npm run test && cd android && ./gradlew assembleRelease",
     "tsc": "tsc --skipLibCheck",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
-    "clean": "rm -rf build"
+    "clean": "rm -rf build",
+    "build:android": "scripts/build_signed_android_release.sh",
+    "build:ios": "scripts/build_xcode_archive.sh build",
+    "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
   "dependencies": {
     "base64-arraybuffer": "=0.1.5",
     "buffer": "=5.2.1",
     "ecma-nacl": "=2.4.2",
     "elliptic": "=6.4.1",
+    "he": "=1.2.0",
     "js-sha3": "=0.8.0",
     "node-libs-browser": "=2.1.0",
     "node-libs-react-native": "=1.0.3",
@@ -69,6 +74,7 @@
     "react-native-qrcode-svg": "=5.1.1",
     "react-native-restart": "0.0.9",
     "react-native-securerandom": "=0.3.0",
+    "react-native-splash-screen": "=3.2.0",
     "react-native-super-grid": "=3.0.1",
     "react-native-svg": "=8.0.8",
     "react-native-util": "=1.0.2",
@@ -107,5 +113,8 @@
       }
     },
     "test-runner": "mocha"
+  },
+  "jest": {
+    "preset": "react-native"
   }
 }

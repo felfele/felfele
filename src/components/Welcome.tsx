@@ -8,6 +8,8 @@ import {
 import { IdentityOnboarding, DispatchProps as IdentityOnboardingDispatchProps  } from '../components/IdentityOnboarding';
 import { ImageData } from '../models/ImageData';
 import { Author } from '../models/Post';
+import SplashScreen from 'react-native-splash-screen';
+import { Colors } from '../styles';
 
 export interface DispatchProps extends IdentityOnboardingDispatchProps {
     onDownloadPosts: () => void;
@@ -33,19 +35,26 @@ export class Welcome extends React.PureComponent<Props, State> {
         authorImage: {},
     };
 
+    public componentDidMount() {
+        SplashScreen.hide();
+    }
+
     public render() {
         return (
             <Onboarding
+                flatlistProps={{
+                    keyboardShouldPersistTaps: 'handled',
+                }}
                 pages={[{
-                    backgroundColor: 'teal',
-                    image: <Image source={require('../../images/network.png')} style={{
+                    backgroundColor: Colors.BRAND_PURPLE,
+                    image: <Image source={require('../../images/icon-white-transparent.png')} style={{
                         width: 150,
                         height: 150,
                     }}/>,
                     title: 'Welcome to Felfele',
                     subtitle: 'Socialize without Compromise',
                 }, {
-                    backgroundColor: 'teal',
+                    backgroundColor: Colors.BRAND_PURPLE,
                     image: <IdentityOnboarding
                         onUpdateAuthor={(text: string) => {
                             this.setState({

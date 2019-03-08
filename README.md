@@ -35,6 +35,11 @@ $ mogrify -alpha off ios/postmodern/Images.xcassets/AppIcon.appiconset/*.png
 
 ## Sign the android release with debug key
 
+### Generate a debug key
+`$ keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"`
+
+### Sign the build with the debug key
+
 `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/.android/debug.keystore -storepass android -keypass android android/app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey`
 
 ## Running with the debugger

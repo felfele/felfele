@@ -1,6 +1,7 @@
 const keyBlacklist = new Set<string>()
     .add('localPath')
     .add('privateKey')
+    .add('isUploading')
     ;
 
 export const serialize = (data: any): string => {

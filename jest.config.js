@@ -18,6 +18,7 @@ module.exports = {
     "<rootDir>/build/",
     "<rootDir>/e2e/"
   ],
+  modulePathIgnorePatterns: ["<rootDir>/src/.*/__mocks__"],
   globals: {
     'ts-jest': {
       babelConfig: true,

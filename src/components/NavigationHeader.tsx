@@ -19,6 +19,7 @@ export interface DispatchProps {
     onPressLeftButton?: () => void;
     onPressRightButton1?: () => void;
     onPressRightButton2?: () => void;
+    onPressTitle?: () => void;
 }
 
 export type Props = StateProps & DispatchProps;
@@ -39,7 +40,7 @@ const Header = (props: Props) => (
                 }
             </RegularText>
         </TouchableView>
-        <View style={styles.middleContainer}>
+        <TouchableView onPress={props.onPressTitle} style={styles.middleContainer}>
             {props.titleImage}
             <MediumText
                 style={styles.titleText}
@@ -48,7 +49,7 @@ const Header = (props: Props) => (
             >
                 {props.title ? props.title : ''}
             </MediumText>
-        </View>
+        </TouchableView>
         <View style={styles.rightContainer}>
             {props.rightButtonText1 &&
             <RightButton onPress={props.onPressRightButton1} text={props.rightButtonText1} />}

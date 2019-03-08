@@ -8,6 +8,7 @@ import { Colors } from '../styles';
 import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import SplashScreen from 'react-native-splash-screen';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -24,29 +25,40 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-export const AllFeedScreen = (props: Props) => {
-    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    return (
-        <RefreshableFeed modelHelper={modelHelper} {...props}>
-            {{
-                navigationHeader: <NavigationHeader
-                                title='All feeds'
-                                rightButtonText1={
-                                    <Icon
-                                        name={'view-grid'}
-                                        size={20}
-                                        color={Colors.DARK_GRAY}
-                                    />
-                                }
-                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer')}
-                            />,
-                listHeader: <FeedHeader
-                                navigation={props.navigation}
-                                onSaveDraft={props.onSaveDraft}
-                                profileImage={props.profileImage}
-                                gatewayAddress={props.gatewayAddress}
-                            />,
-            }}
-        </RefreshableFeed>
-    );
-};
+export class AllFeedScreen extends React.Component<Props> {
+    private ref?: RefreshableFeed = undefined;
+    public render() {
+        const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
+        return (
+            <RefreshableFeed
+                modelHelper={modelHelper} {...this.props}
+                ref={value => this.ref = value || undefined}
+            >
+                {{
+                    navigationHeader: <NavigationHeader
+                                    title='All feeds'
+                                    rightButtonText1={
+                                        <Icon
+                                            name={'view-grid'}
+                                            size={20}
+                                            color={Colors.DARK_GRAY}
+                                        />
+                                    }
+                                    onPressRightButton1={() => this.props.navigation.navigate('FeedListViewerContainer')}
+                                    onPressTitle={this.ref && this.ref.scrollToTop}
+                                />,
+                    listHeader: <FeedHeader
+                                    navigation={this.props.navigation}
+                                    onSaveDraft={this.props.onSaveDraft}
+                                    profileImage={this.props.profileImage}
+                                    gatewayAddress={this.props.gatewayAddress}
+                                />,
+                }}
+            </RefreshableFeed>
+        );
+    }
+
+    public componentDidMount() {
+        SplashScreen.hide();
+    }
+}

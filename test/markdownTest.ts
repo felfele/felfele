@@ -60,7 +60,6 @@ test('Basic markdown unescape', () => {
 
 test('Long text markdown escape', () => {
     const result = markdownEscape(complexText);
-    console.log(result);
     expect(result).toEqual(complexTextEscaped);
 });
 

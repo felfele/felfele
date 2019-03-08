@@ -4,22 +4,22 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    Text,
     Image,
-    TouchableOpacity,
+    Dimensions,
 } from 'react-native';
 import { Author } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { DispatchProps } from './IdentitySettings';
+import { TouchableView } from './TouchableView';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // tslint:disable-next-line:no-var-requires
-const defaultUserImage = require('../../images/user_circle.png');
+const defaultUserImage = require('../../images/user_circle-white.png');
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
-const tooltip = 'Name';
 const namePlaceholder = 'Space Cowboy';
 
 export { DispatchProps };
@@ -33,8 +33,22 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
-        <KeyboardAvoidingView>
-            <Text style={styles.tooltip}>{tooltip}</Text>
+        <KeyboardAvoidingView style={styles.mainContainer}>
+            <View style={styles.imagePicker}>
+                <TouchableView
+                    onPress={async () => {
+                        await openImagePicker(props.onUpdatePicture);
+                    }}
+                >
+                    <Image
+                        source={authorImageUri === ''
+                        ? defaultUserImage
+                        : { uri: authorImageUri }
+                        }
+                        style={styles.faviconPicker}
+                    />
+                </TouchableView>
+            </View>
             <View style={styles.textInputContainer}>
                 <SimpleTextInput
                     style={styles.textInput}
@@ -48,22 +62,6 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                     onChangeText={props.onUpdateAuthor}
                 />
             </View>
-            <Text style={styles.tooltip}>Avatar</Text>
-            <View style={styles.imagePicker}>
-                <TouchableOpacity
-                    onPress={async () => {
-                        await openImagePicker(props.onUpdatePicture);
-                    }}
-                >
-                    <Image
-                        source={authorImageUri === ''
-                        ? defaultUserImage
-                        : { uri: authorImageUri }
-                        }
-                        style={styles.faviconPicker}
-                    />
-                </TouchableOpacity>
-            </View>
         </KeyboardAvoidingView>
     );
 };
@@ -75,18 +73,27 @@ const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
     }
 };
 
+const WIDTH = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
+    mainContainer: {
+        width: WIDTH,
+        height: WIDTH - 30,
+    },
     textInput: {
         paddingHorizontal: 8,
         paddingVertical: 8,
-        color: Colors.LIGHT_GRAY,
-        fontSize: 16,
+        color: Colors.WHITE,
+        fontSize: 20,
         alignItems: 'center',
+        textAlign: 'center',
     },
     textInputContainer: {
+        marginHorizontal: 40,
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: 'darkgrey',
         borderRadius: 20,
+        backgroundColor: Colors.BRAND_PURPLE,
     },
     tooltip: {
         paddingHorizontal: 8,
@@ -102,8 +109,14 @@ const styles = StyleSheet.create({
     },
     faviconPicker: {
         borderRadius : 6,
-        width: 64,
-        height: 64,
+        width: 0.5 * WIDTH,
+        height: 0.5 * WIDTH,
         marginVertical: 10,
+    },
+    cameraIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        margin: 0,
     },
 });
