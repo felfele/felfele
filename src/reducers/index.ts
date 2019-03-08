@@ -26,7 +26,6 @@ import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
 import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
 
@@ -106,6 +105,13 @@ const defaultMetadata = {
 };
 
 const defaultFeeds: Feed[] = [
+    {
+        name: 'Felfele Foundation',
+        url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
+        feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
+        favicon: '',
+        followed: true,
+    },
     {
         name: 'The Verge',
         url: 'https://theverge.com/',

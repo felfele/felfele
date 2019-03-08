@@ -59,6 +59,7 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
                     selectTextOnFocus={true}
                     returnKeyType={'done'}
                     onSubmitEditing={props.onUpdateAuthor}
+                    onChangeText={props.onUpdateAuthor}
                 />
             </View>
         </KeyboardAvoidingView>

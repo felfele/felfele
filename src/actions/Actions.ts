@@ -252,36 +252,35 @@ export const AsyncActions = {
             dispatch(AsyncActions.shareOwnPost(newPost));
         };
     },
+    createOwnFeed: (): Thunk => {
+        return async (dispatch, getState) => {
+            const identity = getState().author.identity!;
+            const address = Swarm.makeFeedAddressFromPublicIdentity(identity);
+            const feedUrl = Swarm.makeBzzFeedUrl(address);
+            const author = getState().author;
+            const ownFeed: LocalFeed = {
+                posts: [],
+                authorImage: author.image,
+                name: author.name,
+                url: feedUrl,
+                feedUrl,
+                favicon: author.image.uri || '',
+                postCommandLog: {
+                    commands: [],
+                },
+                isSyncing: false,
+            };
+            dispatch(InternalActions.addOwnFeed(ownFeed));
+        };
+    },
     shareOwnPost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
-            const getOrCreateOwnFeed = (): LocalFeed => {
-                const ownFeeds = getState().ownFeeds;
-                if (ownFeeds.length === 0) {
-                    const identity = getState().author.identity!;
-                    const address = Swarm.makeFeedAddressFromPublicIdentity(identity);
-                    const feedUrl = Swarm.makeBzzFeedUrl(address);
-                    const author = getState().author;
-                    const ownFeed: LocalFeed = {
-                        posts: [],
-                        authorImage: author.image,
-                        name: author.name,
-                        url: feedUrl,
-                        feedUrl,
-                        favicon: author.image.uri || '',
-                        postCommandLog: {
-                            commands: [],
-                        },
-                        isSyncing: false,
-                    };
-                    dispatch(InternalActions.addOwnFeed(ownFeed));
-                    return ownFeed;
-                } else {
-                    return ownFeeds[0];
-                }
-            };
+            if (getState().ownFeeds[0] == null) {
+                await dispatch(AsyncActions.createOwnFeed());
+            }
+            const localFeed = getState().ownFeeds[0];
             dispatch(Actions.updatePostIsUploading(post, true));
 
-            const localFeed = getOrCreateOwnFeed();
             const updatedPostCommandLog = shareNewPost(post, '', localFeed.postCommandLog);
             dispatch(Actions.updateOwnFeed({
                 ...localFeed,
