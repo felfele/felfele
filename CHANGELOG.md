@@ -1,14 +1,16 @@
-## v0.9.30 (2019-03-01)
+## v0.9.31 (2019-03-01)
 
 This release adds the following new features and fixes:
 
+- [FEATURE] Splash Screen! You may have to delete the app and reinstall to see it :) (https://github.com/agazso/postmodern/pull/187)
 - [FEATURE] We redesigned the app according to the latest design (https://github.com/agazso/postmodern/pull/170)
 - [FEATURE] Multiple photos are shown in an autoplaying carousel (https://github.com/agazso/postmodern/pull/179)
 - [FEATURE] Posts from others can be shared on your feed (https://github.com/agazso/postmodern/pull/171)
+- [FEATURE] We automatically create a feed for you when you first start the app (https://github.com/agazso/postmodern/pull/200)
 - [FEATURE] Bug reporting (https://github.com/agazso/postmodern/pull/155)
 - [FEATURE] Posts are stored separately and in a timeline as well online (https://github.com/agazso/postmodern/pull/151)
 - [FEATURE] Add feed from clipboard automatically (https://github.com/agazso/postmodern/pull/149)
-- [BUGFIX] Hashes in the text no longer change the size of the text (https://github.com/agazso/postmodern/pull/154)
+- [BUGFIX] Hashmarks in the text of post no longer change the size of the text (https://github.com/agazso/postmodern/pull/154)
 
 ## v0.9.28 (2019-01-30)
 
