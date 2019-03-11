@@ -10,8 +10,6 @@ import { ImageData } from '../../models/ImageData';
 import { Colors } from '../../styles';
 import { ImageDataView } from '../../components/ImageDataView';
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
-
 interface Props {
     post: Post;
     showSquareImages: boolean;
@@ -28,11 +26,12 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
     };
 
     public render() {
+        const windowWidth = Dimensions.get('window').width;
         return (
             <View>
                 <AutoPlaySwipeableViews disabled onChangeIndex={this.handleChangeIndex}>
                     {this.props.post.images.map((image, index) => {
-                        const { width, height } = this.props.calculateImageDimensions(image, WINDOW_WIDTH, true);
+                        const { width, height } = this.props.calculateImageDimensions(image, windowWidth, true);
                         return (
                             <ImageDataView
                                 testID={(image.uri || '') + index}

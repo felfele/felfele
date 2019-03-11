@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
-import { Colors, DefaultTabBarHeight } from '../styles';
+import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { GridCard } from '../ui/misc/GridCard';
+import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
@@ -30,14 +30,11 @@ type Props = StateProps & DispatchProps;
 
 const YOUR_FEEDS = 'YOUR FEEDS';
 const PREFERENCES_LABEL = 'PREFERENCES';
-const WINDOW_WIDTH = Dimensions.get('window').width;
-const SPACING = 10;
 
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
-    const itemsInRow = 2;
-    const itemDimension = (WINDOW_WIDTH - SPACING * 3) / itemsInRow;
+    const itemDimension = getGridCardSize();
     return (
         <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader
@@ -46,7 +43,7 @@ export const SettingsEditor = (props: Props) => {
             <ScrollView>
                 <SuperGridSectionList
                     style={{ flex: 1 }}
-                    spacing={SPACING}
+                    spacing={GRID_SPACING}
                     fixed={true}
                     itemDimension={itemDimension}
                     sections={[{

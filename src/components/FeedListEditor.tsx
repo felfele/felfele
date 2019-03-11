@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
@@ -7,7 +7,7 @@ import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
-import { GridCard } from '../ui/misc/GridCard';
+import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
@@ -25,13 +25,9 @@ export interface StateProps {
     title: string;
 }
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
-const SPACING = 10;
-
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
-        const itemsInRow = 2;
-        const itemDimension = (WINDOW_WIDTH - SPACING * 3) / itemsInRow;
+        const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         const sections: Array<{ title: string, data: Feed[] }> = [];
         if (this.props.ownFeeds.length > 0) {
