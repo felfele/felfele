@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
@@ -25,8 +25,13 @@ export interface StateProps {
     title: string;
 }
 
+const WINDOW_WIDTH = Dimensions.get('window').width;
+const SPACING = 10;
+
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
+        const itemsInRow = 2;
+        const itemDimension = (WINDOW_WIDTH - SPACING * 3) / itemsInRow;
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         const sections: Array<{ title: string, data: Feed[] }> = [];
         if (this.props.ownFeeds.length > 0) {
@@ -54,7 +59,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     style={{ flex: 1 }}
                     spacing={10}
                     fixed={true}
-                    itemDimension={170}
+                    itemDimension={itemDimension}
                     sections={sections}
                     renderItem={({ item }: any) => {
                         const imageUri = item.authorImage ? modelHelper.getImageUri(item.authorImage) : item.favicon;
@@ -63,6 +68,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 title={item.name}
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(this.props.navigation, item)}
+                                size={itemDimension}
                             />
                         );
                     }}

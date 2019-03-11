@@ -8,6 +8,7 @@ interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
     imageUri: string;
+    size: number;
 }
 
 export const GridCard = React.memo((props: Props) => (
@@ -17,8 +18,8 @@ export const GridCard = React.memo((props: Props) => (
                 uri: props.imageUri,
             }}
             style={{
-                width: 170,
-                height: 170,
+                width: props.size,
+                height: props.size,
             }}
             resizeMode='cover'
         />
