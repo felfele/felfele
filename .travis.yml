@@ -46,7 +46,7 @@ matrix:
         - node --version
       install:
         - npm install
-        - npm install fsevents
+        - brew install fsevents
         - npm run link
       script:
         - npm run check
