@@ -1,21 +1,7 @@
 env:
 matrix:
   fast_finish: true
-  allow_failures:
-    - os: osx
-      language: objective-c
-      osx_image: xcode10.1
-      env:
-        - JOB_NAME=IOS
-      before_install:
-        - nvm install 11
-        - node --version
-      install:
-        - npm install
-        - npm run link
-      script:
-        - npm run check
-        - npm run build:ios
+
   include:
     - language: node_js
       node_js:
@@ -49,3 +35,19 @@ matrix:
       script:
         - npm run check
         - npm run build:android
+
+    - os: osx
+      language: objective-c
+      osx_image: xcode10.1
+      env:
+        - JOB_NAME=IOS
+      before_install:
+        - nvm install 9
+        - node --version
+      install:
+        - npm install
+        - brew install watchman
+        - npm run link
+      script:
+        - npm run check
+        - npm run build:ios
