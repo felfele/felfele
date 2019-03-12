@@ -63,15 +63,7 @@ const Header = (props: Props) => (
 );
 
 export const NavigationHeader = (props: Props) => {
-    if (props.withoutSafeArea === true) {
-        return <Header {...props} />;
-    } else {
-        return (
-            <SafeAreaView style={styles.mainContainer}>
-                <Header {...props} />
-            </SafeAreaView>
-        );
-    }
+        return <Header {...props}/>;
 };
 
 const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
@@ -90,23 +82,14 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
 };
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        flexDirection: 'column',
-        backgroundColor: Colors.WHITE,
-    },
     headerContainer: {
-        width: '100%',
         height: DefaultNavigationBarHeight,
-        top: 0,
-        left: 0,
-        padding: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 2,
-        marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
         backgroundColor: Colors.WHITE,
