@@ -83,7 +83,6 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
                 <FeedGrid {...this.props}>
                     <NavigationHeader
-                        withoutSafeArea={true}
                         onPressLeftButton={() => {
                             // null is needed otherwise it does not work with switchnavigator backbehavior property
                             this.props.navigation.goBack(null);

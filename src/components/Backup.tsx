@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Clipboard, Alert, ShareContent, ShareOptions, Share } from 'react-native';
+import { View, StyleSheet, Clipboard, Alert, ShareContent, ShareOptions, Share, SafeAreaView } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
@@ -34,7 +34,7 @@ export class Backup extends React.PureComponent<Props, State> {
     };
 
     public render = () => (
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 title='Backup'
                 onPressLeftButton={() => this.props.navigation.goBack(null)}
@@ -58,7 +58,7 @@ export class Backup extends React.PureComponent<Props, State> {
                 placeholder='Loading backup...'
                 multiline={true}
             />
-        </View>
+        </SafeAreaView>
     )
 
     private setSecretText = async (text: string) => {

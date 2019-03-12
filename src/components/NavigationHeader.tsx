@@ -12,7 +12,6 @@ export interface StateProps {
     rightButtonText2?: string | React.ReactNode;
     titleImage?: React.ReactNode;
     title?: string;
-    withoutSafeArea?: boolean;
 }
 
 export interface DispatchProps {

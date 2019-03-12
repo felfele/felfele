@@ -5,6 +5,7 @@ import {
     View,
     Text,
     Slider,
+    SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -87,7 +88,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <NavigationHeader
                     title='Edit filter'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
@@ -114,7 +115,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                         onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
                     />
                 </View>
-            </View>
+            </SafeAreaView>
         );
     }
 

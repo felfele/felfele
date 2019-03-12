@@ -66,7 +66,6 @@ export class PostEditor extends React.Component<Props, State> {
                     style={styles.container}
                 >
                     <NavigationHeader
-                        withoutSafeArea={true}
                         leftButtonText={
                             <Icon
                                 name={'close'}

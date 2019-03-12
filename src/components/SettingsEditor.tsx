@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
-import { Colors, DefaultTabBarHeight } from '../styles';
+import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
@@ -35,13 +35,13 @@ export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     return (
-        <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
                 title='Settings'
             />
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <SuperGridSectionList
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
                     spacing={10}
                     fixed={true}
                     itemDimension={170}
@@ -113,7 +113,7 @@ export const SettingsEditor = (props: Props) => {
                 }
             </ScrollView>
             <TabBarPlaceholder/>
-        </View>
+        </SafeAreaView>
     );
 };
 

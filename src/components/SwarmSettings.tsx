@@ -5,6 +5,7 @@ import {
     Text,
     TouchableOpacity,
     StyleSheet,
+    SafeAreaView,
 } from 'react-native';
 
 import { NavigationHeader } from './NavigationHeader';
@@ -26,28 +27,30 @@ export interface State {
 }
 
 export const SwarmSettings = (props: Props) => (
-    <KeyboardAvoidingView style={styles.mainContainer}>
-        <NavigationHeader
-            onPressLeftButton={() => {
-                // null is needed otherwise it does not work with switchnavigator backbehavior property
-                props.navigation.goBack(null);
-            }}
-            title={'Swarm settings'}
-        />
-        <Text style={styles.tooltip}>Swarm gateway address</Text>
-        <SimpleTextInput
-            style={styles.row}
-            defaultValue={props.swarmGatewayAddress}
-            placeholder={'https://swarm-gateways.net'}
-            autoCapitalize='none'
-            autoFocus={true}
-            autoCorrect={false}
-            selectTextOnFocus={true}
-            returnKeyType={'done'}
-            onSubmitEditing={props.onChangeSwarmGatewayAddress}
-            onEndEditing={() => {}}
-        />
-    </KeyboardAvoidingView>
+    <SafeAreaView style={styles.mainContainer}>
+        <KeyboardAvoidingView style={styles.mainContainer}>
+            <NavigationHeader
+                onPressLeftButton={() => {
+                    // null is needed otherwise it does not work with switchnavigator backbehavior property
+                    props.navigation.goBack(null);
+                }}
+                title={'Swarm settings'}
+            />
+            <Text style={styles.tooltip}>Swarm gateway address</Text>
+            <SimpleTextInput
+                style={styles.row}
+                defaultValue={props.swarmGatewayAddress}
+                placeholder={'https://swarm-gateways.net'}
+                autoCapitalize='none'
+                autoFocus={true}
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                returnKeyType={'done'}
+                onSubmitEditing={props.onChangeSwarmGatewayAddress}
+                onEndEditing={() => {}}
+            />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
 );
 
 const styles = StyleSheet.create({

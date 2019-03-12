@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, Linking } from 'react-native';
+import { View, StyleSheet, Linking, SafeAreaView } from 'react-native';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
 import { BoldText, RegularText } from '../ui/misc/text';
@@ -38,7 +38,7 @@ const getBugReportBody = (filterFields: string[]): string => {
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 leftButtonText={props.navigation ? undefined : ''}
                 onPressLeftButton={() => props.navigation.goBack(null)}
@@ -80,7 +80,7 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
                 }
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
