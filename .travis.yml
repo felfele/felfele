@@ -42,7 +42,7 @@ matrix:
       env:
         - JOB_NAME=IOS
       before_install:
-        - nvm install 11
+        - nvm install 9
         - node --version
       install:
         - npm install

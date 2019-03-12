@@ -2,7 +2,7 @@
 
 TARGET=archive
 if [ "$1" != "" ]; then
-    TARGET="$1"
+    TARGET="$*"
 fi
 
 cd ios
