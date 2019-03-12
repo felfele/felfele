@@ -46,7 +46,7 @@ matrix:
         - node --version
       install:
         - npm install
-        - brew install fsevents
+        - brew install watchman
         - npm run link
       script:
         - npm run check
