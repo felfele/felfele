@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+export CODE_SIGN_IDENTITY=""
+export CODE_SIGNING_REQUIRED="NO"
+export CODE_SIGN_ENTITLEMENTS=""
+export CODE_SIGNING_ALLOWED="NO"
