@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    SafeAreaView,
+} from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { Button } from './Button';
 
