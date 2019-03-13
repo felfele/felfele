@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -25,7 +25,7 @@ export interface StateProps {
     title: string;
 }
 
-export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
+export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<any>[]}> {
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         const sections: Array<{ title: string, data: Feed[] }> = [];
@@ -92,6 +92,22 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         onPressRightButton1={this.onAddFeed}
                         title={this.props.title}
                     />
+                    <TouchableWithoutFeedback
+                        onPress={() => this.props.navigation.navigate('CategoriesContainer')}
+                    >
+                        <View style={{
+                            backgroundColor: Colors.WHITE,
+                            height: 44,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <View style={{ paddingTop: 1, paddingRight: 4 }}>
+                                <Icon name='compass' size={20} color={Colors.DARK_GRAY}/>
+                            </View>
+                            <MediumText style={{ fontSize: 12, color: Colors.DARK_GRAY }}>EXPLORE PUBLIC FEEDS</MediumText>
+                        </View>
+                    </TouchableWithoutFeedback>
                 </FeedGrid>
             </SafeAreaView>
         );

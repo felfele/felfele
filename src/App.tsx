@@ -36,6 +36,8 @@ import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
+import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
+import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -110,6 +112,12 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     },
     FeedListViewerContainer: {
         screen: FeedListViewerContainer,
+    },
+    CategoriesContainer: {
+        screen: CategoriesContainer,
+    },
+    SubCategoriesContainer: {
+        screen: SubCategoriesContainer,
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
