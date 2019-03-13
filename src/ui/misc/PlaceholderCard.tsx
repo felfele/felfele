@@ -2,7 +2,6 @@ import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Colors } from '../../styles';
 import { BoldText, RegularText } from './text';
-import SvgUri from 'react-native-svg-uri';
 
 interface Props {
     image?: React.ReactNode;

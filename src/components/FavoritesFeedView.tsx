@@ -48,7 +48,7 @@ export const FavoritesFeedView = (props: Props) => {
                                             width='29'
                                             height='29'
                                             fill={Colors.BRAND_PURPLE}
-                                            source={require('../../images/scuba.svg')}
+                                            source={require('../../images/snorkeling.svg')}
                                 />}
                              />,
             }}
