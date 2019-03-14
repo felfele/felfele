@@ -19,10 +19,8 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
-
 export class ImagePreviewGrid extends React.Component<Props, any> {
-    private width = WINDOW_WIDTH;
+    private width = Dimensions.get('window').width;
 
     public render() {
         if (this.props.images.length === 0) {

@@ -45,7 +45,7 @@
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
     "build:android": "scripts/build_signed_android_release.sh",
-    "build:ios": "scripts/build_xcode_archive.sh build",
+    "build:ios": "scripts/build_xcode_archive.sh build CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=\"NO\" CODE_SIGN_ENTITLEMENTS=\"\" CODE_SIGNING_ALLOWED=\"NO\"",
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
   "dependencies": {

@@ -9,7 +9,7 @@ import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { GridCard } from '../ui/misc/GridCard';
+import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
@@ -34,6 +34,7 @@ const PREFERENCES_LABEL = 'PREFERENCES';
 export const SettingsEditor = (props: Props) => {
     const version = 'Version: ' + Version;
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
+    const itemDimension = getGridCardSize();
     return (
         <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
@@ -42,9 +43,9 @@ export const SettingsEditor = (props: Props) => {
             <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <SuperGridSectionList
                     style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
-                    spacing={10}
+                    spacing={GRID_SPACING}
                     fixed={true}
-                    itemDimension={170}
+                    itemDimension={itemDimension}
                     sections={[{
                         title: `${YOUR_FEEDS} ${props.ownFeeds.length}`,
                         data: props.ownFeeds,
@@ -55,6 +56,7 @@ export const SettingsEditor = (props: Props) => {
                                     title={item.name}
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
                                     onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
+                                    size={itemDimension}
                                 />
                         );
                     }}

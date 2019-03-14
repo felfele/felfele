@@ -7,7 +7,7 @@ import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
-import { GridCard } from '../ui/misc/GridCard';
+import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
@@ -27,6 +27,7 @@ export interface StateProps {
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
     public render() {
+        const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         const sections: Array<{ title: string, data: Feed[] }> = [];
         if (this.props.ownFeeds.length > 0) {
@@ -54,7 +55,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     style={{ flex: 1 }}
                     spacing={10}
                     fixed={true}
-                    itemDimension={170}
+                    itemDimension={itemDimension}
                     sections={sections}
                     renderItem={({ item }: any) => {
                         const imageUri = item.authorImage ? modelHelper.getImageUri(item.authorImage) : item.favicon;
@@ -63,6 +64,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 title={item.name}
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(this.props.navigation, item)}
+                                size={itemDimension}
                             />
                         );
                     }}
