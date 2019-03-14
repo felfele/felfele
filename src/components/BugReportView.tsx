@@ -56,7 +56,6 @@ const piiFilteredLog = () => {
 
 const getBugReportBody = (): string => {
     const bugReportBody = `Please describe the bug: \n\n\n${deviceInfo()}Logs:\n${piiFilteredLog()}`;
-    Debug.log('Bug report body: ', bugReportBody);
     return bugReportBody;
 };
 
