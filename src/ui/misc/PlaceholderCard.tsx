@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingTop: 10,
         fontSize: 14,
+        color: Colors.DARK_GRAY,
     },
     imageContainer: {
         marginTop: 10,
