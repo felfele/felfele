@@ -17,8 +17,11 @@ export const PlaceholderCard = (props: Props) => {
             <View style={styles.imageContainer}>
                 {props.image}
             </View>}
-            <BoldText style={styles.text}>{props.boldText}</BoldText>
-            <RegularText style={styles.text}>{props.regularText}</RegularText>
+            <View style={styles.textContainer}>
+                <BoldText style={styles.text}>{props.boldText}</BoldText>
+                <RegularText style={styles.text}>{props.regularText}</RegularText>
+            </View>
+
         </View>
     );
 };
@@ -27,6 +30,9 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.WHITE,
         marginBottom: 20,
+    },
+    textContainer: {
+        paddingHorizontal: 20,
     },
     text: {
         textAlign: 'center',
