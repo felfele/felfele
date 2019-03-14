@@ -148,7 +148,7 @@ dependencies {
     compile project(':react-native-get-real-path')
 
     compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:27.1.0"
+    compile "com.android.support:appcompat-v7:28.0.0"
     compile "com.facebook.react:react-native:+"  // From node_modules
 }
 
