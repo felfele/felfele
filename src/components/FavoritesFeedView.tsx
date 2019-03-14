@@ -7,7 +7,9 @@ import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
-import SvgUri from 'react-native-svg-uri';
+
+// @ts-ignore
+import SnorkelingIcon from '../../images/snorkeling.svg';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -44,11 +46,10 @@ export const FavoritesFeedView = (props: Props) => {
                 placeholder: <PlaceholderCard
                                  boldText={PLACEHOLDER_TEXT_1}
                                  regularText={PLACEHOLDER_TEXT_2}
-                                 image={<SvgUri
-                                            width='29'
-                                            height='29'
+                                 image={<SnorkelingIcon
+                                            width={29}
+                                            height={29}
                                             fill={Colors.BRAND_PURPLE}
-                                            source={require('../../images/snorkeling.svg')}
                                 />}
                              />,
             }}

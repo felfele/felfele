@@ -26,6 +26,7 @@
     "mock-async-storage": "=2.0.3",
     "node-fetch": "=2.3.0",
     "react-native-debugger-open": "=0.3.17",
+    "react-native-svg-transformer": "=0.12.1",
     "react-native-typescript-transformer": "=1.2.10",
     "react-test-renderer": "16.6.1",
     "typescript": "=3.0.3"
@@ -77,7 +78,6 @@
     "react-native-splash-screen": "=3.2.0",
     "react-native-super-grid": "=3.0.1",
     "react-native-svg": "=8.0.8",
-    "react-native-svg-uri": "=1.2.3",
     "react-native-util": "=1.0.2",
     "react-native-vector-icons": "=6.0.2",
     "react-native-xml2js": "=1.0.3",

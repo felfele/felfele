@@ -7,7 +7,9 @@ import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
 import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
-import SvgUri from 'react-native-svg-uri';
+
+// @ts-ignore
+import BugIcon from '../../images/bug.svg';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 // personally identifiable information
@@ -56,11 +58,10 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
             />
             <View style={styles.contentContainer}>
                 <View style={styles.iconContainer}>
-                    <SvgUri
-                        width='29'
-                        height='29'
+                    <BugIcon
+                        width={29}
+                        height={29}
                         fill={Colors.BRAND_PURPLE}
-                        source={require('../../images/bug.svg')}
                     />
                 </View>
                 {props.errorView &&
