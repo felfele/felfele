@@ -3,10 +3,12 @@ import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, StyleSheet, Linking, SafeAreaView } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
 import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
+import { Version } from '../Version';
 
 // @ts-ignore
 import BugIcon from '../../images/bug.svg';
@@ -29,13 +31,34 @@ export const escapePII = (text: string, filterFields: string[]): string => {
         ;
 };
 
-const getBugReportBody = (filterFields: string[]): string => {
+const deviceInfo = () => {
+    const brand = DeviceInfo.getBrand();
+    const deviceID = DeviceInfo.getDeviceId();
+    const country = DeviceInfo.getDeviceCountry();
+    const locale = DeviceInfo.getDeviceLocale();
+    const version = Version;
+    const systemName = DeviceInfo.getSystemName();
+    const systemVersion = DeviceInfo.getSystemVersion();
+
+    return `
+System: ${systemName} ${systemVersion} (${brand} ${deviceID})
+Locale: ${locale} ${country}
+Version: ${version}
+`;
+};
+
+const piiFilteredLog = () => {
     return filteredLog()
         .map((logItem: LogItem) => {
-            return `${logItem[0]} ${escapePII(logItem[1], filterFields)}`;
+            return `${logItem[0]} ${escapePII(logItem[1], PIIKeys)}`;
         })
         .join('\n')
         ;
+};
+
+const getBugReportBody = (): string => {
+    const bugReportBody = `Please describe the bug: \n\n\n${deviceInfo()}Logs:\n${piiFilteredLog()}`;
+    return bugReportBody;
 };
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
@@ -53,7 +76,7 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     />
                 }
                 onPressRightButton1={() => {
-                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=Please describe the bug: \n\n\nLogs:\n${getBugReportBody(PIIKeys)}`);
+                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=${getBugReportBody()}`);
                 }}
             />
             <View style={styles.contentContainer}>

@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -52,6 +51,7 @@
 		EB923312C7284B908CCC3036 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF0427FA34DE437BB7A962DF /* FontAwesome.ttf */; };
 		FC76FEB6F34144F29C3EAC5B /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D91E6E646F9A446586AF3FB6 /* AntDesign.ttf */; };
 		FE8AB2163F7C407CA2233F63 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 492D2D7228B64A6785A6D8E5 /* libRNImagePicker.a */; };
+		7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -477,6 +477,8 @@
 		E064342914AF49558CD0B871 /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		EDEAC26023B94CD5B26D863A /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		F6F5F318AAC344DE97A5FF0F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; name = "RNDeviceInfo.xcodeproj"; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; name = "libRNDeviceInfo.a"; path = "libRNDeviceInfo.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -507,6 +509,7 @@
 				9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */,
 				4B50AC760F7D4EEF90AAF112 /* libRCTRestart.a in Frameworks */,
 				24B5F8273A394EDFB70D457D /* libSplashScreen.a in Frameworks */,
+				7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -673,6 +676,7 @@
 				06791FFCBFD84189853C59AD /* RCTImageResizer.xcodeproj */,
 				7F1F9D8F2F5A4B92B714734E /* RCTRestart.xcodeproj */,
 				D31543CE69A94CD890C46310 /* SplashScreen.xcodeproj */,
+				69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1463,11 +1467,13 @@
 					"$(SRCROOT)/../node_modules/react-native-image-resizer/ios/RCTImageResizer",
 					"$(SRCROOT)/../node_modules/react-native-restart/ios/RCTRestart/**",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
+					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 				);
 				INFOPLIST_FILE = postmodern/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/postmodern\"",
 					"\"$(SRCROOT)/postmodern\"",
 					"\"$(SRCROOT)/postmodern\"",
 				);
@@ -1506,11 +1512,13 @@
 					"$(SRCROOT)/../node_modules/react-native-image-resizer/ios/RCTImageResizer",
 					"$(SRCROOT)/../node_modules/react-native-restart/ios/RCTRestart/**",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
+					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 				);
 				INFOPLIST_FILE = postmodern/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/postmodern\"",
 					"\"$(SRCROOT)/postmodern\"",
 					"\"$(SRCROOT)/postmodern\"",
 				);
