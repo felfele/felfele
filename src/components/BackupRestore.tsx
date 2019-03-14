@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    SafeAreaView,
+} from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { Button } from './Button';
 
@@ -16,7 +20,7 @@ export interface State {
 }
 
 export const BackupRestore = (props: Props) => (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
         <NavigationHeader
             title='Backup & Restore'
             onPressLeftButton={() => props.navigation.goBack(null)}
@@ -25,7 +29,7 @@ export const BackupRestore = (props: Props) => (
             <Button text='Backup' onPress={() => props.navigation.navigate('Backup')} />
             <Button text='Restore' onPress={() => props.navigation.navigate('Restore')} />
         </View>
-    </View>
+    </SafeAreaView>
 );
 
 const styles = StyleSheet.create({

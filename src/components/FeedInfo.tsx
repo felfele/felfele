@@ -7,6 +7,7 @@ import {
     ActivityIndicator,
     Dimensions,
     Clipboard,
+    SafeAreaView,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
@@ -141,7 +142,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             : () => this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
         ;
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <NavigationHeader
                     onPressLeftButton={() => {
                         // null is needed otherwise it does not work with switchnavigator backbehavior property
@@ -176,7 +177,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     ? <this.ExistingItemView />
                     : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                 }
-            </View>
+            </SafeAreaView>
         );
     }
 

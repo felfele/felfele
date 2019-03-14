@@ -16,10 +16,7 @@ import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
-
-const WindowWidth = Dimensions.get('window').width;
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -83,8 +80,9 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean, modelHelpe
     if (props.post.images.length === 0) {
         return null;
     } else if (props.post.images.length === 1) {
+        const windowWidth = Dimensions.get('window').width;
         const image = props.post.images[0];
-        const { width, height } = calculateCardImageDimensions(image, WINDOW_WIDTH, props.showSquareImages);
+        const { width, height } = calculateCardImageDimensions(image, windowWidth, props.showSquareImages);
         return (
             <ImageDataView
                 testID={(image.uri || '')}

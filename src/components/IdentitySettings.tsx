@@ -13,6 +13,7 @@ import {
     ShareOptions,
     Platform,
     ScrollView,
+    SafeAreaView,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -79,65 +80,67 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
     Debug.log('IdentitySettings: ', qrCodeValue);
     return (
-        <KeyboardAvoidingView style={styles.mainContainer}>
-            <NavigationHeader
-                rightButtonText1={props.ownFeed != null
-                    ? <MaterialCommunityIcon
-                        name={'share'}
-                        size={20}
-                        color={Colors.DARK_GRAY}
-                    />
-                    : undefined
-                }
-                onPressRightButton1={async () => showShareDialog(props.ownFeed)}
-                title={SCREEN_TITLE}
-            />
-            <ScrollView>
-                <TouchableOpacity
-                    onPress={async () => {
-                        await openImagePicker(props.onUpdatePicture);
-                    }}
-                    style={styles.imagePickerContainer}
-                >
-                    <Image
-                        source={authorImageUri === ''
-                            ? defaultUserImage
-                            : { uri: authorImageUri }
-                        }
-                        style={styles.imagePicker}
-                    />
-                </TouchableOpacity>
-                <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
-                <SimpleTextInput
-                    style={styles.row}
-                    defaultValue={props.author.name}
-                    placeholder={NAME_PLACEHOLDER}
-                    autoCapitalize='none'
-                    autoFocus={props.author.name === ''}
-                    autoCorrect={false}
-                    selectTextOnFocus={true}
-                    returnKeyType={'done'}
-                    onSubmitEditing={props.onUpdateAuthor}
-                />
-                <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
-                <RowItem
-                    title={VIEW_POSTS_LABEL}
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('YourTab')}
-                />
-                { props.ownFeed &&
-                    <View style={styles.qrCodeContainer}>
-                        <QRCode
-                            value={qrCodeValue}
-                            size={QRCodeWidth}
+        <SafeAreaView style={styles.safeAreaContainer}>
+            <KeyboardAvoidingView style={styles.mainContainer}>
+                <NavigationHeader
+                    rightButtonText1={props.ownFeed != null
+                        ? <MaterialCommunityIcon
+                            name={'share'}
+                            size={20}
                             color={Colors.DARK_GRAY}
-                            backgroundColor={Colors.BACKGROUND_COLOR}
                         />
-                    </View>
-                }
-            </ScrollView>
-            <TabBarPlaceholder/>
-        </KeyboardAvoidingView>
+                        : undefined
+                    }
+                    onPressRightButton1={async () => showShareDialog(props.ownFeed)}
+                    title={SCREEN_TITLE}
+                />
+                <ScrollView>
+                    <TouchableOpacity
+                        onPress={async () => {
+                            await openImagePicker(props.onUpdatePicture);
+                        }}
+                        style={styles.imagePickerContainer}
+                    >
+                        <Image
+                            source={authorImageUri === ''
+                                ? defaultUserImage
+                                : { uri: authorImageUri }
+                            }
+                            style={styles.imagePicker}
+                        />
+                    </TouchableOpacity>
+                    <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
+                    <SimpleTextInput
+                        style={styles.row}
+                        defaultValue={props.author.name}
+                        placeholder={NAME_PLACEHOLDER}
+                        autoCapitalize='none'
+                        autoFocus={props.author.name === ''}
+                        autoCorrect={false}
+                        selectTextOnFocus={true}
+                        returnKeyType={'done'}
+                        onSubmitEditing={props.onUpdateAuthor}
+                    />
+                    <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
+                    <RowItem
+                        title={VIEW_POSTS_LABEL}
+                        buttonStyle='navigate'
+                        onPress={() => props.navigation.navigate('YourTab')}
+                    />
+                    { props.ownFeed &&
+                        <View style={styles.qrCodeContainer}>
+                            <QRCode
+                                value={qrCodeValue}
+                                size={QRCodeWidth}
+                                color={Colors.DARK_GRAY}
+                                backgroundColor={Colors.BACKGROUND_COLOR}
+                            />
+                        </View>
+                    }
+                </ScrollView>
+                <TabBarPlaceholder/>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 };
 
@@ -149,8 +152,12 @@ const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) 
 };
 
 const styles = StyleSheet.create({
+    safeAreaContainer: {
+        backgroundColor: Colors.WHITE,
+        flex: 1,
+    },
     mainContainer: {
-        backgroundColor: '#DDDDDD',
+        backgroundColor: Colors.BACKGROUND_COLOR,
         flex: 1,
     },
     row: {

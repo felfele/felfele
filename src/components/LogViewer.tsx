@@ -5,6 +5,7 @@ import { View,
     FlatList,
     Platform,
     Dimensions,
+    SafeAreaView,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
@@ -37,7 +38,7 @@ export class LogViewer extends React.PureComponent<Props> {
     }
 
     public render = () => (
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 onPressLeftButton={() => this.props.navigation.goBack(null)}
                 rightButtonText1='Clear'
@@ -74,7 +75,7 @@ export class LogViewer extends React.PureComponent<Props> {
                 }
                 keyExtractor={(item) => item[0]}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

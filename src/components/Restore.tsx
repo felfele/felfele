@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Clipboard, Alert } from 'react-native';
+import { View, StyleSheet, Clipboard, Alert, SafeAreaView } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
@@ -40,7 +40,7 @@ export class Restore extends React.PureComponent<Props, State> {
     }
 
     public render = () => (
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 title='Restore'
                 onPressLeftButton={() => this.props.navigation.goBack(null)}
@@ -64,7 +64,7 @@ export class Restore extends React.PureComponent<Props, State> {
                 defaultValue='Loading backup...'
                 multiline={true}
             />
-        </View>
+        </SafeAreaView>
     )
 
     private onChangeSecret = async (text: string) => {

@@ -6,6 +6,10 @@ import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
+
+// @ts-ignore
+import SnorkelingIcon from '../../images/snorkeling.svg';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -20,22 +24,34 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
+const PLACEHOLDER_TEXT_1 = "You don't have any favorite feed yet.";
+const PLACEHOLDER_TEXT_2 = 'Go to any feed and simply tap the star icon to add it to your favorites.';
+
 export const FavoritesFeedView = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
-                listHeader: <NavigationHeader
-                                title='Favorites'
-                                rightButtonText1={
-                                    <Icon
-                                        name={'view-grid'}
-                                        size={20}
-                                        color={Colors.DARK_GRAY}
-                                    />
-                                }
-                                onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
-                            />,
+                navigationHeader: <NavigationHeader
+                                      title='Favorites'
+                                      rightButtonText1={
+                                          <Icon
+                                              name={'view-grid'}
+                                              size={20}
+                                              color={Colors.DARK_GRAY}
+                                          />
+                                      }
+                                      onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
+                                  />,
+                placeholder: <PlaceholderCard
+                                 boldText={PLACEHOLDER_TEXT_1}
+                                 regularText={PLACEHOLDER_TEXT_2}
+                                 image={<SnorkelingIcon
+                                            width={29}
+                                            height={29}
+                                            fill={Colors.BRAND_PURPLE}
+                                />}
+                             />,
             }}
         </RefreshableFeed>
     );
