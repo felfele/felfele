@@ -2,14 +2,16 @@ import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, Linking } from 'react-native';
+import { View, StyleSheet, Linking, SafeAreaView } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
 import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
 import { Version } from '../Version';
-import { Debug } from '../Debug';
+
+// @ts-ignore
+import BugIcon from '../../images/bug.svg';
 
 const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 // personally identifiable information
@@ -61,7 +63,7 @@ const getBugReportBody = (): string => {
 
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 leftButtonText={props.navigation ? undefined : ''}
                 onPressLeftButton={() => props.navigation.goBack(null)}
@@ -79,10 +81,10 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
             />
             <View style={styles.contentContainer}>
                 <View style={styles.iconContainer}>
-                    <Icon
-                        name='bug'
-                        size={48}
-                        color={Colors.GRAY}
+                    <BugIcon
+                        width={29}
+                        height={29}
+                        fill={Colors.BRAND_PURPLE}
                     />
                 </View>
                 {props.errorView &&
@@ -102,7 +104,7 @@ export const BugReportView = (props: { navigation?: any, errorView: boolean }) =
                     <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
                 }
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 

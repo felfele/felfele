@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ViewStyle, ScrollView } from 'react-native';
+import { View, ViewStyle, ScrollView, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
@@ -53,7 +53,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 );
 
 export const DebugScreen = (props: Props) => (
-    <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
         <NavigationHeader
             onPressLeftButton={() => props.navigation.goBack(null)}
             title='Debug menu'
@@ -118,7 +118,7 @@ export const DebugScreen = (props: Props) => (
                 />
             </ScrollView>
         </View>
-    </View>
+    </SafeAreaView>
 );
 
 const onAppStateReset = async (props: Props) => {

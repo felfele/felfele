@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -36,13 +36,13 @@ export const SettingsEditor = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     const itemDimension = getGridCardSize();
     return (
-        <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
                 title='Settings'
             />
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <SuperGridSectionList
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
                     spacing={GRID_SPACING}
                     fixed={true}
                     itemDimension={itemDimension}
@@ -115,7 +115,7 @@ export const SettingsEditor = (props: Props) => {
                 }
             </ScrollView>
             <TabBarPlaceholder/>
-        </View>
+        </SafeAreaView>
     );
 };
 

@@ -4,8 +4,8 @@ import {
     FlatList,
     RefreshControl,
     StyleSheet,
-    SafeAreaView,
     LayoutAnimation,
+    SafeAreaView,
 } from 'react-native';
 import { Post } from '../models/Post';
 import { Colors } from '../styles';
@@ -29,6 +29,7 @@ export interface StateProps {
         // WARNING, type parameter included for reference, but it does not typecheck
         listHeader?: React.ReactElement<FeedHeaderProps>,
         navigationHeader?: React.ReactElement<NavHeaderProps>,
+        placeholder?: React.ReactElement<any>;
     };
 }
 
@@ -63,20 +64,16 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <View
-                style={{
-                    flexDirection: 'column',
-                    flex: 1,
-                }}
-            >
+            <SafeAreaView style={styles.container}>
                 <StatusBarView
-                    backgroundColor={Colors.BACKGROUND_COLOR}
+                    backgroundColor={Colors.WHITE}
                     hidden={false}
                     translucent={false}
                     barStyle='dark-content'
                     networkActivityIndicatorVisible={true}
                 />
                 {this.props.children.navigationHeader}
+                {this.props.posts.length === 0 && this.props.children.placeholder}
                 <FlatList
                     ListHeaderComponent={this.props.children.listHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -97,7 +94,6 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                             refreshing={this.state.isRefreshing}
                             onRefresh={() => this.onRefresh() }
                             progressViewOffset={HeaderOffset}
-                            style={styles.refreshControl}
                         />
                     }
                     style={{
@@ -105,7 +101,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                     }}
                     ref={value => this.flatList = value || undefined}
                 />
-            </View>
+            </SafeAreaView>
         );
     }
 
@@ -142,5 +138,9 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 const HeaderOffset = 20;
 
 const styles = StyleSheet.create({
-    refreshControl: { },
+    container: {
+        flexDirection: 'column',
+        flex: 1,
+        backgroundColor: Colors.WHITE,
+    },
 });

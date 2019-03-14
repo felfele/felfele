@@ -1,8 +1,14 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import {
+    Text,
+    StyleSheet,
+    ScrollView,
+    Image,
+    SafeAreaView,
+ } from 'react-native';
 
 import { Settings } from '../../../models/Settings';
-import { Colors, DefaultTabBarHeight } from '../../../styles';
+import { Colors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
@@ -27,7 +33,7 @@ const UNLISTED_EXPLANATION = 'Anyone with a link to your feed can follow it.';
 export const FeedSettingsScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     return (
-        <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader
                 onPressLeftButton={() => props.navigation.goBack()}
                 title={props.feed.name}
@@ -61,7 +67,7 @@ export const FeedSettingsScreen = (props: Props) => {
                 <Text style={styles.explanation}>{UNLISTED_EXPLANATION}</Text>
             </ScrollView>
             <TabBarPlaceholder/>
-        </View>
+        </SafeAreaView>
     );
 };
 

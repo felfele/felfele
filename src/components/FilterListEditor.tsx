@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { ContentFilter } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
@@ -19,14 +19,14 @@ export interface DispatchProps {
 export class FilterListEditor extends React.Component<StateProps & DispatchProps, any> {
     public render() {
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <NavigationHeader
                     title='Filters'
                     onPressLeftButton={() => this.props.navigation.goBack(null)}
                     rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
                     onPressRightButton1={this.onAddFilter}
                 />
-                <ScrollView>
+                <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                     {this.props.filters.map(filter => (
                         <RowItem
                             title={filter.text}
@@ -41,7 +41,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                         />
                     ))}
                 </ScrollView>
-            </View>
+            </SafeAreaView>
         );
     }
 
@@ -62,6 +62,6 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: Colors.WHITE,
     },
 });
