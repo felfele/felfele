@@ -65,6 +65,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(this.props.navigation, item)}
                                 size={itemDimension}
+                                modelHelper={modelHelper}
                             />
                         );
                     }}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Colors } from '../../../styles';
 import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
@@ -9,39 +9,38 @@ import { RowItem } from '../../misc/RowButton';
 const CATEGORIES_LABEL = 'CATEGORIES';
 
 export interface StateProps {
-    categoryMap: { [name: string]: Category };
+    categories: Category[];
     navigation: any;
 }
 
 export interface DispatchProps { }
 
 export const CategoriesScreen = (props: StateProps & DispatchProps) => {
-    const categoryMap = props.categoryMap;
-    const categories = Object.keys(categoryMap).map((categoryName: string) => {
+    const categories = props.categories.map((category: Category) => {
         return (
             <RowItem
-                key={categoryName}
-                title={categoryName}
+                key={category.name}
+                title={category.name}
                 buttonStyle='navigate'
                 onPress={() => {
                     props.navigation.navigate('SubCategoriesContainer', {
-                        title: categoryName,
-                        subCategories: categoryMap[categoryName],
+                        title: category.name,
+                        subCategories: category.subCategories,
                     });
                 }}
             />
         );
     });
     return (
-        <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader title='Explore' onPressLeftButton={() => props.navigation.goBack()}/>
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <RegularText style={styles.label}>
                     {CATEGORIES_LABEL}
                 </RegularText>
                 {categories}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

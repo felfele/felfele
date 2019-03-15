@@ -5,7 +5,7 @@ import { serializeData } from '../../../models/recommendation/NewsSource';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
-        categoryMap: serializeData(),
+        categories: serializeData(),
         navigation: ownProps.navigation,
     };
 };

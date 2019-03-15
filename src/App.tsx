@@ -38,6 +38,7 @@ import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
 import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
 import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
+import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -118,6 +119,12 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     },
     SubCategoriesContainer: {
         screen: SubCategoriesContainer,
+    },
+    NewsSourceGridContainer: {
+        screen: NewsSourceGridContainer,
+    },
+    NewsSourceFeed: {
+        screen: FeedContainer,
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,

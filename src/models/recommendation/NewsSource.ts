@@ -6,7 +6,8 @@ export interface NewsSource {
 }
 
 export interface Category {
-    list: { [name: string]: SubCategory };
+    name: string;
+    subCategories: SubCategory[];
 }
 
 export interface SubCategory {
@@ -16,7 +17,22 @@ export interface SubCategory {
 
 import data from '../../../news.json';
 
+type CategoryMap = { [name: string]: SubCategoryMap };
+type SubCategoryMap = { [name: string]: NewsSource[] };
+
 export const serializeData = () => {
-    const categoryMap: { [name: string]: Category } = data;
-    return categoryMap;
+    const categoryMap: CategoryMap = data;
+    const newsSources: Category[] = Object.keys(categoryMap).map((categoryName) => {
+        const subCategories = Object.keys(categoryMap[categoryName]).map((subCategoryName) => {
+            return {
+                name: subCategoryName,
+                list: categoryMap[categoryName][subCategoryName],
+            };
+        });
+        return {
+            name: categoryName,
+            subCategories,
+        };
+    });
+    return newsSources;
 };

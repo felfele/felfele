@@ -141,7 +141,11 @@ export class RSSFeedManager {
     }
 
     public static async fetchContentWithMimeType(url: string): Promise<ContentWithMimeType | null> {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'curl',
+            },
+        });
         if (response.status !== 200) {
             Debug.log('fetch failed: ', response);
             return null;
