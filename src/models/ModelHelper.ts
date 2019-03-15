@@ -1,4 +1,4 @@
-import { Author } from './Post';
+import { Author } from './Author';
 import { ImageData } from './ImageData';
 
 export interface Rectangle {

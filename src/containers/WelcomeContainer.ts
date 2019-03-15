@@ -7,7 +7,6 @@ import { ImageData } from '../models/ImageData';
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         navigation: ownProps.navigation,
-        author: state.author,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };

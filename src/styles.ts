@@ -16,6 +16,7 @@ export const Colors = {
     GRAY: '#808080',
     DARK_GRAY: '#4A4A4A',
     BRAND_PURPLE: '#873FFF',
+    BRAND_PURPLE_LIGHT: '#BA76FA',
     STRONG_TEXT: '#303030',
     BACKGROUND_COLOR: '#DDDDDD',
     BUTTON_COLOR: '#4A4A4A',

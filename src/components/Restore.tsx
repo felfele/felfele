@@ -60,8 +60,8 @@ export class Restore extends React.PureComponent<Props, State> {
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
-                value={this.state.clipboardText}
-                defaultValue='Loading backup...'
+                defaultValue={this.state.clipboardText}
+                placeholder='Loading backup...'
                 multiline={true}
             />
         </SafeAreaView>

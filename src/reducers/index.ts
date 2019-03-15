@@ -20,7 +20,8 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { Post, Author } from '../models/Post';
+import { Post } from '../models/Post';
+import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
@@ -49,8 +50,8 @@ const defaultSettings: Settings = {
     swarmGatewayAddress: Swarm.defaultGateway,
 };
 
-const defaultAuthor: Author = {
-    name: '',
+export const defaultAuthor: Author = {
+    name: DEFAULT_AUTHOR_NAME,
     uri: '',
     faviconUri: '',
     image: {

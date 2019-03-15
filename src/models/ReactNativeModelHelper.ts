@@ -2,7 +2,7 @@
 import * as RNFS from 'react-native-fs';
 
 import { ModelHelper } from './ModelHelper';
-import { Author } from './Post';
+import { Author } from './Author';
 import { ImageData } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
 

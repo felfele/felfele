@@ -1,5 +1,5 @@
-import { Author } from '../Post';
-import { ModelHelper, Rectangle } from '../ModelHelper';
+import { Author } from '../Author';
+import { ModelHelper } from '../ModelHelper';
 import { ImageData } from '../ImageData';
 
 export class ReactNativeModelHelper implements ModelHelper {

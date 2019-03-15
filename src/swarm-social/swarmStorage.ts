@@ -15,10 +15,11 @@ import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
-import { PublicPost, Post, Author } from '../models/Post';
+import { PublicPost, Post } from '../models/Post';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
-import { syncPostCommandLogWithStorage, uploadUnsyncedPostCommandsToStorage } from '../social/sync';
+import { uploadUnsyncedPostCommandsToStorage } from '../social/sync';
 
 const NUMBER_OF_RECENT_POSTS = 20;
 const DEFAULT_POST_COMMAND_LOG_TOPIC = `felfele:posts:v${PostCommandProtocolVersion}`;

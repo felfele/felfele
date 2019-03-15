@@ -6,6 +6,7 @@ import {
     ReturnKeyTypeOptions,
     StyleSheet,
 } from 'react-native';
+import { Debug } from '../Debug';
 
 interface SimpleTextInputProps {
     style: StyleProp<TextStyle>;
@@ -23,7 +24,6 @@ interface SimpleTextInputProps {
     returnKeyType?: ReturnKeyTypeOptions;
     clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always';
     editable?: boolean;
-    value?: string;
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -32,16 +32,18 @@ interface SimpleTextInputProps {
 
 export class SimpleTextInput extends React.Component<SimpleTextInputProps, { text: string }> {
     public state = {
-        text: this.props.value
-            ? this.props.value
+        text: this.props.defaultValue
+            ? this.props.defaultValue
             : '',
     };
 
     public render() {
+        Debug.log('SimpleTextInput.render', this.state, this.props);
         return (
             <TextInput
                 style={[styles.defaultInput, this.props.style]}
                 onChangeText={(text) => {
+                    Debug.log('SimpleTextInput', text);
                     this.setState({text});
                     if (this.props.onChangeText != null) {
                         this.props.onChangeText(text);
@@ -50,7 +52,6 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 defaultValue={this.props.defaultValue}
                 onSubmitEditing={this.onSubmitEditing}
                 selectTextOnFocus={this.props.selectTextOnFocus}
-                value={this.props.value}
                 placeholder={this.props.placeholder}
                 placeholderTextColor={this.props.placeholderTextColor}
                 autoFocus={this.props.autoFocus}

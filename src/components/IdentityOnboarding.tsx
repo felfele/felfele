@@ -7,20 +7,17 @@ import {
     Image,
     Dimensions,
 } from 'react-native';
-import { Author } from '../models/Post';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { DispatchProps } from './IdentitySettings';
 import { TouchableView } from './TouchableView';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // tslint:disable-next-line:no-var-requires
 const defaultUserImage = require('../../images/user_circle-white.png');
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-
-const namePlaceholder = 'Space Cowboy';
 
 export { DispatchProps };
 export interface StateProps {
@@ -52,7 +49,9 @@ export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
             <View style={styles.textInputContainer}>
                 <SimpleTextInput
                     style={styles.textInput}
-                    defaultValue={props.author.name === '' ? namePlaceholder : props.author.name}
+                    defaultValue={props.author.name}
+                    placeholder={'Enter your name'}
+                    placeholderTextColor={Colors.BRAND_PURPLE_LIGHT}
                     autoCapitalize='none'
                     autoFocus={false}
                     autoCorrect={false}
@@ -108,7 +107,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     faviconPicker: {
-        borderRadius : 6,
+        borderRadius : 0.25 * WIDTH,
         width: 0.5 * WIDTH,
         height: 0.5 * WIDTH,
         marginVertical: 10,
