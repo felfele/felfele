@@ -2,7 +2,7 @@ Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://
 [![Build Status](https://travis-ci.org/felfele/felfele.svg?branch=master)](https://travis-ci.org/felfele/felfele)
 =======
 
-Felfele is a social app that lets you share and receive information easy, offers strong privacy and affordable for everyone.
+Felfele is a social app that lets you share and receive information easily, offers strong privacy and affordable for everyone.
 
 The project is developed by a core team funded by a non-profit organization and volunteers from all over the world.
 
