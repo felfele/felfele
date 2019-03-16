@@ -243,13 +243,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             Debug.log('fetchFeedFromUrl', 'url', url);
             const canonicalUrl = Utils.getCanonicalUrl(url);
             Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-            try {
-                const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
-                Debug.log('fetchFeedFromUrl', 'feed', feed);
-                return feed;
-            } catch (e) {
-                console.log(e);
-            }
+            const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
+            Debug.log('fetchFeedFromUrl', 'feed', feed);
+            return feed;
         }
     }
 

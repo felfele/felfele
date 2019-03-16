@@ -322,7 +322,7 @@ class _RSSPostManager {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
                 const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
-                Debug.log('RSSPostManager: ', rssFeed, favicon);
+                Debug.log('RSSPostManager.loadPosts', 'rssFeed', rssFeed, 'favicon', favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
@@ -443,7 +443,6 @@ class _RSSPostManager {
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
-        const uniques: Set<string> = new Set();
         const strippedFaviconUri = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const markdown = this.htmlToMarkdown(item.description);
@@ -485,11 +484,6 @@ class _RSSPostManager {
             if (post.link != null) {
                 links.add(post.link);
             }
-
-            if (uniques.has(post.text)) {
-                return false;
-            }
-            uniques.add(post.text);
 
             return true;
         });
@@ -547,8 +541,8 @@ const xml2js = require('react-native-xml2js');
 
 interface FeedHelper {
     DefaultTimeout: number;
-    fetch: any;
-    load: any;
+    fetch: (url: string) => Promise<FeedWithMetrics>;
+    load: (url: string, xml: string, startTime?: number, downloadTime?: number) => Promise<FeedWithMetrics>;
     parser: any;
     getDate: any;
     parseAtom: any;
@@ -560,13 +554,14 @@ const feedHelper: FeedHelper = {
         const startTime = Date.now();
         const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-                'Accept': 'text/html,application/xhtml+xml',
+                'User-Agent': 'curl/7.54.0',
+                'Accept': '*/*',
             },
         }));
         const downloadTime = Date.now();
         if (response.status === 200) {
             const xml = await response.text();
+
             return feedHelper.load(url, xml, startTime, downloadTime);
         } else {
             throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
@@ -700,12 +695,8 @@ const feedHelper: FeedHelper = {
 
                 }
                 rss.items.push(obj);
-
             });
-
         }
         return rss;
-
     },
-
 };
