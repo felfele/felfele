@@ -6,23 +6,34 @@ import { syncTests } from './social/syncTest';
 import * as Swarm from './swarm/Swarm';
 import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
+import { Debug } from './Debug';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
 
+// tslint:disable-next-line:no-var-requires
+const FormData = require('form-data');
+
 declare var process: {
     argv: string[];
+    env: any;
 };
 declare var global: any;
 
 global.__DEV__ = true;
 global.fetch = fetch;
+global.FormData = FormData;
+
+// tslint:disable-next-line:no-console
+const output = console.log;
+
+Debug.setDebug(true);
 
 const main = async () => {
     if (process.argv.length > 2) {
         switch (process.argv[2]) {
             case 'version': {
-                console.log(Version);
+                output(Version);
                 break;
             }
             case 'api': {
@@ -34,7 +45,7 @@ const main = async () => {
                     };
                     if (testName === 'allTests') {
                         for (const test of Object.keys(allTests)) {
-                            console.log('\nRunning test: ', test);
+                            output('\nRunning test: ', test);
                             await allTests[test]();
                         }
                     } else {
@@ -52,9 +63,9 @@ const main = async () => {
                                 const bzzHash = process.argv[4];
                                 const bzz = Swarm.makeBzzApi();
                                 const data = await bzz.download(bzzHash, 0);
-                                console.log(data);
+                                output(data);
                             } else {
-                                console.log('usage: cli swarm get <bzz-hash>');
+                                output('usage: cli swarm get <bzz-hash>');
                             }
                             break;
                         }
@@ -65,9 +76,9 @@ const main = async () => {
                                 const paddingByteArray: number[] = new Array<number>(4096 - byteArrayData.length);
                                 paddingByteArray.fill(0);
                                 const hash = keccak256.hex(byteArrayData.concat(paddingByteArray));
-                                console.log(hash);
+                                output(hash);
                             } else {
-                                console.log('usage: cli swarm sha3 <bzz-hash>');
+                                output('usage: cli swarm sha3 <bzz-hash>');
                             }
                             break;
                         }
@@ -78,19 +89,38 @@ const main = async () => {
                                 publicKey: '${identity.publicKey}',
                                 address: '${identity.address}',
                             }`;
-                            console.log('Generated identity:', identityString);
-                            console.warn('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
+                            output('Generated identity:', identityString);
+                            output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
+                            break;
+                        }
+                        case 'uploadImage': {
+                            if (process.argv.length > 4) {
+                                const localPath = process.argv[4];
+                                const swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
+                                const bzz = Swarm.makeBzzApi(swarmGateway);
+                                const files: Swarm.File[] = [
+                                    {
+                                        name: 'image',
+                                        localPath,
+                                        mimeType: Swarm.imageMimeTypeFromFilenameExtension(localPath),
+                                    },
+                                ];
+                                const hash = await bzz.uploadFiles(files);
+                                output(hash);
+                            } else {
+                                output('usage: cli swarm uploadImage <path-to-image>');
+                            }
                             break;
                         }
                     }
                 }
                 else {
-                    console.log('usage: cli swarm [get | sha3]');
+                    output('usage: cli swarm [get | sha3]');
                 }
                 break;
             }
             default: {
-                console.log('usage: cli [version | swarm]');
+                output('usage: cli [version | swarm]');
                 break;
             }
         }
