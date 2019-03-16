@@ -38,12 +38,10 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
     };
 
     public render() {
-        Debug.log('SimpleTextInput.render', this.state, this.props);
         return (
             <TextInput
                 style={[styles.defaultInput, this.props.style]}
                 onChangeText={(text) => {
-                    Debug.log('SimpleTextInput', text);
                     this.setState({text});
                     if (this.props.onChangeText != null) {
                         this.props.onChangeText(text);

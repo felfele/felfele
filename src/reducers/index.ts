@@ -110,7 +110,7 @@ const defaultFeeds: Feed[] = [
         name: 'Felfele Foundation',
         url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
         feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        favicon: '',
+        favicon: 'https://swarm-gateways.net/bzz:/c9cdca819b043fd07394ca1f85be18eaaa6073f0cd16e585fdc7dfd79119b5f5/icon.png',
         followed: true,
     },
     {
