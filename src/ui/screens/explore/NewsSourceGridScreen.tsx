@@ -44,7 +44,9 @@ export class NewsSourceGridScreen extends React.Component<StateProps, State> {
                                <GridCard
                                    title={item.name}
                                    imageUri={imageUri}
-                                   onPress={() => {}}
+                                   onPress={() => this.props.navigation.navigate('NewsSourceFeed', {
+                                       feed: item,
+                                   })}
                                    modelHelper={modelHelper}
                                    size={170}
                                />

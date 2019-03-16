@@ -39,6 +39,7 @@ import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsCo
 import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
 import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
 import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
+import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -124,7 +125,7 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
         screen: NewsSourceGridContainer,
     },
     NewsSourceFeed: {
-        screen: FeedContainer,
+        screen: NewsSourceFeedContainer,
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
