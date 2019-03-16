@@ -54,7 +54,7 @@ export class Backup extends React.PureComponent<Props, State> {
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
-                value={this.state.backupText}
+                defaultValue={this.state.backupText}
                 placeholder='Loading backup...'
                 multiline={true}
             />

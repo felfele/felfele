@@ -18,7 +18,7 @@ import {
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SimpleTextInput } from './SimpleTextInput';
-import { Author } from '../models/Post';
+import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
@@ -46,7 +46,7 @@ export interface StateProps {
 }
 
 const NAME_LABEL = 'NAME';
-const NAME_PLACEHOLDER = 'Space Cowboy';
+const NAME_PLACEHOLDER = DEFAULT_AUTHOR_NAME;
 const SCREEN_TITLE = 'Profile';
 const ACTIVITY_LABEL = 'ACTIVITY';
 const VIEW_POSTS_LABEL = 'View all your posts';
@@ -78,7 +78,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getAuthorImageUri(props.author);
-    Debug.log('IdentitySettings: ', qrCodeValue);
+    Debug.log('IdentitySettings: ', authorImageUri);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <KeyboardAvoidingView style={styles.mainContainer}>
@@ -94,7 +94,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                     title={SCREEN_TITLE}
                 />
-                <ScrollView>
+                <ScrollView
+                    keyboardShouldPersistTaps='handled'
+                >
                     <TouchableOpacity
                         onPress={async () => {
                             await openImagePicker(props.onUpdatePicture);
@@ -119,7 +121,11 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         autoCorrect={false}
                         selectTextOnFocus={true}
                         returnKeyType={'done'}
-                        onSubmitEditing={props.onUpdateAuthor}
+                        onSubmitEditing={(name) =>
+                            name === ''
+                            ? props.onUpdateAuthor(NAME_PLACEHOLDER)
+                            : props.onUpdateAuthor(name)
+                        }
                     />
                     <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
                     <RowItem

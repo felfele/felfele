@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as ShallowRenderer from 'react-test-renderer/shallow';
 import { Card } from '../../src/components/Card';
-import { Author, Post } from '../../src/models/Post';
+import { Post } from '../../src/models/Post';
+import { Author } from '../../src/models/Author';
 import TestRenderer from 'react-test-renderer';
 import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper';
 import { Debug } from '../../src/Debug';

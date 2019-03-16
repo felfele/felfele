@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
     View,
 } from 'react-native';
-import { Author } from '../models/Post';
+import { Author } from '../models/Author';
 
 export interface DispatchProps { }
 
@@ -14,7 +14,7 @@ export interface StateProps {
 export const LoadingScreen = (props: DispatchProps & StateProps) => {
     return (
         <View>
-            {props.author.name === '' ? props.navigation.navigate('Welcome') : props.navigation.navigate('App')}
+            {props.author.identity == null ? props.navigation.navigate('Welcome') : props.navigation.navigate('App')}
         </View>
     );
 };
