@@ -99,7 +99,9 @@ export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, p
 
 export const assertEquals = <T>(expected: T, actual: T) => {
     if (expected !== actual) {
+        // tslint:disable-next-line:no-console
         console.log('expected: ', expected);
+        // tslint:disable-next-line:no-console
         console.log('actual: ', actual);
         throw new Error(`assertEquals failed: expected: ${expected}, actual: ${actual}`);
     }

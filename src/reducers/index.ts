@@ -471,7 +471,9 @@ export const store = createStore(
 );
 
 const initStore = () => {
+    // tslint:disable-next-line:no-console
     console.log('initStore: ', store.getState());
+
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     for (const ownFeed of store.getState().ownFeeds) {

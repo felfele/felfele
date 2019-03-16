@@ -90,7 +90,6 @@ export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSynce
         const syncedPostCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLog, swarmStorage);
         const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
         const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
-        console.log('swarmStorage.sync', 'syncedPostCommandLog', syncedPostCommandLog, 'lastSeenEpoch', lastSeenEpoch, 'postCommandUpdates', postCommandUpdates);
         const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
         return {
             postCommandLog: syncedPostCommandLog,
