@@ -7,7 +7,7 @@ import * as Swarm from './swarm/Swarm';
 import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
 import { Debug } from './Debug';
-import commander from 'commander';
+import { parseArguments, addOption } from './cliParser';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -25,100 +25,73 @@ global.fetch = fetch;
 global.FormData = FormData;
 
 // tslint:disable-next-line:no-console
-const output = console.log;
+let output = console.log;
+Debug.setDebug(false);
+let swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
 
-Debug.setDebug(true);
-
-commander
-    .command('version')
-    .action(() => output(Version))
-    ;
-
-commander
-    .command('test [name]')
-    .action(async (testName) => {
-        const allTests: any = {
-            ...apiTests,
-            ...syncTests,
-        };
-        if (testName === 'allTests') {
-            for (const test of Object.keys(allTests)) {
-                output('\nRunning test: ', test);
-                await allTests[test]();
+const definitions =
+    addOption('-q, --quiet', 'quiet mode', () => output = () => {})
+    .
+    addOption('-v, --verbose', 'verbose mode', () => Debug.setDebug(true))
+    .
+    addCommand('version', 'Prints app version', () => output(Version))
+    .
+    addCommand('test [name]', 'Run integration tests', async (testName) => {
+            const allTests: any = {
+                ...apiTests,
+                ...syncTests,
+            };
+            if (testName === 'all') {
+                for (const test of Object.keys(allTests)) {
+                    output('\nRunning test: ', test);
+                    await allTests[test]();
+                }
+            } else {
+                const test = allTests[testName];
+                await test();
             }
-        } else {
-            const test = allTests[testName];
-            await test();
-        }
     })
-    ;
+    .addCommand('swarm', 'Swarm related commands',
+        addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmGateway = gatewayAddress)
+        .
+        addCommand('get <hash>', 'Download the data by hash', async (hash: string) => {
+            const bzz = Swarm.makeBzzApi(swarmGateway);
+            const data = await bzz.download(hash, 0);
+            output(data);
+        })
+        .
+        addCommand('sha3 <input>', 'Generate SHA3 hash of input', (input) => {
+            const byteArrayData = stringToByteArray(input);
+            const paddingByteArray: number[] = new Array<number>(4096 - byteArrayData.length);
+            paddingByteArray.fill(0);
+            const hash = keccak256.hex(byteArrayData.concat(paddingByteArray));
+            output(hash);
+        })
+        .
+        addCommand('testId', 'Generate a test identity', async () => {
+            const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
+            const identityString = `{
+                privateKey: '${identity.privateKey}',
+                publicKey: '${identity.publicKey}',
+                address: '${identity.address}',
+            }`;
+            output('Generated identity:', identityString);
+            output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
+        })
+        .
+        addCommand('uploadImage <path-to-image>', 'Upload an image to Swarm', async (localPath) => {
+            const bzz = Swarm.makeBzzApi(swarmGateway);
+            const files: Swarm.File[] = [
+                {
+                    name: 'image',
+                    localPath,
+                    mimeType: Swarm.imageMimeTypeFromFilenameExtension(localPath),
+                },
+            ];
+            const hash = await bzz.uploadFiles(files);
+            output(hash);
+        })
+    )
+;
 
-commander
-    .command('swarm <get|sha3|testId|uploadImage> [args...]')
-    .action(async (swarmCommand, args) => {
-        switch (swarmCommand) {
-            case 'get': {
-                if (args.length > 0) {
-                    const bzzHash = args[0];
-                    const bzz = Swarm.makeBzzApi();
-                    const data = await bzz.download(bzzHash, 0);
-                    output(data);
-                } else {
-                    output('usage: cli swarm get <bzz-hash>');
-                }
-                break;
-            }
-            case 'sha3': {
-                if (args.length > 0) {
-                    const data = args[0];
-                    const byteArrayData = stringToByteArray(data);
-                    const paddingByteArray: number[] = new Array<number>(4096 - byteArrayData.length);
-                    paddingByteArray.fill(0);
-                    const hash = keccak256.hex(byteArrayData.concat(paddingByteArray));
-                    output(hash);
-                } else {
-                    output('usage: cli swarm sha3 <bzz-hash>');
-                }
-                break;
-            }
-            case 'testId': {
-                const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
-                const identityString = `{
-                    privateKey: '${identity.privateKey}',
-                    publicKey: '${identity.publicKey}',
-                    address: '${identity.address}',
-                }`;
-                output('Generated identity:', identityString);
-                output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
-                break;
-            }
-            case 'uploadImage': {
-                if (args.length > 0) {
-                    const localPath = args[0];
-                    const swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
-                    const bzz = Swarm.makeBzzApi(swarmGateway);
-                    const files: Swarm.File[] = [
-                        {
-                            name: 'image',
-                            localPath,
-                            mimeType: Swarm.imageMimeTypeFromFilenameExtension(localPath),
-                        },
-                    ];
-                    const hash = await bzz.uploadFiles(files);
-                    output(hash);
-                } else {
-                    output('usage: cli swarm uploadImage <path-to-image>');
-                }
-                break;
-            }
-        }
-    })
-    ;
-
-commander
-    .option('-q, --quiet', 'No debug output')
-    .parse(process.argv);
-
-if (commander.quiet) {
-    Debug.setDebug(false);
-}
+parseArguments(process.argv, definitions, output, output);
