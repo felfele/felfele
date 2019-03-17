@@ -1,9 +1,7 @@
 import { addOption, parseArguments, addCommand, emptyDefinition } from '../src/cliParser';
-import { Debug } from '../src/Debug';
 
 const baseArgs = ['', ''];
 
-beforeEach(() => Debug.setDebug(false));
 test('help is always implicitly defined if any option is defined', () => {
     const helpOption = '-h';
     const option = '-o';
@@ -115,8 +113,6 @@ test('basic command', () => {
 });
 
 test('command with parameter without argument should fail', () => {
-    Debug.setDebug(true);
-
     const command = 'command';
     const commandDef = `${command} <arg>`;
     const definition = addCommand(commandDef, '', (arg) => {});
@@ -204,8 +200,6 @@ test('basic subcommand', () => {
 });
 
 test('subcommand with option', () => {
-    Debug.setDebug(true);
-
     let subcommandActionCalled = false;
     let subcommandOptionActionCalled = false;
     let subcommandOptionActionArg;
