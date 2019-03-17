@@ -77,6 +77,44 @@ test('option with parameter', () => {
     expect(optionActionArgValue).toEqual(optionArgValue);
 });
 
+test('option with short alternative and parameter', () => {
+    let optionActionCalled = false;
+    let optionActionArgValue;
+
+    const shortOption = '-q';
+    const longOption = '--quiet';
+    const optionDef = `${shortOption}, ${longOption} <arg>`;
+    const optionArgValue = 'hello';
+    const definition = addOption(optionDef, '', (arg) => {
+        optionActionCalled = true;
+        optionActionArgValue = arg;
+    });
+    const args = baseArgs.concat([shortOption, optionArgValue]);
+    parseArguments(args, definition);
+
+    expect(optionActionCalled).toBeTruthy();
+    expect(optionActionArgValue).toEqual(optionArgValue);
+});
+
+test('option with long alternative and parameter', () => {
+    let optionActionCalled = false;
+    let optionActionArgValue;
+
+    const shortOption = '-q';
+    const longOption = '--quiet';
+    const optionDef = `${shortOption}, ${longOption} <arg>`;
+    const optionArgValue = 'hello';
+    const definition = addOption(optionDef, '', (arg) => {
+        optionActionCalled = true;
+        optionActionArgValue = arg;
+    });
+    const args = baseArgs.concat([longOption, optionArgValue]);
+    parseArguments(args, definition);
+
+    expect(optionActionCalled).toBeTruthy();
+    expect(optionActionArgValue).toEqual(optionArgValue);
+});
+
 test('option with parameter without argument should fail', () => {
     const option = '-o';
     const optionDef = `${option} <arg>`;
