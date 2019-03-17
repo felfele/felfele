@@ -185,7 +185,7 @@ interface OptionLookup {
 }
 
 interface Context {
-    name: string;
+    commandName: string;
     args: string[];
     definition: Definition;
 }
@@ -206,7 +206,7 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
     if (isOption(args[0])) {
         const option = optionLookup[args[0]] || throwOptionError(args[0]);
         if (option === helpOption) {
-            printUsage(context.name, context.definition, printer);
+            printUsage(context.commandName, context.definition, printer);
             return {
                 ...context,
                 args: [],
@@ -215,7 +215,7 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
         else if (args.length - 1 >= option.args.length) {
             option.action(...args.slice(1, 1 + option.args.length));
             return {
-                name: context.name,
+                commandName: context.commandName,
                 args: args.slice(1 + option.args.length),
                 definition: context.definition,
             };
@@ -231,13 +231,13 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
                     }
                     command.actionOrDefinition(...commandArgs);
                     return {
-                        name: command.name,
+                        commandName: command.name,
                         args: args.slice(1 + command.args.length),
                         definition: context.definition,
                     };
                 } else {
                     return {
-                        name: command.name,
+                        commandName: command.name,
                         args: args.slice(1),
                         definition: command.actionOrDefinition,
                     };
@@ -268,7 +268,7 @@ export const parseArguments = (
 
     try {
         let context = {
-            name,
+            commandName: name,
             args: args.slice(2),
             definition,
         };
