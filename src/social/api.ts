@@ -142,13 +142,12 @@ export interface RecentPostFeedStorage {
     /**
      * Downloades the RecentPostFeed
      *
-     * @param url the url of the feed
      * @param timeout the maximum time to wait to download the feed, if exceeded an
      * exception is thrown
      *
      * @returns the downloaded RecentPostFeed
      */
-    downloadRecentPostFeed: (url: string, timeout: number) => Promise<RecentPostFeed>;
+    downloadRecentPostFeed: (timeout: number) => Promise<RecentPostFeed>;
 }
 
 /**

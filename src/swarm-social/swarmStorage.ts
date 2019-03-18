@@ -79,7 +79,8 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
     uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
         return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, swarmHelpers);
     },
-    downloadRecentPostFeed: async (url: string, timeout: number = 0) => {
+    downloadRecentPostFeed: async (timeout: number = 0) => {
+        const url = swarmApi.feed.getUri();
         return await downloadRecentPostFeed(swarmApi, url, timeout);
     },
 });
