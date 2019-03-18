@@ -181,7 +181,7 @@ const ButtonList = (props: CardProps) => {
 
 const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
     if (props.post.author) {
-        const imageUri = props.modelHelper.getAuthorImageUri(props.post.author);
+        const imageUri = props.modelHelper.getImageUri(props.post.author.image);
         return (
             <Avatar imageUri={imageUri} size='large'/>
         );

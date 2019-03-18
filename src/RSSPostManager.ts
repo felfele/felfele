@@ -344,9 +344,7 @@ class _RSSPostManager {
                 author: {
                     name: 'Postmodern',
                     uri: '',
-                    faviconUri: '',
                     image: {
-                        uri: '',
                     },
                 },
             };
@@ -464,7 +462,6 @@ class _RSSPostManager {
                 author: {
                     name: feedName,
                     uri: feedUrl,
-                    faviconUri: strippedFaviconUri,
                     image: {
                         uri: strippedFaviconUri,
                     },

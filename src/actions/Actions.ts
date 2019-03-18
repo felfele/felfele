@@ -241,7 +241,6 @@ export const AsyncActions = {
                             : {
                                 name: '',
                                 uri: '',
-                                faviconUri: '',
                                 image: {},
                             }
                     ,

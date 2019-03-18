@@ -252,7 +252,6 @@ const uploadAuthor = async (
     const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, getLocalPath);
     return {
         ...author,
-        faviconUri: '',
         image: uploadedImage,
         identity: undefined,
     };
@@ -352,7 +351,6 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
         const author: Author = {
             name: postFeed.name,
             uri: postFeed.url,
-            faviconUri: authorImage.uri,
             image: authorImage,
         };
         const postFeedWithGatewayImageLinks = {

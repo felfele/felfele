@@ -14,7 +14,6 @@ jest.mock('../../src/ui/misc/Carousel');
 
 describe('card test', () => {
     const testAuthor: Author = {
-        faviconUri: '',
         name: 'Test Elek',
         uri: '',
         image: {},
