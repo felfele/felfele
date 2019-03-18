@@ -64,6 +64,18 @@ const favoriteTabScenes: NavigationRouteConfigMap = {
     FeedFromList: {
         screen: SettingsFeedViewContainer,
     },
+    CategoriesContainer: {
+        screen: CategoriesContainer,
+    },
+    SubCategoriesContainer: {
+        screen: SubCategoriesContainer,
+    },
+    NewsSourceGridContainer: {
+        screen: NewsSourceGridContainer,
+    },
+    NewsSourceFeed: {
+        screen: NewsSourceFeedContainer,
+    },
 };
 const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
     {
