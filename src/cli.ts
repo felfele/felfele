@@ -8,6 +8,7 @@ import { generateUnsecureRandom } from './random';
 import { stringToByteArray } from './conversion';
 import { Debug } from './Debug';
 import { parseArguments, addOption } from './cliParser';
+import { makeSwarmStorage } from './swarm-social/swarmStorage';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -34,20 +35,21 @@ const definitions =
     .
     addOption('-v, --verbose', 'verbose mode', () => Debug.setDebug(true))
     .
-    addCommand('version', 'Prints app version', () => output(Version))
+    addCommand('version', 'Print app version', () => output(Version))
     .
     addCommand('test [name]', 'Run integration tests', async (testName) => {
             const allTests: any = {
                 ...apiTests,
                 ...syncTests,
             };
-            if (testName === 'all') {
+            if (testName == null) {
                 for (const test of Object.keys(allTests)) {
                     output('\nRunning test: ', test);
                     await allTests[test]();
                 }
             } else {
                 const test = allTests[testName];
+                output('\nRunning test: ', testName);
                 await test();
             }
     })
@@ -90,6 +92,24 @@ const definitions =
             ];
             const hash = await bzz.uploadFiles(files);
             output(hash);
+        })
+        .
+        addCommand('feed <user>', 'List feed', async (user) => {
+            const feedAddress: Swarm.FeedAddress = {
+                topic: '',
+                user,
+            };
+            const dummySigner = (digest: number[]) => '';
+            const swarmApi = Swarm.makeApi(feedAddress, dummySigner, swarmGateway);
+            const storageApi = makeSwarmStorage(swarmApi);
+            const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
+            output('Recent post feed', JSON.stringify(recentPostFeed, null, 2));
+
+            output('Posts:');
+            const postCommandLog = await storageApi.downloadPostCommandLog();
+            for (const command of postCommandLog.commands) {
+                output(JSON.stringify(command, null, 2));
+            }
         })
     )
 ;
