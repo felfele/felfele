@@ -29,6 +29,7 @@ global.FormData = FormData;
 let output = console.log;
 Debug.setDebug(false);
 let swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
+const jsonPrettyPrint = (obj: any) => JSON.stringify(obj, null, 4);
 
 const definitions =
     addOption('-q, --quiet', 'quiet mode', () => output = () => {})
@@ -103,12 +104,12 @@ const definitions =
             const swarmApi = Swarm.makeApi(feedAddress, dummySigner, swarmGateway);
             const storageApi = makeSwarmStorage(swarmApi);
             const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
-            output('Recent post feed', JSON.stringify(recentPostFeed, null, 2));
+            output('Recent post feed', jsonPrettyPrint(recentPostFeed));
 
             output('Posts:');
             const postCommandLog = await storageApi.downloadPostCommandLog();
             for (const command of postCommandLog.commands) {
-                output(JSON.stringify(command, null, 2));
+                output(jsonPrettyPrint(command));
             }
         })
     )
