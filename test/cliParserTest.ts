@@ -127,6 +127,18 @@ test('option with parameter without argument should fail', () => {
     expect(t).toThrow(`missing parameter to option \`${option}'`);
 });
 
+test('option with optional parameter without argument should not fail', () => {
+    let optionActionArgValue = '';
+
+    const option = '-o';
+    const optionDef = `${option} [arg]`;
+    const definition = addOption(optionDef, '', (arg) => optionActionArgValue = arg);
+    const args = baseArgs.concat([option]);
+    parseArguments(args, definition);
+
+    expect(optionActionArgValue).toBeUndefined();
+});
+
 test('unknown option', () => {
     const option = '-o';
     const definition = emptyDefinition;
@@ -159,7 +171,29 @@ test('command with parameter without argument should fail', () => {
         parseArguments(args, definition);
     };
 
-    expect(t).toThrow(`missing parameter to command \`${command}'`);
+    expect(t).toThrow(`missing parameter to command \`${command}': <arg>`);
+});
+
+test('command with optional parameter without argument should not fail', () => {
+    let commandActionArgument = '';
+
+    const command = 'command';
+    const commandDef = `${command} [arg]`;
+    const definition = addCommand(commandDef, '', (arg) => commandActionArgument = arg);
+    const args = baseArgs.concat([command]);
+    parseArguments(args, definition);
+
+    expect(commandActionArgument).toBeUndefined();
+});
+
+test('command with required parameter after optional parameter should fail', () => {
+    const command = 'command';
+    const commandDef = `${command} [opt] <arg>`;
+    const t = () => {
+        const definition = addCommand(commandDef, '', (arg) => {});
+    };
+
+    expect(t).toThrow(`cannot define required argument after optional arguments: <arg>`);
 });
 
 test('command with parameter', () => {

@@ -4,16 +4,21 @@ type Printer = (...args: any[]) => void;
 
 type Action = (...args: string[]) => void;
 
+interface Argument {
+    name: string;
+    required: boolean;
+}
+
 interface Option {
     names: string[];
-    args: string[];
+    args: Argument[];
     description: string;
     action: Action;
 }
 
 interface Command {
     name: string;
-    args: string[];
+    args: Argument[];
     description: string;
     actionOrDefinition: Action | Definition;
 }
@@ -35,13 +40,40 @@ interface OptionAdder extends CommandAdder {
     addOption: (name: string, description: string, action: Action) => OptionAdder;
 }
 
+const defineArguments = (defArgs: string[]): Argument[] => {
+    let required = true;
+    const args: Argument[] = [];
+    for (const defArg of defArgs) {
+        if (defArg.startsWith('<') && defArg.endsWith('>')) {
+            if (!required) {
+                throwError(`cannot define required argument after optional arguments: ${defArg}`);
+            }
+            args.push({
+                name: defArg,
+                required,
+            });
+        }
+        else if (defArg.startsWith('[') && defArg.endsWith(']')) {
+            required = false;
+            args.push({
+                name: defArg,
+                required,
+            });
+        }
+        else {
+            throwError(`syntax error: argument ${defArg}`);
+        }
+    }
+    return args;
+};
+
 const defineOption = (nameDef: string, description: string, action: Action): Option => {
     const optionNameSeparator = '|';
     const canonicalOptionName = nameDef.replace(optionNameHumanSeparator, optionNameSeparator);
     const optionArguments = canonicalOptionName.split(' ');
     const namesPart = optionArguments[0];
     const names = namesPart.split(optionNameSeparator).map(name => name.trim());
-    const args = optionArguments.slice(1);
+    const args = defineArguments(optionArguments.slice(1));
     return {
         names,
         args,
@@ -53,7 +85,7 @@ const defineOption = (nameDef: string, description: string, action: Action): Opt
 const defineCommand = (nameDef: string, description: string, actionOrDefinition: Action | Definition): Command => {
     const nameParts = nameDef.split(' ');
     const name = nameParts[0];
-    const args = nameParts.slice(1);
+    const args = defineArguments(nameParts.slice(1));
     return {
         name,
         args,
@@ -121,12 +153,17 @@ const subcommandDescription = (commands: Command[]): string =>
 
 const commandArgumentsDescription = (command: Command): string => {
     if (isAction(command.actionOrDefinition)) {
-        return command.args.join(' ');
+        return command.args.map(arg => arg.name).join(' ');
     }
     if (command.actionOrDefinition.commands.length === 0) {
         return '';
     }
     return subcommandDescription(command.actionOrDefinition.commands);
+};
+
+const commandDescription = (command: Command): string => {
+    const desc = commandArgumentsDescription(command);
+    return `${command.name} ${desc}`;
 };
 
 const padWithSpace = (input: string, width: number): string => {
@@ -142,7 +179,19 @@ const printUsage = (name: string, definition: Definition, printer: Printer) => {
     printer('');
     printer('Options:');
 
-    const namePadding = 46;
+    const longestOptionLength = definition.options.reduce<number>((longest, option) =>
+        option.names.join(optionNameHumanSeparator).length > longest
+        ? option.names.join(optionNameHumanSeparator).length
+        : longest
+    , 0);
+
+    const longestCommandLength = definition.commands.reduce<number>((longest, command) =>
+        commandDescription(command).length > longest
+        ? commandDescription(command).length
+        : longest
+    , longestOptionLength);
+
+    const namePadding = longestCommandLength + 10;
     for (const option of definition.options) {
         const optionName = option.names.join(optionNameHumanSeparator);
         printer(`  ${padWithSpace(optionName, namePadding)}${option.description}`);
@@ -151,9 +200,8 @@ const printUsage = (name: string, definition: Definition, printer: Printer) => {
     printer('');
     printer('Commands:');
     for (const command of definition.commands) {
-        const desc = commandArgumentsDescription(command);
-        const commandName = `${command.name} ${desc}`;
-        printer(`  ${padWithSpace(commandName, namePadding)}${command.description}`);
+        const desc = commandDescription(command);
+        printer(`  ${padWithSpace(desc, namePadding)}${command.description}`);
     }
 };
 
@@ -178,7 +226,7 @@ const throwError = (message: string) => { throw new Error(message); };
 const throwOptionError = (name: string) => throwError(`unknown option \`${name}'`);
 const throwOptionMissingParameterError = (name: string) => throwError(`missing parameter to option \`${name}'`);
 const throwCommandError = (name: string) => throwError(`unknown command \`${name}'`);
-const throwCommandMissingParameterError = (name: string) => throwError(`missing parameter to command \`${name}'`);
+const throwCommandMissingParameterError = (command: Command) => throwError(`missing parameter to command \`${command.name}': ${commandArgumentsDescription(command)}`);
 
 interface OptionLookup {
     [name: string]: Option;
@@ -205,6 +253,7 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
 
     if (isOption(args[0])) {
         const option = optionLookup[args[0]] || throwOptionError(args[0]);
+        const optionRequiredArgs = option.args.filter(arg => arg.required);
         if (option === helpOption) {
             printUsage(context.commandName, context.definition, printer);
             return {
@@ -212,7 +261,7 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
                 args: [],
             };
         }
-        else if (args.length - 1 >= option.args.length) {
+        else if (args.length - 1 >= optionRequiredArgs.length) {
             option.action(...args.slice(1, 1 + option.args.length));
             return {
                 commandName: context.commandName,
@@ -225,9 +274,10 @@ const readArgAndExecute = (context: Context, printer: Printer): Context => {
         for (const command of definition.commands) {
             if (command.name === args[0]) {
                 if (isAction(command.actionOrDefinition)) {
+                    const commandRequiredArgs = command.args.filter(arg => arg.required);
                     const commandArgs = [...args.slice(1, 1 + command.args.length)];
-                    if (commandArgs.length < command.args.length) {
-                        throwCommandMissingParameterError(command.name);
+                    if (commandArgs.length < commandRequiredArgs.length) {
+                        throwCommandMissingParameterError(command);
                     }
                     command.actionOrDefinition(...commandArgs);
                     return {
