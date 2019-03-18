@@ -1,11 +1,10 @@
 import { connect } from 'react-redux';
 import { StateProps, CategoriesScreen } from './CategoriesScreen';
 import { AppState } from '../../../reducers';
-import { serializeData } from '../../../models/recommendation/NewsSource';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
-        categories: serializeData(),
+        categories: state.exploreData,
         navigation: ownProps.navigation,
     };
 };

@@ -20,8 +20,7 @@ import data from '../../../news.json';
 type CategoryMap = { [name: string]: SubCategoryMap };
 type SubCategoryMap = { [name: string]: NewsSource[] };
 
-export const serializeData = () => {
-    const categoryMap: CategoryMap = data;
+export const serializeData = (categoryMap: CategoryMap = data) => {
     const newsSources: Category[] = Object.keys(categoryMap).map((categoryName) => {
         const subCategories = Object.keys(categoryMap[categoryName]).map((subCategoryName) => {
             return {

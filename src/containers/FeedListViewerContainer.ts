@@ -4,8 +4,9 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
+import { Actions } from '../actions/Actions';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps & DispatchProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     // TODO: update favicons?
     const ownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
         ? []
@@ -24,14 +25,21 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         followedFeeds: followedFeeds,
         knownFeeds: knownFeeds,
         navigation: ownProps.navigation,
-        onPressFeed: onPressFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
         title: 'All feeds',
     };
 };
 
-const onPressFeed = (navigation: any, feed: Feed) => {
-    navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: any }): DispatchProps => {
+    return {
+        openExplore: () => {
+            dispatch(Actions.initExplore());
+            ownProps.navigation.navigate('CategoriesContainer');
+        },
+        onPressFeed: (navigation: any, feed: Feed) => {
+            navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
+        },
+    };
 };
 
-export const FeedListViewerContainer = connect(mapStateToProps)(FeedListEditor);
+export const FeedListViewerContainer = connect(mapStateToProps, mapDispatchToProps)(FeedListEditor);

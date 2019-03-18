@@ -56,6 +56,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
     CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
+    INIT_EXPLORE = 'INIT-EXPLORE',
 }
 
 const InternalActions = {
@@ -120,6 +121,8 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
     updateOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
+    initExplore: () =>
+        createAction(ActionTypes.INIT_EXPLORE),
 };
 
 export const AsyncActions = {

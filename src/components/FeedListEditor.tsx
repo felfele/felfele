@@ -14,6 +14,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface DispatchProps {
     onPressFeed: (navigation: any, feed: Feed) => void;
+    openExplore: () => void;
 }
 
 export interface StateProps {
@@ -95,7 +96,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         title={this.props.title}
                     />
                     <TouchableWithoutFeedback
-                        onPress={() => this.props.navigation.navigate('CategoriesContainer')}
+                        onPress={() => this.props.openExplore()}
                     >
                         <View style={{
                             backgroundColor: Colors.WHITE,

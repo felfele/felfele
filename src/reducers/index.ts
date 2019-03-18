@@ -28,6 +28,7 @@ import { migrateAppState, currentAppStateVersion } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
+import { Category, serializeData } from '../models/recommendation/NewsSource';
 
 export interface AppState extends PersistedState {
     contentFilters: ContentFilter[];
@@ -40,6 +41,7 @@ export interface AppState extends PersistedState {
     localPosts: Post[];
     draft: Post | null;
     metadata: Metadata;
+    exploreData: Category[];
 }
 
 const defaultSettings: Settings = {
@@ -153,6 +155,7 @@ export const defaultState: AppState = {
     localPosts: defaultLocalPosts,
     draft: null,
     metadata: defaultMetadata,
+    exploreData: [],
 };
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
@@ -266,6 +269,20 @@ const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed
         }
         default: {
             return ownFeeds;
+        }
+    }
+};
+
+const exploreDataReducer = (exploreData: Category[] = [], action: Actions): Category[] => {
+    switch (action.type) {
+        case 'INIT-EXPLORE': {
+            if (exploreData.length > 0) {
+                return exploreData;
+            }
+            return serializeData();
+        }
+        default: {
+            return exploreData;
         }
     }
 };
@@ -437,7 +454,7 @@ class FelfelePersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })];
-    public blacklist = ['currentTimestamp'];
+    public blacklist = ['currentTimestamp', 'exploreData'];
     public key = 'root';
     public storage = AsyncStorage;
     public version = currentAppStateVersion;
@@ -457,6 +474,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    exploreData: exploreDataReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);
