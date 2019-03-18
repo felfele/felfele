@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
-import { StateProps, NewsSourceGridScreen } from './NewsSourceGridScreen';
+import { StateProps, NewsSourceGridScreen, DispatchProps } from './NewsSourceGridScreen';
 import { AppState } from '../../../reducers';
+import { Feed } from '../../../models/Feed';
+import { AsyncActions } from '../../../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
@@ -11,4 +13,12 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
     };
 };
 
-export const NewsSourceGridContainer = connect(mapStateToProps)(NewsSourceGridScreen);
+export const mapDispatchToProps = (dispatch: any): DispatchProps => {
+    return {
+        downloadPostsForNewsSource: (feed: Feed) => {
+            dispatch(AsyncActions.downloadPostsFromFeeds([feed]));
+        },
+    };
+};
+
+export const NewsSourceGridContainer = connect(mapStateToProps, mapDispatchToProps)(NewsSourceGridScreen);

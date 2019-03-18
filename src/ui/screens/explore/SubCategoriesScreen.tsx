@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Colors } from '../../../styles';
 import { RegularText } from '../../misc/text';
-import { SubCategory, Category } from '../../../models/recommendation/NewsSource';
+import { SubCategory } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
 

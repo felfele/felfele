@@ -17,11 +17,15 @@ export interface StateProps {
     navigation: any;
 }
 
+export interface DispatchProps {
+    downloadPostsForNewsSource: (feed: Feed) => void;
+}
+
 interface State {
     feeds: Feed[];
 }
 
-export class NewsSourceGridScreen extends React.Component<StateProps, State> {
+export class NewsSourceGridScreen extends React.Component<StateProps & DispatchProps, State> {
     public state: State = {
         feeds: [],
     };
@@ -44,9 +48,12 @@ export class NewsSourceGridScreen extends React.Component<StateProps, State> {
                                <GridCard
                                    title={item.name}
                                    imageUri={imageUri}
-                                   onPress={() => this.props.navigation.navigate('NewsSourceFeed', {
-                                       feed: item,
-                                   })}
+                                   onPress={() => {
+                                       this.props.downloadPostsForNewsSource(item);
+                                       this.props.navigation.navigate('NewsSourceFeed', {
+                                           feed: item,
+                                       });
+                                   }}
                                    modelHelper={modelHelper}
                                    size={170}
                                />
