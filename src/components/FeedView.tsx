@@ -32,57 +32,75 @@ type Props = StateProps & DispatchProps;
 export const FeedView = (props: Props) => {
     const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const isLocalFeed = props.isOwnFeed || props.feeds.length === 0;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
-                navigationHeader: <NavigationHeader
-                    onPressLeftButton={props.onBack}
-                    rightButtonText2={!isLocalFeed ? <Icon
-                        name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
-                        size={20}
-                        color={Colors.DARK_GRAY}
-                    /> : undefined}
-                    rightButtonText1={!props.isOwnFeed
-                        ? <Icon
-                            name={'star'}
-                            size={20}
-                            color={isFollowedFeed
-                                ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_PURPLE : Colors.DARK_GRAY
-                                : 'transparent'
-                            }
-                        />
-                        : props.feeds.length > 0
-                            ? <Icon
-                                name={'settings-box'}
-                                size={20}
-                                color={Colors.DARK_GRAY}
-                            />
-                            : undefined
-                    }
-                    onPressRightButton2={async () => {
-                        return !props.isOwnFeed && await onFollowPressed(props.feedUrl,
-                            props.feeds,
-                            props.onUnfollowFeed,
-                            props.onFollowFeed);
-                    }}
-                    onPressRightButton1={() => {
-                        if (props.isOwnFeed) {
-                            if (props.feeds.length > 0) {
-                                props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
-                            }
-                        } else if (isFollowedFeed) {
-                            props.onToggleFavorite(props.feedUrl);
-                        } else {
-                            props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
-                        }
-
-                    }}
-                    title={props.feedName}
-                />,
+                navigationHeader:
+                    <NavigationHeader
+                        onPressLeftButton={props.onBack}
+                        rightButtonText1={getRightButton1Text(props, isFollowedFeed)}
+                        rightButtonText2={getRightButton2Text(props, isFollowedFeed)}
+                        onPressRightButton1={getRightButton1OnPress(props, isFollowedFeed)}
+                        onPressRightButton2={getRightButton2OnPress(props)}
+                        title={props.feedName}
+                    />,
             }}
         </RefreshableFeed>
     );
+};
+
+const getRightButton1Text = (props: Props, isFollowedFeed: boolean) => {
+    return !props.isOwnFeed
+        ? <Icon
+            name={'star'}
+            size={20}
+            color={isFollowedFeed
+                ? isFavorite(props.feeds, props.feedUrl) ? Colors.BRAND_PURPLE : Colors.DARK_GRAY
+                : 'transparent'
+            }
+        />
+        : props.feeds.length > 0
+            ? <Icon
+                name={'settings-box'}
+                size={20}
+                color={Colors.DARK_GRAY}
+            />
+            : undefined
+    ;
+};
+
+const getRightButton2Text = (props: Props, isFollowedFeed: boolean) => {
+    const isLocalFeed = props.isOwnFeed || props.feeds.length === 0;
+    return !isLocalFeed
+        ? <Icon
+              name={isFollowedFeed ? 'link-variant-off' : 'link-variant'}
+              size={20}
+              color={Colors.DARK_GRAY}
+          />
+        : undefined
+    ;
+};
+const getRightButton1OnPress = (props: Props, isFollowedFeed: boolean) => {
+    return () => {
+        if (props.isOwnFeed) {
+            if (props.feeds.length > 0) {
+                props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
+            }
+        } else if (isFollowedFeed) {
+            props.onToggleFavorite(props.feedUrl);
+        } else {
+            props.navigation.navigate('FeedSettings', { feed: props.feeds[0] });
+        }
+    };
+};
+
+const getRightButton2OnPress = (props: Props) => {
+    return async () => {
+        return !props.isOwnFeed && await onFollowPressed(props.feedUrl,
+            props.feeds,
+            props.onUnfollowFeed,
+            props.onFollowFeed);
+    };
 };
 
 const isFavorite = (feeds: Feed[], uri: string): boolean => {
