@@ -108,9 +108,7 @@ const definitions =
 
             output('Posts:');
             const postCommandLog = await storageApi.downloadPostCommandLog();
-            for (const command of postCommandLog.commands) {
-                output(jsonPrettyPrint(command));
-            }
+            output(jsonPrettyPrint(postCommandLog.commands));
         })
     )
 ;
