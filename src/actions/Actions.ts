@@ -48,7 +48,7 @@ export enum ActionTypes {
     UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
     UPDATE_POST_IS_UPLOADING = 'UPDATE-POST-IS-UPLOADING',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
-    UPDATE_AUTHOR_PICTURE_PATH = 'UPDATE-AUTHOR-PICTURE-PATH',
+    UPDATE_AUTHOR_IMAGE = 'UPDATE-AUTHOR-IMAGE',
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
@@ -107,8 +107,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_DRAFT),
     updateAuthorName: (name: string) =>
         createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
-    updateAuthorPicturePath: (image: ImageData) =>
-        createAction(ActionTypes.UPDATE_AUTHOR_PICTURE_PATH, { image }),
+    updateAuthorImage: (image: ImageData) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_IMAGE, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
     changeSettingSaveToCameraRoll: (value: boolean) =>

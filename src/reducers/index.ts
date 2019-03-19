@@ -307,7 +307,7 @@ const authorReducer = (author = defaultAuthor, action: Actions): Author => {
                 name: action.payload.name,
             };
         }
-        case 'UPDATE-AUTHOR-PICTURE-PATH': {
+        case 'UPDATE-AUTHOR-IMAGE': {
             return {
                 ...author,
                 image: action.payload.image,
