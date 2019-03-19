@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onCreateUser: async (name: string, image: ImageData, navigation: any) => {
             await dispatch(AsyncActions.chainActions([
                 Actions.updateAuthorName(name),
-                Actions.updateAuthorPicturePath(image),
+                Actions.updateAuthorImage(image),
                 AsyncActions.createUserIdentity(),
                 AsyncActions.createOwnFeed(),
             ]));

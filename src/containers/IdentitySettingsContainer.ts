@@ -22,7 +22,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(Actions.updateAuthorName(text));
         },
         onUpdatePicture: (image: ImageData) => {
-            dispatch(Actions.updateAuthorPicturePath(image));
+            dispatch(Actions.updateAuthorImage(image));
         },
     };
 };
