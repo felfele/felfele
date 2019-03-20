@@ -11,21 +11,6 @@ interface HeaderButton {
     onPress: () => void;
 }
 
-// export interface StateProps {
-//     leftButtonText?: string | React.ReactNode;
-//     rightButtonText1?: string | React.ReactNode;
-//     rightButtonText2?: string | React.ReactNode;
-//     titleImage?: React.ReactNode;
-//     title?: string;
-// }
-
-// export interface DispatchProps {
-//     onPressLeftButton?: () => void;
-//     onPressRightButton1?: () => void;
-//     onPressRightButton2?: () => void;
-//     onPressTitle?: () => void;
-// }
-
 interface HeaderProps {
     leftButton?: HeaderButton;
     rightButton1?: HeaderButton;
