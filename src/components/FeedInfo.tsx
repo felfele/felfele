@@ -108,51 +108,36 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     public render() {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
-        const rightButtonText1 = this.state.loading
-            ? undefined
-            : <Icon
-                  name={isExistingFeed
-                    ? isFollowed
-                        ? 'link-variant-off'
-                        : 'delete'
-                    : 'download'}
-                  size={20}
-                  color={Colors.DARK_GRAY}
-              />
-        ;
-        const rightButtonAction1 = this.state.loading
-            ? undefined
-            : isExistingFeed
-                ? isFollowed
-                    ? this.onUnfollowFeed
-                    : () => this.onDelete()
-                : async () => await this.fetchFeed()
+
+        const icon = (name: string) => <Icon name={name} size={20} color={Colors.DARK_GRAY} />;
+        const button = (iconName: string, onPress: () => void) => ({
+            label: icon(iconName),
+            onPress,
+        });
+
+        const rightButton1 = isExistingFeed
+            ? isFollowed
+                ? button('link-variant-off', this.onUnfollowFeed)
+                : button('delete', this.onDelete)
+            : button('download', async () => await this.fetchFeed())
         ;
 
-        const rightButtonText2 = this.state.loading || !isExistingFeed
+        const rightButton2 = this.state.loading || !isExistingFeed
             ? undefined
-            : <Icon
-                  name={'open-in-new'}
-                  size={20}
-                  color={Colors.DARK_GRAY}
-              />
-        ;
-        const rightButtonAction2 = this.state.loading || !isExistingFeed
-            ? undefined
-            : () => this.props.navigation.navigate('Feed', { feedUrl: this.props.feed.feedUrl, name: this.props.feed.name })
+            : button('open-in-new', () =>
+                this.props.navigation.navigate('Feed', {
+                    feedUrl: this.props.feed.feedUrl,
+                    name: this.props.feed.name,
+                })
+            )
         ;
         return (
             <SafeAreaView style={styles.container}>
                 <NavigationHeader
-                    onPressLeftButton={() => {
-                        // null is needed otherwise it does not work with switchnavigator backbehavior property
-                        this.props.navigation.goBack(null);
-                    }}
                     title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
-                    rightButtonText1={rightButtonText1}
-                    onPressRightButton1={rightButtonAction1}
-                    rightButtonText2={rightButtonText2}
-                    onPressRightButton2={rightButtonAction2}
+                    rightButton1={rightButton1}
+                    rightButton2={rightButton2}
+                    navigation={this.props.navigation}
                 />
                 <SimpleTextInput
                     defaultValue={this.state.url}

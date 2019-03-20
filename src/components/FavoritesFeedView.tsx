@@ -32,17 +32,21 @@ export const FavoritesFeedView = (props: Props) => {
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
             {{
-                navigationHeader: <NavigationHeader
-                                      title='Favorites'
-                                      rightButtonText1={
-                                          <Icon
-                                              name={'view-grid'}
-                                              size={20}
-                                              color={Colors.DARK_GRAY}
-                                          />
-                                      }
-                                      onPressRightButton1={() => props.navigation.navigate('FeedListViewerContainer', { feeds: props.feeds })}
-                                  />,
+                navigationHeader:
+                    <NavigationHeader
+                        title='Favorites'
+                        rightButton1={{
+                            onPress: () => props.navigation.navigate(
+                                'FeedListViewerContainer',
+                                { feeds: props.feeds }
+                            ),
+                            label: <Icon
+                                name={'view-grid'}
+                                size={20}
+                                color={Colors.DARK_GRAY}
+                            />,
+                        }}
+                    />,
                 placeholder: <PlaceholderCard
                                  boldText={PLACEHOLDER_TEXT_1}
                                  regularText={PLACEHOLDER_TEXT_2}

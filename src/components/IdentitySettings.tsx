@@ -83,15 +83,18 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
         <SafeAreaView style={styles.safeAreaContainer}>
             <KeyboardAvoidingView style={styles.mainContainer}>
                 <NavigationHeader
-                    rightButtonText1={props.ownFeed != null
-                        ? <MaterialCommunityIcon
-                            name={'share'}
-                            size={20}
-                            color={Colors.DARK_GRAY}
-                        />
-                        : undefined
+                    rightButton1={
+                        props.ownFeed != null
+                            ? {
+                                label: <MaterialCommunityIcon
+                                    name={'share'}
+                                    size={20}
+                                    color={Colors.DARK_GRAY}
+                                />,
+                                onPress: async () => showShareDialog(props.ownFeed),
+                            }
+                            : undefined
                     }
-                    onPressRightButton1={async () => showShareDialog(props.ownFeed)}
                     title={SCREEN_TITLE}
                 />
                 <ScrollView

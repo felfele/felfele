@@ -55,7 +55,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 export const DebugScreen = (props: Props) => (
     <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
         <NavigationHeader
-            onPressLeftButton={() => props.navigation.goBack(null)}
+            navigation={props.navigation}
             title='Debug menu'
         />
         <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
@@ -149,6 +149,7 @@ const onCreateIdentity = async (props: Props) => {
 
 const onGenerateNewIdentity = async (props: Props) => {
     const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+    // tslint:disable-next-line:no-console
     console.log(privateIdentity);
 };
 

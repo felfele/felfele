@@ -40,11 +40,13 @@ export class LogViewer extends React.PureComponent<Props> {
     public render = () => (
         <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
-                onPressLeftButton={() => this.props.navigation.goBack(null)}
-                rightButtonText1='Clear'
-                onPressRightButton1={() => {
-                    clearLog();
-                    this.props.onTickTime();
+                navigation={this.props.navigation}
+                rightButton1={{
+                    label: 'Clear',
+                    onPress: () => {
+                        clearLog();
+                        this.props.onTickTime();
+                    },
                 }}
                 title='Log viewer'
             />

@@ -91,9 +91,11 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             <SafeAreaView style={styles.container}>
                 <NavigationHeader
                     title='Edit filter'
-                    onPressLeftButton={() => this.props.navigation.goBack(null)}
-                    rightButtonText1={rightButtonText}
-                    onPressRightButton1={rightButtonAction}
+                    navigation={this.props.navigation}
+                    rightButton1={{
+                        onPress: rightButtonAction,
+                        label: rightButtonText,
+                    }}
                 />
                 <SimpleTextInput
                     defaultValue={this.state.filterText}
