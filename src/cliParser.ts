@@ -155,7 +155,7 @@ const describeSubcommands = (commands: Command[]): string =>
     ? ''
     : '<' + commands.map(command => command.name.split(' ')[0]).join('|') + '>';
 
-const commandArgumentsDescription = (command: Command): string => {
+const describeCommandArguments = (command: Command): string => {
     if (isAction(command.actionOrDefinition)) {
         return command.args.map(arg => arg.name).join(' ');
     }
@@ -165,8 +165,8 @@ const commandArgumentsDescription = (command: Command): string => {
     return describeSubcommands(command.actionOrDefinition.commands);
 };
 
-const commandDescription = (command: Command): string => {
-    const desc = commandArgumentsDescription(command);
+const describeCommand = (command: Command): string => {
+    const desc = describeCommandArguments(command);
     return `${command.name} ${desc}`;
 };
 
@@ -180,9 +180,19 @@ const padWithSpace = (input: string, width: number): string => {
 
 const printUsage = (context: Context, print: Printer) => {
     const command = context.command;
-    const subcommandDescription = isAction(command.actionOrDefinition)
-        ? commandArgumentsDescription(command)
-        : describeSubcommands(command.actionOrDefinition.commands)
+    const definition = isDefinition(command.actionOrDefinition)
+        ? command.actionOrDefinition
+        : emptyDefinition
+        ;
+
+    const options = definition.options.length === 0
+        ? [helpOption]
+        : definition.options
+        ;
+
+    const subcommandDescription = isDefinition(command.actionOrDefinition)
+        ? describeSubcommands(command.actionOrDefinition.commands)
+        : describeCommandArguments(command)
         ;
 
     print(`Usage: ${context.command.name} [options] ${subcommandDescription}`);
@@ -191,15 +201,6 @@ const printUsage = (context: Context, print: Printer) => {
         print(command.description);
         print('');
     }
-
-    const definition = isDefinition(command.actionOrDefinition)
-        ? command.actionOrDefinition
-        : emptyDefinition;
-
-    const options = definition.options.length === 0
-        ? [helpOption]
-        : definition.options
-        ;
 
     print('Options:');
 
@@ -210,8 +211,8 @@ const printUsage = (context: Context, print: Printer) => {
     , 0);
 
     const longestCommandLength = definition.commands.reduce<number>((longest, subCommand) =>
-        commandDescription(subCommand).length > longest
-        ? commandDescription(subCommand).length
+        describeCommand(subCommand).length > longest
+        ? describeCommand(subCommand).length
         : longest
     , longestOptionLength);
 
@@ -226,7 +227,7 @@ const printUsage = (context: Context, print: Printer) => {
         print('Commands:');
     }
     for (const subCommand of definition.commands) {
-        const desc = commandDescription(subCommand);
+        const desc = describeCommand(subCommand);
         print(`  ${padWithSpace(desc, namePadding)}${subCommand.description}`);
     }
 };
@@ -252,7 +253,7 @@ const throwError = (message: string) => { throw new Error(message); };
 const throwOptionError = (name: string) => throwError(`unknown option \`${name}'`);
 const throwOptionMissingParameterError = (name: string) => throwError(`missing parameter to option \`${name}'`);
 const throwCommandError = (name: string) => throwError(`unknown command \`${name}'`);
-const throwCommandMissingParameterError = (command: Command) => throwError(`missing parameter to command \`${command.name}': ${commandArgumentsDescription(command)}`);
+const throwCommandMissingParameterError = (command: Command) => throwError(`missing parameter to command \`${command.name}': ${describeCommandArguments(command)}`);
 
 interface Context {
     command: Command;
