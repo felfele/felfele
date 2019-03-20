@@ -1,25 +1,28 @@
 import { addOption, parseArguments, addCommand, emptyDefinition } from '../src/cliParser';
 
 const baseArgs = ['', ''];
+const helpOption = '-h';
 
 test('help is always implicitly defined if any option is defined', () => {
-    const helpOption = '-h';
+    let helpOutput = '';
+
     const option = '-o';
     const definition = addOption(option, '', () => {});
     const args = baseArgs.concat([helpOption]);
-    parseArguments(args, definition, () => {});
+    parseArguments(args, definition, (msg) => helpOutput += msg);
 
-    // expect no exception
+    expect(helpOutput).toMatch('Usage: ');
 });
 
 test('help is always implicitly defined if any command is defined', () => {
-    const helpOption = '-h';
+    let helpOutput = '';
+
     const command = 'command';
     const definition = addCommand(command, '', () => {});
     const args = baseArgs.concat([helpOption]);
-    parseArguments(args, definition, () => {});
+    parseArguments(args, definition, (msg) => helpOutput += msg);
 
-    // expect no exception
+    expect(helpOutput).toMatch('Usage: ');
 });
 
 test('basic option', () => {
@@ -269,6 +272,40 @@ test('basic subcommand', () => {
     parseArguments(args, definition);
 
     expect(subcommandActionCalled).toBeTruthy();
+});
+
+test('basic subcommand with help on command', () => {
+    let subcommandActionCalled = false;
+    let helpOutput = '';
+
+    const command = 'command';
+    const subcommand = 'subcommand';
+    const definition = addCommand(command, '',
+        addCommand(subcommand, '', () => subcommandActionCalled = true)
+    );
+
+    const args = baseArgs.concat([command, helpOption]);
+    parseArguments(args, definition, (msg) => helpOutput += msg);
+
+    expect(subcommandActionCalled).toBeFalsy();
+    expect(helpOutput).toMatch('Usage: ');
+});
+
+test('basic subcommand with help on subcommand', () => {
+    let subcommandActionCalled = false;
+    let helpOutput = '';
+
+    const command = 'command';
+    const subcommand = 'subcommand';
+    const definition = addCommand(command, '',
+        addCommand(subcommand, '', () => subcommandActionCalled = true)
+    );
+
+    const args = baseArgs.concat([command, subcommand, helpOption]);
+    parseArguments(args, definition, (msg) => helpOutput += msg);
+
+    expect(subcommandActionCalled).toBeFalsy();
+    expect(helpOutput).toMatch('Usage: ');
 });
 
 test('subcommand with option', () => {
