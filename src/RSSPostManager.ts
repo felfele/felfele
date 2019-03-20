@@ -344,9 +344,7 @@ class _RSSPostManager {
                 author: {
                     name: 'Postmodern',
                     uri: '',
-                    faviconUri: '',
                     image: {
-                        uri: '',
                     },
                 },
             };
@@ -440,7 +438,7 @@ class _RSSPostManager {
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
         const uniques: Set<string> = new Set();
-        const strippedFaviconUri = this.stripTrailing(favicon, '/');
+        const strippedFavicon = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const markdown = this.htmlToMarkdown(item.description);
             const [text, markdownImages] = this.extractTextAndImagesFromMarkdown(markdown, '');
@@ -464,9 +462,8 @@ class _RSSPostManager {
                 author: {
                     name: feedName,
                     uri: feedUrl,
-                    faviconUri: strippedFaviconUri,
                     image: {
-                        uri: strippedFaviconUri,
+                        uri: strippedFavicon,
                     },
                 },
             };

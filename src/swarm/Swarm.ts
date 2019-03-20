@@ -7,7 +7,9 @@ import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 import { Buffer } from 'buffer';
 
-export const defaultGateway = 'https://swarm-gateways.net';
+// TODO if this changes we have to add either a migration or a setup code to reducers
+// to update it for existing users
+export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz://';
 export const defaultFeedPrefix = 'bzz-feed:/';

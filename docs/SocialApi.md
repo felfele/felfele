@@ -24,7 +24,6 @@ export interface PrivateIdentity extends PublicIdentity {
 export interface Author {
     name: string;
     uri: string;
-    faviconUri: string;
     image?: ImageData;
     identity?: PrivateIdentity;
 }

@@ -77,7 +77,7 @@ const showShareDialog = async (feed?: Feed) => {
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImageUri = modelHelper.getAuthorImageUri(props.author);
+    const authorImageUri = modelHelper.getImageUri(props.author.image);
     Debug.log('IdentitySettings: ', authorImageUri);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>

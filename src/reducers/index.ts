@@ -53,7 +53,6 @@ const defaultSettings: Settings = {
 export const defaultAuthor: Author = {
     name: DEFAULT_AUTHOR_NAME,
     uri: '',
-    faviconUri: '',
     image: {
         uri: '',
     },
@@ -61,7 +60,6 @@ export const defaultAuthor: Author = {
 };
 
 const onboardingAuthor: Author = {
-    faviconUri: '',
     name: 'Felfele Assistant',
     uri: '',
     image: {},
@@ -309,10 +307,9 @@ const authorReducer = (author = defaultAuthor, action: Actions): Author => {
                 name: action.payload.name,
             };
         }
-        case 'UPDATE-AUTHOR-PICTURE-PATH': {
+        case 'UPDATE-AUTHOR-IMAGE': {
             return {
                 ...author,
-                faviconUri: action.payload.image.localPath != null ? action.payload.image.localPath : '',
                 image: action.payload.image,
             };
         }

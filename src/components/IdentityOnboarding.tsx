@@ -27,7 +27,7 @@ export interface StateProps {
 
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImageUri = modelHelper.getAuthorImageUri(props.author);
+    const authorImageUri = modelHelper.getImageUri(props.author.image);
     Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
         <KeyboardAvoidingView style={styles.mainContainer}>
