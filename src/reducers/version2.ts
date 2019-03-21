@@ -8,6 +8,7 @@ import { Metadata } from '../models/Metadata';
 import { Settings } from '../models/Settings';
 import { LocalFeed } from '../social/api';
 import { AppStateV1 } from './version1';
+import * as Swarm from '../swarm/Swarm';
 
 export interface AppStateV2 extends PersistedState {
     contentFilters: ContentFilter[];
@@ -31,6 +32,10 @@ export const migrateVersion1ToVersion2 = (state: PersistedState): AppStateV2 => 
             ...localFeed,
             autoShare: false,
         })),
+        settings: {
+            ...appStateV1.settings,
+            swarmGatewayAddress: Swarm.defaultGateway,
+        },
     };
     return appStateV2;
 };
