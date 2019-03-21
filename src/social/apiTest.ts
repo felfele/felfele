@@ -189,6 +189,37 @@ export const testMergeTwoLocalPostCommandLogs = () => {
     Debug.log('testMergeTwoLocalPostCommandLogs', 'posts', posts);
 };
 
+export const testMergeSameLocalPostCommandLogs = () => {
+    const localSource = 'local';
+    const localPostCommandLog = testSharePosts(localSource);
+    assertPostCommandLogInvariants(localPostCommandLog);
+
+    const mergedPostCommandLog = mergePostCommandLogs(localPostCommandLog, localPostCommandLog);
+    Debug.log('testMergeSameLocalPostCommandLogs', 'mergedPostCommandLog', mergedPostCommandLog);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+
+    assertPostCommandLogsAreEqual(mergedPostCommandLog, localPostCommandLog);
+};
+
+export const testMergeTwoLocalPostCommandLogsWithCommonAncestors = () => {
+    const localSource1 = 'local1';
+    const localPostCommandLog1 = testSharePosts(localSource1);
+    assertPostCommandLogInvariants(localPostCommandLog1);
+
+    const localPostCommandLog2 = {
+        ...localPostCommandLog1,
+    };
+    const localSource2 = 'local2';
+    const localPostCommandLog2After4 = testSharePost(4, localPostCommandLog2, localSource2);
+    assertPostCommandLogInvariants(localPostCommandLog2After4);
+
+    const mergedPostCommandLog = mergePostCommandLogs(localPostCommandLog2After4, localPostCommandLog1);
+    Debug.log('testMergeSameLocalPostCommandLogs', 'mergedPostCommandLog', mergedPostCommandLog);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+
+    assertPostCommandLogsAreEqual(mergedPostCommandLog, localPostCommandLog2After4);
+};
+
 export const testGetLatestUpdatePostCommandsFromLogWithUpdate = () => {
     const postCommandLogAfterUpdate = testSharePostsWithUpdate();
     const posts = getLatestPostsFromLog(postCommandLogAfterUpdate);
@@ -209,6 +240,8 @@ export const apiTests = {
     testSharePostsWithUpdate,
     testSharePostsWithRemove,
     testMergeTwoLocalPostCommandLogs,
+    testMergeSameLocalPostCommandLogs,
+    testMergeTwoLocalPostCommandLogsWithCommonAncestors,
     testGetLatestUpdatePostCommandsFromLogWithUpdate,
     testGetLatestUpdatePostCommandsFromLogWithRemove,
 };
