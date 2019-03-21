@@ -120,8 +120,8 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
     changeSettingSwarmGatewayAddress: (value: string) =>
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
-    updateOwnFeed: (feed: Partial<LocalFeed>) =>
-        createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
+    updateOwnFeed: (partialFeed: Partial<LocalFeed>) =>
+        createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
 };
 
 export const AsyncActions = {

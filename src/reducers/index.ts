@@ -242,13 +242,13 @@ const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed
             return [...ownFeeds, action.payload.feed];
         }
         case 'UPDATE-OWN-FEED': {
-            const ind = ownFeeds.findIndex(feed => action.payload.feed.feedUrl === feed.feedUrl);
+            const ind = ownFeeds.findIndex(feed => action.payload.partialFeed.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return ownFeeds;
             }
             return updateArrayItem(ownFeeds, ind, (feed) => ({
                 ...feed,
-                ...action.payload.feed,
+                ...action.payload.partialFeed,
             }));
 
         }
