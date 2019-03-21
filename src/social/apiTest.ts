@@ -97,6 +97,17 @@ export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, p
     }
 };
 
+export const assertPostCommandLogsAreJSONEqual = (postCommandLogA: PostCommandLog, postCommandLogB: PostCommandLog) => {
+    if (postCommandLogA.commands.length !== postCommandLogB.commands.length) {
+        throw new Error(`assertPostCommandLogsAreEqual failed: ${postCommandLogA.commands.length} != ${postCommandLogB.commands.length}`);
+    }
+    for (let i = 0; i < postCommandLogA.commands.length; i++) {
+        if (JSON.stringify(postCommandLogA.commands[i]) !== JSON.stringify(postCommandLogB.commands[i])) {
+            throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}`);
+        }
+    }
+};
+
 export const assertEquals = <T>(expected: T, actual: T) => {
     if (expected !== actual) {
         // tslint:disable-next-line:no-console
@@ -220,6 +231,32 @@ export const testMergeTwoLocalPostCommandLogsWithCommonAncestors = () => {
     assertPostCommandLogsAreEqual(mergedPostCommandLog, localPostCommandLog2After4);
 };
 
+export const testMergeTwoCommandLogsWithCommonAncestors = () => {
+    const postCommandLog1After1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog1After2 = testSharePost(2, postCommandLog1After1);
+
+    const dateNow = 123456789;
+    const postCommandLog2After2 = {
+        ...postCommandLog1After2,
+        commands: postCommandLog1After2.commands.map((command, index) => ({
+            ...command,
+            epoch: {
+                time: dateNow - index,
+                level: 0,
+            },
+        })),
+    };
+
+    assertPostCommandLogInvariants(postCommandLog2After2);
+    Debug.log('testMergeTwoCommandLogsWithCommonAncestors', 'postCommandLog2After2', postCommandLog2After2);
+
+    const mergedPostCommandLog = mergePostCommandLogs(postCommandLog1After2, postCommandLog2After2);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+    Debug.log('testMergeTwoCommandLogsWithCommonAncestors', 'mergedPostCommandLog', mergedPostCommandLog);
+
+    assertPostCommandLogsAreJSONEqual(mergedPostCommandLog, postCommandLog2After2);
+};
+
 export const testGetLatestUpdatePostCommandsFromLogWithUpdate = () => {
     const postCommandLogAfterUpdate = testSharePostsWithUpdate();
     const posts = getLatestPostsFromLog(postCommandLogAfterUpdate);
@@ -242,6 +279,7 @@ export const apiTests = {
     testMergeTwoLocalPostCommandLogs,
     testMergeSameLocalPostCommandLogs,
     testMergeTwoLocalPostCommandLogsWithCommonAncestors,
+    testMergeTwoCommandLogsWithCommonAncestors,
     testGetLatestUpdatePostCommandsFromLogWithUpdate,
     testGetLatestUpdatePostCommandsFromLogWithRemove,
 };
