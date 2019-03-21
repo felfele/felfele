@@ -9,7 +9,6 @@ import thunkMiddleware from 'redux-thunk';
 import {
     persistStore,
     persistReducer,
-    PersistedState,
     createMigrate,
     getStoredState,
     KEY_PREFIX,
@@ -25,23 +24,11 @@ import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
-import { migrateAppState, currentAppStateVersion } from './migration';
+import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
-
-export interface AppState extends PersistedState {
-    contentFilters: ContentFilter[];
-    feeds: Feed[];
-    ownFeeds: LocalFeed[];
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: Post[];
-    localPosts: Post[];
-    draft: Post | null;
-    metadata: Metadata;
-}
+import { AppState, currentAppStateVersion } from './AppState';
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,

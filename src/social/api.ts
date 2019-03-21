@@ -96,6 +96,7 @@ export interface RecentPostFeed extends Feed {
 export interface LocalFeed extends RecentPostFeed {
     postCommandLog: PostCommandLog;
     isSyncing: boolean;
+    shared: boolean;
 }
 
 /**
