@@ -29,7 +29,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onChangeFeedSharing: (feed: LocalFeed, shared: boolean) => {
+        onChangeFeedSharing: (feed: LocalFeed, autoShare: boolean) => {
             dispatch(Actions.updateOwnFeed({
                 feedUrl: feed.feedUrl,
                 autoShare,
