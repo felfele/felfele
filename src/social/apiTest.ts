@@ -103,7 +103,7 @@ export const assertPostCommandLogsAreJSONEqual = (postCommandLogA: PostCommandLo
     }
     for (let i = 0; i < postCommandLogA.commands.length; i++) {
         if (JSON.stringify(postCommandLogA.commands[i]) !== JSON.stringify(postCommandLogB.commands[i])) {
-            throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}`);
+            throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}, left: ${postCommandLogA}, right: ${postCommandLogB}`);
         }
     }
 };
@@ -231,6 +231,42 @@ export const testMergeTwoLocalPostCommandLogsWithCommonAncestors = () => {
     assertPostCommandLogsAreEqual(mergedPostCommandLog, localPostCommandLog2After4);
 };
 
+export const testMergeTwoCommandLogsWithUndefinedLeft = () => {
+    const postCommandLog1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog2 = {
+        ...postCommandLog1,
+        commands: postCommandLog1.commands.map((command, index) => ({
+            ...command,
+            epoch: {
+                time: 1,
+                level: 0,
+            },
+        })),
+    };
+
+    const mergedPostCommandLog = mergePostCommandLogs(postCommandLog1, postCommandLog2);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+    assertPostCommandLogsAreJSONEqual(mergedPostCommandLog, postCommandLog2);
+};
+
+export const testMergeTwoCommandLogsWithUndefinedRight = () => {
+    const postCommandLog1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog2 = {
+        ...postCommandLog1,
+        commands: postCommandLog1.commands.map((command, index) => ({
+            ...command,
+            epoch: {
+                time: 1,
+                level: 0,
+            },
+        })),
+    };
+
+    const mergedPostCommandLog = mergePostCommandLogs(postCommandLog2, postCommandLog1);
+    assertPostCommandLogInvariants(mergedPostCommandLog);
+    assertPostCommandLogsAreJSONEqual(mergedPostCommandLog, postCommandLog2);
+};
+
 export const testMergeTwoCommandLogsWithCommonAncestors = () => {
     const postCommandLog1After1 = testSharePost(1, emptyPostCommandFeed);
     const postCommandLog1After2 = testSharePost(2, postCommandLog1After1);
@@ -280,6 +316,8 @@ export const apiTests = {
     testMergeSameLocalPostCommandLogs,
     testMergeTwoLocalPostCommandLogsWithCommonAncestors,
     testMergeTwoCommandLogsWithCommonAncestors,
+    testMergeTwoCommandLogsWithUndefinedLeft,
+    testMergeTwoCommandLogsWithUndefinedRight,
     testGetLatestUpdatePostCommandsFromLogWithUpdate,
     testGetLatestUpdatePostCommandsFromLogWithRemove,
 };
