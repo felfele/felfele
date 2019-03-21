@@ -7,7 +7,8 @@ import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import { createBackupFromString } from '../BackupRestore';
 import { DateUtils } from '../DateUtils';
-import { AppState, getSerializedAppState } from '../reducers';
+import { getSerializedAppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { stringToHex } from '../conversion';
 
 export interface StateProps {

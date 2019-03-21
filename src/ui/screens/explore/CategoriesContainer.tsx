@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { StateProps, CategoriesScreen } from './CategoriesScreen';
-import { AppState } from '../../../reducers';
+import { AppState } from '../../../reducers/AppState';
 import { exploreData } from '../../../models/recommendation/NewsSource';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {

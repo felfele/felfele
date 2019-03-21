@@ -1,4 +1,4 @@
-import { AppState } from '.';
+import { AppState } from './AppState';
 import { Settings } from '../models/Settings';
 import * as Swarm from '../swarm/Swarm';
 import { Author } from '../models/Author';

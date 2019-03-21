@@ -12,16 +12,18 @@ import { Colors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { RecentPostFeed } from '../../../social/api';
+import { LocalFeed } from '../../../social/api';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 export interface StateProps {
     navigation: any;
     settings: Settings;
-    feed: RecentPostFeed;
+    feed: LocalFeed;
 }
 
-export interface DispatchProps { }
+export interface DispatchProps {
+    onChangeFeedSharing: (feed: LocalFeed, value: boolean) => void;
+}
 
 type Props = StateProps & DispatchProps;
 
@@ -56,6 +58,12 @@ export const FeedSettingsScreen = (props: Props) => {
                     switchState={true}
                     buttonStyle='switch'
                     switchDisabled={true}
+                />
+                <RowItem
+                    title='Automatic sharing'
+                    switchState={props.feed.autoShare}
+                    buttonStyle='switch'
+                    onSwitchValueChange={(value) => props.onChangeFeedSharing(props.feed, value)}
                 />
                 <Text style={styles.explanation}>{ASSOCIATED_EXPLANATION}</Text>
                 <Text style={styles.label}>{PRIVACY_SHARING_LABEL}</Text>

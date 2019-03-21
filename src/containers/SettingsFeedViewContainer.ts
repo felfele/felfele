@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { StateProps, FeedView } from '../components/FeedView';
 import { mapStateToProps as defaultStateToProps, mapDispatchToProps } from './FeedContainer';
 

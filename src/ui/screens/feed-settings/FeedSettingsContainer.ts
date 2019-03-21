@@ -1,13 +1,28 @@
 import { connect } from 'react-redux';
-import { StateProps, FeedSettingsScreen } from './FeedSettingsScreen';
-import { AppState } from '../../../reducers';
+import { StateProps, DispatchProps, FeedSettingsScreen } from './FeedSettingsScreen';
+import { AppState } from '../../../reducers/AppState';
+import { LocalFeed } from '../../../social/api';
+import { Actions } from '../../../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+    const paramFeed = ownProps.navigation.state.params.feed;
+    const feed = state.ownFeeds.find(ownFeed => ownFeed.feedUrl === paramFeed.feedUrl) || paramFeed;
     return {
         navigation: ownProps.navigation,
         settings: state.settings,
-        feed: ownProps.navigation.state.params.feed,
+        feed,
     };
 };
 
-export const FeedSettingsContainer = connect(mapStateToProps)(FeedSettingsScreen);
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
+    return {
+        onChangeFeedSharing: (feed: LocalFeed, autoShare: boolean) => {
+            dispatch(Actions.updateOwnFeed({
+                feedUrl: feed.feedUrl,
+                autoShare,
+            }));
+        },
+    };
+};
+
+export const FeedSettingsContainer = connect(mapStateToProps, mapDispatchToProps)(FeedSettingsScreen);

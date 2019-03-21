@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { StateProps, SubCategoriesScreen, OwnProps } from './SubCategoriesScreen';
-import { AppState } from '../../../reducers';
+import { AppState } from '../../../reducers/AppState';
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return {
