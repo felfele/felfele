@@ -16,7 +16,6 @@ import { TouchableView } from './TouchableView';
 
 // tslint:disable-next-line:no-var-requires
 const defaultUserImage = require('../../images/user_circle-white.png');
-import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export { DispatchProps };
@@ -28,7 +27,6 @@ export interface StateProps {
 export const IdentityOnboarding = (props: DispatchProps & StateProps) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getImageUri(props.author.image);
-    Debug.log('IdentityOnboarding: ', authorImageUri);
     return (
         <KeyboardAvoidingView style={styles.mainContainer}>
             <View style={styles.imagePicker}>
