@@ -9,7 +9,7 @@ import { IdentityOnboarding, DispatchProps as IdentityOnboardingDispatchProps  }
 import { ImageData } from '../models/ImageData';
 import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
-import { defaultAuthor } from '../reducers';
+import { defaultAuthor } from '../reducers/defaultData';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;

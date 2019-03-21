@@ -73,7 +73,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                     networkActivityIndicatorVisible={true}
                 />
                 {this.props.children.navigationHeader}
-                {this.props.posts.length === 0 && this.props.children.placeholder}
+                {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
                     ListHeaderComponent={this.props.children.listHeader}
                     ListFooterComponent={this.renderListFooter}

@@ -24,9 +24,10 @@ export interface StateProps {
     knownFeeds: Feed[];
     gatewayAddress: string;
     title: string;
+    showExplore: boolean;
 }
 
-export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<any>[]}> {
+export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactNode}> {
     public render() {
         const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
@@ -94,6 +95,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         }}
                         title={this.props.title}
                     />
+                    {this.props.showExplore &&
                     <TouchableWithoutFeedback
                         onPress={() => this.props.openExplore()}
                     >
@@ -109,7 +111,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                             </View>
                             <MediumText style={{ fontSize: 12, color: Colors.DARK_GRAY }}>EXPLORE PUBLIC FEEDS</MediumText>
                         </View>
-                    </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback>}
                 </FeedGrid>
             </SafeAreaView>
         );

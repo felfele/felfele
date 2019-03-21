@@ -11,7 +11,6 @@ import { setCustomText } from 'react-native-global-props';
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
 import { store, persistor } from './reducers';
-import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
@@ -63,18 +62,6 @@ const favoriteTabScenes: NavigationRouteConfigMap = {
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
-    },
-    CategoriesContainer: {
-        screen: CategoriesContainer,
-    },
-    SubCategoriesContainer: {
-        screen: SubCategoriesContainer,
-    },
-    NewsSourceGridContainer: {
-        screen: NewsSourceGridContainer,
-    },
-    NewsSourceFeed: {
-        screen: NewsSourceFeedContainer,
     },
 };
 const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
@@ -145,6 +132,9 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     FeedSettings: {
         screen: FeedSettingsContainer,
     },
+    FeedInfo: {
+        screen: FeedInfoContainer,
+    },
 };
 
 const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
@@ -177,9 +167,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     Backup: {
         screen: BackupContainer,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
     },
     Feed: {
         screen: SettingsFeedViewContainer,
@@ -316,9 +303,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: PostEditorContainer,
-    },
-    FeedInfo: {
-        screen: FeedInfoContainer,
     },
 };
 

@@ -4,9 +4,14 @@ import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
-import { Actions } from '../actions/Actions';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 : 0) - (a.favorite === true ? 1 : 0);
+
+const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
+
+export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
+
+const mapStateToProps = (state: AppState, ownProps: { navigation: any, showExplore: boolean }): StateProps => {
     // TODO: update favicons?
     const ownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
         ? []
@@ -27,13 +32,13 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
         title: 'All feeds',
+        showExplore: ownProps.navigation.state.params.showExplore,
     };
 };
 
 export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: any }): DispatchProps => {
     return {
         openExplore: () => {
-            dispatch(Actions.initExplore());
             ownProps.navigation.navigate('CategoriesContainer');
         },
         onPressFeed: (navigation: any, feed: Feed) => {

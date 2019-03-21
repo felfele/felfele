@@ -34,7 +34,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
             <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-                <NavigationHeader title={this.props.subCategoryName} onPressLeftButton={() => this.props.navigation.goBack()}/>
+                <NavigationHeader title={this.props.subCategoryName} navigation={this.props.navigation}/>
                 {this.state.feeds.length > 0 &&
                     <FlatGrid
                        style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}

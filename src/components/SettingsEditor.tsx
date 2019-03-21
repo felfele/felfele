@@ -73,11 +73,6 @@ export const SettingsEditor = (props: Props) => {
                     {PREFERENCES_LABEL}
                 </RegularText>
                 <RowItem
-                    title='Feeds'
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FeedListEditorContainer')}
-                />
-                <RowItem
                     title='Save to Camera Roll'
                     switchState={props.settings.saveToCameraRoll}
                     onSwitchValueChange={props.onSaveToCameraRollValueChange}

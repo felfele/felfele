@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts } from '../selectors/selectors';
+import { mapDispatchToProps as defaultMapDispatchToProps } from '../containers/FeedContainer';
 
-export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const feed = ownProps.navigation.state.params.feed;
     const addedFeed = state.feeds.find(value => value.feedUrl === feed.feedUrl);
     const feeds = addedFeed != null ? [ addedFeed ] : [ feed ];
@@ -23,20 +24,12 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
     };
 };
 
-export const mapDispatchToProps = (dispatch: any): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onRefreshPosts: (feeds: Feed[]) => {
-            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
-        },
-        onUnfollowFeed: (feed: Feed) => {
-            dispatch(Actions.unfollowFeed(feed));
-        },
+        ...defaultMapDispatchToProps(dispatch),
         onFollowFeed: (feed: Feed) => {
             dispatch(Actions.addFeed(feed));
             dispatch(Actions.followFeed(feed));
-        },
-        onToggleFavorite: (feedUrl: string) => {
-            dispatch(Actions.toggleFeedFavorite(feedUrl));
         },
     };
 };

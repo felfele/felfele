@@ -57,7 +57,6 @@ export enum ActionTypes {
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
     CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
-    INIT_EXPLORE = 'INIT-EXPLORE',
 }
 
 const InternalActions = {
@@ -122,8 +121,6 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
     updateOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
-    initExplore: () =>
-        createAction(ActionTypes.INIT_EXPLORE),
 };
 
 export const AsyncActions = {
@@ -420,8 +417,9 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
 };
 
 const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
-    const rssFeeds = feeds.filter(feed => !isPostFeedUrl(feed.url));
-    const postFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
+    const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== 'local/onboarding');
+    const rssFeeds = feedsWithoutOnboarding.filter(feed => !isPostFeedUrl(feed.url));
+    const postFeeds = feedsWithoutOnboarding.filter(feed => isPostFeedUrl(feed.url));
     const allPostsCombined = await Promise.all([
         RSSPostManager.loadPosts(rssFeeds) as Promise<PublicPost[]>,
         loadRecentPosts(swarm, postFeeds),

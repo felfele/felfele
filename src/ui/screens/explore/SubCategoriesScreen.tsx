@@ -36,7 +36,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
     });
     return (
         <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-            <NavigationHeader title={props.title} onPressLeftButton={() => props.navigation.goBack()}/>
+            <NavigationHeader title={props.title} navigation={props.navigation}/>
             <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <RegularText style={styles.label}>
                     {SUBCATEGORIES_LABEL}

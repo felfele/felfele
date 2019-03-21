@@ -31,6 +31,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: any }): Dispa
         onRemoveFeed: (feed: Feed) => {
             dispatch(Actions.removeFeed(feed));
             dispatch(AsyncActions.downloadFollowedFeedPosts());
+            ownProps.navigation.pop(2);
         },
         onUnfollowFeed: (feed: Feed) => {
             dispatch(Actions.unfollowFeed(feed));

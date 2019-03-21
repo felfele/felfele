@@ -33,7 +33,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
     });
     return (
         <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-            <NavigationHeader title='Explore' onPressLeftButton={() => props.navigation.goBack()}/>
+            <NavigationHeader navigation={props.navigation} title='Explore'/>
             <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                 <RegularText style={styles.label}>
                     {CATEGORIES_LABEL}
