@@ -37,7 +37,7 @@ export class Backup extends React.PureComponent<Props, State> {
         <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 title='Backup'
-                onPressLeftButton={() => this.props.navigation.goBack(null)}
+                navigation={this.props.navigation}
             />
             <View style={styles.secretContainer}>
                 <SimpleTextInput

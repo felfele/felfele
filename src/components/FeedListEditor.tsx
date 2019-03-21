@@ -85,12 +85,11 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
                 <FeedGrid {...this.props}>
                     <NavigationHeader
-                        onPressLeftButton={() => {
-                            // null is needed otherwise it does not work with switchnavigator backbehavior property
-                            this.props.navigation.goBack(null);
+                        navigation={this.props.navigation}
+                        rightButton1={{
+                            onPress: this.onAddFeed,
+                            label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
                         }}
-                        rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
-                        onPressRightButton1={this.onAddFeed}
                         title={this.props.title}
                     />
                 </FeedGrid>

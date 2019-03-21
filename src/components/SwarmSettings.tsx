@@ -30,10 +30,7 @@ export const SwarmSettings = (props: Props) => (
     <SafeAreaView style={styles.mainContainer}>
         <KeyboardAvoidingView style={styles.mainContainer}>
             <NavigationHeader
-                onPressLeftButton={() => {
-                    // null is needed otherwise it does not work with switchnavigator backbehavior property
-                    props.navigation.goBack(null);
-                }}
+                navigation={props.navigation}
                 title={'Swarm settings'}
             />
             <Text style={styles.tooltip}>Swarm gateway address</Text>

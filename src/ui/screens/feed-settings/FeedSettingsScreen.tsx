@@ -35,7 +35,7 @@ export const FeedSettingsScreen = (props: Props) => {
     return (
         <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
             <NavigationHeader
-                onPressLeftButton={() => props.navigation.goBack()}
+                navigation={props.navigation}
                 title={props.feed.name}
             />
             <ScrollView>

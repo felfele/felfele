@@ -23,7 +23,7 @@ export const BackupRestore = (props: Props) => (
     <SafeAreaView style={styles.mainContainer}>
         <NavigationHeader
             title='Backup & Restore'
-            onPressLeftButton={() => props.navigation.goBack(null)}
+            navigation={props.navigation}
         />
         <View style={styles.buttonContainer}>
             <Button text='Backup' onPress={() => props.navigation.navigate('Backup')} />

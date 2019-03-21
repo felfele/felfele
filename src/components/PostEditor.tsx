@@ -66,22 +66,22 @@ export class PostEditor extends React.Component<Props, State> {
                     style={styles.container}
                 >
                     <NavigationHeader
-                        leftButtonText={
-                            <Icon
+                        leftButton={{
+                            onPress: this.onCancelConfirmation,
+                            label: <Icon
                                 name={'close'}
                                 size={20}
                                 color={Colors.DARK_GRAY}
-                            />
-                        }
-                        onPressLeftButton={this.onCancelConfirmation}
-                        rightButtonText1={
-                            <Icon
+                            />,
+                        }}
+                        rightButton1={{
+                            onPress: this.onPressSubmit,
+                            label: <Icon
                                 name={'send'}
                                 size={20}
                                 color={Colors.BRAND_PURPLE}
-                            />
-                        }
-                        onPressRightButton1={this.onPressSubmit}
+                            />,
+                        }}
                         titleImage={
                             <Avatar
                                 size='medium'

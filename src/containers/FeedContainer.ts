@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState, defaultLocalPosts } from '../reducers';
+import { AppState, defaultLocalPosts, FELFELE_ASSISTANT_NAME } from '../reducers';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
@@ -10,7 +10,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
     const feedName = ownProps.navigation.state.params.name;
 
     const isOwnFeed = feedName === state.author.name;
-    const isAssistantFeed = feedName === 'Felfele Assistant';
+    const isAssistantFeed = feedName === FELFELE_ASSISTANT_NAME;
     const hasOwnFeed = state.ownFeeds.length > 0;
     const ownFeed = hasOwnFeed ? state.ownFeeds[0] : undefined;
     const selectedFeeds = isOwnFeed
@@ -56,6 +56,9 @@ export const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onToggleFavorite: (feedUrl: string) => {
             dispatch(Actions.toggleFeedFavorite(feedUrl));
+        },
+        onRemoveFeed: (feed: Feed) => {
+            dispatch(Actions.removeFeed(feed));
         },
     };
 };

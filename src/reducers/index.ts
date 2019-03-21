@@ -59,8 +59,10 @@ export const defaultAuthor: Author = {
     identity: undefined,
 };
 
+export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
+
 const onboardingAuthor: Author = {
-    name: 'Felfele Assistant',
+    name: FELFELE_ASSISTANT_NAME,
     uri: '',
     image: {},
 };

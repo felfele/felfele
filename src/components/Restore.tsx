@@ -43,7 +43,7 @@ export class Restore extends React.PureComponent<Props, State> {
         <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 title='Restore'
-                onPressLeftButton={() => this.props.navigation.goBack(null)}
+                navigation={this.props.navigation}
             />
             <View style={styles.secretContainer}>
                 <SimpleTextInput

@@ -61,22 +61,22 @@ const getBugReportBody = (): string => {
     return bugReportBody;
 };
 
+const onPressSend = () =>
+    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=${getBugReportBody()}`);
+
 export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <NavigationHeader
-                leftButtonText={props.navigation ? undefined : ''}
-                onPressLeftButton={() => props.navigation.goBack(null)}
+                navigation={props.navigation}
                 title='Bug Report'
-                rightButtonText1={
-                    <Icon
+                rightButton1={{
+                    onPress: onPressSend,
+                    label: <Icon
                         name={'send'}
                         size={20}
                         color={Colors.BRAND_PURPLE}
-                    />
-                }
-                onPressRightButton1={() => {
-                    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=${getBugReportBody()}`);
+                    />,
                 }}
             />
             <View style={styles.contentContainer}>
