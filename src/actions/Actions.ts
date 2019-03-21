@@ -2,7 +2,8 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { Author } from '../models/Author';
@@ -269,6 +270,7 @@ export const AsyncActions = {
                     commands: [],
                 },
                 isSyncing: false,
+                shared: true,
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
         };

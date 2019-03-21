@@ -5,7 +5,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
-import { AppState, getSerializedAppState, getAppStateFromSerialized } from '../reducers';
+import { getSerializedAppState, getAppStateFromSerialized } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';

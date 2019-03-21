@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, Backup } from '../components/Backup';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
