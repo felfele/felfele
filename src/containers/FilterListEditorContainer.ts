@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FilterListEditor } from '../components/FilterListEditor';
 import { ContentFilter } from '../models/ContentFilter';
 

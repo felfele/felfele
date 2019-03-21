@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
-import { AppState, defaultLocalPosts, FELFELE_ASSISTANT_NAME } from '../reducers';
+import { defaultLocalPosts, FELFELE_ASSISTANT_NAME } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';

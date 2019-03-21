@@ -9,7 +9,6 @@ import thunkMiddleware from 'redux-thunk';
 import {
     persistStore,
     persistReducer,
-    PersistedState,
     createMigrate,
     getStoredState,
     KEY_PREFIX,
@@ -25,23 +24,11 @@ import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
-import { migrateAppState, currentAppStateVersion } from './migration';
+import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
 import * as Swarm from '../swarm/Swarm';
-
-export interface AppState extends PersistedState {
-    contentFilters: ContentFilter[];
-    feeds: Feed[];
-    ownFeeds: LocalFeed[];
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: Post[];
-    localPosts: Post[];
-    draft: Post | null;
-    metadata: Metadata;
-}
+import { AppState, currentAppStateVersion } from './AppState';
 
 const defaultSettings: Settings = {
     saveToCameraRoll: true,
@@ -255,13 +242,13 @@ const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed
             return [...ownFeeds, action.payload.feed];
         }
         case 'UPDATE-OWN-FEED': {
-            const ind = ownFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            const ind = ownFeeds.findIndex(feed => action.payload.partialFeed.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return ownFeeds;
             }
             return updateArrayItem(ownFeeds, ind, (feed) => ({
                 ...feed,
-                ...action.payload.feed,
+                ...action.payload.partialFeed,
             }));
 
         }
@@ -412,7 +399,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
-    Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -424,7 +410,12 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         }
         default: {
             try {
-                return combinedReducers(state, action);
+                const newState = combinedReducers(state, action);
+                if (action.type !== 'TIME-TICK') {
+                    // tslint:disable-next-line:no-console
+                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                }
+                return newState;
             } catch (e) {
                 Debug.log('reducer error: ', e);
                 return state;

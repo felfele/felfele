@@ -2,7 +2,8 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
 import { Author } from '../models/Author';
@@ -119,8 +120,8 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
     changeSettingSwarmGatewayAddress: (value: string) =>
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
-    updateOwnFeed: (feed: LocalFeed) =>
-        createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
+    updateOwnFeed: (partialFeed: Partial<LocalFeed>) =>
+        createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
 };
 
 export const AsyncActions = {
@@ -185,6 +186,14 @@ export const AsyncActions = {
             dispatch(InternalActions.addPost(post));
             dispatch(InternalActions.increaseHighestSeenPostId());
             Debug.log('Post saved and synced, ', post._id);
+
+            const ownFeeds = getState().ownFeeds;
+            if (ownFeeds.length > 0) {
+                const localFeed = getState().ownFeeds[0];
+                if (localFeed.autoShare) {
+                    dispatch(AsyncActions.sharePost(post));
+                }
+            }
         };
     },
     removePost: (post: Post): Thunk => {
@@ -269,6 +278,7 @@ export const AsyncActions = {
                     commands: [],
                 },
                 isSyncing: false,
+                autoShare: true,
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
         };
