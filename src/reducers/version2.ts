@@ -27,7 +27,10 @@ export const migrateVersion1ToVersion2 = (state: PersistedState): AppStateV2 => 
     const appStateV1 = state as AppStateV1;
     const appStateV2 = {
         ...appStateV1,
-        ownFeeds: appStateV1.ownFeeds.map(localFeed => ({...localFeed, shared: false})),
+        ownFeeds: appStateV1.ownFeeds.map(localFeed => ({
+            ...localFeed,
+            autoShare: false,
+        })),
     };
     return appStateV2;
 };

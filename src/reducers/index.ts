@@ -242,7 +242,7 @@ const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed
             return [...ownFeeds, action.payload.feed];
         }
         case 'UPDATE-OWN-FEED': {
-            const ind = ownFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            const ind = ownFeeds.findIndex(feed => action.payload.feed.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return ownFeeds;
             }
@@ -399,7 +399,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
-    Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -411,7 +410,12 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         }
         default: {
             try {
-                return combinedReducers(state, action);
+                const newState = combinedReducers(state, action);
+                if (action.type !== 'TIME-TICK') {
+                    // tslint:disable-next-line:no-console
+                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                }
+                return newState;
             } catch (e) {
                 Debug.log('reducer error: ', e);
                 return state;

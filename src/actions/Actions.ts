@@ -120,7 +120,7 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SHOW_DEBUG_MENU, { value }),
     changeSettingSwarmGatewayAddress: (value: string) =>
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
-    updateOwnFeed: (feed: LocalFeed) =>
+    updateOwnFeed: (feed: Partial<LocalFeed>) =>
         createAction(ActionTypes.UPDATE_OWN_FEED, { feed }),
 };
 
@@ -186,6 +186,14 @@ export const AsyncActions = {
             dispatch(InternalActions.addPost(post));
             dispatch(InternalActions.increaseHighestSeenPostId());
             Debug.log('Post saved and synced, ', post._id);
+
+            const ownFeeds = getState().ownFeeds;
+            if (ownFeeds.length > 0) {
+                const localFeed = getState().ownFeeds[0];
+                if (localFeed.autoShare) {
+                    dispatch(AsyncActions.sharePost(post));
+                }
+            }
         };
     },
     removePost: (post: Post): Thunk => {
@@ -270,7 +278,7 @@ export const AsyncActions = {
                     commands: [],
                 },
                 isSyncing: false,
-                shared: true,
+                autoShare: true,
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
         };
