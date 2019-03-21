@@ -3,14 +3,14 @@ matrix:
   fast_finish: true
 
   include:
-    - stage "JS build"
+    - stage: "JS build"
     - language: node_js
       node_js:
         - "9"
       script:
         - npm run check
 
-    - stage "Native builds"
+    - stage: "Native builds"
     - os: linux
       language: android
       jdk: oraclejdk8
