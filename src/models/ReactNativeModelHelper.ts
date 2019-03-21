@@ -2,27 +2,11 @@
 import * as RNFS from 'react-native-fs';
 
 import { ModelHelper } from './ModelHelper';
-import { Author } from './Post';
 import { ImageData } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
 export class ReactNativeModelHelper implements ModelHelper {
     public constructor(private readonly gatewayAddress: string) {
-    }
-
-    public getAuthorImageUri(author: Author): string {
-        // this is here for compatibility with previous version where
-        // image was optional
-        if (author.image == null) {
-            return author.faviconUri;
-        }
-        if (author.image.localPath != null) {
-            return this.getLocalPath(author.image.localPath);
-        }
-        if (author.image.uri != null) {
-            return author.image.uri;
-        }
-        return author.faviconUri;
     }
 
     public getLocalPath(localPath: string): string {

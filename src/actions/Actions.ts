@@ -4,7 +4,8 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState, getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost, Author } from '../models/Post';
+import { Post, PublicPost } from '../models/Post';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -47,7 +48,7 @@ export enum ActionTypes {
     UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
     UPDATE_POST_IS_UPLOADING = 'UPDATE-POST-IS-UPLOADING',
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
-    UPDATE_AUTHOR_PICTURE_PATH = 'UPDATE-AUTHOR-PICTURE-PATH',
+    UPDATE_AUTHOR_IMAGE = 'UPDATE-AUTHOR-IMAGE',
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
@@ -107,8 +108,8 @@ export const Actions = {
         createAction(ActionTypes.REMOVE_DRAFT),
     updateAuthorName: (name: string) =>
         createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
-    updateAuthorPicturePath: (image: ImageData) =>
-        createAction(ActionTypes.UPDATE_AUTHOR_PICTURE_PATH, { image }),
+    updateAuthorImage: (image: ImageData) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_IMAGE, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
     changeSettingSaveToCameraRoll: (value: boolean) =>
@@ -243,7 +244,6 @@ export const AsyncActions = {
                             : {
                                 name: '',
                                 uri: '',
-                                faviconUri: '',
                                 image: {},
                             }
                     ,
@@ -296,7 +296,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             try {
                 Debug.log('syncPostCommandLogs', 'feed', feed);
-                const localFeed = getLocalFeed(getState(), feed);
+                const localFeed = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
                 if (localFeed == null) {
                     return;
                 }
@@ -304,25 +304,30 @@ export const AsyncActions = {
                     return;
                 }
 
-                dispatch(Actions.updateOwnFeed({
+                const localFeedToSync = {
                     ...localFeed,
+                    authorImage: getState().author.image,
+                    name: getState().author.name,
                     isSyncing: true,
+                };
+                dispatch(Actions.updateOwnFeed({
+                    ...localFeedToSync,
                 }));
 
                 const identity = getState().author.identity!;
                 const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
                 const swarmGateway = getState().settings.swarmGatewayAddress;
-                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeed, swarmGateway);
+                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeedToSync.feedUrl, swarmGateway);
 
-                const localPostCommandLog = localFeed.postCommandLog;
-                const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeed);
+                const localPostCommandLog = localFeedToSync.postCommandLog;
+                const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeedToSync);
                 Debug.log('syncPostCommandLogs', 'storageSyncUpdate', storageSyncUpdate);
 
                 storageSyncUpdate.updatedPosts.map(updatedPost => {
                     // TODO also check for:
                     // - deleted posts
                     // - not uploaded posts
-                    dispatch(Actions.updatePostLink(updatedPost, localFeed.url));
+                    dispatch(Actions.updatePostLink(updatedPost, localFeedToSync.url));
                     dispatch(Actions.updatePostIsUploading(updatedPost, undefined));
                     const localPosts = getState().localPosts;
                     const originalPost = localPosts.find(p => p._id === updatedPost.author);
@@ -334,7 +339,7 @@ export const AsyncActions = {
                 });
 
                 // Re-check if there were an update to the command log during syncing
-                const localFeedAfterUpdate = getLocalFeed(getState(), localFeed);
+                const localFeedAfterUpdate = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === localFeedToSync.feedUrl);
                 if (localFeedAfterUpdate == null) {
                     return;
                 }
@@ -426,8 +431,8 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
     return allPosts;
 };
 
-const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: LocalFeed, swarmGateway: string) => {
-    const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
+const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feedUrl: string, swarmGateway: string) => {
+    const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feedUrl);
     const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
     const modelHelper = new ReactNativeModelHelper(swarmGateway);
     const swarmHelpers: SwarmHelpers = {
@@ -440,8 +445,4 @@ const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feed: Loc
     const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);
     const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
     return swarmStorageSyncer;
-};
-
-const getLocalFeed = (appState: AppState, feed: LocalFeed): LocalFeed | undefined => {
-    return appState.ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
 };

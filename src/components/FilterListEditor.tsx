@@ -22,9 +22,11 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
             <SafeAreaView style={styles.container}>
                 <NavigationHeader
                     title='Filters'
-                    onPressLeftButton={() => this.props.navigation.goBack(null)}
-                    rightButtonText1={<MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />}
-                    onPressRightButton1={this.onAddFilter}
+                    navigation={this.props.navigation}
+                    rightButton1={{
+                        onPress: this.onAddFilter,
+                        label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
+                    }}
                 />
                 <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
                     {this.props.filters.map(filter => (

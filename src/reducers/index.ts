@@ -20,7 +20,8 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
-import { Post, Author } from '../models/Post';
+import { Post } from '../models/Post';
+import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
@@ -51,19 +52,19 @@ const defaultSettings: Settings = {
     swarmGatewayAddress: Swarm.defaultGateway,
 };
 
-const defaultAuthor: Author = {
-    name: '',
+export const defaultAuthor: Author = {
+    name: DEFAULT_AUTHOR_NAME,
     uri: '',
-    faviconUri: '',
     image: {
         uri: '',
     },
     identity: undefined,
 };
 
+export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
+
 const onboardingAuthor: Author = {
-    faviconUri: '',
-    name: 'Felfele Assistant',
+    name: FELFELE_ASSISTANT_NAME,
     uri: '',
     image: {},
 };
@@ -111,7 +112,7 @@ const defaultFeeds: Feed[] = [
         name: 'Felfele Foundation',
         url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
         feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        favicon: '',
+        favicon: 'https://swarm-gateways.net/bzz:/c9cdca819b043fd07394ca1f85be18eaaa6073f0cd16e585fdc7dfd79119b5f5/icon.png',
         followed: true,
     },
     {
@@ -325,10 +326,9 @@ const authorReducer = (author = defaultAuthor, action: Actions): Author => {
                 name: action.payload.name,
             };
         }
-        case 'UPDATE-AUTHOR-PICTURE-PATH': {
+        case 'UPDATE-AUTHOR-IMAGE': {
             return {
                 ...author,
-                faviconUri: action.payload.image.localPath != null ? action.payload.image.localPath : '',
                 image: action.payload.image,
             };
         }
@@ -488,7 +488,9 @@ export const store = createStore(
 );
 
 const initStore = () => {
+    // tslint:disable-next-line:no-console
     console.log('initStore: ', store.getState());
+
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
     for (const ownFeed of store.getState().ownFeeds) {

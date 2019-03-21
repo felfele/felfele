@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Post, PostReferences, Author } from '../models/Post';
+import { Post, PostReferences } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
@@ -15,8 +15,8 @@ import { Avatar } from '../ui/misc/Avatar';
 import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
-
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
+import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -181,7 +181,7 @@ const ButtonList = (props: CardProps) => {
 
 const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
     if (props.post.author) {
-        const imageUri = props.modelHelper.getAuthorImageUri(props.post.author);
+        const imageUri = props.modelHelper.getImageUri(props.post.author.image);
         return (
             <Avatar imageUri={imageUri} size='large'/>
         );
@@ -223,7 +223,7 @@ const CardTop = (props: {
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
-    const authorName = props.post.author ? props.post.author.name : 'Space Cowboy';
+    const authorName = props.post.author ? props.post.author.name : DEFAULT_AUTHOR_NAME;
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
     const onPress = props.post.author

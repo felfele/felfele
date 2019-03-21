@@ -1,18 +1,10 @@
 import { Model } from './Model';
 import { ImageData } from './ImageData';
-import { PrivateIdentity } from './Identity';
+import { Author } from './Author';
 
 interface Location {
     latitude: number;
     longitude: number;
-}
-
-export interface Author {
-    name: string;
-    uri: string;
-    faviconUri: string;
-    image: ImageData;
-    identity?: PrivateIdentity;
 }
 
 type PostLink = string;

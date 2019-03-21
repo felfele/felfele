@@ -15,10 +15,11 @@ import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
-import { PublicPost, Post, Author } from '../models/Post';
+import { PublicPost, Post } from '../models/Post';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
-import { syncPostCommandLogWithStorage, uploadUnsyncedPostCommandsToStorage } from '../social/sync';
+import { uploadUnsyncedPostCommandsToStorage } from '../social/sync';
 
 const NUMBER_OF_RECENT_POSTS = 20;
 const DEFAULT_POST_COMMAND_LOG_TOPIC = `felfele:posts:v${PostCommandProtocolVersion}`;
@@ -78,7 +79,8 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
     uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
         return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, swarmHelpers);
     },
-    downloadRecentPostFeed: async (url: string, timeout: number = 0) => {
+    downloadRecentPostFeed: async (timeout: number = 0) => {
+        const url = swarmApi.feed.getUri();
         return await downloadRecentPostFeed(swarmApi, url, timeout);
     },
 });
@@ -89,7 +91,6 @@ export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSynce
         const syncedPostCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLog, swarmStorage);
         const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
         const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
-        console.log('swarmStorage.sync', 'syncedPostCommandLog', syncedPostCommandLog, 'lastSeenEpoch', lastSeenEpoch, 'postCommandUpdates', postCommandUpdates);
         const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
         return {
             postCommandLog: syncedPostCommandLog,
@@ -248,10 +249,9 @@ const uploadAuthor = async (
     imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<Author | undefined> => {
-    const uploadedImage = await uploadImage(swarm, author.image!, imageResizer, getLocalPath);
+    const uploadedImage = await uploadImage(swarm, author.image, imageResizer, getLocalPath);
     return {
         ...author,
-        faviconUri: '',
         image: uploadedImage,
         identity: undefined,
     };
@@ -267,10 +267,14 @@ const uploadPost = async (
         return post;
     }
     const uploadedImages = await uploadImages(swarm, post.images, imageResizer, getLocalPath);
+    const uploadedAuthor = post.author != null
+        ? await uploadAuthor(swarm, post.author, imageResizer, getLocalPath)
+        : post.author
+        ;
     const uploadedPost = {
         ...post,
         images: uploadedImages,
-        author: undefined,
+        author: uploadedAuthor,
     };
 
     const uploadedPostJSON = serialize(uploadedPost);
@@ -346,12 +350,12 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
 
         const postFeed = deserialize(content) as RecentPostFeed;
         const authorImage = {
+            ...postFeed.authorImage,
             uri: swarm.bzz.getGatewayUrl(postFeed.authorImage.uri || ''),
         };
         const author: Author = {
             name: postFeed.name,
             uri: postFeed.url,
-            faviconUri: authorImage.uri,
             image: authorImage,
         };
         const postFeedWithGatewayImageLinks = {
@@ -420,6 +424,7 @@ const uploadRecentPostFeed = async (
         }))
         ;
 
+    const uploadedAuthorImage = await uploadImage(swarm.bzz, recentPostFeed.authorImage, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
     const uploadedPosts = await uploadPosts(swarm.bzz, posts, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
     const postFeed: RecentPostFeed = {
         name: recentPostFeed.name,
@@ -427,10 +432,7 @@ const uploadRecentPostFeed = async (
         feedUrl: recentPostFeed.feedUrl,
         favicon: recentPostFeed.favicon,
         posts: uploadedPosts,
-        authorImage: {
-            ...recentPostFeed.authorImage,
-            localPath: '',
-        },
+        authorImage: uploadedAuthorImage,
     };
     Debug.log('uploadRecentPostFeed: after uploadPosts');
 

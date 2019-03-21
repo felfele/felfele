@@ -7,7 +7,9 @@ import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 import { Buffer } from 'buffer';
 
-export const defaultGateway = 'https://swarm-gateways.net';
+// TODO if this changes we have to add either a migration or a setup code to reducers
+// to update it for existing users
+export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz://';
 export const defaultFeedPrefix = 'bzz-feed:/';
@@ -25,17 +27,22 @@ const upload = async (data: string, swarmGateway: string): Promise<string> => {
     }
 };
 
-const uploadForm = async (data: FormData, swarmGateway: string): Promise<string> => {
-    Debug.log('uploadForm: ', data);
+// this is a workaround needed for compatibility with Node.js
+interface ExtendedFormData extends FormData {
+    getHeaders?: () => string[][];
+}
+
+const uploadForm = async (data: ExtendedFormData, swarmGateway: string): Promise<string> => {
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
+            ...data.getHeaders != null ? data.getHeaders() : undefined,
             'Content-Type': 'multipart/form-data',
         },
         method: 'POST',
     };
     options.body = data;
-    Debug.log('uploadForm: ', url, options);
+    Debug.log('uploadForm', 'url', url, 'options', options);
     const response = await safeFetch(url, options);
     const text = await response.text();
     Debug.log('uploadForm: response: ', text);
@@ -87,17 +94,36 @@ export interface File {
     mimeType: MimeType;
 }
 
+const isNode = () => {
+    return typeof process === 'object'
+        && typeof process.versions === 'object'
+        && typeof process.versions.node !== 'undefined';
+};
+
 const uploadFiles = async (files: File[], swarmGateway: string): Promise<string> => {
-    const data = new FormData();
-    for (const file of files) {
-        data.append(file.name, {
-            uri: file.localPath,
-            type: file.mimeType,
-            name: file.name,
-        } as any as Blob);
+    if (isNode()) {
+        // avoid metro bundler to try to load the module
+        const nodeRequire = require;
+        const fs = nodeRequire('fs');
+        const data = new FormData();
+        for (const file of files) {
+            const readStream = fs.createReadStream(file.localPath);
+            data.append(file.name, readStream);
+        }
+        const hash = await uploadForm(data as ExtendedFormData, swarmGateway);
+        return defaultPrefix + hash;
+    } else {
+        const data = new FormData();
+        for (const file of files) {
+            data.append(file.name, {
+                uri: file.localPath,
+                type: file.mimeType,
+                name: file.name,
+            } as any as Blob);
+        }
+        const hash = await uploadForm(data, swarmGateway);
+        return defaultPrefix + hash;
     }
-    const hash = await uploadForm(data, swarmGateway);
-    return defaultPrefix + hash;
 };
 
 const uploadData = async (data: string, swarmGateway: string): Promise<string> => {

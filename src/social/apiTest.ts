@@ -99,7 +99,9 @@ export const assertPostCommandLogsAreEqual = (postCommandLogA: PostCommandLog, p
 
 export const assertEquals = <T>(expected: T, actual: T) => {
     if (expected !== actual) {
+        // tslint:disable-next-line:no-console
         console.log('expected: ', expected);
+        // tslint:disable-next-line:no-console
         console.log('actual: ', actual);
         throw new Error(`assertEquals failed: expected: ${expected}, actual: ${actual}`);
     }
@@ -123,7 +125,7 @@ export const testSharePost = (
     return shareNewPost(post, source, postCommandLog);
 };
 
-export const testSharePosts = async (source = ''): Promise<PostCommandLog> => {
+export const testSharePosts = (source = '') => {
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed, source);
     const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1, source);
     const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2, source);
@@ -133,7 +135,7 @@ export const testSharePosts = async (source = ''): Promise<PostCommandLog> => {
     return postCommandLogAfter3;
 };
 
-export const testSharePostsWithUpdate = async () => {
+export const testSharePostsWithUpdate = () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -149,9 +151,11 @@ export const testSharePostsWithUpdate = async () => {
     assertPostCommandLogInvariants(postCommandLogAfter4);
 
     Debug.log('testSharePostsWithUpdate', postCommandLogAfter4);
+
+    return postCommandLogAfter4;
 };
 
-export const testSharePostsWithRemove = async () => {
+export const testSharePostsWithRemove = () => {
     const source = '';
 
     const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
@@ -164,23 +168,39 @@ export const testSharePostsWithRemove = async () => {
 
     const posts = getLatestPostsFromLog(postCommandLogAfter4, 3);
     Debug.log('testSharePostsWithRemove', 'posts', posts);
+
+    return postCommandLogAfter4;
 };
 
-export const testMergeTwoLocalPostCommandLogs = async () => {
+export const testMergeTwoLocalPostCommandLogs = () => {
     const localSource1 = 'local1';
-    const localPostCommandFeed1 = await testSharePosts(localSource1);
+    const localPostCommandFeed1 = testSharePosts(localSource1);
     assertPostCommandLogInvariants(localPostCommandFeed1);
 
     const localSource2 = 'local2';
-    const localPostCommandFeed2 = await testSharePosts(localSource2);
+    const localPostCommandFeed2 = testSharePosts(localSource2);
     assertPostCommandLogInvariants(localPostCommandFeed2);
 
-    const mergedPostCommandLog = await mergePostCommandLogs(localPostCommandFeed1, localPostCommandFeed2);
+    const mergedPostCommandLog = mergePostCommandLogs(localPostCommandFeed1, localPostCommandFeed2);
     Debug.log('testMergeTwoLocalPostCommandLogs', 'mergedPostCommandLog', mergedPostCommandLog);
     assertPostCommandLogInvariants(mergedPostCommandLog);
 
     const posts = getLatestPostsFromLog(mergedPostCommandLog);
     Debug.log('testMergeTwoLocalPostCommandLogs', 'posts', posts);
+};
+
+export const testGetLatestUpdatePostCommandsFromLogWithUpdate = () => {
+    const postCommandLogAfterUpdate = testSharePostsWithUpdate();
+    const posts = getLatestPostsFromLog(postCommandLogAfterUpdate);
+
+    assertEquals(3, posts.length);
+};
+
+export const testGetLatestUpdatePostCommandsFromLogWithRemove = () => {
+    const postCommandLogAfterRemove = testSharePostsWithRemove();
+    const posts = getLatestPostsFromLog(postCommandLogAfterRemove);
+
+    assertEquals(2, posts.length);
 };
 
 export const apiTests = {
@@ -189,4 +209,6 @@ export const apiTests = {
     testSharePostsWithUpdate,
     testSharePostsWithRemove,
     testMergeTwoLocalPostCommandLogs,
+    testGetLatestUpdatePostCommandsFromLogWithUpdate,
+    testGetLatestUpdatePostCommandsFromLogWithRemove,
 };

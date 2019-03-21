@@ -1,4 +1,3 @@
-import { Author } from './Post';
 import { ImageData } from './ImageData';
 
 export interface Rectangle {
@@ -7,7 +6,6 @@ export interface Rectangle {
 }
 
 export interface ModelHelper {
-    getAuthorImageUri: (author: Author) => string;
     getLocalPath: (localPath: string) => string;
     getImageUri: (image: ImageData) => string;
 }

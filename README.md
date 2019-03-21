@@ -1,47 +1,26 @@
-# Felfele
-[![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://gitter.im/felfele/purple-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://gitter.im/felfele/purple-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/felfele/felfele.svg?branch=master)](https://travis-ci.org/felfele/felfele)
+=======
 
-## Install dependencies
+Felfele is a social app that lets you share and receive information easily, offers strong privacy and affordable for everyone.
 
-`npm install; react-native link`
+The project is developed by a core team funded by a non-profit organization and volunteers from all over the world.
 
-## Build and test in simulator
+[Homepage](https://felfele.com/)
 
-`react-native run-ios `
+Contribute
+--------------------
 
-## Start tests that run automatically
+We've set up a separate document for our
+[contribution guidelines](https://github.com/felfele/felfele/blob/master/CONTRIBUTING.md).
 
-`npm run watchTest`
+Develop
+--------------------
 
-## Start packager in terminal
+We've set up a separate document for
+[developers](https://github.com/felfele/felfele/blob/master/DEVELOPERS.md).
 
-`react-native start --verbose --resetCache`
+License
+--------------------
 
-## Generate the icon
-
-`app-icon generate`
-
-Make sure the generated images does not contain transparency for iOS.
-
-```bash
-$ mogrify -alpha off ios/postmodern/Images.xcassets/AppIcon.appiconset/*.png
-```
-
-## Build android release version
-
-`cd android`
-`./gradlew assembleRelease`
-
-## Sign the android release with debug key
-
-### Generate a debug key
-`$ keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"`
-
-### Sign the build with the debug key
-
-`jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/.android/debug.keystore -storepass android -keypass android android/app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey`
-
-## Running with the debugger
-
-`REACT_DEBUGGER="node node_modules/react-native-debugger-open/bin/rndebugger-open.js --open --port 8081" react-native start --verbose --resetCache`
+Felfele is licensed under AGPL v3. See the [LICENSE](https://github.com/felfele/felfele/blob/master/LICENSE)

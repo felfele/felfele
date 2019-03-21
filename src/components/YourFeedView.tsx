@@ -29,7 +29,7 @@ export const YourFeedView = (props: Props) => {
             {{
                 navigationHeader: <NavigationHeader
                                       title='All your posts'
-                                      onPressLeftButton={() => props.navigation.goBack(null)}
+                                      navigation={props.navigation}
                                 />,
                 listHeader: <FeedHeader
                                 navigation={props.navigation}

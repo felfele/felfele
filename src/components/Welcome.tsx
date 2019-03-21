@@ -7,9 +7,9 @@ import {
 
 import { IdentityOnboarding, DispatchProps as IdentityOnboardingDispatchProps  } from '../components/IdentityOnboarding';
 import { ImageData } from '../models/ImageData';
-import { Author } from '../models/Post';
 import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
+import { defaultAuthor } from '../reducers';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;
@@ -18,7 +18,6 @@ export interface DispatchProps {
 
 export interface StateProps {
     navigation: any;
-    author: Author;
     gatewayAddress: string;
 }
 
@@ -31,8 +30,8 @@ export interface State {
 
 export class Welcome extends React.PureComponent<Props, State> {
     public state: State = {
-        authorName: 'Space Cowboy',
-        authorImage: {},
+        authorName: defaultAuthor.name,
+        authorImage: defaultAuthor.image,
     };
 
     public componentDidMount() {
@@ -68,7 +67,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                             });
                         }}
                         author={{
-                            ...this.props.author,
+                            ...defaultAuthor,
                             name: this.state.authorName,
                             image: this.state.authorImage,
                         }}
@@ -80,7 +79,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                 ]}
                 onDone={() => {
                     this.props.onCreateUser(
-                        this.state.authorName,
+                        this.state.authorName !== '' ? this.state.authorName : defaultAuthor.name,
                         this.state.authorImage,
                         this.props.navigation,
                     );

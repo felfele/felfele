@@ -37,14 +37,14 @@ export class AllFeedScreen extends React.Component<Props> {
                 {{
                     navigationHeader: <NavigationHeader
                                     title='All feeds'
-                                    rightButtonText1={
-                                        <Icon
+                                    rightButton1={{
+                                        onPress: () => this.props.navigation.navigate('FeedListViewerContainer'),
+                                        label: <Icon
                                             name={'view-grid'}
                                             size={20}
                                             color={Colors.DARK_GRAY}
-                                        />
-                                    }
-                                    onPressRightButton1={() => this.props.navigation.navigate('FeedListViewerContainer')}
+                                        />,
+                                    }}
                                     onPressTitle={this.ref && this.ref.scrollToTop}
                                 />,
                     listHeader: <FeedHeader

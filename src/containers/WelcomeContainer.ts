@@ -7,7 +7,6 @@ import { ImageData } from '../models/ImageData';
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     return {
         navigation: ownProps.navigation,
-        author: state.author,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };
 };
@@ -20,7 +19,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onCreateUser: async (name: string, image: ImageData, navigation: any) => {
             await dispatch(AsyncActions.chainActions([
                 Actions.updateAuthorName(name),
-                Actions.updateAuthorPicturePath(image),
+                Actions.updateAuthorImage(image),
                 AsyncActions.createUserIdentity(),
                 AsyncActions.createOwnFeed(),
             ]));

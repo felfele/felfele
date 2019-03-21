@@ -11,6 +11,7 @@ export class Debug {
 
     public static log(...args: any[]) {
         if (__DEV__ && Debug.isDebug) {
+            // tslint:disable-next-line:no-console
             console.log.call(console, ...args);
         }
         const maxLengthArgs = args.map((value) => {
