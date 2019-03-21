@@ -345,6 +345,10 @@ export const AsyncActions = {
                     return updatedPost;
                 });
 
+                if (getState().author.image.uri == null) {
+                    dispatch(Actions.updateAuthorImage(storageSyncUpdate.recentPostFeed.authorImage));
+                }
+
                 // Re-check if there were an update to the command log during syncing
                 const localFeedAfterUpdate = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === localFeedToSync.feedUrl);
                 if (localFeedAfterUpdate == null) {
