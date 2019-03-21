@@ -3,23 +3,10 @@ import { StateProps, DispatchProps, FeedSettingsScreen } from './FeedSettingsScr
 import { AppState } from '../../../reducers/AppState';
 import { LocalFeed } from '../../../social/api';
 import { Actions } from '../../../actions/Actions';
-import { emptyPostCommandLog } from '../../../social/api';
-
-const emptyFeed: LocalFeed = {
-    name: '',
-    url: '',
-    feedUrl: '',
-    favicon: '',
-    isSyncing: false,
-    authorImage: {},
-    posts: [],
-    postCommandLog: emptyPostCommandLog,
-    autoShare: false,
-};
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
     const paramFeed = ownProps.navigation.state.params.feed;
-    const feed = state.ownFeeds.find(ownFeed => ownFeed.feedUrl === paramFeed.feedUrl) || emptyFeed;
+    const feed = state.ownFeeds.find(ownFeed => ownFeed.feedUrl === paramFeed.feedUrl) || paramFeed;
     return {
         navigation: ownProps.navigation,
         settings: state.settings,
