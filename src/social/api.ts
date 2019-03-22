@@ -491,14 +491,16 @@ export const epochCompare = (a?: Swarm.Epoch, b?: Swarm.Epoch): number => {
 export const sortAndFilterPostCommands = (commands: PostCommand[]): PostCommand[] => {
     const sortedCommands = [...commands].sort((a, b) =>
             // reversed time ordering
-            epochCompare(b.epoch, a.epoch) || timestampCompare(b, a) || sourceCompare(b, a)
+            timestampCompare(b, a) || sourceCompare(b, a) || epochCompare(b.epoch, a.epoch)
         )
         .filter((value, index, cmds) =>
             // filter out doubles
             index + 1 < cmds.length
             ? arePostCommandIdsEqual(value.id, cmds[index + 1].id) === false
             : true
-        );
+        )
+        .sort((a, b) => epochCompare(b.epoch, a.epoch))
+        ;
 
     return sortedCommands;
 };

@@ -7,8 +7,6 @@ import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
 import { Buffer } from 'buffer';
 
-// TODO if this changes we have to add either a migration or a setup code to reducers
-// to update it for existing users
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz://';
@@ -23,7 +21,7 @@ const upload = async (data: string, swarmGateway: string): Promise<string> => {
         return hash;
     } catch (e) {
         Debug.log('upload:', 'failed', JSON.stringify(e));
-        return '';
+        throw e;
     }
 };
 
