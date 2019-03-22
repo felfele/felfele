@@ -5,13 +5,16 @@ import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    // this fixes the case when navigating back from an opened Feed
+    // this fixes rerendering after unfollow
     updateNavParam(state.feeds, ownProps.navigation);
+    const navParamFeed = ownProps.navigation.state.params.feed;
+    const isKnownFeed = state.feeds.find(feed => navParamFeed.feedUrl === feed.feedUrl) != null;
 
     return {
-        feed: ownProps.navigation.state.params.feed,
+        feed: navParamFeed,
         swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
+        isKnownFeed: isKnownFeed,
     };
 };
 

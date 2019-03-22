@@ -46,6 +46,7 @@ export interface StateProps {
     swarmGateway: string;
     feed: Feed;
     navigation: any;
+    isKnownFeed: boolean;
 }
 
 type Props = DispatchProps & StateProps;
@@ -114,7 +115,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const rightButton1 = isExistingFeed
             ? isFollowed
                 ? button('link-variant-off', this.onUnfollowFeed)
-                : button('delete', this.onDelete)
+                : this.props.isKnownFeed
+                    ? button('delete', this.onDelete)
+                    : undefined
             : button('download', async () => await this.fetchFeed())
         ;
 
