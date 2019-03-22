@@ -23,11 +23,13 @@ export interface DispatchProps {
 
 interface State {
     feeds: Feed[];
+    feedLoadCounter: number;
 }
 
 export class NewsSourceGridScreen extends React.Component<StateProps & DispatchProps, State> {
     public state: State = {
         feeds: [],
+        feedLoadCounter: 0,
     };
 
     public render() {
@@ -61,7 +63,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                        }}
                    />
                 }
-                {this.state.feeds.length !== this.props.newsSource.length &&
+                {this.state.feedLoadCounter !== this.props.newsSource.length &&
                     <View style={styles.activityIndicatorContainer}>
                         <ActivityIndicator style={styles.activityIndicator} size='large'/>
                     </View>
@@ -72,13 +74,25 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
 
     public componentDidMount() {
         this.props.newsSource.forEach(newsSource => {
-            fetchRSSFeedFromUrl(newsSource.url).then(feed => {
-                this.setState((prevState: State) => {
-                    return {
-                        feeds: prevState.feeds.concat(feed!),
-                    };
-                });
-            });
+            fetchRSSFeedFromUrl(newsSource.url)
+                .then(feed => {
+                    if (feed != null) {
+                        this.setState((prevState: State) => {
+                            return {
+                                feeds: prevState.feeds.concat(feed),
+                                feedLoadCounter: prevState.feedLoadCounter + 1,
+                            };
+                        });
+                    } else {
+                        Debug.log(`failed to load ${newsSource.url}`);
+                        this.setState((prevState: State) => {
+                            return {
+                                feedLoadCounter: prevState.feedLoadCounter + 1,
+                            };
+                        });
+                    }
+                })
+            ;
         });
     }
 }

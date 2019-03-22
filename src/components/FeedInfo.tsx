@@ -13,7 +13,7 @@ import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
-import { Utils } from '../Utils';
+import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
@@ -198,7 +198,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         if (!isExistingFeed) {
             const value = await Clipboard.getString();
-            const link = Utils.getLinkFromText(value);
+            const link = urlUtils.getLinkFromText(value);
             if (link != null) {
                 this.setState({
                     url: link,
@@ -217,7 +217,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             return feed;
         } else {
             Debug.log('fetchFeedFromUrl', 'url', url);
-            const canonicalUrl = Utils.getCanonicalUrl(url);
+            const canonicalUrl = urlUtils.getCanonicalUrl(url);
             Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
             const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
             Debug.log('fetchFeedFromUrl', 'feed', feed);
