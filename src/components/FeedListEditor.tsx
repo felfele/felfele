@@ -3,6 +3,7 @@ import { View, StyleSheet, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import { Feed } from '../models/Feed';
+import { ImageData } from '../models/ImageData';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Props as NavHeaderProps } from './NavigationHeader';
@@ -58,7 +59,11 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     itemDimension={itemDimension}
                     sections={sections}
                     renderItem={({ item }: any) => {
-                        const imageUri = item.authorImage ? modelHelper.getImageUri(item.authorImage) : item.favicon;
+                        const image: ImageData = item.authorImage != null
+                            ? item.authorImage
+                            : { uri: item.favicon }
+                            ;
+                        const imageUri = modelHelper.getImageUri(image);
                         return (
                             <GridCard
                                 title={item.name}
