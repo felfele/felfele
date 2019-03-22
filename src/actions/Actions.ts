@@ -301,32 +301,33 @@ export const AsyncActions = {
     },
     syncPostCommandLogs: (feed: LocalFeed): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('syncPostCommandLogs', 'feed', feed);
+            const localFeed = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
+            if (localFeed == null) {
+                return;
+            }
+            if (localFeed.isSyncing === true) {
+                return;
+            }
+
+            const localFeedToSync = {
+                ...localFeed,
+                authorImage: getState().author.image,
+                name: getState().author.name,
+                isSyncing: true,
+            };
+            dispatch(Actions.updateOwnFeed({
+                ...localFeedToSync,
+            }));
+
+            const identity = getState().author.identity!;
+            const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+            const swarmGateway = getState().settings.swarmGatewayAddress;
+            const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeedToSync.feedUrl, swarmGateway);
+
+            const localPostCommandLog = localFeedToSync.postCommandLog;
+
             try {
-                Debug.log('syncPostCommandLogs', 'feed', feed);
-                const localFeed = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
-                if (localFeed == null) {
-                    return;
-                }
-                if (localFeed.isSyncing === true) {
-                    return;
-                }
-
-                const localFeedToSync = {
-                    ...localFeed,
-                    authorImage: getState().author.image,
-                    name: getState().author.name,
-                    isSyncing: true,
-                };
-                dispatch(Actions.updateOwnFeed({
-                    ...localFeedToSync,
-                }));
-
-                const identity = getState().author.identity!;
-                const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
-                const swarmGateway = getState().settings.swarmGatewayAddress;
-                const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeedToSync.feedUrl, swarmGateway);
-
-                const localPostCommandLog = localFeedToSync.postCommandLog;
                 const storageSyncUpdate = await swarmStorageSyncer.sync(localPostCommandLog, localFeedToSync);
                 Debug.log('syncPostCommandLogs', 'storageSyncUpdate', storageSyncUpdate);
 
@@ -370,12 +371,16 @@ export const AsyncActions = {
 
                 if (getPreviousCommandEpochFromLog(mergedPostCommandLog) == null) {
                     Debug.log('syncPostCommandLogs', 'waiting for resyncing');
-                    await Utils.waitMillisec(30 * 1000);
+                    await Utils.waitMillisec(60 * 1000);
                     dispatch(AsyncActions.syncPostCommandLogs(localFeedAfterUpdate));
                 }
             } catch (e) {
                 Debug.log('syncPostCommandLogs: ', 'error', e);
                 dispatch(AsyncActions.cleanUploadingPostState());
+                dispatch(Actions.updateOwnFeed({
+                    feedUrl: localFeed.feedUrl,
+                    isSyncing: false,
+                }));
             }
         };
     },
