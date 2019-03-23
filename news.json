@@ -54,7 +54,7 @@
     ],
     "cats": [
       {
-        "url": "https:///www.reddit.com/r/cats.rss",
+        "url": "https://www.reddit.com/r/cats.rss",
         "title": "Cats",
         "description": "Pictures, videos, articles and questions featuring and about cats.",
         "tags": [
@@ -121,7 +121,7 @@
   "art and creation": {
     "art": [
       {
-        "url": "https:///www.reddit.com/r/Art.rss",
+        "url": "https://www.reddit.com/r/Art.rss",
         "title": "Art",
         "description": "This is a subreddit about art.\n\nWe do not support the reddit redesign. It is horrible and the admins have ignored our feedback. Please do not use it. Go to your preferences and enable old reddit as your default experience.\n\n",
         "tags": [
@@ -207,7 +207,7 @@
     ],
     "music": [
       {
-        "url": "https:///www.reddit.com/r/Music.rss",
+        "url": "https://www.reddit.com/r/Music.rss",
         "title": "/r/Music",
         "description": "The musical community of reddit",
         "tags": [
@@ -345,7 +345,7 @@
     ],
     "comics": [
       {
-        "url": "https:///www.reddit.com/r/comics.rss",
+        "url": "https://www.reddit.com/r/comics.rss",
         "title": "Print Comics and Webcomics ",
         "description": "Everything related to print comics (comic books, graphic novels, and strips) and web comics.  Artists are encouraged to post their own work.  News and media for adaptations based on comic books are welcome. Read [the subreddit wiki](https://www.reddit.com/r/comics/wiki/index) for more information about the subreddit.",
         "tags": [
@@ -389,7 +389,7 @@
     ],
     "videos": [
       {
-        "url": "https:///www.reddit.com/r/videos.rss",
+        "url": "https://www.reddit.com/r/videos.rss",
         "title": "/r/videos",
         "description": "The best place for video content of all kinds. \n\nPlease read the sidebar below for our rules.",
         "tags": [
@@ -400,7 +400,7 @@
     ],
     "animation": [
       {
-        "url": "https:///www.reddit.com/r/anime.rss",
+        "url": "https://www.reddit.com/r/anime.rss",
         "title": "Animes ja nai, anime da.",
         "description": "Reddit's premier anime community.",
         "tags": [
@@ -460,7 +460,7 @@
     ],
     "movies": [
       {
-        "url": "https:///www.reddit.com/r/movies.rss",
+        "url": "https://www.reddit.com/r/movies.rss",
         "title": "Movie News and Discussion",
         "description": "News &amp; Discussion about Major Motion Pictures",
         "tags": [
@@ -494,7 +494,7 @@
     ],
     "television": [
       {
-        "url": "https:///www.reddit.com/r/television.rss",
+        "url": "https://www.reddit.com/r/television.rss",
         "title": "Television Discussion and News",
         "description": "Admins please fix your markdown and spoiler tags.\n\n##A general discussion television community for news, user discussion, reviews, video clips and more.\n\nSee our sidebar to check out our calendar which lists upcoming TV premieres.\n\nWe conduct a yearly survey on users' favorite shows which you can look at [here](https://i.imgur.com/hk9ZZyv.png).\n\nFor an archive of premiere discussions, click [here](https://old.reddit.com/r/television/search?q=flair%3Apremiere&amp;restrict_sr=on&amp;sort=new&amp;t=all).",
         "tags": [
@@ -511,7 +511,7 @@
     ],
     "entertainment": [
       {
-        "url": "https:///www.reddit.com/r/videos.rss",
+        "url": "https://www.reddit.com/r/videos.rss",
         "title": "/r/videos",
         "description": "The best place for video content of all kinds. \n\nPlease read the sidebar below for our rules.",
         "tags": [
@@ -520,7 +520,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/funny.rss",
+        "url": "https://www.reddit.com/r/funny.rss",
         "title": "funny",
         "description": "Welcome to r/Funny: reddit's largest humour depository",
         "tags": [
@@ -529,7 +529,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/movies.rss",
+        "url": "https://www.reddit.com/r/movies.rss",
         "title": "Movie News and Discussion",
         "description": "News &amp; Discussion about Major Motion Pictures",
         "tags": [
@@ -538,7 +538,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/television.rss",
+        "url": "https://www.reddit.com/r/television.rss",
         "title": "Television Discussion and News",
         "description": "Admins please fix your markdown and spoiler tags.\n\n##A general discussion television community for news, user discussion, reviews, video clips and more.\n\nSee our sidebar to check out our calendar which lists upcoming TV premieres.\n\nWe conduct a yearly survey on users' favorite shows which you can look at [here](https://i.imgur.com/hk9ZZyv.png).\n\nFor an archive of premiere discussions, click [here](https://old.reddit.com/r/television/search?q=flair%3Apremiere&amp;restrict_sr=on&amp;sort=new&amp;t=all).",
         "tags": [
@@ -547,7 +547,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/marvelstudios.rss",
+        "url": "https://www.reddit.com/r/marvelstudios.rss",
         "title": "Marvel Studios and the Marvel Cinematic Universe",
         "description": "/r/MarvelStudios is the subreddit dedicated to Marvel Studios and the Marvel Cinematic Universe as a whole!",
         "tags": [
@@ -556,7 +556,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/hiphopheads.rss",
+        "url": "https://www.reddit.com/r/hiphopheads.rss",
         "title": "/r/HipHopHeads on Reddit",
         "description": "Everything hip-hop! The latest mixtapes, videos, news, and anything else hip-hop related from your favorite artists.",
         "tags": [
@@ -565,7 +565,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/dbz.rss",
+        "url": "https://www.reddit.com/r/dbz.rss",
         "title": "Dragon World",
         "description": "Welcome to Reddit's largest Dragon Ball community!",
         "tags": [
@@ -574,7 +574,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/arrow.rss",
+        "url": "https://www.reddit.com/r/arrow.rss",
         "title": "Arrow",
         "description": "Welcome to r/arrow, a subreddit about the comic-book TV series starring Stephen Amell. Discuss anything and everything about the show here.  Airs Mondays at 8 PM EST on The CW!",
         "tags": [
@@ -583,7 +583,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Documentaries.rss",
+        "url": "https://www.reddit.com/r/Documentaries.rss",
         "title": "Documentaries",
         "description": "tl;dw",
         "tags": [
@@ -592,7 +592,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/anime.rss",
+        "url": "https://www.reddit.com/r/anime.rss",
         "title": "Animes ja nai, anime da.",
         "description": "Reddit's premier anime community.",
         "tags": [
@@ -601,7 +601,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/youtubehaiku.rss",
+        "url": "https://www.reddit.com/r/youtubehaiku.rss",
         "title": "Youtube Haiku",
         "description": "Youtube Haiku: Any almost poetic video under 14 seconds. Don't ask me why 14 seconds; it's just a number I have learned from experience.  Videos can still be poetic after 15 or longer, but no longer than 30 seconds.",
         "tags": [
@@ -610,7 +610,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/rupaulsdragrace.rss",
+        "url": "https://www.reddit.com/r/rupaulsdragrace.rss",
         "title": "RuPaul’s Drag Race",
         "description": "Do you have what it takes? Only those with Charisma, Uniqueness, Nerve and Talent will make it to the top! Start your engines...and may the best **woman** *win*! Dedicated to everyone's favorite drag queen tv show.",
         "tags": [
@@ -619,7 +619,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/books.rss",
+        "url": "https://www.reddit.com/r/books.rss",
         "title": "So many books, so little time",
         "description": "This is a moderated subreddit. It is our intent and purpose to foster and encourage in-depth discussion about all things related to books, authors, genres, or publishing in a safe, supportive environment. If you're looking for help with a personal book recommendation, consult our Weekly Recommendation Thread, Suggested Reading page, or ask in r/suggestmeabook.",
         "tags": [
@@ -628,7 +628,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/FlashTV.rss",
+        "url": "https://www.reddit.com/r/FlashTV.rss",
         "title": "The Flash",
         "description": "Welcome to r/FlashTV, a subreddit about the comic-book TV series starring Grant Gustin. Discuss anything and everything about the show here.   Airs Tuesdays at 8 PM EST on The CW!",
         "tags": [
@@ -637,7 +637,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/TumblrInAction.rss",
+        "url": "https://www.reddit.com/r/TumblrInAction.rss",
         "title": "TumblrInAction: O Toucan, Where Art Thou?",
         "description": "A true force for good!",
         "tags": [
@@ -646,7 +646,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/pokemon.rss",
+        "url": "https://www.reddit.com/r/pokemon.rss",
         "title": "Pokémon: Gotta Catch ’Em All!",
         "description": "/r/pokemon is an unofficial Pokémon fan community. This is the place for most things Pokémon on Reddit—TV shows, video games, toys, trading cards, you name it!",
         "tags": [
@@ -655,7 +655,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/nottheonion.rss",
+        "url": "https://www.reddit.com/r/nottheonion.rss",
         "title": "Sadly, this is not the Onion.",
         "description": "For true stories that are so mind-blowingly ridiculous that you could have sworn they were from The Onion.",
         "tags": [
@@ -664,7 +664,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/StarWars.rss",
+        "url": "https://www.reddit.com/r/StarWars.rss",
         "title": "Star Wars - A long time ago, in a galaxy far, far, away...",
         "description": "Star Wars is an American epic space opera franchise, created by George Lucas and centered around a film series that began with the eponymous 1977 movie.",
         "tags": [
@@ -673,7 +673,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/southpark.rss",
+        "url": "https://www.reddit.com/r/southpark.rss",
         "title": "We got Tegridy",
         "description": "A subreddit dedicated to the TV show *South Park*.",
         "tags": [
@@ -682,7 +682,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/comics.rss",
+        "url": "https://www.reddit.com/r/comics.rss",
         "title": "Print Comics and Webcomics ",
         "description": "Everything related to print comics (comic books, graphic novels, and strips) and web comics.  Artists are encouraged to post their own work.  News and media for adaptations based on comic books are welcome. Read [the subreddit wiki](https://www.reddit.com/r/comics/wiki/index) for more information about the subreddit.",
         "tags": [
@@ -691,7 +691,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/polandball.rss",
+        "url": "https://www.reddit.com/r/polandball.rss",
         "title": "Polandball",
         "description": "Wiggly mouse-drawn comics where balls represent different countries. They poke fun at national stereotypes and the \"international drama\" of their diplomatic relations. Polandball combines history, geography, Engrish, and an inferiority complex. ",
         "tags": [
@@ -700,7 +700,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Music.rss",
+        "url": "https://www.reddit.com/r/Music.rss",
         "title": "/r/Music",
         "description": "The musical community of reddit",
         "tags": [
@@ -709,7 +709,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/kpop.rss",
+        "url": "https://www.reddit.com/r/kpop.rss",
         "title": "Reddit K-Pop | Share and discover Korean music",
         "description": "K-Pop (Korean popular music) is a musical genre consisting of pop, dance, electropop, hiphop, rock, R&amp;B, and electronic music originating in South Korea. In addition to music, K-Pop has grown into a popular subculture, resulting in widespread interest in the fashion and style of Korean idol groups and singers.",
         "tags": [
@@ -718,7 +718,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/manga.rss",
+        "url": "https://www.reddit.com/r/manga.rss",
         "title": "/r/manga: manga, on reddit.",
         "description": "Everything and anything manga!  (manhwa/manhua is okay too!)\n\nDiscuss weekly chapters, find/recommend a new series to read, post a picture of your collection, lurk, etc!",
         "tags": [
@@ -727,7 +727,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Marvel.rss",
+        "url": "https://www.reddit.com/r/Marvel.rss",
         "title": "Marvel Comics",
         "description": "This is a subreddit dedicated to Marvel Comics, its publications and hundreds of characters. It is not affiliated with Marvel Entertainment, LLC and is an unofficial community operated by dedicated fans.",
         "tags": [
@@ -736,7 +736,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/gameofthrones.rss",
+        "url": "https://www.reddit.com/r/gameofthrones.rss",
         "title": "Game of Thrones",
         "description": "This is a place to enjoy and discuss the HBO series, book series ASOIAF, and GRRM works in general. It is a safe place regardless of where you are in the story. We have three main rules. Content must be relevant. Spoilers must have warning. Be legal and respectful to others.\n\nPost spoiler tags are: [No Spoilers], [Spoilers], or [Leaks]\n\nPosts outside the content scope are removed. Redditors unable to follow the [sub's rules](http://www.reddit.com/r/gameofthrones/w/posting_policy) are banned.",
         "tags": [
@@ -745,7 +745,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/rickandmorty.rss",
+        "url": "https://www.reddit.com/r/rickandmorty.rss",
         "title": "Rick and Morty News and Discussion",
         "description": "This is the subreddit for fans of Dan Harmon &amp; Justin Roiland's animated series, Rick and Morty",
         "tags": [
@@ -754,7 +754,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/nosleep.rss",
+        "url": "https://www.reddit.com/r/nosleep.rss",
         "title": "nosleep",
         "description": "NoSleep is a place for realistic horror stories.\n\nEverything is true here, even if it's not. \n    \n\nPlease thoroughly read our rules and guidelines before posting or commenting.",
         "tags": [
@@ -763,7 +763,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/MURICA.rss",
+        "url": "https://www.reddit.com/r/MURICA.rss",
         "title": "'MURICA! FUCK YEAH!",
         "description": "A subreddit for FREEDOM! 'MURICA! FUCK YEAH!",
         "tags": [
@@ -772,7 +772,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/comicbooks.rss",
+        "url": "https://www.reddit.com/r/comicbooks.rss",
         "title": "comicbooks",
         "description": "A reddit for fans of comic books, graphic novels, and digital comics. ",
         "tags": [
@@ -781,7 +781,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/BoJackHorseman.rss",
+        "url": "https://www.reddit.com/r/BoJackHorseman.rss",
         "title": "BoJack Horseman",
         "description": "Subreddit for the Netflix animated series, BoJack Horseman, starring BoJack Horseman as BoJack Horseman.",
         "tags": [
@@ -790,7 +790,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/OnePiece.rss",
+        "url": "https://www.reddit.com/r/OnePiece.rss",
         "title": "One Piece",
         "description": "Welcome to r/OnePiece, the community for Eiichiro Oda's manga and anime series One Piece. From the East Blue to the New World, anything related to the world of One Piece belongs here! If you've just set sail with the Straw Hat Pirates, be wary of spoilers on this subreddit!",
         "tags": [
@@ -799,7 +799,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/IASIP.rss",
+        "url": "https://www.reddit.com/r/IASIP.rss",
         "title": "It's Always Sunny In Philadelphia",
         "description": "A sub-reddit for the fans and critics of the show It's Always Sunny In Philadelphia. Discussion of the show, pictures from the show and anything else.",
         "tags": [
@@ -812,7 +812,7 @@
   "games": {
     "games": [
       {
-        "url": "https:///www.reddit.com/r/gaming.rss",
+        "url": "https://www.reddit.com/r/gaming.rss",
         "title": "r/gaming",
         "description": "A subreddit for (almost) anything related to games - video games, board games, card games, etc. (but not sports).",
         "tags": [
@@ -821,7 +821,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/leagueoflegends.rss",
+        "url": "https://www.reddit.com/r/leagueoflegends.rss",
         "title": "League of Legends",
         "description": "This is a subreddit devoted to League of Legends.",
         "tags": [
@@ -830,7 +830,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/DestinyTheGame.rss",
+        "url": "https://www.reddit.com/r/DestinyTheGame.rss",
         "title": "Destiny | Reddit",
         "description": "Welcome! This sub is for discussing Bungie's shared world, action FPS looter-shooters: Destiny 2 and its predecessor, Destiny. \n\nPlease read the sidebar rules and be sure to search for your question before posting.",
         "tags": [
@@ -839,7 +839,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Overwatch.rss",
+        "url": "https://www.reddit.com/r/Overwatch.rss",
         "title": "Overwatch",
         "description": "Subreddit for all things Overwatch™, the team-based shooter from Blizzard Entertainment.",
         "tags": [
@@ -848,7 +848,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/hearthstone.rss",
+        "url": "https://www.reddit.com/r/hearthstone.rss",
         "title": "Hearthstone",
         "description": "For fans of Blizzard Entertainment's digital card game, Hearthstone",
         "tags": [
@@ -857,7 +857,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Games.rss",
+        "url": "https://www.reddit.com/r/Games.rss",
         "title": "Quality Gaming Content and Discussion -- /r/Games",
         "description": "The goal of /r/Games is to provide a place for informative and interesting gaming content and discussions.\n\nSubmissions should be for the purpose of informing or initiating a discussion, not just with the goal of entertaining viewers. Memes, comics, funny screenshots, arts-and-crafts, etc. will be removed.",
         "tags": [
@@ -865,7 +865,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/wow.rss",
+        "url": "https://www.reddit.com/r/wow.rss",
         "title": "World of Warcraft",
         "description": "World of Warcraft on Reddit! ",
         "tags": [
@@ -874,7 +874,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/pcmasterrace.rss",
+        "url": "https://www.reddit.com/r/pcmasterrace.rss",
         "title": "PC Master Race - Spearheading the Second Golden Age of PC Gaming",
         "description": "Welcome to the official subreddit of the PC Master Race. In this subreddit, we celebrate and promote the ultimate gaming and working platform. Ascend to a level that respects your eyes, your wallet, your mind, and your heart. Ascend to... the PC Master Race.",
         "tags": [
@@ -883,7 +883,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/DotA2.rss",
+        "url": "https://www.reddit.com/r/DotA2.rss",
         "title": "Dota 2 on Reddit",
         "description": "Dota",
         "tags": [
@@ -892,7 +892,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Rainbow6.rss",
+        "url": "https://www.reddit.com/r/Rainbow6.rss",
         "title": "Rainbow 6",
         "description": "Welcome to the Rainbow 6 subreddit, a community for R6 fans to discuss Rainbow Six Siege and past favorites.",
         "tags": [
@@ -901,7 +901,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/StarWarsBattlefront.rss",
+        "url": "https://www.reddit.com/r/StarWarsBattlefront.rss",
         "title": "/r/StarWarsBattlefront",
         "description": "The subreddit for all things *Star Wars: Battlefront*!  News and community for the both the modern games developed by EA DICE, as well as the older entries in the franchise, developed by Pandemic Studios and Rebellion Developments.",
         "tags": [
@@ -910,7 +910,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/GlobalOffensive.rss",
+        "url": "https://www.reddit.com/r/GlobalOffensive.rss",
         "title": "Counter-Strike: Global Offensive",
         "description": "/r/GlobalOffensive is a home for the Counter-Strike: Global Offensive community and a hub for the discussion and sharing of content relevant to CS:GO. \n\nCounter-Strike: Global Offensive is a game created by Valve Corporation and released on August 21st, 2012 as a successor to previous games in the series dating back to 1999. The latest installment to the Counter-Strike franchise maintains a healthy, ever-intensifying competitive scene alongside a growing casual playerbase.",
         "tags": [
@@ -919,7 +919,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/2007scape.rss",
+        "url": "https://www.reddit.com/r/2007scape.rss",
         "title": "Old School RuneScape!",
         "description": "The community for Old School RuneScape discussion on reddit. Join us for game discussions, weekly events and skilling competitions!\n\nOSRS is the official legacy version of RS, the largest free-to-play MMORPG.",
         "tags": [
@@ -928,7 +928,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/xboxone.rss",
+        "url": "https://www.reddit.com/r/xboxone.rss",
         "title": "/r/XboxOne - The home of everything Xbox One on Reddit",
         "description": "Everything and anything related to the Xbox One. News, reviews, previews, rumors, screenshots, videos and more!",
         "tags": [
@@ -937,7 +937,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/tf2.rss",
+        "url": "https://www.reddit.com/r/tf2.rss",
         "title": "Team Fortress 2",
         "description": "This subreddit is dedicated to Team Fortress 2, created by Valve Corporation in 2007. Please read [our subreddit rules](https://old.reddit.com/r/tf2/wiki/subreddit_rules) before posting.",
         "tags": [
@@ -946,7 +946,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/magicTCG.rss",
+        "url": "https://www.reddit.com/r/magicTCG.rss",
         "title": "Magic: The Redditing",
         "description": "A place for sophisticated discussion of all things related to the Magic: The Gathering® (MTG or M:tG) trading card game (TCG or sometimes CCG for Collectible Card Game). We discuss tournament play, new cards, EDH/Commander, altered art, rules questions, card prices, etc.",
         "tags": [
@@ -955,7 +955,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/DnD.rss",
+        "url": "https://www.reddit.com/r/DnD.rss",
         "title": "DnD: Roll for Initiative!",
         "description": "A subreddit dedicated to the various iterations of Dungeons &amp; Dragons, from its First Edition roots to its Fifth Edition future.",
         "tags": [
@@ -964,7 +964,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/pcgaming.rss",
+        "url": "https://www.reddit.com/r/pcgaming.rss",
         "title": "PC Gaming",
         "description": "A subreddit for discussion of everything PC gaming related!\n\n\n",
         "tags": [
@@ -973,7 +973,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/RocketLeague.rss",
+        "url": "https://www.reddit.com/r/RocketLeague.rss",
         "title": "Rocket League",
         "description": "Rocket League: The Game - everything related to Rocket League!",
         "tags": [
@@ -982,7 +982,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/starcitizen.rss",
+        "url": "https://www.reddit.com/r/starcitizen.rss",
         "title": "Roberts Space Industries",
         "description": "This is the subreddit for everything related to Star Citizen - an up and coming epic space sim MMO being developed by Chris Roberts and Cloud Imperium Games.",
         "tags": [
@@ -991,7 +991,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/PS4.rss",
+        "url": "https://www.reddit.com/r/PS4.rss",
         "title": "PlayStation 4 - News • Discussion • Community",
         "description": "The largest PlayStation 4 community on the internet.  Your hub for everything related to PS4 including games, news, reviews, discussion, questions, videos, and screenshots.\n",
         "tags": [
@@ -1000,7 +1000,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Warframe.rss",
+        "url": "https://www.reddit.com/r/Warframe.rss",
         "title": "/r/Warframe",
         "description": "Reddit community and official fansite for the free-to-play third-person co-op action shooter, *Warframe*. The game is currently in open beta on PC, PlayStation 4, Xbox One, and Nintendo Switch.\n\nFor the new Reddit design, go to https://rwarframe.github.io/#flair to set user flair and text.",
         "tags": [
@@ -1009,7 +1009,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/DBZDokkanBattle.rss",
+        "url": "https://www.reddit.com/r/DBZDokkanBattle.rss",
         "title": "DBZ: Dokkan Battle",
         "description": "Everything Dragon Ball Z: Dokkan Battle! This subreddit is for both the Japanese and Global version. Information, guides, tips, news, fan art, questions and everything else Dokkan Battle related.\n",
         "tags": [
@@ -1018,7 +1018,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/pathofexile.rss",
+        "url": "https://www.reddit.com/r/pathofexile.rss",
         "title": "Path of Exile",
         "description": "A subreddit dedicated to the action RPG game Path of Exile, made by Grinding Gear Games.",
         "tags": [
@@ -1027,7 +1027,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/skyrim.rss",
+        "url": "https://www.reddit.com/r/skyrim.rss",
         "title": "The Elder Scrolls V: Skyrim",
         "description": "",
         "tags": [
@@ -1036,7 +1036,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/heroesofthestorm.rss",
+        "url": "https://www.reddit.com/r/heroesofthestorm.rss",
         "title": "Heroes of the Storm",
         "description": "Reddit community for Blizzard's MOBA game - Heroes of the Storm",
         "tags": [
@@ -1045,7 +1045,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Guildwars2.rss",
+        "url": "https://www.reddit.com/r/Guildwars2.rss",
         "title": "/r/GuildWars2",
         "description": "Guild Wars 2 news and discussion.",
         "tags": [
@@ -1054,7 +1054,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Minecraft.rss",
+        "url": "https://www.reddit.com/r/Minecraft.rss",
         "title": "Minecraft on reddit",
         "description": "Minecraft community on reddit.",
         "tags": [
@@ -1063,7 +1063,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/lego.rss",
+        "url": "https://www.reddit.com/r/lego.rss",
         "title": "LEGO - News from a Studded World",
         "description": "Reports, news, pics, videos, discussions and documentation from a studded world.\n\n/r/lego is about all things LEGO®. \n",
         "tags": [
@@ -1084,7 +1084,7 @@
     ],
     "fitness": [
       {
-        "url": "https:///www.reddit.com/r/Fitness.rss",
+        "url": "https://www.reddit.com/r/Fitness.rss",
         "title": "Fitness",
         "description": "Discussion of physical fitness goals and how they can be achieved",
         "tags": [
@@ -1103,7 +1103,7 @@
     ],
     "health": [
       {
-        "url": "https:///www.reddit.com/r/Fitness.rss",
+        "url": "https://www.reddit.com/r/Fitness.rss",
         "title": "Fitness",
         "description": "Discussion of physical fitness goals and how they can be achieved",
         "tags": [
@@ -1124,7 +1124,7 @@
     ],
     "philosophy": [
       {
-        "url": "https:///www.reddit.com/r/philosophy.rss",
+        "url": "https://www.reddit.com/r/philosophy.rss",
         "title": "philosophy",
         "description": "",
         "tags": [
@@ -1162,7 +1162,7 @@
     ],
     "information": [
       {
-        "url": "https:///www.reddit.com/r/news.rss",
+        "url": "https://www.reddit.com/r/news.rss",
         "title": "All news, US and international.",
         "description": "/r/news is: real news articles, primarily but not exclusively, news relating to the United States and the rest of the World. /r/news isn't: editorials, commercials, political minutiae, shouting, justin bieber updates, kitty pictures. For a subreddit for all news-related content (editorials, satire, etc.) visit /r/inthenews.",
         "tags": [
@@ -1171,7 +1171,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/books.rss",
+        "url": "https://www.reddit.com/r/books.rss",
         "title": "So many books, so little time",
         "description": "This is a moderated subreddit. It is our intent and purpose to foster and encourage in-depth discussion about all things related to books, authors, genres, or publishing in a safe, supportive environment. If you're looking for help with a personal book recommendation, consult our Weekly Recommendation Thread, Suggested Reading page, or ask in r/suggestmeabook.",
         "tags": [
@@ -1265,7 +1265,7 @@
   "people and society": {
     "family": [
       {
-        "url": "https:///www.reddit.com/r/teenagers.rss",
+        "url": "https://www.reddit.com/r/teenagers.rss",
         "title": "r/teenagers: HAPPY ONE MILLION!",
         "description": "r/teenagers is the biggest community forum run by teenagers for teenagers. Our subreddit is primarily for discussions and memes that an average teenager would enjoy to discuss about. We do not have any age-restriction in place but do keep in mind this is targeted for users between the ages of 13 to 19. \n\nParents, teachers, and the like are welcomed to participate and ask any questions!",
         "tags": [
@@ -1335,7 +1335,7 @@
     ],
     "politics": [
       {
-        "url": "https:///www.reddit.com/r/politics.rss",
+        "url": "https://www.reddit.com/r/politics.rss",
         "title": "Politics",
         "description": "/r/Politics is for news and discussion about U.S. politics.",
         "tags": [
@@ -1344,7 +1344,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/guns.rss",
+        "url": "https://www.reddit.com/r/guns.rss",
         "title": "/r/guns: Firearms and related articles",
         "description": "A place for responsible gun owners and enthusiasts to talk about guns without the politics.",
         "tags": [
@@ -1378,7 +1378,7 @@
     ],
     "relationships": [
       {
-        "url": "https:///www.reddit.com/r/relationships.rss",
+        "url": "https://www.reddit.com/r/relationships.rss",
         "title": "Relationships",
         "description": "/r/Relationships is a community built around helping people and the goal of providing a platform for interpersonal relationship advice between redditors. We seek posts from users who have specific and personal relationship quandaries that other redditors can help them try to solve.",
         "tags": [
@@ -1395,7 +1395,7 @@
     ],
     "religion": [
       {
-        "url": "https:///www.reddit.com/r/Christianity.rss",
+        "url": "https://www.reddit.com/r/Christianity.rss",
         "title": "Christianity",
         "description": "/r/Christianity is a subreddit to discuss Christianity and aspects of Christian life. All are welcome to participate.",
         "tags": [
@@ -1437,7 +1437,7 @@
     ],
     "sex": [
       {
-        "url": "https:///www.reddit.com/r/sex.rss",
+        "url": "https://www.reddit.com/r/sex.rss",
         "title": "Sex",
         "description": "r/sex is for civil discussions about all facets of sexuality and sexual relationships. It is a sex-positive community and a safe space for people of all genders and orientations. This is (mostly) a 'serious' community - posts and comments that sidetrack discussion will be removed and may result in a ban.",
         "tags": [
@@ -1506,7 +1506,7 @@
     ],
     "food and drink": [
       {
-        "url": "https:///www.reddit.com/r/food.rss",
+        "url": "https://www.reddit.com/r/food.rss",
         "title": "food",
         "description": "Cooking, restaurants, recipes, food network, foodies, talk about it here!",
         "tags": [
@@ -1598,7 +1598,7 @@
     ],
     "science": [
       {
-        "url": "https:///www.reddit.com/r/science.rss",
+        "url": "https://www.reddit.com/r/science.rss",
         "title": "Science",
         "description": "This community is a place to share and discuss new scientific research. Read about the latest advances in astronomy, biology, medicine, physics, social science, and more. Find and submit new publications and popular science coverage of current research.",
         "tags": [
@@ -1626,7 +1626,7 @@
     ],
     "space": [
       {
-        "url": "https:///www.reddit.com/r/space.rss",
+        "url": "https://www.reddit.com/r/space.rss",
         "title": "/r/space: news, articles, images, videos, and discussion",
         "description": "Share &amp; discuss informative content on:\n\n* Astrophysics\n* Cosmology\n* Space Exploration\n* Planetary Science\n* Astrobiology",
         "tags": [
@@ -1694,7 +1694,7 @@
   "sports": {
     "baseball": [
       {
-        "url": "https:///www.reddit.com/r/baseball.rss",
+        "url": "https://www.reddit.com/r/baseball.rss",
         "title": "America's Pastime",
         "description": "The subreddit for the bat-and-ball sport played between two teams of nine players. America's Pastime.\n\n**For the best user experience, we recommend disabling the Reddit redesign.**",
         "tags": [
@@ -1705,7 +1705,7 @@
     ],
     "cricket": [
       {
-        "url": "https:///www.reddit.com/r/Cricket.rss",
+        "url": "https://www.reddit.com/r/Cricket.rss",
         "title": "Cricket",
         "description": "News, banter and occasional serious discussion on the great game.",
         "tags": [
@@ -1734,7 +1734,7 @@
     ],
     "hockey": [
       {
-        "url": "https:///www.reddit.com/r/hockey.rss",
+        "url": "https://www.reddit.com/r/hockey.rss",
         "title": "hockey: the best game on earth",
         "description": "hockey: the best game on earth",
         "tags": [
@@ -1751,7 +1751,7 @@
     ],
     "soccer": [
       {
-        "url": "https:///www.reddit.com/r/soccer.rss",
+        "url": "https://www.reddit.com/r/soccer.rss",
         "title": "The back page of the internet ",
         "description": "The football subreddit.\n\nNews, results and discussion about the beautiful game.\n",
         "tags": [
@@ -1762,7 +1762,7 @@
     ],
     "sports": [
       {
-        "url": "https:///www.reddit.com/r/nba.rss",
+        "url": "https://www.reddit.com/r/nba.rss",
         "title": "NBA",
         "description": "All things NBA basketball.",
         "tags": [
@@ -1771,7 +1771,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/soccer.rss",
+        "url": "https://www.reddit.com/r/soccer.rss",
         "title": "The back page of the internet ",
         "description": "The football subreddit.\n\nNews, results and discussion about the beautiful game.\n",
         "tags": [
@@ -1780,7 +1780,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/CFB.rss",
+        "url": "https://www.reddit.com/r/CFB.rss",
         "title": "The Internet's Tailgate",
         "description": "A forum for all things college football. Primarily focused on NCAA football, discussion is welcome on any collegiate league, teams, and players.",
         "tags": [
@@ -1789,7 +1789,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/nfl.rss",
+        "url": "https://www.reddit.com/r/nfl.rss",
         "title": "NFL: National Football League Discussion",
         "description": "NFL: National Football League News &amp; Discussion\n",
         "tags": [
@@ -1798,7 +1798,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/hockey.rss",
+        "url": "https://www.reddit.com/r/hockey.rss",
         "title": "hockey: the best game on earth",
         "description": "hockey: the best game on earth",
         "tags": [
@@ -1807,7 +1807,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/MMA.rss",
+        "url": "https://www.reddit.com/r/MMA.rss",
         "title": "MMA: Mixed Martial Arts",
         "description": "A subreddit for all things Mixed Martial Arts.",
         "tags": [
@@ -1816,7 +1816,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/SquaredCircle.rss",
+        "url": "https://www.reddit.com/r/SquaredCircle.rss",
         "title": "r/SquaredCircle",
         "description": "",
         "tags": [
@@ -1825,7 +1825,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/fantasyfootball.rss",
+        "url": "https://www.reddit.com/r/fantasyfootball.rss",
         "title": "/r/fantasyfootball - Good For Your Season",
         "description": "/r/fantasyfootball - Good For Your Season",
         "tags": [
@@ -1834,7 +1834,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/sports.rss",
+        "url": "https://www.reddit.com/r/sports.rss",
         "title": "redditsports",
         "description": "The central hub for sports on reddit.",
         "tags": [
@@ -1842,7 +1842,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/baseball.rss",
+        "url": "https://www.reddit.com/r/baseball.rss",
         "title": "America's Pastime",
         "description": "The subreddit for the bat-and-ball sport played between two teams of nine players. America's Pastime.\n\n**For the best user experience, we recommend disabling the Reddit redesign.**",
         "tags": [
@@ -1851,7 +1851,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/formula1.rss",
+        "url": "https://www.reddit.com/r/formula1.rss",
         "title": "Formula 1",
         "description": "Formula 1 news and stories",
         "tags": [
@@ -1860,7 +1860,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/CollegeBasketball.rss",
+        "url": "https://www.reddit.com/r/CollegeBasketball.rss",
         "title": "/r/CollegeBasketball: The Internet's Student Section",
         "description": "A subreddit for college basketball news and discussion",
         "tags": [
@@ -1869,7 +1869,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/LiverpoolFC.rss",
+        "url": "https://www.reddit.com/r/LiverpoolFC.rss",
         "title": "Liverpool FC: You'll Never Walk Alone",
         "description": "A subreddit for news and discussion of Liverpool FC, a football club playing in the English Premier League. Liverpool are one of the most decorated football clubs in all of world football.",
         "tags": [
@@ -1878,7 +1878,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/FIFA.rss",
+        "url": "https://www.reddit.com/r/FIFA.rss",
         "title": "EA Sports FIFA",
         "description": "* The front page of EA Sports FIFA.",
         "tags": [
@@ -1887,7 +1887,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Gunners.rss",
+        "url": "https://www.reddit.com/r/Gunners.rss",
         "title": "The Arsenal on reddit",
         "description": "The internet's largest Arsenal community.",
         "tags": [
@@ -1944,7 +1944,7 @@
     ],
     "technology": [
       {
-        "url": "https:///www.reddit.com/r/technology.rss",
+        "url": "https://www.reddit.com/r/technology.rss",
         "title": "Technology",
         "description": "For all things technology.",
         "tags": [
@@ -1953,7 +1953,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Android.rss",
+        "url": "https://www.reddit.com/r/Android.rss",
         "title": "Android",
         "description": "Android news, reviews, tips, and discussions about rooting, tutorials, and apps. Generic discussion about phones/tablets is allowed, but technical-support and carrier-related issues should be asked in their respective subreddits!",
         "tags": [
@@ -1962,7 +1962,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/ProgrammerHumor.rss",
+        "url": "https://www.reddit.com/r/ProgrammerHumor.rss",
         "title": "Programmer Humor",
         "description": "Dedicated to humor and jokes relating to programmers and programming.",
         "tags": [
@@ -1971,7 +1971,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/apple.rss",
+        "url": "https://www.reddit.com/r/apple.rss",
         "title": "/r/Apple - the unofficial Apple community",
         "description": "An unofficial community to discuss Apple devices and software, including news, rumors, opinions and analysis pertaining to the company located at One Apple Park Way.",
         "tags": [
@@ -1980,7 +1980,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/Futurology.rss",
+        "url": "https://www.reddit.com/r/Futurology.rss",
         "title": "Future(s) Studies",
         "description": "Welcome to r/Futurology, a subreddit devoted to the field of Future(s) Studies and speculation about the development of humanity, technology, and civilization.\n",
         "tags": [
@@ -1989,7 +1989,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/dataisbeautiful.rss",
+        "url": "https://www.reddit.com/r/dataisbeautiful.rss",
         "title": "Data Is Beautiful",
         "description": "A place for visual representations of data: Graphs, charts, maps, etc.\n\nDataIsBeautiful is for visualizations that effectively convey information. **Aesthetics are an important part of information visualization, but pretty pictures are not the aim of this subreddit.**",
         "tags": [
@@ -1998,7 +1998,7 @@
         ]
       },
       {
-        "url": "https:///www.reddit.com/r/MechanicalKeyboards.rss",
+        "url": "https://www.reddit.com/r/MechanicalKeyboards.rss",
         "title": "r/MechanicalKeyboards for all the Click and None of the Clack!",
         "description": "Keyboard lovers Clicking and Clacking in a content rich, friendly place. The goal of this subreddit is to provide daily links to interesting mechanical keyboard content.\n",
         "tags": [
@@ -2043,7 +2043,7 @@
     ],
     "cars": [
       {
-        "url": "https:///www.reddit.com/r/cars.rss",
+        "url": "https://www.reddit.com/r/cars.rss",
         "title": "r/Cars - For Car Enthusiasts",
         "description": "/r/Cars is one of the largest online automotive enthusiast communities. We serve as Reddit's central hub for vehicle-related discussion including industry news, reviews, projects, videos, DIY guides, art, advice, stories, and more. ",
         "tags": [
