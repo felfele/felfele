@@ -80,8 +80,6 @@ const HEADERS_WITH_FELFELE = {
     'Accept': '*/*',
 };
 
-const REDDIT_COM = 'reddit.com';
-
 export class RSSFeedManager {
     public static getFeedUrlFromHtmlLink(link: Node): string {
         for (const mimeType of RSSMimeTypes) {
@@ -157,7 +155,7 @@ export class RSSFeedManager {
     }
 
     public static async fetchContentWithMimeType(url: string): Promise<ContentWithMimeType | null> {
-        const isRedditUrl = urlUtils.getHumanHostname(url) === REDDIT_COM;
+        const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
         const response = await fetch(url, {
             headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
         });
@@ -291,7 +289,11 @@ export class RSSFeedManager {
             if (feed.name === '') {
                 feed.name = feedFromHtml.name;
             }
-            feed.favicon = feedFromHtml.favicon;
+            if (urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM) {
+                feed.favicon = await FaviconCache.getFavicon(url);
+            } else {
+                feed.favicon = feedFromHtml.favicon;
+            }
             return feed;
         }
 
@@ -336,7 +338,13 @@ class _RSSPostManager {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
-                const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
+                const storedFeed = storedFeeds.find(feed => urlUtils.compareUrlWithoutProtocol(feed.url, rssFeed.url));
+                const favicon = storedFeed && storedFeed.favicon
+                    ? storedFeed.favicon
+                    : rssFeed.icon
+                        ? rssFeed.icon
+                        : ''
+                ;
                 Debug.log('RSSPostManager.loadPosts', 'rssFeed', rssFeed, 'favicon', favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
@@ -564,7 +572,7 @@ const feedHelper: FeedHelper = {
     DefaultTimeout: 10000,
     fetch: async (url: string): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
-        const isRedditUrl = urlUtils.getHumanHostname(url) === REDDIT_COM;
+        const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
         const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
             headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
         }));
@@ -623,6 +631,7 @@ const feedHelper: FeedHelper = {
         return null;
     },
 
+    // TODO is this atom?
     parseAtom: (json: any) => {
         const feed = json.feed;
         const rss: any = { items: [] };

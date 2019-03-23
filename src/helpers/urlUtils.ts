@@ -2,6 +2,8 @@
 const Url = require('url');
 import { Utils } from '../Utils';
 
+export const REDDIT_COM = 'reddit.com';
+
 export const getHumanHostname = (url: string): string => {
     if (url.startsWith('//')) {
         url = 'https:' + url;
@@ -57,6 +59,13 @@ export const getCanonicalUrl = (url: string): string => {
         url = 'https://' + url;
     }
     return url;
+};
+
+export const compareUrlWithoutProtocol = (url1: string, url2: string): boolean => {
+    const strippedUrl1 = url1.split('//', 2)[1];
+    const strippedUrl2 = url2.split('//', 2)[1];
+
+    return strippedUrl1 === strippedUrl2;
 };
 
 export const stripNonAscii = (s: string): string => {
