@@ -73,8 +73,8 @@ export const defaultMetadata = {
 export const defaultFeeds: Feed[] = [
     {
         name: 'Felfele Assistant',
-        url: 'local/onboarding',
-        feedUrl: 'local/onboarding',
+        url: FELFELE_ASSISTANT_URL,
+        feedUrl: FELFELE_ASSISTANT_URL,
         favicon: '',
         followed: true,
     },

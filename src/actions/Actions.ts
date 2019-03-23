@@ -25,6 +25,7 @@ import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -436,7 +437,7 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
 };
 
 const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
-    const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== 'local/onboarding');
+    const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
     const rssFeeds = feedsWithoutOnboarding.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feedsWithoutOnboarding.filter(feed => isPostFeedUrl(feed.url));
     const allPostsCombined = await Promise.all([
