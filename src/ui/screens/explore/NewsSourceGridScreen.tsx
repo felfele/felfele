@@ -9,12 +9,13 @@ import { NewsSource } from '../../../models/recommendation/NewsSource';
 import { RSSFeedManager } from '../../../RSSPostManager';
 import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
+import { TypedNavigation, Routes } from '../../../helpers/navigation';
 
 export interface StateProps {
     gatewayAddress: string;
     subCategoryName: string;
     newsSource: NewsSource[];
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {
@@ -52,7 +53,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                                    imageUri={imageUri}
                                    onPress={() => {
                                        this.props.downloadPostsForNewsSource(item);
-                                       this.props.navigation.navigate('NewsSourceFeed', {
+                                       this.props.navigation.navigate<Routes, 'NewsSourceFeed'>('NewsSourceFeed', {
                                            feed: item,
                                        });
                                    }}

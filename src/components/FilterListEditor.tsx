@@ -6,9 +6,10 @@ import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import { RowItem } from '../ui/misc/RowButton';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     filters: ContentFilter[];
 }
 
@@ -48,7 +49,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
     }
 
     private editFilter = (filter: ContentFilter) => {
-        this.props.navigation.navigate('EditFilter', { filter: filter });
+        this.props.navigation.navigate<Routes, 'EditFilter'>('EditFilter', { filter: filter });
     }
 
     private onAddFilter = () => {
@@ -57,7 +58,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
             createdAt: 0,
             validUntil: 0,
         };
-        this.props.navigation.navigate('EditFilter', { filter: filter });
+        this.props.navigation.navigate<Routes, 'EditFilter'>('EditFilter', { filter: filter });
     }
 }
 

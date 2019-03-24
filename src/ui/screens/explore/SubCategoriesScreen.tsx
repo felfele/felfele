@@ -5,17 +5,18 @@ import { RegularText } from '../../misc/text';
 import { SubCategory } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TypedNavigation, Routes } from '../../../helpers/navigation';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
 export interface StateProps {
     subCategories: SubCategory[];
-    navigation: any;
+    navigation: TypedNavigation;
     title: string;
 }
 
 export interface OwnProps {
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps { }
@@ -27,7 +28,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
                 key={subCategory.name}
                 title={subCategory.name}
                 buttonStyle='navigate'
-                onPress={() => props.navigation.navigate('NewsSourceGridContainer', {
+                onPress={() => props.navigation.navigate<Routes, 'NewsSourceGridContainer'>('NewsSourceGridContainer', {
                     newsSources: subCategory.list,
                     subCategoryName: subCategory.name,
                 })}

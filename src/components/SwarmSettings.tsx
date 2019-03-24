@@ -11,10 +11,11 @@ import {
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Colors } from '../styles';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
     swarmGatewayAddress: string;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {

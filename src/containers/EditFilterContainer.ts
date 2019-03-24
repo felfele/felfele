@@ -2,12 +2,12 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter';
-import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
-        filter: ownProps.navigation.state.params.filter,
+        filter: ownProps.navigation.getParam<Routes['EditFilter'], 'filter'>('filter'),
         navigation: ownProps.navigation,
     };
 };

@@ -5,12 +5,13 @@ import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TypedNavigation, Routes } from '../../../helpers/navigation';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 
 export interface StateProps {
     categories: Category[];
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps { }
@@ -23,7 +24,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
                 title={category.name}
                 buttonStyle='navigate'
                 onPress={() => {
-                    props.navigation.navigate('SubCategoriesContainer', {
+                    props.navigation.navigate<Routes, 'SubCategoriesContainer'>('SubCategoriesContainer', {
                         title: category.name,
                         subCategories: category.subCategories,
                     });

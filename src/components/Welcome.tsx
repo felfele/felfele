@@ -10,14 +10,15 @@ import { ImageData } from '../models/ImageData';
 import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
 import { defaultAuthor } from '../reducers/defaultData';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;
-    onCreateUser: (name: string, image: ImageData, navigation: any) => void;
+    onCreateUser: (name: string, image: ImageData, navigation: TypedNavigation) => void;
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     gatewayAddress: string;
 }
 

@@ -9,6 +9,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
+import { TypedNavigation, Routes } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -19,7 +21,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     onBack: () => void;
     feedUrl: string;
     feedName: string;
@@ -42,11 +44,11 @@ export const FeedView = (props: Props) => {
         onPress,
     });
     const toggleFavorite = () => props.onToggleFavorite(props.feedUrl);
-    const navigateToFeedSettings = () => props.navigation.navigate(
+    const navigateToFeedSettings = () => props.navigation.navigate<Routes, 'FeedSettings'>(
         'FeedSettings',
-        { feed: props.feeds[0] },
+        { feed: props.feeds[0] as LocalFeed },
     );
-    const navigateToFeedInfo = () => props.navigation.navigate(
+    const navigateToFeedInfo = () => props.navigation.navigate<Routes, 'FeedInfo'>(
         'FeedInfo', {
             feed: props.feeds[0],
         }

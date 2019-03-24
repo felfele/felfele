@@ -15,6 +15,7 @@ import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
+import { TypedNavigation } from '../helpers/navigation';
 
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -53,7 +54,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     filter: ContentFilter;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 type Props = DispatchProps & StateProps;

@@ -23,6 +23,7 @@ import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -45,7 +46,7 @@ export interface DispatchProps {
 export interface StateProps {
     swarmGateway: string;
     feed: Feed;
-    navigation: any;
+    navigation: TypedNavigation;
     isKnownFeed: boolean;
 }
 
@@ -96,7 +97,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 onSuccess();
             }
             this.onAdd(feed);
-            this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
+            this.props.navigation.navigate<Routes, 'Feed'>('Feed', {
+                feedUrl: feed.feedUrl,
+                name: feed.name,
+            });
         } else {
             this.onFailedFeedLoad();
         }
