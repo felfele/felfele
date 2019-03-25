@@ -95,8 +95,8 @@ const defaultMetadata = {
 const defaultFeeds: Feed[] = [
     {
         name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0x3081dc348c0b82d3ca9b14132f44ccef48e1f0af',
-        feedUrl: 'bzz-feed:/?user=0x3081dc348c0b82d3ca9b14132f44ccef48e1f0af',
+        url: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
+        feedUrl: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
         favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
         followed: true,
     },
