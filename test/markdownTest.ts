@@ -63,7 +63,27 @@ test('Long text markdown escape', () => {
     expect(result).toEqual(complexTextEscaped);
 });
 
+test('Long text markdown unescape', () => {
+    const result = markdownUnescape(complexTextEscaped);
+    expect(result).toEqual(complexText);
+});
+
 test('Long text markdown escape then unescape gives back original', () => {
     const result = markdownUnescape(markdownEscape(complexText));
     expect(result).toEqual(complexText);
+});
+
+test('Dot is not escaped', () => {
+    const plainText = 'This is the beginning of a beautiful friendship.';
+    const result = markdownEscape(plainText);
+
+    expect(result).toEqual(plainText);
+});
+
+test('When dot is escaped it is correctly unescaped', () => {
+    const markdownText = 'This is the beginning of a beautiful friendship\\.';
+    const plainText = 'This is the beginning of a beautiful friendship.';
+    const result = markdownUnescape(markdownText);
+
+    expect(result).toEqual(plainText);
 });
