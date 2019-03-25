@@ -10,6 +10,7 @@ import {
     mergePostCommandLogs,
     getLatestPostsFromLog,
     getPostCommandFromLogById,
+    emptyPostCommandLog,
 } from './api';
 import { Post} from '../models/Post';
 import { Debug } from '../Debug';
@@ -118,13 +119,9 @@ export const assertEquals = <T>(expected: T, actual: T) => {
     }
 };
 
-export const emptyPostCommandFeed: PostCommandLog = {
-    commands: [],
-};
-
 export const testSharePost = (
     id: number = 1,
-    postCommandLog: PostCommandLog = emptyPostCommandFeed,
+    postCommandLog: PostCommandLog = emptyPostCommandLog,
     source: string = '',
 ): PostCommandLog => {
     const post: Post = {
@@ -137,7 +134,7 @@ export const testSharePost = (
 };
 
 export const testSharePosts = (source = '') => {
-    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandLog, source);
     const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1, source);
     const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2, source);
 
@@ -149,7 +146,7 @@ export const testSharePosts = (source = '') => {
 export const testSharePostsWithUpdate = () => {
     const source = '';
 
-    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandLog);
     const post1 = postCommandLogAfter1.commands[0].post;
     const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1);
     const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2);
@@ -169,7 +166,7 @@ export const testSharePostsWithUpdate = () => {
 export const testSharePostsWithRemove = () => {
     const source = '';
 
-    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLogAfter1 = testSharePost(1, emptyPostCommandLog);
     const postCommandLogAfter2 = testSharePost(2, postCommandLogAfter1);
     const postCommandLogAfter3 = testSharePost(3, postCommandLogAfter2);
     const post3 = postCommandLogAfter3.commands[2].post;
@@ -232,7 +229,7 @@ export const testMergeTwoLocalPostCommandLogsWithCommonAncestors = () => {
 };
 
 export const testMergeTwoCommandLogsWithUndefinedLeft = () => {
-    const postCommandLog1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog1 = testSharePost(1, emptyPostCommandLog);
     const postCommandLog2 = {
         ...postCommandLog1,
         commands: postCommandLog1.commands.map((command, index) => ({
@@ -250,7 +247,7 @@ export const testMergeTwoCommandLogsWithUndefinedLeft = () => {
 };
 
 export const testMergeTwoCommandLogsWithUndefinedRight = () => {
-    const postCommandLog1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog1 = testSharePost(1, emptyPostCommandLog);
     const postCommandLog2 = {
         ...postCommandLog1,
         commands: postCommandLog1.commands.map((command, index) => ({
@@ -268,7 +265,7 @@ export const testMergeTwoCommandLogsWithUndefinedRight = () => {
 };
 
 export const testMergeTwoCommandLogsWithCommonAncestors = () => {
-    const postCommandLog1After1 = testSharePost(1, emptyPostCommandFeed);
+    const postCommandLog1After1 = testSharePost(1, emptyPostCommandLog);
     const postCommandLog1After2 = testSharePost(2, postCommandLog1After1);
 
     const dateNow = 123456789;

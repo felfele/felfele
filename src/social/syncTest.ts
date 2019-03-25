@@ -9,9 +9,9 @@ import {
     getLatestPostsFromLog,
     mergePostCommandLogs,
     getPostCommandUpdatesSinceEpoch,
+    emptyPostCommandLog,
 } from './api';
 import {
-    emptyPostCommandFeed,
     testSharePost,
     testSharePosts,
     assertPostCommandLogInvariants,
@@ -52,7 +52,7 @@ const testSharePostStorage = async (id: number, postCommandLog: PostCommandLog, 
 };
 
 const testSharePostsStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
-    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandLog, source);
     const postCommandLogAfter2 = await testSharePost(2, postCommandLogAfter1, source);
     const postCommandLogAfter3 = await testSharePost(3, postCommandLogAfter2, source);
     assertPostCommandLogInvariants(postCommandLogAfter3);
@@ -66,7 +66,7 @@ const testSharePostsStorage = async (source = 'storage', storage: PostCommandLog
 
 const testLatestPostsAfterFirstSync = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const lastSeenEpoch = undefined;
-    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandLog, source);
 
     const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter1, storage);
     assertPostCommandLogInvariants(syncedCommandLog);
@@ -83,7 +83,7 @@ const testLatestPostsAfterFirstSync = async (source = 'storage', storage: PostCo
 };
 
 const testMergeTheSamePostWithOneUploadedStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
-    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandFeed, source);
+    const postCommandLogAfter1 = await testSharePost(1, emptyPostCommandLog, source);
 
     const syncedCommandLog = await uploadUnsyncedPostCommandsToStorage(postCommandLogAfter1, storage);
 
@@ -129,7 +129,7 @@ const testFetchLastThreePosts = async (storage: PostCommandLogStorage = defaultS
 
 const testSyncLocalEmptyPostCommandLogWithStorage = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     await testSharePostsStorage(source, storage);
-    const syncedPostCommandLog = await syncPostCommandLogWithStorage(emptyPostCommandFeed, storage);
+    const syncedPostCommandLog = await syncPostCommandLogWithStorage(emptyPostCommandLog, storage);
     Debug.log('testSyncLocalEmptyPostCommandLogWithStorage', 'syncedPostCommandLog', syncedPostCommandLog);
     assertPostCommandLogInvariants(syncedPostCommandLog);
 
