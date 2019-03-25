@@ -99,7 +99,7 @@ export const DebugScreen = (props: Props) => (
                         <MaterialCommunityIcon name='backup-restore' />
                     }
                     title='Backup & Restore'
-                    onPress={() => props.navigation.navigate<Routes, 'BackupRestore'>('BackupRestore', {})}
+                    onPress={() => props.navigation.navigate('BackupRestore', {})}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -107,7 +107,7 @@ export const DebugScreen = (props: Props) => (
                         <MaterialCommunityIcon name='server-network' />
                     }
                     title='Swarm settings'
-                    onPress={async () => props.navigation.navigate<Routes, 'SwarmSettingsContainer'>('SwarmSettingsContainer', {})}
+                    onPress={async () => props.navigation.navigate('SwarmSettingsContainer', {})}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -115,7 +115,7 @@ export const DebugScreen = (props: Props) => (
                         <IonIcon name='md-list' />
                     }
                     title='View logs'
-                    onPress={() => props.navigation.navigate<Routes, 'LogViewer'>('LogViewer', {})}
+                    onPress={() => props.navigation.navigate('LogViewer', {})}
                     buttonStyle='none'
                 />
             </ScrollView>

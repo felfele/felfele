@@ -24,7 +24,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
                 AsyncActions.createUserIdentity(),
                 AsyncActions.createOwnFeed(),
             ]));
-            navigation.navigate<Routes, 'Loading'>('Loading', {});
+            navigation.navigate('Loading', {});
         },
     };
 };

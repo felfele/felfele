@@ -24,7 +24,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
                 title={category.name}
                 buttonStyle='navigate'
                 onPress={() => {
-                    props.navigation.navigate<Routes, 'SubCategoriesContainer'>('SubCategoriesContainer', {
+                    props.navigation.navigate('SubCategoriesContainer', {
                         title: category.name,
                         subCategories: category.subCategories,
                     });

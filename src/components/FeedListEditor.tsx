@@ -125,7 +125,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             name: '',
             url: '',
         };
-        this.props.navigation.navigate<Routes, 'FeedInfo'>('FeedInfo', { feed: feed });
+        this.props.navigation.navigate('FeedInfo', { feed: feed });
     }
 }
 

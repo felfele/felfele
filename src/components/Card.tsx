@@ -213,7 +213,7 @@ const CardTopOriginalAuthorText = (props: {
         return (
             <TouchableView
                 style={{flexDirection: 'row'}}
-                onPress={() => props.navigation.navigate<Routes, 'Feed'>('Feed', {
+                onPress={() => props.navigation.navigate('Feed', {
                     feedUrl,
                     name,
                 })}
@@ -238,7 +238,7 @@ const CardTop = (props: {
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + urlUtils.getHumanHostname(url);
     const onPress = props.post.author
-        ? () => props.navigation.navigate<Routes, 'Feed'>('Feed', {
+        ? () => props.navigation.navigate('Feed', {
             feedUrl: props.post.author!.uri || '',
             name: authorName,
         })

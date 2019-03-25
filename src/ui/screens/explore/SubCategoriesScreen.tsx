@@ -28,7 +28,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
                 key={subCategory.name}
                 title={subCategory.name}
                 buttonStyle='navigate'
-                onPress={() => props.navigation.navigate<Routes, 'NewsSourceGridContainer'>('NewsSourceGridContainer', {
+                onPress={() => props.navigation.navigate('NewsSourceGridContainer', {
                     newsSources: subCategory.list,
                     subCategoryName: subCategory.name,
                 })}

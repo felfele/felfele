@@ -136,7 +136,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     <RowItem
                         title={VIEW_POSTS_LABEL}
                         buttonStyle='navigate'
-                        onPress={() => props.navigation.navigate<Routes, 'YourTab'>('YourTab', {})}
+                        onPress={() => props.navigation.navigate('YourTab', {})}
                     />
                     { props.ownFeed &&
                         <View style={styles.qrCodeContainer}>

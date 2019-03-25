@@ -62,7 +62,7 @@ export interface Routes {
 
 export interface TypedNavigation {
     goBack: (routeKey?: string | null) => boolean;
-    navigate: <T, K extends keyof T>(routeKey: K, params: T[K]) => boolean;
+    navigate: <K extends keyof Routes>(routeKey: K, params: Routes[K]) => boolean;
     pop: (n?: number, params?: { immediate?: boolean }) => boolean;
     getParam: <R, P extends keyof R>(param: P) => R[P];
     setParams: <R>(newParams: R) => boolean;

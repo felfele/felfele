@@ -53,7 +53,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                                    imageUri={imageUri}
                                    onPress={() => {
                                        this.props.downloadPostsForNewsSource(item);
-                                       this.props.navigation.navigate<Routes, 'NewsSourceFeed'>('NewsSourceFeed', {
+                                       this.props.navigation.navigate('NewsSourceFeed', {
                                            feed: item,
                                        });
                                    }}

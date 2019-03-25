@@ -238,7 +238,7 @@ const Root = createBottomTabNavigator(
                     />
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
-                    navigation.navigate<Routes, 'Post'>('Post', {});
+                    navigation.navigate('Post', {});
                 },
             },
         },

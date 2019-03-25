@@ -42,10 +42,10 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         openExplore: () => {
-            ownProps.navigation.navigate<Routes, 'CategoriesContainer'>('CategoriesContainer', {});
+            ownProps.navigation.navigate('CategoriesContainer', {});
         },
         onPressFeed: (feed: Feed) => {
-            ownProps.navigation.navigate<Routes, 'FeedFromList'>('FeedFromList', {
+            ownProps.navigation.navigate('FeedFromList', {
                 feedUrl: feed.feedUrl,
                 name: feed.name,
             });

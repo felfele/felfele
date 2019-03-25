@@ -56,7 +56,7 @@ export const SettingsEditor = (props: Props) => {
                                 <GridCard
                                     title={item.name}
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
-                                    onPress={() => props.navigation.navigate<Routes, 'FeedSettings'>('FeedSettings', { feed: item as any })}
+                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
                                     size={itemDimension}
                                     modelHelper={modelHelper}
                                 />
@@ -88,12 +88,12 @@ export const SettingsEditor = (props: Props) => {
                 <RowItem
                     title='Filters'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate<Routes, 'FilterListEditorContainer'>('FilterListEditorContainer', {})}
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
                 />
                 <RowItem
                     title='Send bug report'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate<Routes, 'BugReportView'>('BugReportView', {})}
+                    onPress={() => props.navigation.navigate('BugReportView', {})}
                     />
                 <RowItem
                     title={version}
@@ -107,7 +107,7 @@ export const SettingsEditor = (props: Props) => {
                     }
                     title='Debug menu'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate<Routes, 'Debug'>('Debug', {})}
+                    onPress={() => props.navigation.navigate('Debug', {})}
                 />
                 }
             </ScrollView>

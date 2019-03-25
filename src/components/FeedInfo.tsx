@@ -97,7 +97,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 onSuccess();
             }
             this.onAdd(feed);
-            this.props.navigation.navigate<Routes, 'Feed'>('Feed', {
+            this.props.navigation.navigate('Feed', {
                 feedUrl: feed.feedUrl,
                 name: feed.name,
             });

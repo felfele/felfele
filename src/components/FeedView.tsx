@@ -44,11 +44,11 @@ export const FeedView = (props: Props) => {
         onPress,
     });
     const toggleFavorite = () => props.onToggleFavorite(props.feedUrl);
-    const navigateToFeedSettings = () => props.navigation.navigate<Routes, 'FeedSettings'>(
+    const navigateToFeedSettings = () => props.navigation.navigate(
         'FeedSettings',
         { feed: props.feeds[0] as LocalFeed },
     );
-    const navigateToFeedInfo = () => props.navigation.navigate<Routes, 'FeedInfo'>(
+    const navigateToFeedInfo = () => props.navigation.navigate(
         'FeedInfo', {
             feed: props.feeds[0],
         }

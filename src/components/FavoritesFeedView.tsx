@@ -37,7 +37,7 @@ export const FavoritesFeedView = (props: Props) => {
                     <NavigationHeader
                         title='Favorites'
                         rightButton1={{
-                            onPress: () => props.navigation.navigate<Routes, 'FeedListViewerContainer'>(
+                            onPress: () => props.navigation.navigate(
                                 'FeedListViewerContainer', {
                                     feeds: props.feeds,
                                     showExplore: false,

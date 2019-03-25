@@ -41,7 +41,7 @@ export class FeedHeader extends React.PureComponent<Props> {
             createdAt: Date.now(),
         };
         this.props.onSaveDraft(post);
-        this.props.navigation.navigate<Routes, 'Post'>('Post', {});
+        this.props.navigation.navigate('Post', {});
     }
 
     public render() {
@@ -53,7 +53,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                 <ProfileIcon profileImage={this.props.profileImage} gatewayAddress={this.props.gatewayAddress}/>
                 <TouchableView
                     onPress={() =>
-                        this.props.navigation.navigate<Routes, 'Post'>('Post', {})
+                        this.props.navigation.navigate('Post', {})
                     }
                     style={styles.headerTextContainer}
                     hitSlop={{

@@ -49,7 +49,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
     }
 
     private editFilter = (filter: ContentFilter) => {
-        this.props.navigation.navigate<Routes, 'EditFilter'>('EditFilter', { filter: filter });
+        this.props.navigation.navigate('EditFilter', { filter: filter });
     }
 
     private onAddFilter = () => {
@@ -58,7 +58,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
             createdAt: 0,
             validUntil: 0,
         };
-        this.props.navigation.navigate<Routes, 'EditFilter'>('EditFilter', { filter: filter });
+        this.props.navigation.navigate('EditFilter', { filter: filter });
     }
 }
 
