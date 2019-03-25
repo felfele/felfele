@@ -347,7 +347,11 @@ export const AsyncActions = {
                 });
 
                 if (getState().author.image.uri == null) {
-                    dispatch(Actions.updateAuthorImage(storageSyncUpdate.recentPostFeed.authorImage));
+                    const authorImage = {
+                        ...getState().author.image,
+                        uri: storageSyncUpdate.recentPostFeed.authorImage.uri,
+                    };
+                    dispatch(Actions.updateAuthorImage(authorImage));
                 }
 
                 // Re-check if there were an update to the command log during syncing
