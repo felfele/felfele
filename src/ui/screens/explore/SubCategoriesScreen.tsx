@@ -5,6 +5,7 @@ import { RegularText } from '../../misc/text';
 import { SubCategory } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
@@ -43,6 +44,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
                 </RegularText>
                 {subCategories}
             </ScrollView>
+            <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
         </SafeAreaView>
     );
 };

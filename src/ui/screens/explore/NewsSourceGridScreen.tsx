@@ -9,6 +9,7 @@ import { NewsSource } from '../../../models/recommendation/NewsSource';
 import { RSSFeedManager } from '../../../RSSPostManager';
 import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
+import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 export interface StateProps {
     gatewayAddress: string;
@@ -68,6 +69,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                         <ActivityIndicator style={styles.activityIndicator} size='large'/>
                     </View>
                 }
+                <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
             </SafeAreaView>
         );
     }

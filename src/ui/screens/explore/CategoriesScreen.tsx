@@ -5,6 +5,7 @@ import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 
@@ -40,6 +41,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
                 </RegularText>
                 {categories}
             </ScrollView>
+            <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
         </SafeAreaView>
     );
 };
