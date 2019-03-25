@@ -8,7 +8,7 @@ import { mapDispatchToProps as defaultMapDispatchToProps } from '../containers/F
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const navParamFeed = ownProps.navigation.getParam<Routes['NewsSourceFeed'], 'feed'>('feed');
+    const navParamFeed = ownProps.navigation.getParam<'NewsSourceFeed', 'feed'>('feed');
     const addedFeed = state.feeds.find(value => value.feedUrl === navParamFeed.feedUrl);
     const feeds = addedFeed != null ? [ addedFeed ] : [ navParamFeed ];
     const feedName = navParamFeed.name;

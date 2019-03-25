@@ -8,7 +8,7 @@ import { TypedNavigation, Routes } from '../helpers/navigation';
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     // this fixes rerendering after unfollow
     updateNavParam(state.feeds, ownProps.navigation);
-    const navParamFeed = ownProps.navigation.getParam<Routes['FeedInfo'], 'feed'>('feed');
+    const navParamFeed = ownProps.navigation.getParam<'FeedInfo', 'feed'>('feed');
     const isKnownFeed = state.feeds.find(feed => navParamFeed.feedUrl === feed.feedUrl) != null;
 
     return {
@@ -20,12 +20,12 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 };
 
 const updateNavParam = (feeds: Feed[], navigation: TypedNavigation) => {
-    const feedUrl = navigation.getParam<Routes['FeedInfo'], 'feed'>('feed').feedUrl;
-    const isFollowed = navigation.getParam<Routes['FeedInfo'], 'feed'>('feed').followed;
+    const feedUrl = navigation.getParam<'FeedInfo', 'feed'>('feed').feedUrl;
+    const isFollowed = navigation.getParam<'FeedInfo', 'feed'>('feed').followed;
 
     const updatedFeed = feeds.find(feed => feed.feedUrl === feedUrl);
     if (updatedFeed != null && updatedFeed.followed !== isFollowed) {
-        navigation.setParams<Routes['FeedInfo']>({ feed: updatedFeed });
+        navigation.setParams<'FeedInfo'>({ feed: updatedFeed });
     }
 };
 

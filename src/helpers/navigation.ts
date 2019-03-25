@@ -61,9 +61,10 @@ export interface Routes {
 }
 
 export interface TypedNavigation {
-    goBack: (routeKey?: string | null) => boolean;
+    goBack: <K extends keyof Routes>(routeKey?: K | null) => boolean;
     navigate: <K extends keyof Routes>(routeKey: K, params: Routes[K]) => boolean;
     pop: (n?: number, params?: { immediate?: boolean }) => boolean;
-    getParam: <R, P extends keyof R>(param: P) => R[P];
-    setParams: <R>(newParams: R) => boolean;
+    getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => K[P];
+    setParams: <K extends keyof Routes>(newParams: Routes[K]) => boolean;
 }
+//         navigation.setParams<Routes['FeedInfo']>({ feed: updatedFeed });

@@ -14,8 +14,8 @@ export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favorit
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     // TODO: update favicons?
-    const navParamFeeds = ownProps.navigation.getParam<Routes['FeedListViewerContainer'], 'feeds'>('feeds');
-    const navParamShowExplore = ownProps.navigation.getParam<Routes['FeedListViewerContainer'], 'showExplore'>('showExplore');
+    const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
+    const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
     const ownFeeds = navParamFeeds
         ? []
         : state.ownFeeds

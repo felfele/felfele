@@ -6,8 +6,8 @@ import { AsyncActions } from '../../../actions/Actions';
 import { TypedNavigation, Routes } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const subCategoryName = ownProps.navigation.getParam<Routes['NewsSourceGridContainer'], 'subCategoryName'>('subCategoryName');
-    const newsSources = ownProps.navigation.getParam<Routes['NewsSourceGridContainer'], 'newsSources'>('newsSources');
+    const subCategoryName = ownProps.navigation.getParam<'NewsSourceGridContainer', 'subCategoryName'>('subCategoryName');
+    const newsSources = ownProps.navigation.getParam<'NewsSourceGridContainer', 'newsSources'>('newsSources');
 
     return {
         subCategoryName: subCategoryName,

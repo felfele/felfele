@@ -7,8 +7,8 @@ import { getFeedPosts, getYourPosts } from '../selectors/selectors';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const feedUrl = ownProps.navigation.getParam<Routes['Feed'], 'feedUrl'>('feedUrl');
-    const feedName = ownProps.navigation.getParam<Routes['Feed'], 'name'>('name');
+    const feedUrl = ownProps.navigation.getParam<'Feed', 'feedUrl'>('feedUrl');
+    const feedName = ownProps.navigation.getParam<'Feed', 'name'>('name');
 
     const isOwnFeed = feedName === state.author.name;
     const hasOwnFeed = state.ownFeeds.length > 0;

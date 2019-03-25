@@ -4,8 +4,8 @@ import { AppState } from '../../../reducers/AppState';
 import { Routes } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
-    const navParamTitle = ownProps.navigation.getParam<Routes['SubCategoriesContainer'], 'title'>('title');
-    const navParamSubCategories = ownProps.navigation.getParam<Routes['SubCategoriesContainer'], 'subCategories'>('subCategories');
+    const navParamTitle = ownProps.navigation.getParam<'SubCategoriesContainer', 'title'>('title');
+    const navParamSubCategories = ownProps.navigation.getParam<'SubCategoriesContainer', 'subCategories'>('subCategories');
     return {
         title: navParamTitle,
         subCategories: navParamSubCategories,
