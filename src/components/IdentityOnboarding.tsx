@@ -13,9 +13,9 @@ import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { DispatchProps } from './IdentitySettings';
 import { TouchableView } from './TouchableView';
+import { defaultImages } from '../defaultImages';
 
-// tslint:disable-next-line:no-var-requires
-const defaultUserImage = require('../../images/user_circle-white.png');
+const defaultUserImage = defaultImages.userCircleWhite;
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export { DispatchProps };

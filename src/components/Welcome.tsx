@@ -10,6 +10,7 @@ import { ImageData } from '../models/ImageData';
 import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
 import { defaultAuthor } from '../reducers';
+import { defaultImages} from '../defaultImages';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;
@@ -47,7 +48,7 @@ export class Welcome extends React.PureComponent<Props, State> {
                 }}
                 pages={[{
                     backgroundColor: Colors.BRAND_PURPLE,
-                    image: <Image source={require('../../images/icon-white-transparent.png')} style={{
+                    image: <Image source={defaultImages.iconWhiteTransparent} style={{
                         width: 150,
                         height: 150,
                     }}/>,

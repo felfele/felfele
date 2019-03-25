@@ -14,6 +14,7 @@ import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { defaultImages } from '../defaultImages';
 
 export interface StateProps {
     navigation: any;
@@ -82,12 +83,13 @@ const ProfileIcon = (props: { profileImage: ImageData, gatewayAddress: string })
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const imageUri = modelHelper.getImageUri(props.profileImage);
     const imageSource = imageUri === ''
-        ? require('../../images/user_circle.png')
+        ? defaultImages.userCircle
         : { uri: imageUri };
     return (
         <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',

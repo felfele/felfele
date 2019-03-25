@@ -6,6 +6,7 @@ import { ModelHelper } from '../models/ModelHelper';
 
 export interface StateProps extends ImageProperties {
     source: ImageData;
+    defaultImage?: number;
     style: StyleProp<ImageStyle>;
     modelHelper: ModelHelper;
 }
@@ -19,7 +20,10 @@ export interface State {
 }
 
 export const ImageDataView = (props: Props) => {
-    const imageUri = props.modelHelper.getImageUri(props.source);
+    const sourceImageUri = props.modelHelper.getImageUri(props.source);
+    const source = sourceImageUri !== '' || props.defaultImage == null
+        ? { uri: sourceImageUri }
+        : props.defaultImage;
     const width = props.style
         ? StyleSheet.flatten(props.style).width != null
             ? StyleSheet.flatten(props.style).width
@@ -32,9 +36,7 @@ export const ImageDataView = (props: Props) => {
         : props.source.height;
     return (
         <Image
-            source={{
-                uri: imageUri,
-            }}
+            source={source}
             style={[props.style, {
                 width: width,
                 height: height,

@@ -13,6 +13,7 @@ import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { defaultImages } from '../defaultImages';
 
 export interface StateProps {
     navigation: any;
@@ -57,6 +58,7 @@ export const SettingsEditor = (props: Props) => {
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
                                     onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
                                     size={itemDimension}
+                                    defaultImage={defaultImages.userCircle}
                                 />
                         );
                     }}
