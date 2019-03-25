@@ -9,7 +9,7 @@ import { Buffer } from 'buffer';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
-export const defaultPrefix = 'bzz://';
+export const defaultPrefix = 'bzz:/';
 export const defaultFeedPrefix = 'bzz-feed:/';
 const hashLength = 64;
 
@@ -53,7 +53,12 @@ export const isSwarmLink = (link: string): boolean => {
 
 export const getSwarmGatewayUrl = (swarmUrl: string, gatewayAddress: string): string => {
     if (isSwarmLink(swarmUrl)) {
-        return gatewayAddress + defaultUrlScheme + swarmUrl.slice(defaultPrefix.length);
+        const legacyDefaultPrefix = defaultPrefix + '/';
+        const correctSwarmUrl = swarmUrl.startsWith(legacyDefaultPrefix)
+            ? swarmUrl.replace(legacyDefaultPrefix, defaultPrefix)
+            : swarmUrl
+            ;
+        return gatewayAddress + defaultUrlScheme + correctSwarmUrl.slice(defaultPrefix.length);
     }
     if (swarmUrl.length === hashLength) {
         return gatewayAddress + defaultUrlScheme + swarmUrl;
