@@ -10,6 +10,7 @@ import {
     getLatestPostsFromLog,
     epochCompare,
     PostCommandProtocolVersion,
+    emptyPostCommandLog,
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
@@ -74,7 +75,11 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
             topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
         };
         const feedApi = Swarm.makeReadableFeedApi(postCommandLogFeedAddress, swarmApi.swarmGateway);
-        return await fetchSwarmPostCommandLog(feedApi, until);
+        try {
+            return await fetchSwarmPostCommandLog(feedApi, until);
+        } catch (e) {
+            return emptyPostCommandLog;
+        }
     },
     uploadRecentPostFeed: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed) => {
         return await uploadRecentPostFeed(swarmApi, postCommandLog, recentPostFeed, swarmHelpers);
@@ -128,7 +133,7 @@ const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, unt
         return postCommandLog;
     } catch (e) {
         Debug.log('fetchSwarmPostCommandLog', e);
-        return postCommandLog;
+        throw e;
     }
 };
 
@@ -336,7 +341,7 @@ const updateRecentPostFeed = async (swarm: Swarm.Api, postFeed: RecentPostFeed):
         };
     } catch (e) {
         Debug.log('updatePostFeed failed, ', e);
-        return postFeed;
+        throw e;
     }
 };
 
@@ -373,16 +378,7 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
         return postFeedWithGatewayImageLinks;
     } catch (e) {
         Debug.log('downloadPostFeed failed: ', e);
-        return {
-            posts: [],
-            name: '',
-            url: '',
-            feedUrl: '',
-            favicon: '',
-            authorImage: {
-                localPath: '',
-            },
-        };
+        throw e;
     }
 };
 

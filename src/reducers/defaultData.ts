@@ -80,9 +80,9 @@ export const defaultFeeds: Feed[] = [
     },
     {
         name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        favicon: 'https://swarm-gateways.net/bzz:/c9cdca819b043fd07394ca1f85be18eaaa6073f0cd16e585fdc7dfd79119b5f5/icon.png',
+        url: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
+        feedUrl: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
+        favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
         followed: true,
     },
     {
