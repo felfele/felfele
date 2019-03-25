@@ -20,128 +20,23 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post } from '../models/Post';
-import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
+import { Author } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
-import * as Swarm from '../swarm/Swarm';
+import {
+    defaultFeeds,
+    defaultSettings,
+    defaultAuthor,
+    defaultCurrentTimestamp,
+    defaultLocalPosts,
+    defaultMetadata,
+    defaultState,
+} from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
-
-const defaultSettings: Settings = {
-    saveToCameraRoll: true,
-    showSquareImages: false,
-    showDebugMenu: false,
-    swarmGatewayAddress: Swarm.defaultGateway,
-};
-
-export const defaultAuthor: Author = {
-    name: DEFAULT_AUTHOR_NAME,
-    uri: '',
-    image: {
-        uri: '',
-    },
-    identity: undefined,
-};
-
-export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
-
-const onboardingAuthor: Author = {
-    name: FELFELE_ASSISTANT_NAME,
-    uri: '',
-    image: {},
-};
-
-const defaultPost1: Post = {
-    _id: 0,
-    createdAt: Date.now(),
-    images: [],
-    text: `Basic features:.
-
-Post text and images privately, and later add the posts to your public feed.
-
-Follow the public feed of others, or add your favorite RSS/Atom feeds.
-
-If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
-    author: onboardingAuthor,
-};
-
-const defaultPost2: Post = {
-    _id: 1,
-    createdAt: Date.now(),
-    images: [],
-    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
-    author: onboardingAuthor,
-};
-
-const defaultPost3: Post = {
-    _id: 2,
-    createdAt: Date.now(),
-    images: [],
-    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
-    author: onboardingAuthor,
-};
-
-export const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
-
-const defaultCurrentTimestamp = 0;
-
-const defaultMetadata = {
-    highestSeenPostId: defaultLocalPosts.length - 1,
-};
-
-const defaultFeeds: Feed[] = [
-    {
-        name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
-        feedUrl: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
-        favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
-        followed: true,
-    },
-    {
-        name: 'The Verge',
-        url: 'https://theverge.com/',
-        feedUrl: 'https://www.theverge.com/rss/index.xml',
-        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png',
-        followed: true,
-    },
-    {
-        name: 'Wired Photos',
-        url: 'https://www.wired.com/',
-        feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: 'https://static.savings-united.com/image_setting/132/logo/wired_coupons_logo.png',
-        followed: true,
-    },
-    {
-        name: '500px Blog',
-        url: 'https://iso.500px.com',
-        feedUrl: 'https://iso.500px.com/feed',
-        favicon: 'https://iso.500px.com/wp-content/uploads/2017/10/cropped-FAVICON-180x180.png',
-        followed: true,
-    },
-    {
-        name: 'Favorite Places – Outdoor Photographer',
-        url: 'https://www.outdoorphotographer.com',
-        feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
-        favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
-        followed: true,
-    },
-];
-
-export const defaultState: AppState = {
-    contentFilters: [],
-    feeds: defaultFeeds,
-    ownFeeds: [],
-    settings: defaultSettings,
-    author: defaultAuthor,
-    currentTimestamp: defaultCurrentTimestamp,
-    rssPosts: [],
-    localPosts: defaultLocalPosts,
-    draft: null,
-    metadata: defaultMetadata,
-};
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -428,7 +323,7 @@ class FelfelePersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })];
-    public blacklist = ['currentTimestamp'];
+    public blacklist = ['currentTimestamp', 'exploreData'];
     public key = 'root';
     public storage = AsyncStorage;
     public version = currentAppStateVersion;

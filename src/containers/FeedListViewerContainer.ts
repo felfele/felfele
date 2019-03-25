@@ -5,7 +5,13 @@ import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedLis
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps & DispatchProps => {
+const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 : 0) - (a.favorite === true ? 1 : 0);
+
+const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
+
+export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
+
+const mapStateToProps = (state: AppState, ownProps: { navigation: any, showExplore: boolean }): StateProps => {
     // TODO: update favicons?
     const ownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
         ? []
@@ -24,14 +30,21 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateP
         followedFeeds: followedFeeds,
         knownFeeds: knownFeeds,
         navigation: ownProps.navigation,
-        onPressFeed: onPressFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
         title: 'All feeds',
+        showExplore: ownProps.navigation.state.params.showExplore,
     };
 };
 
-const onPressFeed = (navigation: any, feed: Feed) => {
-    navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: any }): DispatchProps => {
+    return {
+        openExplore: () => {
+            ownProps.navigation.navigate('CategoriesContainer');
+        },
+        onPressFeed: (navigation: any, feed: Feed) => {
+            navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
+        },
+    };
 };
 
-export const FeedListViewerContainer = connect(mapStateToProps)(FeedListEditor);
+export const FeedListViewerContainer = connect(mapStateToProps, mapDispatchToProps)(FeedListEditor);

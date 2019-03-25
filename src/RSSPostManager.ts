@@ -4,9 +4,11 @@ import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
 import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
+import * as urlUtils from './helpers/urlUtils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 import { Debug } from './Debug';
+import { Version } from './Version';
 // tslint:disable-next-line:no-var-requires
 const he = require('he');
 
@@ -65,6 +67,18 @@ const RSSMimeTypes = [
     'application/xml',
     'text/xml',
 ];
+
+// this is needed for tumblr
+const HEADERS_WITH_CURL = {
+    'User-Agent': 'curl/7.54.0',
+    'Accept': '*/*',
+};
+
+// this is needed for reddit (https://github.com/reddit-archive/reddit/wiki/API)
+const HEADERS_WITH_FELFELE = {
+    'User-Agent': `react-native:org.felfele.felfele:${Version}`,
+    'Accept': '*/*',
+};
 
 export class RSSFeedManager {
     public static getFeedUrlFromHtmlLink(link: Node): string {
@@ -141,7 +155,10 @@ export class RSSFeedManager {
     }
 
     public static async fetchContentWithMimeType(url: string): Promise<ContentWithMimeType | null> {
-        const response = await fetch(url);
+        const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
+        const response = await fetch(url, {
+            headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
+        });
         if (response.status !== 200) {
             Debug.log('fetch failed: ', response);
             return null;
@@ -166,10 +183,10 @@ export class RSSFeedManager {
     public static getFeedFromHtml(baseUrl: string, html: string): Feed {
         const feed = RSSFeedManager.parseFeedFromHtml(html);
         if (feed.feedUrl !== '') {
-            feed.feedUrl = Utils.createUrlFromUrn(feed.feedUrl, baseUrl);
+            feed.feedUrl = urlUtils.createUrlFromUrn(feed.feedUrl, baseUrl);
         }
         if (feed.favicon !== '') {
-            feed.favicon = Utils.createUrlFromUrn(feed.favicon, baseUrl);
+            feed.favicon = urlUtils.createUrlFromUrn(feed.favicon, baseUrl);
         }
         if (feed.name.search(' - ') >= 0) {
             feed.name = feed.name.replace(/ - .*/, '');
@@ -226,7 +243,7 @@ export class RSSFeedManager {
         Debug.log('fetchFeedFromUrl contentWithMimeType: ', contentWithMimeType);
 
         if (contentWithMimeType.mimeType === 'text/html') {
-            const baseUrl = Utils.getBaseUrl(url);
+            const baseUrl = urlUtils.getBaseUrl(url);
             Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
             Debug.log('fetchFeedFromUrl feed: ', feed);
@@ -239,7 +256,7 @@ export class RSSFeedManager {
                 altFeedLocations.unshift('/');
             }
             for (const altFeedLocation of altFeedLocations) {
-                const altUrl = Utils.createUrlFromUrn(altFeedLocation, baseUrl);
+                const altUrl = urlUtils.createUrlFromUrn(altFeedLocation, baseUrl);
                 const altFeedUrl = await RSSFeedManager.fetchRSSFeedUrlFromUrl(altUrl);
                 if (altFeedUrl !== '') {
                     feed.feedUrl = altFeedUrl;
@@ -253,7 +270,7 @@ export class RSSFeedManager {
             const rssFeed = await feedHelper.load(url, contentWithMimeType.content);
             Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
             const feedUrl = (rssFeed.feed && rssFeed.feed.url) || undefined;
-            const baseUrl = Utils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
+            const baseUrl = urlUtils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
             Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
@@ -272,7 +289,11 @@ export class RSSFeedManager {
             if (feed.name === '') {
                 feed.name = feedFromHtml.name;
             }
-            feed.favicon = feedFromHtml.favicon;
+            if (urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM) {
+                feed.favicon = await FaviconCache.getFavicon(url);
+            } else {
+                feed.favicon = feedFromHtml.favicon;
+            }
             return feed;
         }
 
@@ -317,8 +338,14 @@ class _RSSPostManager {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
-                const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
-                Debug.log('RSSPostManager: ', rssFeed, favicon);
+                const storedFeed = storedFeeds.find(feed => urlUtils.compareUrlWithoutProtocol(feed.url, rssFeed.url));
+                const favicon = storedFeed && storedFeed.favicon
+                    ? storedFeed.favicon
+                    : rssFeed.icon
+                        ? rssFeed.icon
+                        : ''
+                ;
+                Debug.log('RSSPostManager.loadPosts', 'rssFeed', rssFeed, 'favicon', favicon);
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
@@ -332,7 +359,7 @@ class _RSSPostManager {
 
         if (__DEV__) {
             const stats = metrics
-                .map(metric => `${Utils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
+                .map(metric => `${urlUtils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
                 .join('\n');
 
             const elapsed = Date.now() - startTime;
@@ -412,8 +439,8 @@ class _RSSPostManager {
     }
 
     public isTitleSameAsText(title: string, text: string): boolean {
-        const replacedText = Utils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
-        const trimmedTitle = Utils.stripNonAscii(title.trim());
+        const replacedText = urlUtils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
+        const trimmedTitle = urlUtils.stripNonAscii(title.trim());
         const isSame =  this.matchString(trimmedTitle, replacedText);
         return isSame;
     }
@@ -437,7 +464,6 @@ class _RSSPostManager {
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
-        const uniques: Set<string> = new Set();
         const strippedFavicon = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const markdown = this.htmlToMarkdown(item.description);
@@ -478,11 +504,6 @@ class _RSSPostManager {
             if (post.link != null) {
                 links.add(post.link);
             }
-
-            if (uniques.has(post.text)) {
-                return false;
-            }
-            uniques.add(post.text);
 
             return true;
         });
@@ -540,8 +561,8 @@ const xml2js = require('react-native-xml2js');
 
 interface FeedHelper {
     DefaultTimeout: number;
-    fetch: any;
-    load: any;
+    fetch: (url: string) => Promise<FeedWithMetrics>;
+    load: (url: string, xml: string, startTime?: number, downloadTime?: number) => Promise<FeedWithMetrics>;
     parser: any;
     getDate: any;
     parseAtom: any;
@@ -551,15 +572,14 @@ const feedHelper: FeedHelper = {
     DefaultTimeout: 10000,
     fetch: async (url: string): Promise<FeedWithMetrics> => {
         const startTime = Date.now();
+        const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
         const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-                'Accept': 'text/html,application/xhtml+xml',
-            },
+            headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
         }));
         const downloadTime = Date.now();
         if (response.status === 200) {
             const xml = await response.text();
+
             return feedHelper.load(url, xml, startTime, downloadTime);
         } else {
             throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
@@ -611,6 +631,7 @@ const feedHelper: FeedHelper = {
         return null;
     },
 
+    // TODO is this atom?
     parseAtom: (json: any) => {
         const feed = json.feed;
         const rss: any = { items: [] };
@@ -693,12 +714,8 @@ const feedHelper: FeedHelper = {
 
                 }
                 rss.items.push(obj);
-
             });
-
         }
         return rss;
-
     },
-
 };

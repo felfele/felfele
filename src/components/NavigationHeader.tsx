@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, DefaultNavigationBarHeight } from '../styles';
@@ -27,7 +27,7 @@ const BUTTON_COLOR = Colors.DARK_GRAY;
 
 export const HeaderDefaultLeftButtonIcon = <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />;
 
-const Header = (props: Props) => (
+export const NavigationHeader = (props: Props) => (
     <View style={styles.headerContainer}>
         <TouchableView onPress={
                 props.leftButton != null
@@ -69,10 +69,6 @@ const Header = (props: Props) => (
         </View>
     </View>
 );
-
-export const NavigationHeader = (props: Props) => {
-        return <Header {...props}/>;
-};
 
 const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
     return (

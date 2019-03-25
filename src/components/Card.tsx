@@ -5,7 +5,7 @@ import { Colors } from '../styles';
 import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
-import { Utils } from '../Utils';
+import * as urlUtils from '../helpers/urlUtils';
 import { ImageDataView } from './ImageDataView';
 import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
@@ -16,7 +16,8 @@ import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
-import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
+import { Author } from '../models/Author';
+import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -225,7 +226,7 @@ const CardTop = (props: {
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
     const authorName = props.post.author ? props.post.author.name : DEFAULT_AUTHOR_NAME;
     const url = props.post.link || '';
-    const hostnameText = url === '' ? '' : ' -  ' + Utils.getHumanHostname(url);
+    const hostnameText = url === '' ? '' : ' -  ' + urlUtils.getHumanHostname(url);
     const onPress = props.post.author
         ? () => props.navigate('Feed', {
             feedUrl: props.post.author!.uri || '',

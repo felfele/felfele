@@ -35,12 +35,12 @@ const UNLISTED_EXPLANATION = 'Anyone with a link to your feed can follow it.';
 export const FeedSettingsScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
                 navigation={props.navigation}
                 title={props.feed.name}
             />
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 <Image
                     source={{
                         uri: modelHelper.getImageUri(props.feed.authorImage),

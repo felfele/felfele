@@ -57,6 +57,7 @@ export const SettingsEditor = (props: Props) => {
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
                                     onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
                                     size={itemDimension}
+                                    modelHelper={modelHelper}
                                 />
                         );
                     }}
@@ -71,11 +72,6 @@ export const SettingsEditor = (props: Props) => {
                 >
                     {PREFERENCES_LABEL}
                 </RegularText>
-                <RowItem
-                    title='Feeds'
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FeedListEditorContainer')}
-                />
                 <RowItem
                     title='Save to Camera Roll'
                     switchState={props.settings.saveToCameraRoll}

@@ -38,7 +38,9 @@ export class AllFeedScreen extends React.Component<Props> {
                     navigationHeader: <NavigationHeader
                                     title='All feeds'
                                     rightButton1={{
-                                        onPress: () => this.props.navigation.navigate('FeedListViewerContainer'),
+                                        onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
+                                            showExplore: true,
+                                        }),
                                         label: <Icon
                                             name={'view-grid'}
                                             size={20}

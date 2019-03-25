@@ -37,8 +37,10 @@ export const FavoritesFeedView = (props: Props) => {
                         title='Favorites'
                         rightButton1={{
                             onPress: () => props.navigation.navigate(
-                                'FeedListViewerContainer',
-                                { feeds: props.feeds }
+                                'FeedListViewerContainer', {
+                                    feeds: props.feeds,
+                                    showExplore: false,
+                                }
                             ),
                             label: <Icon
                                 name={'view-grid'}

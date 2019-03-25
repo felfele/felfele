@@ -11,7 +11,6 @@ import { setCustomText } from 'react-native-global-props';
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
 import { store, persistor } from './reducers';
-import { FeedListEditorContainer } from './containers/FeedListEditorContainer';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
@@ -36,6 +35,10 @@ import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportView } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
+import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
+import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
+import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
+import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -111,11 +114,26 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     FeedListViewerContainer: {
         screen: FeedListViewerContainer,
     },
+    CategoriesContainer: {
+        screen: CategoriesContainer,
+    },
+    SubCategoriesContainer: {
+        screen: SubCategoriesContainer,
+    },
+    NewsSourceGridContainer: {
+        screen: NewsSourceGridContainer,
+    },
+    NewsSourceFeed: {
+        screen: NewsSourceFeedContainer,
+    },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
     },
     FeedSettings: {
         screen: FeedSettingsContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
     },
 };
 
@@ -149,9 +167,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     Backup: {
         screen: BackupContainer,
-    },
-    FeedListEditorContainer: {
-        screen: FeedListEditorContainer,
     },
     Feed: {
         screen: SettingsFeedViewContainer,
@@ -288,9 +303,6 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: PostEditorContainer,
-    },
-    FeedInfo: {
-        screen: FeedInfoContainer,
     },
 };
 

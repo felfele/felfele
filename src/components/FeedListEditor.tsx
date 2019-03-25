@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Props as NavHeaderProps } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -15,6 +15,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 
 export interface DispatchProps {
     onPressFeed: (navigation: any, feed: Feed) => void;
+    openExplore: () => void;
 }
 
 export interface StateProps {
@@ -24,9 +25,10 @@ export interface StateProps {
     knownFeeds: Feed[];
     gatewayAddress: string;
     title: string;
+    showExplore: boolean;
 }
 
-export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactElement<NavHeaderProps>}> {
+export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactNode}> {
     public render() {
         const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
@@ -70,6 +72,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(this.props.navigation, item)}
                                 size={itemDimension}
+                                modelHelper={modelHelper}
                             />
                         );
                     }}
@@ -97,6 +100,23 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         }}
                         title={this.props.title}
                     />
+                    {this.props.showExplore &&
+                    <TouchableWithoutFeedback
+                        onPress={() => this.props.openExplore()}
+                    >
+                        <View style={{
+                            backgroundColor: Colors.WHITE,
+                            height: 44,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <View style={{ paddingTop: 1, paddingRight: 4 }}>
+                                <Icon name='compass' size={20} color={Colors.DARK_GRAY}/>
+                            </View>
+                            <MediumText style={{ fontSize: 12, color: Colors.DARK_GRAY }}>EXPLORE PUBLIC FEEDS</MediumText>
+                        </View>
+                    </TouchableWithoutFeedback>}
                 </FeedGrid>
             </SafeAreaView>
         );
