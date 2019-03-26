@@ -1,0 +1,53 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "fonts/Roboto-Bold.ttf",
+      "sha1": "6cbb57ba2355cf442e06899898ff5af55867103e"
+    },
+    {
+      "path": "fonts/Roboto-Medium.ttf",
+      "sha1": "adbc3bde424bcf7dbc38f148005c8319825891f2"
+    },
+    {
+      "path": "fonts/Roboto-Regular.ttf",
+      "sha1": "1d1d41fcadc571decb6444211b7993b99ce926e2"
+    },
+    {
+      "path": "images/balloon.svg",
+      "sha1": "6ffe771d93deee38d42ebcee715eb127c9a54ddf"
+    },
+    {
+      "path": "images/bug.svg",
+      "sha1": "b407e308255a705997de6f1f185599fbddf0bb85"
+    },
+    {
+      "path": "images/compass.svg",
+      "sha1": "b12beba38b39b8da1b23db49f57df1359a8f27db"
+    },
+    {
+      "path": "images/ghost.svg",
+      "sha1": "ea59e8832a6abbed04f14408796077812e8e33d6"
+    },
+    {
+      "path": "images/icon-white-transparent.png",
+      "sha1": "e94c04815ce9e09c0bcd9c5bc9faa4b3d308c9f8"
+    },
+    {
+      "path": "images/link.svg",
+      "sha1": "7413156ecd2769ea4e620940902a14438b641912"
+    },
+    {
+      "path": "images/snorkeling.svg",
+      "sha1": "a5be66096a68bc34f6311d808ccfa34aea335044"
+    },
+    {
+      "path": "images/user_circle-white.png",
+      "sha1": "7595d032b39c1bf773a1a0b12dd9e77f6fa39f27"
+    },
+    {
+      "path": "images/user_circle.png",
+      "sha1": "123f5ee2a4304b80ced77b073043b362b910d9d2"
+    }
+  ]
+}

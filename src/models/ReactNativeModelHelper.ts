@@ -5,15 +5,17 @@ import { ModelHelper } from './ModelHelper';
 import { ImageData } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
+const FILE_PROTOCOL = 'file://';
+
 export class ReactNativeModelHelper implements ModelHelper {
     public constructor(private readonly gatewayAddress: string) {
     }
 
     public getLocalPath(localPath: string): string {
-        if (localPath.startsWith('file://')) {
+        if (localPath.startsWith(FILE_PROTOCOL)) {
             return localPath;
         }
-        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
+        const documentPath = FILE_PROTOCOL + RNFS.DocumentDirectoryPath + '/';
         return documentPath + localPath;
     }
 

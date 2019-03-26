@@ -8,11 +8,15 @@ This project uses React Native. You will need Android SDK, XCode, Node.js and NP
 
 ## Install dependencies
 
-`npm install; react-native link`
+`npm install && npm run link`
+
+## Link assets
+
+`npm run link-assets`
 
 ## Build and test in simulator
 
-`react-native run-ios `
+`npm run ios `
 
 ## Start tests that run automatically
 

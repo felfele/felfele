@@ -52,6 +52,15 @@
 		FC76FEB6F34144F29C3EAC5B /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D91E6E646F9A446586AF3FB6 /* AntDesign.ttf */; };
 		FE8AB2163F7C407CA2233F63 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 492D2D7228B64A6785A6D8E5 /* libRNImagePicker.a */; };
 		7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */; };
+		1212A1D8F597478DA34F9714 /* balloon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 2C5A7B46A4F74DA88EF68C43 /* balloon.svg */; };
+		47E2E2325C154B20B09B6A4E /* bug.svg in Resources */ = {isa = PBXBuildFile; fileRef = 029BA8B4B5414D939ED679B8 /* bug.svg */; };
+		728746CC6135433CBA0C318B /* compass.svg in Resources */ = {isa = PBXBuildFile; fileRef = B62038FF944B431B89240D96 /* compass.svg */; };
+		A8EBE0B623C44729B4C11544 /* ghost.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0D59251A36BF40EB84AF71EC /* ghost.svg */; };
+		B9D2B3EDD83B4BA4914F9663 /* icon-white-transparent.png in Resources */ = {isa = PBXBuildFile; fileRef = C937772672CB4207B82786FE /* icon-white-transparent.png */; };
+		FA76FEDA951D45A78696B915 /* link.svg in Resources */ = {isa = PBXBuildFile; fileRef = 521631539AD04CF7B924808D /* link.svg */; };
+		36FBDC539DE04433B274C452 /* snorkeling.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7620F138DB11460688CB12DD /* snorkeling.svg */; };
+		9E238CD8F31B46F58D192C8A /* user_circle-white.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D41A6CC11E04E959E847D7F /* user_circle-white.png */; };
+		8B75B5D9060E4802BB91A846 /* user_circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 65242521C1404BC4874744AE /* user_circle.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -479,6 +488,15 @@
 		F6F5F318AAC344DE97A5FF0F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; name = "RNDeviceInfo.xcodeproj"; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; name = "libRNDeviceInfo.a"; path = "libRNDeviceInfo.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		2C5A7B46A4F74DA88EF68C43 /* balloon.svg */ = {isa = PBXFileReference; name = "balloon.svg"; path = "../images/balloon.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		029BA8B4B5414D939ED679B8 /* bug.svg */ = {isa = PBXFileReference; name = "bug.svg"; path = "../images/bug.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B62038FF944B431B89240D96 /* compass.svg */ = {isa = PBXFileReference; name = "compass.svg"; path = "../images/compass.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0D59251A36BF40EB84AF71EC /* ghost.svg */ = {isa = PBXFileReference; name = "ghost.svg"; path = "../images/ghost.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C937772672CB4207B82786FE /* icon-white-transparent.png */ = {isa = PBXFileReference; name = "icon-white-transparent.png"; path = "../images/icon-white-transparent.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		521631539AD04CF7B924808D /* link.svg */ = {isa = PBXFileReference; name = "link.svg"; path = "../images/link.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7620F138DB11460688CB12DD /* snorkeling.svg */ = {isa = PBXFileReference; name = "snorkeling.svg"; path = "../images/snorkeling.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7D41A6CC11E04E959E847D7F /* user_circle-white.png */ = {isa = PBXFileReference; name = "user_circle-white.png"; path = "../images/user_circle-white.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		65242521C1404BC4874744AE /* user_circle.png */ = {isa = PBXFileReference; name = "user_circle.png"; path = "../images/user_circle.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -859,6 +877,15 @@
 				3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */,
 				AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */,
 				8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */,
+				2C5A7B46A4F74DA88EF68C43 /* balloon.svg */,
+				029BA8B4B5414D939ED679B8 /* bug.svg */,
+				B62038FF944B431B89240D96 /* compass.svg */,
+				0D59251A36BF40EB84AF71EC /* ghost.svg */,
+				C937772672CB4207B82786FE /* icon-white-transparent.png */,
+				521631539AD04CF7B924808D /* link.svg */,
+				7620F138DB11460688CB12DD /* snorkeling.svg */,
+				7D41A6CC11E04E959E847D7F /* user_circle-white.png */,
+				65242521C1404BC4874744AE /* user_circle.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1396,6 +1423,15 @@
 				B96EC6087B3A4BE79F0DF72D /* Roboto-Bold.ttf in Resources */,
 				3A71C102C9F543238ED15939 /* Roboto-Medium.ttf in Resources */,
 				2AF1ED3028F34C3F8FAA9738 /* Roboto-Regular.ttf in Resources */,
+				1212A1D8F597478DA34F9714 /* balloon.svg in Resources */,
+				47E2E2325C154B20B09B6A4E /* bug.svg in Resources */,
+				728746CC6135433CBA0C318B /* compass.svg in Resources */,
+				A8EBE0B623C44729B4C11544 /* ghost.svg in Resources */,
+				B9D2B3EDD83B4BA4914F9663 /* icon-white-transparent.png in Resources */,
+				FA76FEDA951D45A78696B915 /* link.svg in Resources */,
+				36FBDC539DE04433B274C452 /* snorkeling.svg in Resources */,
+				9E238CD8F31B46F58D192C8A /* user_circle-white.png in Resources */,
+				8B75B5D9060E4802BB91A846 /* user_circle.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

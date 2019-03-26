@@ -11,6 +11,7 @@ import SplashScreen from 'react-native-splash-screen';
 import { Colors } from '../styles';
 import { defaultAuthor } from '../reducers';
 import { defaultImages} from '../defaultImages';
+import { getDefaultUserImage } from '../defaultUserImage';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;
@@ -78,10 +79,16 @@ export class Welcome extends React.PureComponent<Props, State> {
                     subtitle: 'Pick a name and an avatar',
                 },
                 ]}
-                onDone={() => {
+                onDone={async () => {
                     this.props.onCreateUser(
-                        this.state.authorName !== '' ? this.state.authorName : defaultAuthor.name,
-                        this.state.authorImage,
+                        this.state.authorName !== ''
+                            ? this.state.authorName
+                            : defaultAuthor.name
+                        ,
+                        this.state.authorImage.uri !== ''
+                            ? this.state.authorImage
+                            : await getDefaultUserImage()
+                        ,
                         this.props.navigation,
                     );
                 }}
