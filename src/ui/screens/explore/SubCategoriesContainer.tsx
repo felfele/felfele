@@ -1,11 +1,14 @@
 import { connect } from 'react-redux';
 import { StateProps, SubCategoriesScreen, OwnProps } from './SubCategoriesScreen';
 import { AppState } from '../../../reducers/AppState';
+import { Routes } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
+    const navParamTitle = ownProps.navigation.getParam<'SubCategoriesContainer', 'title'>('title');
+    const navParamSubCategories = ownProps.navigation.getParam<'SubCategoriesContainer', 'subCategories'>('subCategories');
     return {
-        title: ownProps.navigation.state.params.title,
-        subCategories: ownProps.navigation.state.params.subCategories,
+        title: navParamTitle,
+        subCategories: navParamSubCategories,
         navigation: ownProps.navigation,
     };
 };

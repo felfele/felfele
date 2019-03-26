@@ -5,13 +5,14 @@ import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 
 export interface StateProps {
     categories: Category[];
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps { }

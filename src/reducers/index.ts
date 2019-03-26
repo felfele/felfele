@@ -323,7 +323,7 @@ class FelfelePersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
         whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
     })];
-    public blacklist = ['currentTimestamp', 'exploreData'];
+    public blacklist = ['currentTimestamp'];
     public key = 'root';
     public storage = AsyncStorage;
     public version = currentAppStateVersion;

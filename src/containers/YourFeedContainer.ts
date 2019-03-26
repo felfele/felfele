@@ -4,8 +4,9 @@ import { StateProps, DispatchProps, YourFeedView } from '../components/YourFeedV
 import { Post } from '../models/Post';
 import { Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
+import { TypedNavigation } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const posts = state.localPosts;
     const filteredPosts = posts;
 

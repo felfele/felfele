@@ -13,10 +13,11 @@ import { NavigationHeader } from './NavigationHeader';
 import { clearLog, filteredLog, setLogFilter } from '../log';
 import { Colors, DefaultTabBarHeight } from '../styles';
 import { SimpleTextInput } from './SimpleTextInput';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
     currentTimestamp: number;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {

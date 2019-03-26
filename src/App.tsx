@@ -39,6 +39,7 @@ import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
 import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
 import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
+import { Routes, TypedNavigation } from './helpers/navigation';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -236,8 +237,8 @@ const Root = createBottomTabNavigator(
                         color={Colors.BRAND_PURPLE}
                     />
                 ),
-                tabBarOnPress: ({ navigation }: NavigationScreenProps) => {
-                    navigation.navigate('Post');
+                tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
+                    navigation.navigate('Post', {});
                 },
             },
         },

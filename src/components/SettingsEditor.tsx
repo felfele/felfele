@@ -13,9 +13,10 @@ import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     settings: Settings;
     ownFeeds: RecentPostFeed[];
 }
@@ -55,7 +56,7 @@ export const SettingsEditor = (props: Props) => {
                                 <GridCard
                                     title={item.name}
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
-                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
+                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
                                     size={itemDimension}
                                     modelHelper={modelHelper}
                                 />
@@ -87,12 +88,12 @@ export const SettingsEditor = (props: Props) => {
                 <RowItem
                     title='Filters'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FilterListEditorContainer')}
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
                 />
                 <RowItem
                     title='Send bug report'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('BugReportView')}
+                    onPress={() => props.navigation.navigate('BugReportView', {})}
                     />
                 <RowItem
                     title={version}
@@ -106,7 +107,7 @@ export const SettingsEditor = (props: Props) => {
                     }
                     title='Debug menu'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('Debug')}
+                    onPress={() => props.navigation.navigate('Debug', {})}
                 />
                 }
             </ScrollView>

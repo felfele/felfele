@@ -12,8 +12,8 @@ import { Colors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { LocalFeed } from '../../../social/api';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { LocalFeed } from '../../../social/api';
 
 export interface StateProps {
     navigation: any;

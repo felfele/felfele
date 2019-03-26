@@ -5,18 +5,19 @@ import { RegularText } from '../../misc/text';
 import { SubCategory } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
+import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
 export interface StateProps {
     subCategories: SubCategory[];
-    navigation: any;
+    navigation: TypedNavigation;
     title: string;
 }
 
 export interface OwnProps {
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps { }

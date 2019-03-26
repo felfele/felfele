@@ -6,9 +6,10 @@ import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import { RowItem } from '../ui/misc/RowButton';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     filters: ContentFilter[];
 }
 
