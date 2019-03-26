@@ -1,6 +1,7 @@
 import { HtmlUtils } from './HtmlUtils';
 import { Debug } from './Debug';
 import { safeFetch } from './Network';
+import * as urlUtils from './helpers/urlUtils';
 
 // tslint:disable:class-name
 class _FaviconCache {
@@ -12,7 +13,10 @@ class _FaviconCache {
         }
         const baseUrl = this.getBaseUrl(url);
         try {
-            const favicon = await this.downloadIndexAndParseFavicon(baseUrl);
+            const favicon = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM
+                ? await this.downloadSubRedditAboutJsonAndParseFavicon(url)
+                : await this.downloadIndexAndParseFavicon(baseUrl)
+            ;
             Debug.log('getFavicon: ', favicon);
             this.favicons.set(url, favicon);
             return favicon;
@@ -47,6 +51,13 @@ class _FaviconCache {
             }
         }
         return null;
+    }
+
+    private async downloadSubRedditAboutJsonAndParseFavicon(url: string): Promise<string> {
+        const jsonUrl = url.slice(0, -4).concat('/about.json');
+        const jsonText = await this.fetchHtml(jsonUrl);
+        const json = JSON.parse(jsonText);
+        return json.data.icon_img;
     }
 
     private async downloadIndexAndParseFavicon(url: string) {

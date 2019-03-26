@@ -18,7 +18,7 @@ import {
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SimpleTextInput } from './SimpleTextInput';
-import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
@@ -30,6 +30,8 @@ import { RowItem } from '../ui/misc/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
+import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
+import { TypedNavigation } from '../helpers/navigation';
 
 const defaultUserImage = defaultImages.userCircle;
 
@@ -42,7 +44,7 @@ export interface DispatchProps {
 export interface StateProps {
     author: Author;
     ownFeed?: Feed;
-    navigation: any;
+    navigation: TypedNavigation;
     gatewayAddress: string;
 }
 
@@ -135,7 +137,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     <RowItem
                         title={VIEW_POSTS_LABEL}
                         buttonStyle='navigate'
-                        onPress={() => props.navigation.navigate('YourTab')}
+                        onPress={() => props.navigation.navigate('YourTab', {})}
                     />
                     { props.ownFeed &&
                         <View style={styles.qrCodeContainer}>

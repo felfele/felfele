@@ -12,9 +12,9 @@ import { Colors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { LocalFeed } from '../../../social/api';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';
+import { LocalFeed } from '../../../social/api';
 
 export interface StateProps {
     navigation: any;
@@ -41,12 +41,12 @@ export const FeedSettingsScreen = (props: Props) => {
         : defaultImages.userCircle
     ;
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
                 navigation={props.navigation}
                 title={props.feed.name}
             />
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 <Image
                     source={source}
                     style={styles.image}

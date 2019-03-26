@@ -10,13 +10,14 @@ import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
 
 // @ts-ignore
 import SnorkelingIcon from '../../images/snorkeling.svg';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     posts: Post[];
     feeds: Feed[];
     gatewayAddress: string;
@@ -37,8 +38,10 @@ export const FavoritesFeedView = (props: Props) => {
                         title='Favorites'
                         rightButton1={{
                             onPress: () => props.navigation.navigate(
-                                'FeedListViewerContainer',
-                                { feeds: props.feeds }
+                                'FeedListViewerContainer', {
+                                    feeds: props.feeds,
+                                    showExplore: false,
+                                }
                             ),
                             label: <Icon
                                 name={'view-grid'}

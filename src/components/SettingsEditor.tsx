@@ -14,9 +14,10 @@ import { RegularText, MediumText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     settings: Settings;
     ownFeeds: RecentPostFeed[];
 }
@@ -56,9 +57,10 @@ export const SettingsEditor = (props: Props) => {
                                 <GridCard
                                     title={item.name}
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
-                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item })}
+                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
                                     size={itemDimension}
                                     defaultImage={defaultImages.userCircle}
+                                    modelHelper={modelHelper}
                                 />
                         );
                     }}
@@ -74,11 +76,6 @@ export const SettingsEditor = (props: Props) => {
                     {PREFERENCES_LABEL}
                 </RegularText>
                 <RowItem
-                    title='Feeds'
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FeedListEditorContainer')}
-                />
-                <RowItem
                     title='Save to Camera Roll'
                     switchState={props.settings.saveToCameraRoll}
                     onSwitchValueChange={props.onSaveToCameraRollValueChange}
@@ -93,12 +90,12 @@ export const SettingsEditor = (props: Props) => {
                 <RowItem
                     title='Filters'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FilterListEditorContainer')}
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
                 />
                 <RowItem
                     title='Send bug report'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('BugReportView')}
+                    onPress={() => props.navigation.navigate('BugReportView', {})}
                     />
                 <RowItem
                     title={version}
@@ -112,7 +109,7 @@ export const SettingsEditor = (props: Props) => {
                     }
                     title='Debug menu'
                     buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('Debug')}
+                    onPress={() => props.navigation.navigate('Debug', {})}
                 />
                 }
             </ScrollView>

@@ -24,9 +24,10 @@ import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     draft: Post | null;
     name: string;
     avatar: ImageData;

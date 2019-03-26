@@ -13,7 +13,7 @@ import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
-import { Utils } from '../Utils';
+import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
@@ -23,6 +23,7 @@ import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -45,7 +46,8 @@ export interface DispatchProps {
 export interface StateProps {
     swarmGateway: string;
     feed: Feed;
-    navigation: any;
+    navigation: TypedNavigation;
+    isKnownFeed: boolean;
 }
 
 type Props = DispatchProps & StateProps;
@@ -74,10 +76,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.props.onAddFeed(feed);
     }
 
-    public goBack() {
-        this.props.navigation.goBack();
-    }
-
     public async fetchFeed(onSuccess?: () => void, feedUrl?: string) {
         Debug.log('fetchFeed', 'this.state', this.state);
         if (this.state.loading === true) {
@@ -99,7 +97,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 onSuccess();
             }
             this.onAdd(feed);
-            this.props.navigation.navigate('Feed', { feedUrl: feed.feedUrl, name: feed.name });
+            this.props.navigation.navigate('Feed', {
+                feedUrl: feed.feedUrl,
+                name: feed.name,
+            });
         } else {
             this.onFailedFeedLoad();
         }
@@ -118,50 +119,44 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const rightButton1 = isExistingFeed
             ? isFollowed
                 ? button('link-variant-off', this.onUnfollowFeed)
-                : button('delete', this.onDelete)
+                : this.props.isKnownFeed
+                    ? button('delete', this.onDelete)
+                    : undefined
             : button('download', async () => await this.fetchFeed())
         ;
 
-        const rightButton2 = this.state.loading || !isExistingFeed
-            ? undefined
-            : button('open-in-new', () =>
-                this.props.navigation.navigate('Feed', {
-                    feedUrl: this.props.feed.feedUrl,
-                    name: this.props.feed.name,
-                })
-            )
-        ;
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.mainContainer}>
                 <NavigationHeader
                     title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
                     rightButton1={rightButton1}
-                    rightButton2={rightButton2}
                     navigation={this.props.navigation}
                 />
-                <SimpleTextInput
-                    defaultValue={this.state.url}
-                    style={styles.linkInput}
-                    onChangeText={(text) => this.setState({ url: text })}
-                    placeholder='Link of the feed'
-                    autoCapitalize='none'
-                    autoFocus={true}
-                    autoCorrect={false}
-                    editable={!isExistingFeed}
-                    returnKeyType='done'
-                    onSubmitEditing={async () => await this.fetchFeed()}
-                    onEndEditing={() => {}}
-                />
-                { this.state.loading
-                ?
-                    <View style={styles.centerIcon}>
-                        <Text style={styles.activityText}>{this.state.activityText}</Text>
-                        <ActivityIndicator size='large' color='grey' />
-                    </View>
-                : this.props.feed.feedUrl.length > 0
-                    ? <this.ExistingItemView />
-                    : <this.NewItemView showQRCamera={this.state.showQRCamera} />
-                }
+                <View style={styles.container}>
+                    <SimpleTextInput
+                        defaultValue={this.state.url}
+                        style={styles.linkInput}
+                        onChangeText={(text) => this.setState({ url: text })}
+                        placeholder='Link of the feed'
+                        autoCapitalize='none'
+                        autoFocus={true}
+                        autoCorrect={false}
+                        editable={!isExistingFeed}
+                        returnKeyType='done'
+                        onSubmitEditing={async () => await this.fetchFeed()}
+                        onEndEditing={() => {}}
+                    />
+                    { this.state.loading
+                    ?
+                        <View style={styles.centerIcon}>
+                            <Text style={styles.activityText}>{this.state.activityText}</Text>
+                            <ActivityIndicator size='large' color='grey' />
+                        </View>
+                    : this.props.feed.feedUrl.length > 0
+                        ? <this.ExistingItemView />
+                        : <this.NewItemView showQRCamera={this.state.showQRCamera} />
+                    }
+                </View>
             </SafeAreaView>
         );
     }
@@ -207,7 +202,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         if (!isExistingFeed) {
             const value = await Clipboard.getString();
-            const link = Utils.getLinkFromText(value);
+            const link = urlUtils.getLinkFromText(value);
             if (link != null) {
                 this.setState({
                     url: link,
@@ -226,7 +221,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             return feed;
         } else {
             Debug.log('fetchFeedFromUrl', 'url', url);
-            const canonicalUrl = Utils.getCanonicalUrl(url);
+            const canonicalUrl = urlUtils.getCanonicalUrl(url);
             Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
             const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
             Debug.log('fetchFeedFromUrl', 'feed', feed);
@@ -246,17 +241,12 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private onUnfollowFeed = () => {
-        unfollowFeed(this.props.feed, this.unfollowAndGoBack);
-    }
-
-    private unfollowAndGoBack = (feed: Feed) => {
-        this.props.onUnfollowFeed(feed);
-        this.goBack();
+        unfollowFeed(this.props.feed, this.props.onUnfollowFeed);
     }
 
     private onDelete = () => {
         const options: any[] = [
-            { text: 'Yes', onPress: () => this.deleteFeedAndGoBack() },
+            { text: 'Yes', onPress: () => this.props.onRemoveFeed(this.props.feed) },
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
@@ -280,12 +270,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
         this.setState({
             loading: false,
-        });
-    }
-
-    private deleteFeedAndGoBack = () => {
-        this.props.onRemoveFeed(this.props.feed);
-        this.goBack();
+    });
     }
 
     private onScanSuccess = async (data: any) => {
@@ -303,6 +288,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 }
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        backgroundColor: Colors.WHITE,
+        flex: 1,
+        flexDirection: 'column',
+    },
     container: {
         backgroundColor: Colors.BACKGROUND_COLOR,
         flex: 1,
@@ -318,7 +308,6 @@ const styles = StyleSheet.create({
         borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
         borderTopColor: 'lightgray',
-        borderTopWidth: 1,
         paddingHorizontal: 8,
         paddingVertical: 8,
         color: 'gray',

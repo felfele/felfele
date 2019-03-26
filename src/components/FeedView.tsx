@@ -8,7 +8,9 @@ import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { FELFELE_ASSISTANT_NAME } from '../reducers';
+import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
+import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -19,7 +21,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     onBack: () => void;
     feedUrl: string;
     feedName: string;
@@ -32,6 +34,7 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
+    const isOnboardingFeed = props.feeds[0] != null && props.feeds[0].feedUrl === FELFELE_ASSISTANT_URL;
     const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const isLocalFeed = props.isOwnFeed || props.feeds.length === 0;
@@ -43,30 +46,35 @@ export const FeedView = (props: Props) => {
     const toggleFavorite = () => props.onToggleFavorite(props.feedUrl);
     const navigateToFeedSettings = () => props.navigation.navigate(
         'FeedSettings',
-        { feed: props.feeds[0] },
+        { feed: props.feeds[0] as LocalFeed },
+    );
+    const navigateToFeedInfo = () => props.navigation.navigate(
+        'FeedInfo', {
+            feed: props.feeds[0],
+        }
     );
     const onLinkPressed = async () => onFollowPressed(props.feedUrl,
         props.feeds,
         props.onUnfollowFeed,
         props.onFollowFeed
     );
+
     const rightButton1 = props.isOwnFeed
         ? props.feedName.length > 0
-            ? button('settings-box', Colors.DARK_GRAY, navigateToFeedSettings)
+            ? button('dots-vertical', Colors.DARK_GRAY, navigateToFeedSettings)
             : undefined
-        : isFollowedFeed
-            ? isFavorite(props.feeds, props.feedUrl)
-                ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
-                : button('star', Colors.DARK_GRAY, toggleFavorite)
-            : props.feedName === FELFELE_ASSISTANT_NAME
-                ? undefined
-                : button('delete', Colors.DARK_GRAY, () => removeFeedAndGoBack(props))
+        : isOnboardingFeed
+            ? undefined
+            : isFollowedFeed
+                ? isFavorite(props.feeds, props.feedUrl)
+                    ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
+                    : button('star', Colors.DARK_GRAY, toggleFavorite)
+                : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
     ;
-    const rightButton2 = isLocalFeed
+
+    const rightButton2 = isLocalFeed || isOnboardingFeed
         ? undefined
-        : isFollowedFeed
-            ? button('link-variant-off', Colors.DARK_GRAY, onLinkPressed)
-            : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
+        : button('dots-vertical', Colors.DARK_GRAY, navigateToFeedInfo)
     ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>

@@ -6,8 +6,9 @@ import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, AllFeedScreen } from '../components/AllFeedScreen';
 import { getAllFeeds, getAllPostsSorted } from '../selectors/selectors';
 import { Post } from '../models/Post';
+import { TypedNavigation } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const followedFeeds = getAllFeeds(state);
     const filteredPosts = getAllPostsSorted(state);
 

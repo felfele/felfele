@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { Colors } from '../../styles';
 import { MediumText } from './text';
+import { ImageDataView } from '../../components/ImageDataView';
+import { ModelHelper } from '../../models/ModelHelper';
 
 interface Props {
     title: string;
@@ -16,6 +18,7 @@ interface Props {
     imageUri: string;
     defaultImage?: number;
     size: number;
+    modelHelper: ModelHelper;
 }
 
 export const GRID_SPACING = 10;
@@ -26,16 +29,12 @@ export const getGridCardSize = () => {
     return (windowWidth - GRID_SPACING * 3) / GRID_CARD_COUNT_IN_ROW;
 };
 
-const imageSource = (props: Props) =>
-    props.imageUri !== '' || props.defaultImage == null
-    ? { uri: props.imageUri}
-    : props.defaultImage
-    ;
-
 export const GridCard = React.memo((props: Props) => (
     <TouchableView style={styles.feedCard} onPress={props.onPress}>
-        <Image
-            source={imageSource(props)}
+        <ImageDataView
+            source={{uri: props.imageUri}}
+            defaultImage={props.defaultImage}
+            modelHelper={props.modelHelper}
             style={{
                 width: props.size,
                 height: props.size,

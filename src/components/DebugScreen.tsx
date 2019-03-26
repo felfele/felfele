@@ -15,10 +15,11 @@ import { RowItem } from '../ui/misc/RowButton';
 import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
     appState: AppState;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {
@@ -98,7 +99,7 @@ export const DebugScreen = (props: Props) => (
                         <MaterialCommunityIcon name='backup-restore' />
                     }
                     title='Backup & Restore'
-                    onPress={() => props.navigation.navigate('BackupRestore')}
+                    onPress={() => props.navigation.navigate('BackupRestore', {})}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -106,7 +107,7 @@ export const DebugScreen = (props: Props) => (
                         <MaterialCommunityIcon name='server-network' />
                     }
                     title='Swarm settings'
-                    onPress={async () => props.navigation.navigate('SwarmSettingsContainer')}
+                    onPress={async () => props.navigation.navigate('SwarmSettingsContainer', {})}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -114,7 +115,7 @@ export const DebugScreen = (props: Props) => (
                         <IonIcon name='md-list' />
                     }
                     title='View logs'
-                    onPress={() => props.navigation.navigate('LogViewer')}
+                    onPress={() => props.navigation.navigate('LogViewer', {})}
                     buttonStyle='none'
                 />
             </ScrollView>

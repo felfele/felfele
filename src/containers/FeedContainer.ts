@@ -1,26 +1,23 @@
 import { connect } from 'react-redux';
-import { defaultLocalPosts, FELFELE_ASSISTANT_NAME } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts, getYourPosts } from '../selectors/selectors';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
-export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    const feedUrl = ownProps.navigation.state.params.feedUrl;
-    const feedName = ownProps.navigation.state.params.name;
+export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
+    const feedUrl = ownProps.navigation.getParam<'Feed', 'feedUrl'>('feedUrl');
+    const feedName = ownProps.navigation.getParam<'Feed', 'name'>('name');
 
     const isOwnFeed = feedName === state.author.name;
-    const isAssistantFeed = feedName === FELFELE_ASSISTANT_NAME;
     const hasOwnFeed = state.ownFeeds.length > 0;
     const ownFeed = hasOwnFeed ? state.ownFeeds[0] : undefined;
     const selectedFeeds = isOwnFeed
         ? hasOwnFeed
             ? [ownFeed!]
             : []
-        : isAssistantFeed
-            ? []
-            : state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl)
+        : state.feeds.filter(feed => feed != null && feed.feedUrl === feedUrl)
         ;
     // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
     // see https://github.com/reduxjs/reselect/blob/master/README.md#accessing-react-props-in-selectors
@@ -28,9 +25,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
     const ownPosts = getYourPosts(state);
     const posts = isOwnFeed
         ? ownPosts
-        : isAssistantFeed
-            ? defaultLocalPosts
-            : feedPosts
+        : feedPosts
         ;
     return {
         onBack: () => ownProps.navigation.goBack(null),

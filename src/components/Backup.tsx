@@ -10,9 +10,10 @@ import { DateUtils } from '../DateUtils';
 import { getSerializedAppState } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { stringToHex } from '../conversion';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     appState: AppState;
 }
 

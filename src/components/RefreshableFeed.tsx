@@ -15,13 +15,14 @@ import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
 import { ModelHelper } from '../models/ModelHelper';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     posts: Post[];
     feeds: Feed[];
     modelHelper: ModelHelper;
@@ -73,7 +74,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                     networkActivityIndicatorVisible={true}
                 />
                 {this.props.children.navigationHeader}
-                {this.props.posts.length === 0 && this.props.children.placeholder}
+                {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
                     ListHeaderComponent={this.props.children.listHeader}
                     ListFooterComponent={this.renderListFooter}
@@ -82,7 +83,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                         <CardContainer
                             post={obj.item}
                             isSelected={this.isPostSelected(obj.item)}
-                            navigate={this.props.navigation.navigate}
+                            navigation={this.props.navigation}
                             togglePostSelection={this.togglePostSelection}
                             modelHelper={this.props.modelHelper}
                         />
