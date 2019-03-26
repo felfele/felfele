@@ -4,10 +4,11 @@ import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts, getYourPosts } from '../selectors/selectors';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
-export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    const feedUrl = ownProps.navigation.state.params.feedUrl;
-    const feedName = ownProps.navigation.state.params.name;
+export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
+    const feedUrl = ownProps.navigation.getParam<'Feed', 'feedUrl'>('feedUrl');
+    const feedName = ownProps.navigation.getParam<'Feed', 'name'>('name');
 
     const isOwnFeed = feedName === state.author.name;
     const hasOwnFeed = state.ownFeeds.length > 0;

@@ -6,11 +6,20 @@ import { Author } from '../../src/models/Author';
 import TestRenderer from 'react-test-renderer';
 import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper';
 import { Debug } from '../../src/Debug';
+import { TypedNavigation } from '../../src/helpers/navigation';
 
 Debug.setDebug(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
 jest.mock('../../src/components/CardMarkdown');
 jest.mock('../../src/ui/misc/Carousel');
+
+const mockNavigation: TypedNavigation = {
+    goBack: (routeKey?: string | null) => true,
+    navigate: (routeKey: any, params: any) => true,
+    pop: (n?: number, params?: { immediate?: boolean }) => true,
+    getParam: (param: any) => param.name,
+    setParams: (newParams: any) => true,
+};
 
 describe('card test', () => {
     const testAuthor: Author = {
@@ -56,7 +65,7 @@ describe('card test', () => {
             <Card
                 post={testPostWithoutImage}
                 isSelected={false}
-                navigate={(_) => {}}
+                navigation={mockNavigation}
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
@@ -76,7 +85,7 @@ describe('card test', () => {
             <Card
                 post={testPostWithoutImage}
                 isSelected={true}
-                navigate={(_) => {}}
+                navigation={mockNavigation}
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
@@ -96,7 +105,7 @@ describe('card test', () => {
             <Card
                 post={testPostWithImage}
                 isSelected={false}
-                navigate={(_) => {}}
+                navigation={mockNavigation}
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
@@ -117,7 +126,7 @@ describe('card test', () => {
             <Card
                 post={testPostWithMultipleImages}
                 isSelected={false}
-                navigate={(_) => {}}
+                navigation={mockNavigation}
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
@@ -138,7 +147,7 @@ describe('card test', () => {
             <Card
                 post={testPostWithImage}
                 isSelected={false}
-                navigate={(_) => {}}
+                navigation={mockNavigation}
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}

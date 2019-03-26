@@ -6,9 +6,10 @@ import {
 } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { Button } from './Button';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {
@@ -26,8 +27,8 @@ export const BackupRestore = (props: Props) => (
             navigation={props.navigation}
         />
         <View style={styles.buttonContainer}>
-            <Button text='Backup' onPress={() => props.navigation.navigate('Backup')} />
-            <Button text='Restore' onPress={() => props.navigation.navigate('Restore')} />
+            <Button text='Backup' onPress={() => props.navigation.navigate('Backup', {})} />
+            <Button text='Restore' onPress={() => props.navigation.navigate('Restore', {})} />
         </View>
     </SafeAreaView>
 );

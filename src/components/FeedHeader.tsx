@@ -14,9 +14,10 @@ import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     profileImage: ImageData;
     gatewayAddress: string;
 }
@@ -40,7 +41,7 @@ export class FeedHeader extends React.PureComponent<Props> {
             createdAt: Date.now(),
         };
         this.props.onSaveDraft(post);
-        this.props.navigation.navigate('Post');
+        this.props.navigation.navigate('Post', {});
     }
 
     public render() {
@@ -52,7 +53,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                 <ProfileIcon profileImage={this.props.profileImage} gatewayAddress={this.props.gatewayAddress}/>
                 <TouchableView
                     onPress={() =>
-                        this.props.navigation.navigate('Post')
+                        this.props.navigation.navigate('Post', {})
                     }
                     style={styles.headerTextContainer}
                     hitSlop={{

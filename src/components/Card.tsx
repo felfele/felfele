@@ -2,7 +2,16 @@ import * as React from 'react';
 import { Post, PostReferences } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
-import { View, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Platform, StyleSheet, Image, Text, Linking, Alert, Share } from 'react-native';
+import {
+    View,
+    ActivityIndicator,
+    TouchableOpacity,
+    Dimensions,
+    Platform,
+    StyleSheet,
+    Linking,
+    Alert,
+} from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import * as urlUtils from '../helpers/urlUtils';
@@ -18,6 +27,7 @@ import { CardMarkdown } from './CardMarkdown';
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 import { Author } from '../models/Author';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -27,7 +37,7 @@ export interface StateProps {
     author: Author;
     modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
-    navigate: (view: string, {}) => void;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {
@@ -49,7 +59,7 @@ export const Card = (props: CardProps) => {
                 currentTimestamp={props.currentTimestamp}
                 author={props.author}
                 modelHelper={props.modelHelper}
-                navigate={props.navigate}
+                navigation={props.navigation}
                 onSharePost={props.onSharePost}
             />
             <TouchableOpacity
@@ -193,7 +203,7 @@ const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
 
 const CardTopOriginalAuthorText = (props: {
     references: PostReferences | undefined,
-    navigate: (view: string, {}) => void,
+    navigation: TypedNavigation,
 }) => {
     if (props.references == null || props.references.originalAuthor == null) {
         return null;
@@ -203,7 +213,7 @@ const CardTopOriginalAuthorText = (props: {
         return (
             <TouchableView
                 style={{flexDirection: 'row'}}
-                onPress={() => props.navigate('Feed', {
+                onPress={() => props.navigation.navigate('Feed', {
                     feedUrl,
                     name,
                 })}
@@ -219,7 +229,7 @@ const CardTop = (props: {
     currentTimestamp: number,
     author: Author,
     modelHelper: ModelHelper,
-    navigate: (view: string, {}) => void,
+    navigation: TypedNavigation,
     onSharePost: (post: Post) => void,
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
@@ -228,7 +238,7 @@ const CardTop = (props: {
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : ' -  ' + urlUtils.getHumanHostname(url);
     const onPress = props.post.author
-        ? () => props.navigate('Feed', {
+        ? () => props.navigation.navigate('Feed', {
             feedUrl: props.post.author!.uri || '',
             name: authorName,
         })
@@ -246,7 +256,7 @@ const CardTop = (props: {
                     <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
                     <CardTopOriginalAuthorText
                         references={props.post.references}
-                        navigate={props.navigate}
+                        navigation={props.navigation}
                     />
                 </View>
                 <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>

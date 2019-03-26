@@ -9,13 +9,14 @@ import { NewsSource } from '../../../models/recommendation/NewsSource';
 import { RSSFeedManager } from '../../../RSSPostManager';
 import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
+import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 
 export interface StateProps {
     gatewayAddress: string;
     subCategoryName: string;
     newsSource: NewsSource[];
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {

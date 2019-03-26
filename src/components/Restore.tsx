@@ -8,9 +8,10 @@ import { Button } from './Button';
 import { isValidBackup, restoreBackupToString } from '../BackupRestore';
 import { stringToHex } from '../conversion';
 import { getAppStateFromSerialized } from '../reducers';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {

@@ -3,8 +3,9 @@ import { AppState } from '../reducers/AppState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
+import { TypedNavigation } from '../helpers/navigation';
 
-export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
         ? state.ownFeeds[0]
         : undefined;
