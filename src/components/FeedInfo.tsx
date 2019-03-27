@@ -214,30 +214,30 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        if (url.startsWith(Swarm.defaultFeedPrefix)) {
-            const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-            const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
-            const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
-            return feed;
-        } else {
-            Debug.log('fetchFeedFromUrl', 'url', url);
-            const canonicalUrl = urlUtils.getCanonicalUrl(url);
-            Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-            const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
-            Debug.log('fetchFeedFromUrl', 'feed', feed);
-            return feed;
-        }
-    }
-
-    private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
-            const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-            Debug.log('fetchFeedFromUrl: feed: ', feed);
-            return feed;
+            if (url.startsWith(Swarm.defaultFeedPrefix)) {
+                const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
+                const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
+                const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
+                return feed;
+            } else {
+                Debug.log('fetchFeedFromUrl', 'url', url);
+                const canonicalUrl = urlUtils.getCanonicalUrl(url);
+                Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
+                const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
+                Debug.log('fetchFeedFromUrl', 'feed', feed);
+                return feed;
+            }
         } catch (e) {
             Debug.log(e);
             return null;
         }
+    }
+
+    private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
+        const feed = await RSSFeedManager.fetchFeedFromUrl(url);
+        Debug.log('fetchFeedFromUrl: feed: ', feed);
+        return feed;
     }
 
     private onUnfollowFeed = () => {
