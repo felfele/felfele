@@ -26,6 +26,7 @@
     "mocha": "=5.2.0",
     "mock-async-storage": "=2.0.3",
     "node-fetch": "=2.3.0",
+    "react-native-asset": "=1.1.2",
     "react-native-debugger-open": "=0.3.17",
     "react-native-svg-transformer": "=0.12.1",
     "react-native-typescript-transformer": "=1.2.10",
@@ -37,6 +38,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "link": "react-native link",
+    "link-assets": "react-native-asset",
     "test": "node node_modules/jest/bin/jest.js",
     "watchTest": "node node_modules/jest/bin/jest.js --watch",
     "check": "npm run tsc && npm run lint && npm run test",
@@ -103,7 +105,8 @@
   },
   "rnpm": {
     "assets": [
-      "fonts"
+      "fonts",
+      "images/assets"
     ]
   },
   "detox": {

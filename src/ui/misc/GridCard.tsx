@@ -16,6 +16,7 @@ interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
     imageUri: string;
+    defaultImage?: number;
     size: number;
     modelHelper: ModelHelper;
 }
@@ -31,9 +32,8 @@ export const getGridCardSize = () => {
 export const GridCard = React.memo((props: Props) => (
     <TouchableView style={styles.feedCard} onPress={props.onPress}>
         <ImageDataView
-            source={{
-                uri: props.imageUri,
-            }}
+            source={{uri: props.imageUri}}
+            defaultImage={props.defaultImage}
             modelHelper={props.modelHelper}
             style={{
                 width: props.size,

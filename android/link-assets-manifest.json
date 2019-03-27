@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "fonts/Roboto-Bold.ttf",
+      "sha1": "6cbb57ba2355cf442e06899898ff5af55867103e"
+    },
+    {
+      "path": "fonts/Roboto-Medium.ttf",
+      "sha1": "adbc3bde424bcf7dbc38f148005c8319825891f2"
+    },
+    {
+      "path": "fonts/Roboto-Regular.ttf",
+      "sha1": "1d1d41fcadc571decb6444211b7993b99ce926e2"
+    },
+    {
+      "path": "images/assets/user_circle.png",
+      "sha1": "123f5ee2a4304b80ced77b073043b362b910d9d2"
+    }
+  ]
+}

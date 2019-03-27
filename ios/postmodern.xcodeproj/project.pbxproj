@@ -52,6 +52,7 @@
 		FC76FEB6F34144F29C3EAC5B /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D91E6E646F9A446586AF3FB6 /* AntDesign.ttf */; };
 		FE8AB2163F7C407CA2233F63 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 492D2D7228B64A6785A6D8E5 /* libRNImagePicker.a */; };
 		7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */; };
+		D8A729BD711B47C08169B207 /* user_circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CA15BD83829431189DCB227 /* user_circle.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -479,6 +480,7 @@
 		F6F5F318AAC344DE97A5FF0F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; name = "RNDeviceInfo.xcodeproj"; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; name = "libRNDeviceInfo.a"; path = "libRNDeviceInfo.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		2CA15BD83829431189DCB227 /* user_circle.png */ = {isa = PBXFileReference; name = "user_circle.png"; path = "../images/assets/user_circle.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -859,6 +861,7 @@
 				3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */,
 				AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */,
 				8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */,
+				2CA15BD83829431189DCB227 /* user_circle.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1396,6 +1399,7 @@
 				B96EC6087B3A4BE79F0DF72D /* Roboto-Bold.ttf in Resources */,
 				3A71C102C9F543238ED15939 /* Roboto-Medium.ttf in Resources */,
 				2AF1ED3028F34C3F8FAA9738 /* Roboto-Regular.ttf in Resources */,
+				D8A729BD711B47C08169B207 /* user_circle.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

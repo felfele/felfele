@@ -13,6 +13,7 @@ import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { defaultImages } from '../../../defaultImages';
 import { LocalFeed } from '../../../social/api';
 
 export interface StateProps {
@@ -34,6 +35,11 @@ const UNLISTED_EXPLANATION = 'Anyone with a link to your feed can follow it.';
 
 export const FeedSettingsScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
+    const sourceImageUri = modelHelper.getImageUri(props.feed.authorImage);
+    const source = sourceImageUri !== ''
+        ? { uri: sourceImageUri }
+        : defaultImages.userCircle
+    ;
     return (
         <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
             <NavigationHeader
@@ -42,9 +48,7 @@ export const FeedSettingsScreen = (props: Props) => {
             />
             <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 <Image
-                    source={{
-                        uri: modelHelper.getImageUri(props.feed.authorImage),
-                    }}
+                    source={source}
                     style={styles.image}
                     resizeMode='cover'
                 />

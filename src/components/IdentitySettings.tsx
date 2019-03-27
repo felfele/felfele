@@ -23,16 +23,17 @@ import { ImageData } from '../models/ImageData';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-// tslint:disable-next-line:no-var-requires
-const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/misc/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+
+const defaultUserImage = defaultImages.userCircle;
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -80,7 +81,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getImageUri(props.author.image);
-    Debug.log('IdentitySettings: ', authorImageUri);
+    Debug.log('IdentitySettings', authorImageUri);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <KeyboardAvoidingView style={styles.mainContainer}>

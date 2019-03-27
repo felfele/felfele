@@ -12,7 +12,8 @@ import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { defaultImages } from '../defaultImages';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onPressFeed: (feed: Feed) => void;
@@ -73,6 +74,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(item)}
                                 size={itemDimension}
+                                defaultImage={defaultImages.userCircle}
                                 modelHelper={modelHelper}
                             />
                         );
