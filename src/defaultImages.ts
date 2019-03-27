@@ -7,5 +7,5 @@ export const defaultImages = {
     link: require('../images/link.svg'),
     snorkeling: require('../images/snorkeling.svg'),
     userCircleWhite: require('../images/user_circle-white.png'),
-    userCircle: require('../images/user_circle.png'),
+    userCircle: require('../images/assets/user_circle.png'),
 };

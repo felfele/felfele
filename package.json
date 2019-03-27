@@ -106,7 +106,7 @@
   "rnpm": {
     "assets": [
       "fonts",
-      "images"
+      "images/assets"
     ]
   },
   "detox": {
