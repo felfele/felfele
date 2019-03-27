@@ -1,3 +1,12 @@
+## v0.9.32 (2019-03-27)
+
+This release adds the following new features and fixes:
+
+- Feature: News recommendation: you can find interesting new content organized by categories (https://github.com/felfele/felfele/pull/230)
+- Feature: Automatic sharing: your posts are shared automatically now, you can disable this (https://github.com/felfele/felfele/pull/242)
+- Bugfix: Fixed stuck syncing after sharing (https://github.com/felfele/felfele/pull/244)
+- Many small bugfixes and style changes
+
 ## v0.9.31 (2019-03-01)
 
 This release adds the following new features and fixes:
