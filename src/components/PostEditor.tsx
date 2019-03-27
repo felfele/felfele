@@ -59,6 +59,10 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     public render() {
+        const isPostEmpty = this.isPostEmpty();
+        const sendIconColor = isPostEmpty ? Colors.GRAY : Colors.BRAND_PURPLE;
+        const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
+        const sendButtonOnPress = isPostEmpty ? () => {} : this.onPressSubmit;
         return (
             <SafeAreaView style={styles.container}>
                 <KeyboardAvoidingView
@@ -76,12 +80,8 @@ export class PostEditor extends React.Component<Props, State> {
                             />,
                         }}
                         rightButton1={{
-                            onPress: this.onPressSubmit,
-                            label: <Icon
-                                name={'send'}
-                                size={20}
-                                color={Colors.BRAND_PURPLE}
-                            />,
+                            onPress: sendButtonOnPress,
+                            label: sendIcon,
                         }}
                         titleImage={
                             <Avatar
@@ -115,6 +115,10 @@ export class PostEditor extends React.Component<Props, State> {
                 </KeyboardAvoidingView>
             </SafeAreaView>
         );
+    }
+
+    private isPostEmpty = () => {
+        return this.state.post.text === '' && this.state.post.images.length === 0;
     }
 
     private onRemoveImage = (removedImage: ImageData) => {
