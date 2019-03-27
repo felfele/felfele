@@ -40,7 +40,7 @@ echo "Building the android release version signed with debug key..."
 ./scripts/build_signed_android_release.sh
 
 echo "Uploading the android version to https://app.felfele.com..."
-./scripts/upload_android_release "$version"
+./scripts/upload_android_release.sh "$version"
 
 ask "Download the released versions and do manual QA (both android and iOS)"
 
