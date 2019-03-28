@@ -37,7 +37,7 @@ export class AllFeedScreen extends React.Component<Props> {
             >
                 {{
                     navigationHeader: <NavigationHeader
-                                    title='All feeds'
+                                    title='Home'
                                     rightButton1={{
                                         onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
                                             showExplore: true,
