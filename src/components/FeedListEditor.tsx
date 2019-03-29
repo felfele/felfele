@@ -20,11 +20,14 @@ export interface DispatchProps {
     openExplore: () => void;
 }
 
+export interface FeedSection {
+    title?: string;
+    data: Feed[];
+}
+
 export interface StateProps {
     navigation: TypedNavigation;
-    ownFeeds: Feed[];
-    followedFeeds: Feed[];
-    knownFeeds: Feed[];
+    sections: FeedSection[];
     gatewayAddress: string;
     title: string;
     showExplore: boolean;
@@ -34,25 +37,6 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
     public render() {
         const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
-        const sections: Array<{ title: string, data: Feed[] }> = [];
-        if (this.props.ownFeeds.length > 0) {
-            sections.push({
-                title: `Your feeds ${this.props.ownFeeds.length}`,
-                data: this.props.ownFeeds,
-            });
-        }
-        if (this.props.followedFeeds.length > 0) {
-            sections.push({
-                title: `Public feeds you follow  ${this.props.followedFeeds.length}`,
-                data: this.props.followedFeeds,
-            });
-        }
-        if (this.props.knownFeeds.length > 0) {
-            sections.push({
-                title: `Other feeds  ${this.props.knownFeeds.length}`,
-                data: this.props.knownFeeds,
-            });
-        }
         return (
             <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
@@ -61,7 +45,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     spacing={10}
                     fixed={true}
                     itemDimension={itemDimension}
-                    sections={sections}
+                    sections={this.props.sections}
                     renderItem={({ item }: any) => {
                         const image: ImageData = item.authorImage != null
                             ? item.authorImage
@@ -79,7 +63,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                             />
                         );
                     }}
-                    renderSectionHeader={({ section }) => (
+                    renderSectionHeader={({ section }) => ( section.title &&
                         <MediumText style={styles.sectionHeader}>{section.title}</MediumText>
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing

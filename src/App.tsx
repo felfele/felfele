@@ -39,7 +39,8 @@ import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
 import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContainer';
 import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
-import { Routes, TypedNavigation } from './helpers/navigation';
+import { TypedNavigation } from './helpers/navigation';
+import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -58,8 +59,8 @@ const favoriteTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
-    FeedListViewerContainer: {
-        screen: FeedListViewerContainer,
+    FavoriteListViewerContainer: {
+        screen: FavoriteListViewerContainer,
     },
     FeedFromList: {
         screen: SettingsFeedViewContainer,
