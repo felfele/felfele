@@ -47,3 +47,19 @@ test('Serializing should skip blacklisted names but work with normal', () => {
 
     expect(result).toBe(expected);
 });
+
+test('Serializing undefined should work', () => {
+    const input = undefined;
+    const expected = undefined;
+    const result = serialize(input);
+
+    expect(result).toBe(expected);
+});
+
+test('Serializing undefined key should work', () => {
+    const input = {undefined};
+    const expected = `{}`;
+    const result = serialize(input);
+
+    expect(result).toBe(expected);
+});
