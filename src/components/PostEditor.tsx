@@ -44,6 +44,7 @@ type Props = StateProps & DispatchProps;
 
 interface State {
     post: Post;
+    isSending: boolean;
 }
 
 export class PostEditor extends React.Component<Props, State> {
@@ -54,15 +55,17 @@ export class PostEditor extends React.Component<Props, State> {
         super(props);
         this.state = {
             post: this.getPostFromDraft(this.props.draft),
+            isSending: false,
         };
         this.modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
     }
 
     public render() {
         const isPostEmpty = this.isPostEmpty();
-        const sendIconColor = isPostEmpty ? Colors.GRAY : Colors.BRAND_PURPLE;
+        const isSendEnabled = !isPostEmpty && !this.state.isSending;
+        const sendIconColor = isSendEnabled ? Colors.BRAND_PURPLE : Colors.GRAY;
         const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
-        const sendButtonOnPress = isPostEmpty ? () => {} : this.onPressSubmit;
+        const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
             <SafeAreaView style={styles.container}>
                 <KeyboardAvoidingView
@@ -230,9 +233,13 @@ export class PostEditor extends React.Component<Props, State> {
 
     private sendUpdate = () => {
         this.setState({
+            isSending: true,
+        });
+        const markdownText = markdownEscape(this.state.post.text);
+        this.setState({
            post: {
             ...this.state.post,
-            text: markdownEscape(this.state.post.text),
+            text: markdownText,
            },
         }, () => {
             Debug.log(this.state.post);
