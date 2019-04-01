@@ -173,7 +173,8 @@ export const AsyncActions = {
             const notUpdatedPosts = previousPosts.filter(post => post.author != null && !uniqueAuthors.has(post.author.uri));
             const allPosts = notUpdatedPosts.concat(downloadedPosts);
             const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
-            const posts = sortedPosts.map((post, index) => ({...post, _id: index}));
+            const startId = Date.now();
+            const posts = sortedPosts.map((post, index) => ({...post, _id: startId + index}));
 
             dispatch(Actions.updateRssPosts(posts));
         };
