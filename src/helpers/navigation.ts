@@ -26,6 +26,9 @@ export interface Routes {
         showExplore: boolean,
         feeds?: Feed[],
     };
+    FavoriteListViewerContainer: {
+        feeds: Feed[],
+    };
     Feed: {
         feedUrl: string,
         name: string,

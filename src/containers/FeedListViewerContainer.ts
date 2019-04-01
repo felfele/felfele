@@ -1,19 +1,22 @@
 import { connect } from 'react-redux';
 
 import { AppState } from '../reducers/AppState';
-import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
+import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
-const favoriteCompare = (a: Feed, b: Feed): number => (b.favorite === true ? 1 : 0) - (a.favorite === true ? 1 : 0);
-
-const followedCompare = (a: Feed, b: Feed): number => (b.followed === true ? 1 : 0) - (a.followed === true ? 1 : 0);
-
-export const sortFeeds = (feeds: Feed[]): Feed[] => feeds.sort((a, b) => favoriteCompare(a, b) || followedCompare (a, b) || a.name.localeCompare(b.name));
+const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
+    if (feeds.length > 0) {
+        return [{
+            title: `${title} ${feeds.length}`,
+            data: feeds,
+        }];
+    }
+    return [];
+};
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
-    // TODO: update favicons?
     const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
     const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
     const ownFeeds = navParamFeeds
@@ -28,10 +31,15 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : getKnownFeeds(state)
     ;
+
+    const sections: FeedSection[] = ([] as FeedSection[]).concat(
+        addSection('Your feeds', ownFeeds),
+        addSection('Public feeds you follow', followedFeeds),
+        addSection('Other feeds', knownFeeds),
+    );
+
     return {
-        ownFeeds: ownFeeds,
-        followedFeeds: followedFeeds,
-        knownFeeds: knownFeeds,
+        sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
         title: 'All feeds',
