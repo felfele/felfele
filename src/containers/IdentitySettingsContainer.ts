@@ -4,6 +4,7 @@ import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
 import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
@@ -19,11 +20,24 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onUpdateAuthor: (text: string) => {
+        onUpdateAuthor: (text: string, ownFeed?: LocalFeed) => {
             dispatch(Actions.updateAuthorName(text));
+            if (ownFeed != null) {
+                dispatch(Actions.updateOwnFeed({
+                    feedUrl: ownFeed.feedUrl,
+                    name: text,
+                }));
+            }
         },
-        onUpdatePicture: (image: ImageData) => {
+        onUpdatePicture: (image: ImageData, ownFeed?: LocalFeed) => {
             dispatch(Actions.updateAuthorImage(image));
+            if (ownFeed != null) {
+                dispatch(Actions.updateOwnFeed({
+                    feedUrl: ownFeed.feedUrl,
+                    authorImage: image,
+                    favicon: undefined,
+                }));
+            }
         },
     };
 };

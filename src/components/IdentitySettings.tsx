@@ -20,10 +20,10 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
+import { Feed } from '../models/Feed';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/misc/RowButton';
@@ -32,18 +32,19 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
 
 const defaultUserImage = defaultImages.userCircle;
 
 export interface DispatchProps {
-    onUpdateAuthor: (text: string) => void;
-    onUpdatePicture: (image: ImageData) => void;
+    onUpdateAuthor: (text: string, ownFeed?: LocalFeed) => void;
+    onUpdatePicture: (image: ImageData, ownFeed?: LocalFeed) => void;
     onChangeText?: (text: string) => void;
 }
 
 export interface StateProps {
     author: Author;
-    ownFeed?: Feed;
+    ownFeed?: LocalFeed;
     navigation: TypedNavigation;
     gatewayAddress: string;
 }
@@ -105,7 +106,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 >
                     <TouchableOpacity
                         onPress={async () => {
-                            await openImagePicker(props.onUpdatePicture);
+                            await openImagePicker(props.onUpdatePicture, props.ownFeed);
                         }}
                         style={styles.imagePickerContainer}
                     >
@@ -129,8 +130,8 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         returnKeyType={'done'}
                         onSubmitEditing={(name) =>
                             name === ''
-                            ? props.onUpdateAuthor(NAME_PLACEHOLDER)
-                            : props.onUpdateAuthor(name)
+                            ? props.onUpdateAuthor(NAME_PLACEHOLDER, props.ownFeed)
+                            : props.onUpdateAuthor(name, props.ownFeed)
                         }
                     />
                     <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
@@ -156,10 +157,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
+const openImagePicker = async (onUpdatePicture: (imageData: ImageData, ownFeed?: LocalFeed) => void, ownFeed?: LocalFeed) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
     if (imageData != null) {
-        onUpdatePicture(imageData);
+        onUpdatePicture(imageData, ownFeed);
     }
 };
 
