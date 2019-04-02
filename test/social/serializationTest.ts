@@ -63,3 +63,11 @@ test('Serializing undefined key should work', () => {
 
     expect(result).toBe(expected);
 });
+
+test('Serializing arrays should work', () => {
+    const input = [0, 1, 2];
+    const expected = `[0,1,2]`;
+    const result = serialize(input);
+
+    expect(result).toBe(expected);
+});
