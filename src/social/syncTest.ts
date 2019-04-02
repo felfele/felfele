@@ -10,6 +10,7 @@ import {
     mergePostCommandLogs,
     getPostCommandUpdatesSinceEpoch,
     emptyPostCommandLog,
+    getUnsyncedPostCommandLog,
 } from './api';
 import {
     testSharePost,
@@ -62,6 +63,28 @@ const testSharePostsStorage = async (source = 'storage', storage: PostCommandLog
     assertPostCommandLogInvariants(syncedCommandLog);
 
     return syncedCommandLog;
+};
+
+const testUnsyncedPostCommandLogWithNoUnsyncedCommands = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    const sharedPostCommandLog = await testSharePostsStorage(source, storage);
+
+    const unsyncedCommandLog = getUnsyncedPostCommandLog(sharedPostCommandLog);
+    assertPostCommandLogInvariants(unsyncedCommandLog);
+
+    assertEquals(0, unsyncedCommandLog.commands.length);
+
+    return unsyncedCommandLog;
+};
+
+const testUnsyncedPostCommandLogWithOneUnsyncedCommand = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
+    const sharedPostCommandLog = await testSharePostsStorage(source, storage);
+    const postCommandLogAfterUnsynced = testSharePost(4, sharedPostCommandLog, source);
+    const unsyncedCommandLog = getUnsyncedPostCommandLog(postCommandLogAfterUnsynced);
+    assertPostCommandLogInvariants(unsyncedCommandLog);
+
+    assertEquals(1, unsyncedCommandLog.commands.length);
+
+    return unsyncedCommandLog;
 };
 
 const testLatestPostsAfterFirstSync = async (source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
@@ -215,6 +238,8 @@ const testDownloadFeedTemplate = async () => {
 export const syncTests = {
     testSharePostStorage,
     testSharePostsStorage,
+    testUnsyncedPostCommandLogWithNoUnsyncedCommands,
+    testUnsyncedPostCommandLogWithOneUnsyncedCommand,
     testLatestPostsAfterFirstSync,
     testMergeTheSamePostWithOneUploadedStorage,
     testSharePostsWithRemoveOnStorage,

@@ -12,6 +12,12 @@ beforeEach(() => localSwarmStorage = makeLocalSwarmStorage());
 test('Test sharing posts to storage', async () =>
     syncTests.testSharePostsStorage(source, localSwarmStorage));
 
+test('Test unsynced post command log with no unsynced commands ', async () =>
+    syncTests.testUnsyncedPostCommandLogWithNoUnsyncedCommands(source, localSwarmStorage));
+
+test('Test unsynced post command log with one unsynced command ', async () =>
+    syncTests.testUnsyncedPostCommandLogWithOneUnsyncedCommand(source, localSwarmStorage));
+
 test('Test latest posts after first sync', async () =>
     syncTests.testLatestPostsAfterFirstSync(source, localSwarmStorage));
 
