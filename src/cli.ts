@@ -59,7 +59,7 @@ const definitions =
         .
         addCommand('get <hash>', 'Download the data by hash', async (hash: string) => {
             const bzz = Swarm.makeBzzApi(swarmGateway);
-            const data = await bzz.download(hash, 0);
+            const data = await bzz.downloadString(hash, 0);
             output(data);
         })
         .

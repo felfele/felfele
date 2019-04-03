@@ -4,11 +4,12 @@ import nacl from 'ecma-nacl';
 import * as base64 from 'base64-arraybuffer';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
+// @ts-ignore
+import * as utf8 from 'utf8-encoder';
 
 import { hexToByteArray } from './conversion';
 import { Version } from './Version';
-// @ts-ignore
-import * as utf8 from 'utf8-encoder';
+import { encrypt, decrypt } from './cryptoHelpers';
 
 const header = `-----BEGIN FELFELE BACKUP-----`;
 const headerFields = `
@@ -39,21 +40,30 @@ export const isValidBackup = (backupText: string): boolean => {
     return true;
 };
 
-export const createBackupFromString = async (data: string, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<string> => {
+export const createBinaryBackupFromString = async (data: string, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<Uint8Array> => {
     const dataUint8Array: Uint8Array = utf8.fromString(data);
-    const secureRandomUint8Array = await generateRandom(24);
-    const secretUint8Array = new Uint8Array(keccak256.array(hexToByteArray(secretHex)));
-    const encryptedData = nacl.secret_box.formatWN.pack(dataUint8Array, secureRandomUint8Array, secretUint8Array);
+    const secretByteArray = hexToByteArray(secretHex);
+    const encryptedData = await encrypt(dataUint8Array, secretByteArray, generateRandom);
+    return encryptedData;
+};
+
+export const createTextBackupFromString = async (data: string, secretHex: string, generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom): Promise<string> => {
+    const encryptedData = await createBinaryBackupFromString(data, secretHex, generateRandom);
     const encryptedDataBase64 = base64.encode(encryptedData.buffer);
     const backupText = wrapWithHeaderAndFooter(encryptedDataBase64);
     return backupText;
 };
 
-export const restoreBackupToString = async (backupText: string, secretHex: string): Promise<string> => {
-    const encryptedDataBase64 = stripHeaderAndFooter(backupText);
-    const secretUint8Array = new Uint8Array(keccak256.array(hexToByteArray(secretHex)));
-    const encryptedBytes = new Uint8Array(base64.decode(encryptedDataBase64));
-    const decryptedData = nacl.secret_box.formatWN.open(encryptedBytes, secretUint8Array);
+export const restoreBinaryBackupToString = (encryptedBackup: Uint8Array, secretHex: string): string => {
+    const secretByteArray = hexToByteArray(secretHex);
+    const decryptedData = decrypt(encryptedBackup, secretByteArray);
     const originalText = utf8.toString(decryptedData);
+    return originalText;
+};
+
+export const restoreTextBackupToString = (backupText: string, secretHex: string): string => {
+    const encryptedDataBase64 = stripHeaderAndFooter(backupText);
+    const encryptedBytes = new Uint8Array(base64.decode(encryptedDataBase64));
+    const originalText = restoreBinaryBackupToString(encryptedBytes, secretHex);
     return originalText;
 };

@@ -1,16 +1,22 @@
 import * as React from 'react';
-import { View, StyleSheet, Clipboard, Alert, ShareContent, ShareOptions, Share, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Clipboard, Alert, ShareContent, ShareOptions, Share, SafeAreaView, Platform } from 'react-native';
+// @ts-ignore
+import { generateSecureRandom } from 'react-native-securerandom';
+
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { createBackupFromString } from '../BackupRestore';
+import { createBinaryBackupFromString } from '../BackupRestore';
 import { DateUtils } from '../DateUtils';
 import { getSerializedAppState } from '../reducers';
 import { AppState } from '../reducers/AppState';
-import { stringToHex } from '../conversion';
+import { byteArrayToHex, stringToByteArray, hexToByteArray } from '../conversion';
 import { TypedNavigation } from '../helpers/navigation';
+import * as Swarm from '../swarm/Swarm';
+import { encrypt } from '../cryptoHelpers';
+import { HexString } from '../opaqueTypes';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -23,17 +29,30 @@ export interface DispatchProps {
 export type Props = StateProps & DispatchProps;
 
 export interface State {
-    backupText: string;
-    secretText: string;
+    backupPassword: string;
+    randomSecret: HexString;
+    contentHash: HexString;
+    backupData: HexString;
     serializedAppState?: string;
 }
 
 export class Backup extends React.PureComponent<Props, State> {
     public state = {
-        backupText: '',
-        secretText: '',
+        backupPassword: '',
+        randomSecret: '' as HexString,
+        contentHash: '' as HexString,
+        backupData: '' as HexString,
         serializedAppState: undefined,
     };
+
+    public componentDidMount = async () => {
+        const randomSecretBytes = await generateSecureRandom(32);
+        const randomSecret = byteArrayToHex(randomSecretBytes, false) as HexString;
+
+        this.setState({
+            randomSecret,
+        });
+    }
 
     public render = () => (
         <SafeAreaView style={styles.mainContainer}>
@@ -49,36 +68,44 @@ export class Backup extends React.PureComponent<Props, State> {
                     placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
-                    onChangeText={async (text) => await this.setSecretText(text)}
+                    defaultValue={this.state.backupPassword}
+                    onChangeText={async (text) => await this.setBackupPassword(text)}
                 />
-                <Button style={styles.backupButton} text='Backup' onPress={async () => await this.onBackupData()} />
+                <Button
+                    style={styles.backupButton}
+                    text='Backup'
+                    onPress={async () => await this.onBackupData()}
+                    enabled={this.state.contentHash === ''}
+                />
             </View>
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
-                defaultValue={this.state.backupText}
-                placeholder='Loading backup...'
+                defaultValue={this.getBackupText()}
+                placeholder='Saving backup...'
                 multiline={true}
             />
         </SafeAreaView>
     )
 
-    private setSecretText = async (text: string) => {
-        const secretHex = stringToHex(this.state.secretText);
-        const serializedAppState = await this.getOrLoadSerializedAppState();
-        const backupText = await createBackupFromString(serializedAppState, secretHex);
-
-        this.setState({
-            secretText: text,
-            backupText,
+    private completeSetState = <K extends keyof State>(state: ((prevState: Readonly<State>, props: Readonly<Props>) => (Pick<State, K> | State | null)) | (Pick<State, K> | State | null)): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            this.setState(state, () => resolve());
         });
     }
 
-    private showShareDialog = async (message: string) => {
+    private setBackupPassword = async (text: string) => {
+        await this.completeSetState({
+            backupPassword: text,
+        });
+    }
+
+    private showShareDialog = async (backupData: HexString) => {
+        Debug.log('Backup.showShareDialog', 'backupLink', backupData);
         const title = 'Felfele backup ' + DateUtils.timestampToDateString(Date.now(), true);
         const content: ShareContent = {
             title,
-            message,
+            message: backupData,
         };
         const options: ShareOptions = {
         };
@@ -90,23 +117,63 @@ export class Backup extends React.PureComponent<Props, State> {
             return this.state.serializedAppState!;
         }
         const serializedAppState = await getSerializedAppState();
-        this.setState({
+        await this.completeSetState({
             serializedAppState,
         });
         return serializedAppState;
     }
 
+    private getBackupData = (): HexString => {
+        const backupData = `${this.state.contentHash}${this.state.randomSecret}` as HexString;
+        return backupData;
+    }
+
+    private getBackupText = () => {
+        const backupText = `
+Random secret: ${this.state.randomSecret}
+Content hash: ${this.state.contentHash}
+Backup link: ${this.state.backupData}
+`;
+        return backupText;
+    }
+
+    private calculateEncryptedBackupData = async (): Promise<HexString> => {
+        const backupData = this.getBackupData();
+        if (this.state.backupPassword !== '') {
+            const plainData = new Uint8Array(hexToByteArray(backupData));
+            const backupPasswordByteArray = stringToByteArray(this.state.backupPassword);
+            const encryptedBackupData = await encrypt(plainData, backupPasswordByteArray);
+            const encryptedHexBackup = byteArrayToHex(encryptedBackupData, false) as HexString;
+            return encryptedHexBackup;
+        }
+        return backupData;
+    }
+
     private onBackupData = async () => {
         try {
-            const secretHex = stringToHex(this.state.secretText);
-            const serializedAppState = await this.getOrLoadSerializedAppState();
-            const emailBody = await createBackupFromString(serializedAppState, secretHex);
-            Debug.log('sendBackup body', emailBody);
-
-            this.showShareDialog(emailBody);
+            const contentHash = await this.backupAppStateToSwarm(this.state.randomSecret);
+            await this.completeSetState({
+                contentHash,
+            });
+            const backupData = await this.calculateEncryptedBackupData();
+            await this.completeSetState({
+                backupData,
+            });
+            Clipboard.setString(backupData);
+            await this.showShareDialog(backupData);
         } catch (e) {
             Debug.log('sendBackup error', e);
         }
+    }
+
+    private backupAppStateToSwarm = async (secretHex: HexString): Promise<HexString> => {
+        Debug.log('Backup.backupAppStateToSwarm', 'secretHex', secretHex);
+        const serializedAppState = await this.getOrLoadSerializedAppState();
+        const encryptedBackup = await createBinaryBackupFromString(serializedAppState, secretHex);
+        const bzz = Swarm.makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
+        const contentHash = await bzz.uploadUint8Array(encryptedBackup) as HexString;
+        Debug.log('Backup.backupAppStateToSwarm', 'contentHash', contentHash);
+        return contentHash;
     }
 }
 

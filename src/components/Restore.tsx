@@ -5,38 +5,54 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { isValidBackup, restoreBackupToString } from '../BackupRestore';
-import { stringToHex } from '../conversion';
+import { restoreBinaryBackupToString } from '../BackupRestore';
 import { getAppStateFromSerialized } from '../reducers';
 import { TypedNavigation } from '../helpers/navigation';
+import * as Swarm from '../swarm/Swarm';
+import { AppState } from '../reducers/AppState';
+import { HexString } from '../opaqueTypes';
+import { decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../cryptoHelpers';
+import { stringToByteArray, hexToByteArray, byteArrayToHex } from '../conversion';
+
+const BACKUP_DATA_LENGTH = 128;
+const ENCRYPTED_BACKUP_DATA_LENGHT = ENCRYPTED_HEX_HEADER_LENGTH + BACKUP_DATA_LENGTH;
+const CONTENT_HASH_OFFSET = 0;
+const SECRET_OFFSET = 64;
 
 export interface StateProps {
     navigation: TypedNavigation;
+    swarmGatewayAddress: string;
 }
 
 export interface DispatchProps {
-    onRestoreData: (data: string, secretHex: string) => void;
+    onRestoreData: (appState: AppState) => void;
 }
 
 export type Props = StateProps & DispatchProps;
 
 export interface State {
-    clipboardText: string;
-    secretText: string;
-    canRestore: boolean;
+    backupPassword: string;
+    backupData: HexString;
+    backupInfo: string;
+    appState: AppState | undefined;
 }
 
 export class Restore extends React.PureComponent<Props, State> {
     public state = {
-        clipboardText: '',
-        secretText: '',
-        canRestore: false,
+        backupPassword: '',
+        backupData: '' as HexString,
+        backupInfo: '',
+        appState: undefined,
     };
 
     public componentWillMount = () => {
         Clipboard.getString().then(value => {
             Debug.log('Restore clipboard', value);
-            this.setState({clipboardText: value});
+            if (value.length === BACKUP_DATA_LENGTH || value.length === ENCRYPTED_BACKUP_DATA_LENGHT) {
+                this.setState({
+                    backupData: value as HexString,
+                }, () => this.onChangePassword(''));
+            }
         });
     }
 
@@ -54,49 +70,75 @@ export class Restore extends React.PureComponent<Props, State> {
                     placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
-                    onChangeText={async (text) => this.onChangeSecret(text)}
+                    defaultValue={this.state.backupPassword}
+                    onChangeText={async (text) => this.onChangePassword(text)}
                 />
-                <Button enabled={this.state.canRestore} style={styles.restoreButton} text='Restore' onPress={() => this.onRestoreData()} />
+                <Button
+                    enabled={this.state.appState != null}
+                    style={styles.restoreButton}
+                    text='Restore'
+                    onPress={() => this.onRestoreData()}
+                />
             </View>
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
-                defaultValue={this.state.clipboardText}
                 placeholder='Loading backup...'
+                defaultValue={this.state.backupInfo}
                 multiline={true}
             />
         </SafeAreaView>
     )
 
-    private onChangeSecret = async (text: string) => {
+    private onChangePassword = async (password: string) => {
         try {
-            const secretHex = stringToHex(text);
-            const serializedAppState = await restoreBackupToString(this.state.clipboardText, secretHex);
+            const backupData = this.getDecryptedBackupData(password);
+            Debug.log('Restore.onChangePassword', 'backupData', backupData);
+            const contentHash = backupData.slice(CONTENT_HASH_OFFSET, SECRET_OFFSET) as HexString;
+            const secret = backupData.slice(SECRET_OFFSET) as HexString;
+
+            const bzz = Swarm.makeBzzApi(this.props.swarmGatewayAddress);
+            const encryptedBackup = await bzz.downloadUint8Array(contentHash, 0);
+
+            const serializedAppState = restoreBinaryBackupToString(encryptedBackup, secret);
             const appState = await getAppStateFromSerialized(serializedAppState);
-            Debug.log('Restore.onChangeSecret: success');
+            Debug.log('Restore.onChangePassword', 'success');
+
+            const backupInfo = this.backupInfo(contentHash, secret);
+
             this.setState({
-                secretText: text,
-                canRestore: true,
+                appState,
+                backupInfo,
             });
         } catch (e) {
-            Debug.log('Restore.onChangeSecret: failed', e);
+            Debug.log('Restore.onChangePassword', 'failed', e);
             this.setState({
-                secretText: text,
-                canRestore: false,
+                appState: undefined,
             });
         }
     }
 
-    private onRestoreData = () => {
-        const isValid = isValidBackup(this.state.clipboardText);
-        if (!isValid) {
-            Alert.alert('Invalid backup!');
-            return;
+    private getDecryptedBackupData = (password: string): HexString => {
+        if (this.state.backupData.length === ENCRYPTED_BACKUP_DATA_LENGHT) {
+            const backupPasswordByteArray = stringToByteArray(password);
+            const backupData = new Uint8Array(hexToByteArray(this.state.backupData));
+            const decryptedBackupData = decrypt(backupData, backupPasswordByteArray);
+            return byteArrayToHex(decryptedBackupData, false) as HexString;
         }
+        return this.state.backupData;
+    }
 
-        const data = this.state.clipboardText;
-        const secretHex = stringToHex(this.state.secretText);
-        this.props.onRestoreData(data, secretHex);
+    private onRestoreData = async () => {
+        if (this.state.appState != null) {
+            this.props.onRestoreData(this.state.appState!);
+        }
+    }
+
+    private backupInfo = (contentHash: HexString, secret: HexString) => {
+        return `
+Content hash: ${contentHash}
+Random secret: ${secret}
+`;
     }
 }
 

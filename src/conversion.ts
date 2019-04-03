@@ -26,8 +26,9 @@ export const byteArrayToString = (byteArray: number[]): string => {
 export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 
 // cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
-export const byteArrayToHex = (byteArray: number[] | Uint8Array): string => {
-    return '0x' + Array.from(byteArray, (byte) => {
+export const byteArrayToHex = (byteArray: number[] | Uint8Array, withPrefix: boolean = true): string => {
+    const prefix = withPrefix ? '0x' : '';
+    return prefix + Array.from(byteArray, (byte) => {
         // tslint:disable-next-line:no-bitwise
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('');

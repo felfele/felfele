@@ -19,7 +19,7 @@ import {
 } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
-import { restoreBackupToString } from '../BackupRestore';
+import { restoreTextBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
@@ -410,10 +410,8 @@ export const AsyncActions = {
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
-    restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
+    restoreAppStateFromBackup: (appState: AppState): Thunk => {
         return async (dispatch, getState) => {
-            const serializedAppState = await restoreBackupToString(backupText, secretHex);
-            const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
             dispatch(InternalActions.appStateSet(currentVersionAppState));
         };

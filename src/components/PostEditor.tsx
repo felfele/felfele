@@ -242,7 +242,7 @@ export class PostEditor extends React.Component<Props, State> {
             text: markdownText,
            },
         }, () => {
-            Debug.log(this.state.post);
+            Debug.log('PostEditor.sendUpdate', 'this.state.post', this.state.post);
             this.props.onPost(this.state.post);
         });
     }
