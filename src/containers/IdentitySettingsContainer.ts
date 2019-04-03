@@ -4,7 +4,6 @@ import { AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
 import { TypedNavigation } from '../helpers/navigation';
-import { LocalFeed } from '../social/api';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
@@ -23,7 +22,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onUpdateAuthor: (text: string) => {
             dispatch(AsyncActions.updateProfileName(text));
         },
-        onUpdatePicture: (image: ImageData, ownFeed?: LocalFeed) => {
+        onUpdatePicture: (image: ImageData) => {
             dispatch(AsyncActions.updateProfileImage(image));
         },
     };

@@ -37,8 +37,8 @@ import { LocalFeed } from '../social/api';
 const defaultUserImage = defaultImages.userCircle;
 
 export interface DispatchProps {
-    onUpdateAuthor: (text: string, ownFeed?: LocalFeed) => void;
-    onUpdatePicture: (image: ImageData, ownFeed?: LocalFeed) => void;
+    onUpdateAuthor: (text: string) => void;
+    onUpdatePicture: (image: ImageData) => void;
     onChangeText?: (text: string) => void;
 }
 
@@ -106,7 +106,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 >
                     <TouchableOpacity
                         onPress={async () => {
-                            await openImagePicker(props.onUpdatePicture, props.ownFeed);
+                            await openImagePicker(props.onUpdatePicture);
                         }}
                         style={styles.imagePickerContainer}
                     >
@@ -130,8 +130,8 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         returnKeyType={'done'}
                         onSubmitEditing={(name) =>
                             name === ''
-                            ? props.onUpdateAuthor(NAME_PLACEHOLDER, props.ownFeed)
-                            : props.onUpdateAuthor(name, props.ownFeed)
+                            ? props.onUpdateAuthor(NAME_PLACEHOLDER)
+                            : props.onUpdateAuthor(name)
                         }
                     />
                     <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
@@ -157,10 +157,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     );
 };
 
-const openImagePicker = async (onUpdatePicture: (imageData: ImageData, ownFeed?: LocalFeed) => void, ownFeed?: LocalFeed) => {
+const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
     const imageData = await AsyncImagePicker.launchImageLibrary();
     if (imageData != null) {
-        onUpdatePicture(imageData, ownFeed);
+        onUpdatePicture(imageData);
     }
 };
 
