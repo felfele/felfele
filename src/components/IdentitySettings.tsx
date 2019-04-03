@@ -20,10 +20,10 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
+import { Feed } from '../models/Feed';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Feed } from '../models/Feed';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/misc/RowButton';
@@ -32,6 +32,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
 
 const defaultUserImage = defaultImages.userCircle;
 
@@ -43,7 +44,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     author: Author;
-    ownFeed?: Feed;
+    ownFeed?: LocalFeed;
     navigation: TypedNavigation;
     gatewayAddress: string;
 }
