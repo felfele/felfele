@@ -48,13 +48,13 @@ export const initializeNotifications = () => {
     });
 };
 
-export const localScheduledNotification = (message: string) => {
+export const localScheduledNotification = (message: string, millisecondsLater: number) => {
     PushNotification.checkPermissions((permissions: any) => {
         Debug.log('localScheduledNotification', 'permissions', permissions);
     });
     PushNotification.localNotificationSchedule({
         message,
-        date: new Date(Date.now() + (15 * 1000)), // in 60 secs
+        date: new Date(Date.now() + millisecondsLater),
         id: Date.now(),
     });
 };

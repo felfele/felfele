@@ -17,6 +17,7 @@ import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 import { localScheduledNotification } from '../helpers/notifications';
+import { DateUtils, SECOND } from '../DateUtils';
 
 export interface StateProps {
     appState: AppState;
@@ -117,7 +118,7 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Send scheduled notification'
                     onPress={() => {
-                        localScheduledNotification('hello');
+                        localScheduledNotification('hello', 15 * SECOND);
                         Alert.alert('Notification set!');
                     }}
                     buttonStyle='none'
