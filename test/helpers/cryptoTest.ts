@@ -1,5 +1,5 @@
-import { encrypt, decrypt } from '../src/cryptoHelpers';
-import { stringToByteArray } from '../src/conversion';
+import { encrypt, decrypt } from '../../src/helpers/crypto';
+import { stringToByteArray } from '../../src/helpers/conversion';
 
 const stringToUint8Array = (s: string): Uint8Array => new Uint8Array(stringToByteArray(s));
 

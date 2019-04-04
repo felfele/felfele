@@ -19,7 +19,6 @@ import {
 } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
-import { restoreTextBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';

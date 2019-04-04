@@ -1,5 +1,5 @@
-import { createTextBackupFromString, restoreTextBackupToString } from '../src/BackupRestore';
-import { stringToByteArray } from '../src/conversion';
+import { createTextBackupFromString, restoreTextBackupToString } from '../../src/helpers/backup';
+import { stringToByteArray } from '../../src/helpers/conversion';
 
 const generateRandom = async (num: number): Promise<Uint8Array> => {
     return new Uint8Array(stringToByteArray('e4219722f9eefbdfe9c66ae9'));

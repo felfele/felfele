@@ -4,7 +4,7 @@ import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
-import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
+import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
 
 export const defaultGateway = 'https://swarm.felfele.com';

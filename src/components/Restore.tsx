@@ -5,14 +5,14 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { restoreBinaryBackupToString } from '../BackupRestore';
+import { restoreBinaryBackupToString } from '../helpers/backup';
 import { getAppStateFromSerialized } from '../reducers';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
 import { AppState } from '../reducers/AppState';
-import { HexString } from '../opaqueTypes';
-import { decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../cryptoHelpers';
-import { stringToByteArray, hexToByteArray, byteArrayToHex } from '../conversion';
+import { HexString } from '../helpers/opaqueTypes';
+import { decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../helpers/crypto';
+import { stringToByteArray, hexToByteArray, byteArrayToHex } from '../helpers/conversion';
 
 const BACKUP_DATA_LENGTH = 128;
 const ENCRYPTED_BACKUP_DATA_LENGHT = ENCRYPTED_HEX_HEADER_LENGTH + BACKUP_DATA_LENGTH;
@@ -38,7 +38,7 @@ export interface State {
 }
 
 export class Restore extends React.PureComponent<Props, State> {
-    public state = {
+    public state: State = {
         backupPassword: '',
         backupData: '' as HexString,
         backupInfo: '',

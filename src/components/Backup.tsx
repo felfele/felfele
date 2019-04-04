@@ -8,15 +8,15 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { createBinaryBackupFromString } from '../BackupRestore';
+import { createBinaryBackupFromString } from '../helpers/backup';
 import { DateUtils } from '../DateUtils';
 import { getSerializedAppState } from '../reducers';
 import { AppState } from '../reducers/AppState';
-import { byteArrayToHex, stringToByteArray, hexToByteArray } from '../conversion';
+import { byteArrayToHex, stringToByteArray, hexToByteArray } from '../helpers/conversion';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
-import { encrypt } from '../cryptoHelpers';
-import { HexString } from '../opaqueTypes';
+import { encrypt } from '../helpers/crypto';
+import { HexString } from '../helpers/opaqueTypes';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -37,7 +37,7 @@ export interface State {
 }
 
 export class Backup extends React.PureComponent<Props, State> {
-    public state = {
+    public state: State = {
         backupPassword: '',
         randomSecret: '' as HexString,
         contentHash: '' as HexString,
