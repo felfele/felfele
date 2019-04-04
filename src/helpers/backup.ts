@@ -5,12 +5,20 @@ import { generateSecureRandom } from 'react-native-securerandom';
 // @ts-ignore
 import * as utf8 from 'utf8-encoder';
 
-import { hexToByteArray, stringToByteArray, byteArrayToHex } from '../helpers/conversion';
+import { hexToByteArray, stringToByteArray, byteArrayToHex, isHexString } from '../helpers/conversion';
 import { Version } from '../Version';
-import { encrypt, decrypt } from '../helpers/crypto';
+import { encrypt, decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../helpers/crypto';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
 import { HexString } from './opaqueTypes';
+
+const CONTENT_HASH_OFFSET = 0;
+const CONTENT_HASH_LENGTH = 64;
+const SECRET_OFFSET = 64;
+const SECRET_LENGTH = 64;
+const BACKUP_DATA_LENGTH = CONTENT_HASH_LENGTH + SECRET_LENGTH;
+
+const ENCRYPTED_BACKUP_LINK_DATA_LENGHT = ENCRYPTED_HEX_HEADER_LENGTH + BACKUP_DATA_LENGTH;
 
 const header = `-----BEGIN FELFELE BACKUP-----`;
 const headerFields = `
@@ -77,7 +85,7 @@ export const backupToSwarm = async (bzz: Swarm.BzzApi, data: string, secretHex: 
     return contentHash;
 };
 
-export const generateBackupLinkData = async (contentHash: HexString, randomSecret: HexString, backupPassword: string): Promise<HexString> => {
+export const encryptBackupLinkData = async (contentHash: HexString, randomSecret: HexString, backupPassword: string): Promise<HexString> => {
     const backupData = `${contentHash}${randomSecret}` as HexString;
     const plainData = new Uint8Array(hexToByteArray(backupData));
     const backupPasswordByteArray = stringToByteArray(backupPassword);
@@ -92,4 +100,27 @@ export const generateBackupRandomSecret = async (
     const randomSecretBytes = await generateRandom(32);
     const randomSecret = byteArrayToHex(randomSecretBytes, false);
     return randomSecret;
+};
+
+export const isValidBackupLinkData = (s: string): boolean => {
+    if (s.length !== ENCRYPTED_BACKUP_LINK_DATA_LENGHT) {
+        return false;
+    }
+    return isHexString(s);
+};
+
+export const downloadBackupFromSwarm = async (bzz: Swarm.BzzApi, backupLinkData: HexString, backupPassword: string): Promise<string> => {
+    const backupPasswordByteArray = stringToByteArray(backupPassword);
+    const backupDataUint8Array = new Uint8Array(hexToByteArray(backupLinkData));
+    const decryptedBackupData = decrypt(backupDataUint8Array, backupPasswordByteArray);
+    const backupData = byteArrayToHex(decryptedBackupData, false);
+
+    Debug.log('downloadBackupFromSwarm', 'backupData', backupData);
+
+    const contentHash = backupData.slice(CONTENT_HASH_OFFSET, SECRET_OFFSET) as HexString;
+    const secret = backupData.slice(SECRET_OFFSET) as HexString;
+    const encryptedBackup = await bzz.downloadUint8Array(contentHash, 0);
+    const backupString = restoreBinaryBackupToString(encryptedBackup, secret);
+
+    return backupString;
 };

@@ -5,19 +5,15 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { restoreBinaryBackupToString } from '../helpers/backup';
+import {
+    isValidBackupLinkData,
+    downloadBackupFromSwarm,
+} from '../helpers/backup';
 import { getAppStateFromSerialized } from '../reducers';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
 import { AppState } from '../reducers/AppState';
 import { HexString } from '../helpers/opaqueTypes';
-import { decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../helpers/crypto';
-import { stringToByteArray, hexToByteArray, byteArrayToHex } from '../helpers/conversion';
-
-const BACKUP_DATA_LENGTH = 128;
-const ENCRYPTED_BACKUP_DATA_LENGHT = ENCRYPTED_HEX_HEADER_LENGTH + BACKUP_DATA_LENGTH;
-const CONTENT_HASH_OFFSET = 0;
-const SECRET_OFFSET = 64;
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -32,7 +28,7 @@ export type Props = StateProps & DispatchProps;
 
 export interface State {
     backupPassword: string;
-    backupData: HexString;
+    backupLinkData: HexString;
     backupInfo: string;
     appState: AppState | undefined;
 }
@@ -40,7 +36,7 @@ export interface State {
 export class Restore extends React.PureComponent<Props, State> {
     public state: State = {
         backupPassword: '',
-        backupData: '' as HexString,
+        backupLinkData: '' as HexString,
         backupInfo: '',
         appState: undefined,
     };
@@ -48,9 +44,9 @@ export class Restore extends React.PureComponent<Props, State> {
     public componentWillMount = () => {
         Clipboard.getString().then(value => {
             Debug.log('Restore clipboard', value);
-            if (value.length === BACKUP_DATA_LENGTH || value.length === ENCRYPTED_BACKUP_DATA_LENGHT) {
+            if (isValidBackupLinkData(value)) {
                 this.setState({
-                    backupData: value as HexString,
+                    backupLinkData: value as HexString,
                 }, () => this.onChangePassword(''));
             }
         });
@@ -92,19 +88,12 @@ export class Restore extends React.PureComponent<Props, State> {
 
     private onChangePassword = async (password: string) => {
         try {
-            const backupData = this.getDecryptedBackupData(password);
-            Debug.log('Restore.onChangePassword', 'backupData', backupData);
-            const contentHash = backupData.slice(CONTENT_HASH_OFFSET, SECRET_OFFSET) as HexString;
-            const secret = backupData.slice(SECRET_OFFSET) as HexString;
-
             const bzz = Swarm.makeBzzApi(this.props.swarmGatewayAddress);
-            const encryptedBackup = await bzz.downloadUint8Array(contentHash, 0);
-
-            const serializedAppState = restoreBinaryBackupToString(encryptedBackup, secret);
+            const serializedAppState = await downloadBackupFromSwarm(bzz, this.state.backupLinkData, password);
             const appState = await getAppStateFromSerialized(serializedAppState);
             Debug.log('Restore.onChangePassword', 'success');
 
-            const backupInfo = this.backupInfo(contentHash, secret);
+            const backupInfo = 'App state downloaded and decrypted';
 
             this.setState({
                 appState,
@@ -116,16 +105,6 @@ export class Restore extends React.PureComponent<Props, State> {
                 appState: undefined,
             });
         }
-    }
-
-    private getDecryptedBackupData = (password: string): HexString => {
-        if (this.state.backupData.length === ENCRYPTED_BACKUP_DATA_LENGHT) {
-            const backupPasswordByteArray = stringToByteArray(password);
-            const backupData = new Uint8Array(hexToByteArray(this.state.backupData));
-            const decryptedBackupData = decrypt(backupData, backupPasswordByteArray);
-            return byteArrayToHex(decryptedBackupData, false) as HexString;
-        }
-        return this.state.backupData;
     }
 
     private onRestoreData = async () => {

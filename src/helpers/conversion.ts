@@ -54,19 +54,21 @@ export const hexToByteArray = (hex: string): number[] => {
     return subStrings.map(s => parseInt(s, 16));
 };
 
-const isHexStrict = (s: string): boolean => {
-    if (!s.startsWith('0x')) {
+export const isHexString = (s: string, strict: boolean = false): boolean => {
+    const hasPrefix = s.startsWith('0x');
+    if (strict && !hasPrefix) {
         return false;
     }
-    if (s.length < 4) {
+    const hex = s.substr(hasPrefix ? 2 : 0);
+    if (hex.length < 2) {
         return false;
     }
-    if (s.length % 2 === 1) {
+    if (hex.length % 2 === 1) {
         return false;
     }
     const legalChars: string = '0123456789aAbBcCdDeEfF';
-    for (let i = 2; i < s.length; i++) {
-        if (!legalChars.includes(s.charAt(i))) {
+    for (let i = 0; i < hex.length; i++) {
+        if (!legalChars.includes(hex.charAt(i))) {
             return false;
         }
     }

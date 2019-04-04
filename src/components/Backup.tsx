@@ -16,7 +16,7 @@ import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import {
     backupToSwarm,
-    generateBackupLinkData,
+    encryptBackupLinkData,
     generateBackupRandomSecret,
 } from '../helpers/backup';
 import { DateUtils } from '../DateUtils';
@@ -144,7 +144,7 @@ Backup link: ${this.state.backupData}
             const bzz = Swarm.makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
             const serializedAppState = await this.getOrLoadSerializedAppState();
             const contentHash = await backupToSwarm(bzz, serializedAppState, this.state.randomSecret);
-            const backupData = await generateBackupLinkData(contentHash, this.state.randomSecret, this.state.backupPassword);
+            const backupData = await encryptBackupLinkData(contentHash, this.state.randomSecret, this.state.backupPassword);
             this.setState({
                 contentHash,
                 backupData,
