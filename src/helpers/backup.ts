@@ -5,9 +5,12 @@ import { generateSecureRandom } from 'react-native-securerandom';
 // @ts-ignore
 import * as utf8 from 'utf8-encoder';
 
-import { hexToByteArray } from '../helpers/conversion';
+import { hexToByteArray, stringToByteArray, byteArrayToHex } from '../helpers/conversion';
 import { Version } from '../Version';
 import { encrypt, decrypt } from '../helpers/crypto';
+import * as Swarm from '../swarm/Swarm';
+import { Debug } from '../Debug';
+import { HexString } from './opaqueTypes';
 
 const header = `-----BEGIN FELFELE BACKUP-----`;
 const headerFields = `
@@ -64,4 +67,29 @@ export const restoreTextBackupToString = (backupText: string, secretHex: string)
     const encryptedBytes = new Uint8Array(base64.decode(encryptedDataBase64));
     const originalText = restoreBinaryBackupToString(encryptedBytes, secretHex);
     return originalText;
+};
+
+export const backupToSwarm = async (bzz: Swarm.BzzApi, data: string, secretHex: HexString): Promise<HexString> => {
+    Debug.log('backupToSwarm', 'secretHex', secretHex);
+    const encryptedBackup = await createBinaryBackupFromString(data, secretHex);
+    const contentHash = await bzz.uploadUint8Array(encryptedBackup) as HexString;
+    Debug.log('backupToSwarm', 'contentHash', contentHash);
+    return contentHash;
+};
+
+export const generateBackupLinkData = async (contentHash: HexString, randomSecret: HexString, backupPassword: string): Promise<HexString> => {
+    const backupData = `${contentHash}${randomSecret}` as HexString;
+    const plainData = new Uint8Array(hexToByteArray(backupData));
+    const backupPasswordByteArray = stringToByteArray(backupPassword);
+    const encryptedBackupData = await encrypt(plainData, backupPasswordByteArray);
+    const encryptedHexBackup = byteArrayToHex(encryptedBackupData, false);
+    return encryptedHexBackup;
+};
+
+export const generateBackupRandomSecret = async (
+    generateRandom: (num: number) => Promise<Uint8Array> = generateSecureRandom,
+): Promise<HexString> => {
+    const randomSecretBytes = await generateRandom(32);
+    const randomSecret = byteArrayToHex(randomSecretBytes, false);
+    return randomSecret;
 };

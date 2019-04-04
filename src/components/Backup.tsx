@@ -1,21 +1,29 @@
 import * as React from 'react';
-import { View, StyleSheet, Clipboard, Alert, ShareContent, ShareOptions, Share, SafeAreaView, Platform } from 'react-native';
-// @ts-ignore
-import { generateSecureRandom } from 'react-native-securerandom';
+import {
+    View,
+    StyleSheet,
+    Clipboard,
+    ShareContent,
+    ShareOptions,
+    Share,
+    SafeAreaView,
+} from 'react-native';
 
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { createBinaryBackupFromString } from '../helpers/backup';
+import {
+    backupToSwarm,
+    generateBackupLinkData,
+    generateBackupRandomSecret,
+} from '../helpers/backup';
 import { DateUtils } from '../DateUtils';
 import { getSerializedAppState } from '../reducers';
 import { AppState } from '../reducers/AppState';
-import { byteArrayToHex, stringToByteArray, hexToByteArray } from '../helpers/conversion';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
-import { encrypt } from '../helpers/crypto';
 import { HexString } from '../helpers/opaqueTypes';
 
 export interface StateProps {
@@ -46,8 +54,7 @@ export class Backup extends React.PureComponent<Props, State> {
     };
 
     public componentDidMount = async () => {
-        const randomSecretBytes = await generateSecureRandom(32);
-        const randomSecret = byteArrayToHex(randomSecretBytes, false) as HexString;
+        const randomSecret = await generateBackupRandomSecret();
 
         this.setState({
             randomSecret,
@@ -123,11 +130,6 @@ export class Backup extends React.PureComponent<Props, State> {
         return serializedAppState;
     }
 
-    private getBackupData = (): HexString => {
-        const backupData = `${this.state.contentHash}${this.state.randomSecret}` as HexString;
-        return backupData;
-    }
-
     private getBackupText = () => {
         const backupText = `
 Random secret: ${this.state.randomSecret}
@@ -137,26 +139,14 @@ Backup link: ${this.state.backupData}
         return backupText;
     }
 
-    private calculateEncryptedBackupData = async (): Promise<HexString> => {
-        const backupData = this.getBackupData();
-        if (this.state.backupPassword !== '') {
-            const plainData = new Uint8Array(hexToByteArray(backupData));
-            const backupPasswordByteArray = stringToByteArray(this.state.backupPassword);
-            const encryptedBackupData = await encrypt(plainData, backupPasswordByteArray);
-            const encryptedHexBackup = byteArrayToHex(encryptedBackupData, false) as HexString;
-            return encryptedHexBackup;
-        }
-        return backupData;
-    }
-
     private onBackupData = async () => {
         try {
-            const contentHash = await this.backupAppStateToSwarm(this.state.randomSecret);
-            await this.completeSetState({
+            const bzz = Swarm.makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
+            const serializedAppState = await this.getOrLoadSerializedAppState();
+            const contentHash = await backupToSwarm(bzz, serializedAppState, this.state.randomSecret);
+            const backupData = await generateBackupLinkData(contentHash, this.state.randomSecret, this.state.backupPassword);
+            this.setState({
                 contentHash,
-            });
-            const backupData = await this.calculateEncryptedBackupData();
-            await this.completeSetState({
                 backupData,
             });
             Clipboard.setString(backupData);
@@ -164,16 +154,6 @@ Backup link: ${this.state.backupData}
         } catch (e) {
             Debug.log('sendBackup error', e);
         }
-    }
-
-    private backupAppStateToSwarm = async (secretHex: HexString): Promise<HexString> => {
-        Debug.log('Backup.backupAppStateToSwarm', 'secretHex', secretHex);
-        const serializedAppState = await this.getOrLoadSerializedAppState();
-        const encryptedBackup = await createBinaryBackupFromString(serializedAppState, secretHex);
-        const bzz = Swarm.makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
-        const contentHash = await bzz.uploadUint8Array(encryptedBackup) as HexString;
-        Debug.log('Backup.backupAppStateToSwarm', 'contentHash', contentHash);
-        return contentHash;
     }
 }
 
