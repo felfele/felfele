@@ -41,6 +41,7 @@ import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridCont
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
 import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
+import { initializeNotifications } from './helpers/notifications';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -49,6 +50,7 @@ YellowBox.ignoreWarnings([
 Debug.setDebug(true);
 Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
+initializeNotifications();
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
