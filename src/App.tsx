@@ -164,12 +164,6 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     BackupRestore: {
         screen: BackupRestore,
     },
-    Restore: {
-        screen: RestoreContainer,
-    },
-    Backup: {
-        screen: BackupContainer,
-    },
     Feed: {
         screen: SettingsFeedViewContainer,
     },
@@ -305,6 +299,12 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Post: {
         screen: PostEditorContainer,
+    },
+    Restore: {
+        screen: RestoreContainer,
+    },
+    Backup: {
+        screen: BackupContainer,
     },
 };
 

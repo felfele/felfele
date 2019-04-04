@@ -4,7 +4,7 @@ import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
-import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
+import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
 
 export const defaultGateway = 'https://swarm.felfele.com';
@@ -16,7 +16,7 @@ const hashLength = 64;
 const upload = async (data: string, swarmGateway: string): Promise<string> => {
     Debug.log('upload: to Swarm: ', data);
     try {
-        const hash = await uploadData(data, swarmGateway);
+        const hash = await uploadString(data, swarmGateway);
         Debug.log('upload:', 'hash is', hash);
         return hash;
     } catch (e) {
@@ -129,8 +129,8 @@ const uploadFiles = async (files: File[], swarmGateway: string): Promise<string>
     }
 };
 
-const uploadData = async (data: string, swarmGateway: string): Promise<string> => {
-    Debug.log('uploadData: ', data);
+const uploadString = async (data: string, swarmGateway: string): Promise<string> => {
+    Debug.log('uploadString: ', data);
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -144,12 +144,59 @@ const uploadData = async (data: string, swarmGateway: string): Promise<string> =
     return text;
 };
 
-const downloadData = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
+const uploadUint8Array = async (data: Uint8Array, swarmGateway: string): Promise<string> => {
+    Debug.log('uploadUint8Array', 'data.length', data.length);
+    const url = swarmGateway + defaultUrlScheme;
+    const options: RequestInit = {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+        method: 'POST',
+    };
+    options.body = data;
+    const response = await safeFetch(url, options);
+    const text = await response.text();
+    return text;
+};
+
+const downloadString = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
     const url = swarmGateway + '/bzz:/' + hash + '/';
     Debug.log('downloadData:', url);
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
+};
+
+const fetchArrayBuffer = (url: string, timeout: number): Promise<Uint8Array> => {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.responseType = 'arraybuffer';
+
+        request.onload = (event) => {
+            const response = request.response as ArrayBuffer;
+            if (response != null) {
+                resolve(new Uint8Array(response));
+            }
+        };
+
+        request.onerror = () => reject();
+        request.onabort = () => reject();
+
+        if (timeout > 0) {
+            setTimeout(() => reject(), timeout);
+        }
+        request.send();
+    });
+};
+
+const downloadUint8Array = async (hash: string, timeout: number, swarmGateway: string): Promise<Uint8Array> => {
+    const url = swarmGateway + defaultUrlScheme + hash + '/';
+    Debug.log('downloadUint8Array', 'url', url);
+
+    const response = await fetchArrayBuffer(url, timeout);
+    Debug.log('downloadUint8Array', 'response.length', response.length);
+    return response;
 };
 
 export const DefaultEpoch = {
@@ -289,16 +336,20 @@ export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSign
 };
 
 export interface BzzApi {
-    download: (hash: string, timeout: number) => Promise<string>;
-    upload: (data: string) => Promise<string>;
+    downloadString: (hash: string, timeout: number) => Promise<string>;
+    downloadUint8Array: (hash: string, timeout: number) => Promise<Uint8Array>;
+    uploadString: (data: string) => Promise<string>;
+    uploadUint8Array: (data: Uint8Array) => Promise<string>;
     uploadFiles: (files: File[]) => Promise<string>;
     getGatewayUrl: (swarmUrl: string) => string;
 }
 
 export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
     return {
-        download: (hash: string, timeout: number = 0) => downloadData(hash, timeout, swarmGateway),
-        upload: (data: string) => upload(data, swarmGateway),
+        downloadString: (hash: string, timeout: number = 0) => downloadString(hash, timeout, swarmGateway),
+        downloadUint8Array: (hash: string, timeout: number = 0) => downloadUint8Array(hash, timeout, swarmGateway),
+        uploadString: (data: string) => upload(data, swarmGateway),
+        uploadUint8Array: (data: Uint8Array) => uploadUint8Array(data, swarmGateway),
         uploadFiles: (files: File[]) => uploadFiles(files, swarmGateway),
         getGatewayUrl: (swarmUrl: string) => getSwarmGatewayUrl(swarmUrl, swarmGateway),
     };

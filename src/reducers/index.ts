@@ -230,9 +230,6 @@ const rssPostsReducer = (rssPosts: Post[] = [], action: Actions): Post[] => {
 const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Post[] => {
     switch (action.type) {
         case 'ADD-POST': {
-            if (action.payload.post._id === defaultLocalPosts.length) {
-                return [action.payload.post];
-            }
             return insertInArray(localPosts, action.payload.post, 0);
         }
         case 'DELETE-POST': {
