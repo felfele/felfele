@@ -112,13 +112,6 @@ export class Restore extends React.PureComponent<Props, State> {
             this.props.onRestoreData(this.state.appState!);
         }
     }
-
-    private backupInfo = (contentHash: HexString, secret: HexString) => {
-        return `
-Content hash: ${contentHash}
-Random secret: ${secret}
-`;
-    }
 }
 
 const styles = StyleSheet.create({
