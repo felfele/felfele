@@ -1,6 +1,6 @@
 // @ts-ignore
 import PushNotification from 'react-native-push-notification';
-import { PushNotificationIOS, Platform } from 'react-native';
+import { PushNotificationIOS, Platform, Alert } from 'react-native';
 import { Debug } from '../Debug';
 
 const localNotification = () => {};
@@ -10,23 +10,21 @@ export const initializeNotifications = () => {
 
         // (optional) Called when Token is generated (iOS and Android)
         onRegister: (token: any) => {
-            Debug.log('TOKEN:', token );
+            Debug.log('TOKEN:', token);
         },
 
         // (required) Called when a remote or local notification is opened or received
         onNotification: (notification: any) => {
-            Debug.log( 'NOTIFICATION:', notification );
+            Debug.log('NOTIFICATION:', notification);
 
             // process the notification
+            Alert.alert(notification.message);
 
             if (Platform.OS === 'ios') {
                 // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
                 notification.finish(PushNotificationIOS.FetchResult.NoData);
             }
         },
-
-        // ANDROID ONLY: GCM or FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
-        // senderID: "YOUR GCM (OR FCM) SENDER ID",
 
         // IOS ONLY (optional): default: all - Permissions to register.
         permissions: {
