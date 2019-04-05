@@ -36,7 +36,6 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new ReactNativePushNotificationPackage(),
-            new ReactNativePushNotificationPackage(),
             new RNDeviceInfo(),
             new SplashScreenReactPackage(),
             new ReactNativeRestartPackage(),
