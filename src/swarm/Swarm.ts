@@ -420,7 +420,7 @@ function publicKeyToAddress(pubKey: any) {
 
 export const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
-    const keyPair = curve.keyFromPrivate(new Buffer(identity.privateKey.substring(2), 'hex'));
+    const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
     const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
     if (sigRaw.recoveryParam != null) {
