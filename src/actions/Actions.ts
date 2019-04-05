@@ -19,7 +19,6 @@ import {
 } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
-import { restoreBackupToString } from '../BackupRestore';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
@@ -74,6 +73,10 @@ const InternalActions = {
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
+    updateAuthorName: (name: string) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
+    updateAuthorImage: (image: ImageData) =>
+        createAction(ActionTypes.UPDATE_AUTHOR_IMAGE, { image }),
 };
 
 export const Actions = {
@@ -107,10 +110,6 @@ export const Actions = {
         createAction(ActionTypes.ADD_DRAFT, { draft }),
     removeDraft: () =>
         createAction(ActionTypes.REMOVE_DRAFT),
-    updateAuthorName: (name: string) =>
-        createAction(ActionTypes.UPDATE_AUTHOR_NAME, { name }),
-    updateAuthorImage: (image: ImageData) =>
-        createAction(ActionTypes.UPDATE_AUTHOR_IMAGE, { image }),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
     changeSettingSaveToCameraRoll: (value: boolean) =>
@@ -353,7 +352,7 @@ export const AsyncActions = {
                         ...getState().author.image,
                         uri: storageSyncUpdate.recentPostFeed.authorImage.uri,
                     };
-                    dispatch(Actions.updateAuthorImage(authorImage));
+                    dispatch(InternalActions.updateAuthorImage(authorImage));
                 }
 
                 // Re-check if there were an update to the command log during syncing
@@ -410,12 +409,35 @@ export const AsyncActions = {
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
-    restoreFromBackup: (backupText: string, secretHex: string): Thunk => {
+    restoreAppStateFromBackup: (appState: AppState): Thunk => {
         return async (dispatch, getState) => {
-            const serializedAppState = await restoreBackupToString(backupText, secretHex);
-            const appState = await getAppStateFromSerialized(serializedAppState);
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
             dispatch(InternalActions.appStateSet(currentVersionAppState));
+        };
+    },
+    updateProfileName: (name: string): Thunk => {
+        return async (dispatch, getState) => {
+            dispatch(InternalActions.updateAuthorName(name));
+            if (getState().ownFeeds.length > 0) {
+                const ownFeed = getState().ownFeeds[0];
+                dispatch(Actions.updateOwnFeed({
+                    feedUrl: ownFeed.feedUrl,
+                    name,
+                }));
+            }
+        };
+    },
+    updateProfileImage: (image: ImageData): Thunk => {
+        return async (dispatch, getState) => {
+            dispatch(InternalActions.updateAuthorImage(image));
+            if (getState().ownFeeds.length > 0) {
+                const ownFeed = getState().ownFeeds[0];
+                dispatch(Actions.updateOwnFeed({
+                    feedUrl: ownFeed.feedUrl,
+                    authorImage: image,
+                    favicon: undefined,
+                }));
+            }
         };
     },
 };

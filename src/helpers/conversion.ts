@@ -1,3 +1,5 @@
+import { HexString } from '../helpers/opaqueTypes';
+
 export const hexToString = (hex: string): string => {
     const byteArray = hexToByteArray(hex);
     return byteArrayToString(byteArray);
@@ -26,11 +28,12 @@ export const byteArrayToString = (byteArray: number[]): string => {
 export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 
 // cheekily borrowed from https://stackoverflow.com/questions/34309988/byte-array-to-hex-string-conversion-in-javascript
-export const byteArrayToHex = (byteArray: number[] | Uint8Array): string => {
-    return '0x' + Array.from(byteArray, (byte) => {
+export const byteArrayToHex = (byteArray: number[] | Uint8Array, withPrefix: boolean = true): HexString => {
+    const prefix = withPrefix ? '0x' : '';
+    return prefix + Array.from(byteArray, (byte) => {
         // tslint:disable-next-line:no-bitwise
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('');
+    }).join('') as HexString;
 };
 
 // equally cheekily borrowed from https://stackoverflow.com/questions/17720394/javascript-string-to-byte-to-string
@@ -51,19 +54,21 @@ export const hexToByteArray = (hex: string): number[] => {
     return subStrings.map(s => parseInt(s, 16));
 };
 
-const isHexStrict = (s: string): boolean => {
-    if (!s.startsWith('0x')) {
+export const isHexString = (s: string, strict: boolean = false): boolean => {
+    const hasPrefix = s.startsWith('0x');
+    if (strict && !hasPrefix) {
         return false;
     }
-    if (s.length < 4) {
+    const hex = s.substr(hasPrefix ? 2 : 0);
+    if (hex.length < 2) {
         return false;
     }
-    if (s.length % 2 === 1) {
+    if (hex.length % 2 === 1) {
         return false;
     }
     const legalChars: string = '0123456789aAbBcCdDeEfF';
-    for (let i = 2; i < s.length; i++) {
-        if (!legalChars.includes(s.charAt(i))) {
+    for (let i = 0; i < hex.length; i++) {
+        if (!legalChars.includes(hex.charAt(i))) {
             return false;
         }
     }

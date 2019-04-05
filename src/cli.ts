@@ -4,8 +4,8 @@ import { Version } from './Version';
 import { apiTests } from './social/apiTest';
 import { syncTests } from './social/syncTest';
 import * as Swarm from './swarm/Swarm';
-import { generateUnsecureRandom } from './random';
-import { stringToByteArray } from './conversion';
+import { generateUnsecureRandom } from './helpers/unsecureRandom';
+import { stringToByteArray } from './helpers/conversion';
 import { Debug } from './Debug';
 import { parseArguments, addOption } from './cliParser';
 import { makeSwarmStorage } from './swarm-social/swarmStorage';
@@ -59,7 +59,7 @@ const definitions =
         .
         addCommand('get <hash>', 'Download the data by hash', async (hash: string) => {
             const bzz = Swarm.makeBzzApi(swarmGateway);
-            const data = await bzz.download(hash, 0);
+            const data = await bzz.downloadString(hash, 0);
             output(data);
         })
         .

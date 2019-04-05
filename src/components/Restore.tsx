@@ -5,38 +5,50 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
-import { isValidBackup, restoreBackupToString } from '../BackupRestore';
-import { stringToHex } from '../conversion';
+import {
+    isValidBackupLinkData,
+    downloadBackupFromSwarm,
+} from '../helpers/backup';
 import { getAppStateFromSerialized } from '../reducers';
 import { TypedNavigation } from '../helpers/navigation';
+import * as Swarm from '../swarm/Swarm';
+import { AppState } from '../reducers/AppState';
+import { HexString } from '../helpers/opaqueTypes';
 
 export interface StateProps {
     navigation: TypedNavigation;
+    swarmGatewayAddress: string;
 }
 
 export interface DispatchProps {
-    onRestoreData: (data: string, secretHex: string) => void;
+    onRestoreData: (appState: AppState) => void;
 }
 
 export type Props = StateProps & DispatchProps;
 
 export interface State {
-    clipboardText: string;
-    secretText: string;
-    canRestore: boolean;
+    backupPassword: string;
+    backupLinkData: HexString;
+    backupInfo: string;
+    appState: AppState | undefined;
 }
 
 export class Restore extends React.PureComponent<Props, State> {
-    public state = {
-        clipboardText: '',
-        secretText: '',
-        canRestore: false,
+    public state: State = {
+        backupPassword: '',
+        backupLinkData: '' as HexString,
+        backupInfo: '',
+        appState: undefined,
     };
 
     public componentWillMount = () => {
         Clipboard.getString().then(value => {
             Debug.log('Restore clipboard', value);
-            this.setState({clipboardText: value});
+            if (isValidBackupLinkData(value)) {
+                this.setState({
+                    backupLinkData: value as HexString,
+                }, () => this.onChangePassword(''));
+            }
         });
     }
 
@@ -54,49 +66,51 @@ export class Restore extends React.PureComponent<Props, State> {
                     placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
-                    onChangeText={async (text) => this.onChangeSecret(text)}
+                    defaultValue={this.state.backupPassword}
+                    onChangeText={async (text) => this.onChangePassword(text)}
                 />
-                <Button enabled={this.state.canRestore} style={styles.restoreButton} text='Restore' onPress={() => this.onRestoreData()} />
+                <Button
+                    enabled={this.state.appState != null}
+                    style={styles.restoreButton}
+                    text='Restore'
+                    onPress={() => this.onRestoreData()}
+                />
             </View>
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
-                defaultValue={this.state.clipboardText}
                 placeholder='Loading backup...'
+                defaultValue={this.state.backupInfo}
                 multiline={true}
             />
         </SafeAreaView>
     )
 
-    private onChangeSecret = async (text: string) => {
+    private onChangePassword = async (password: string) => {
         try {
-            const secretHex = stringToHex(text);
-            const serializedAppState = await restoreBackupToString(this.state.clipboardText, secretHex);
+            const bzz = Swarm.makeBzzApi(this.props.swarmGatewayAddress);
+            const serializedAppState = await downloadBackupFromSwarm(bzz, this.state.backupLinkData, password);
             const appState = await getAppStateFromSerialized(serializedAppState);
-            Debug.log('Restore.onChangeSecret: success');
+            Debug.log('Restore.onChangePassword', 'success');
+
+            const backupInfo = 'App state downloaded and decrypted';
+
             this.setState({
-                secretText: text,
-                canRestore: true,
+                appState,
+                backupInfo,
             });
         } catch (e) {
-            Debug.log('Restore.onChangeSecret: failed', e);
+            Debug.log('Restore.onChangePassword', 'failed', e);
             this.setState({
-                secretText: text,
-                canRestore: false,
+                appState: undefined,
             });
         }
     }
 
-    private onRestoreData = () => {
-        const isValid = isValidBackup(this.state.clipboardText);
-        if (!isValid) {
-            Alert.alert('Invalid backup!');
-            return;
+    private onRestoreData = async () => {
+        if (this.state.appState != null) {
+            this.props.onRestoreData(this.state.appState!);
         }
-
-        const data = this.state.clipboardText;
-        const secretHex = stringToHex(this.state.secretText);
-        this.props.onRestoreData(data, secretHex);
     }
 }
 
