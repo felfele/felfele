@@ -27,14 +27,14 @@ global.FormData = FormData;
 
 // tslint:disable-next-line:no-console
 let output = console.log;
-Debug.setDebug(false);
+Debug.setDebugMode(false);
 let swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
 const jsonPrettyPrint = (obj: any) => JSON.stringify(obj, null, 4);
 
 const definitions =
     addOption('-q, --quiet', 'quiet mode', () => output = () => {})
     .
-    addOption('-v, --verbose', 'verbose mode', () => Debug.setDebug(true))
+    addOption('-v, --verbose', 'verbose mode', () => Debug.setDebugMode(true))
     .
     addCommand('version', 'Print app version', () => output(Version))
     .
@@ -45,9 +45,13 @@ const definitions =
             };
             if (testName == null) {
                 for (const test of Object.keys(allTests)) {
-                    output('\nRunning test: ', test);
+                    output('Running test:', test);
                     await allTests[test]();
+                    if (Debug.isDebugMode) {
+                        output('Finished test:', test, '\n\n');
+                    }
                 }
+                output(`${Object.keys(allTests).length} tests passed succesfully`);
             } else {
                 const test = allTests[testName];
                 output('\nRunning test: ', testName);

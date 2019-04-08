@@ -14,7 +14,7 @@ import {
 } from '../../src/social/apiTest';
 import { Debug } from '../../src/Debug';
 
-beforeEach(() => Debug.setDebug(false));
+beforeEach(() => Debug.setDebugMode(false));
 
 test('Test sharing post', async () => testSharePost());
 test('Test sharing multiple posts', async () => testSharePosts());
