@@ -3,6 +3,7 @@ package com.postmodern;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
@@ -35,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNBackgroundFetchPackage(),
             new ReactNativePushNotificationPackage(),
             new RNDeviceInfo(),
             new SplashScreenReactPackage(),
