@@ -1,4 +1,4 @@
-import { addOption, parseArguments, addCommand, emptyDefinition } from '../src/cliParser';
+import { addOption, parseArguments, addCommand, emptyDefinition } from '../src/cli/cliParser';
 
 const baseArgs = ['', ''];
 const helpOption = '-h';
@@ -333,4 +333,35 @@ test('subcommand with option', () => {
     expect(subcommandActionCalled).toBeTruthy();
     expect(subcommandOptionActionCalled).toBeTruthy();
     expect(subcommandOptionActionArg).toEqual(optionArgValue);
+});
+
+test('sub-subcommand with option', () => {
+    let subsubCommandActionCalled = false;
+    let subsubCommandOptionActionCalled = false;
+    let subsubCommandOptionActionArg;
+
+    const command = 'command';
+    const subcommand = 'subcommand';
+    const subsubcommand = 'subsubcommand';
+    const option = '-o';
+    const optionDef = `${option} <arg>`;
+    const optionArgValue = 'hello';
+    const definition = addCommand(command, '',
+        addCommand(subcommand, '',
+            addOption(optionDef, '', (arg) => {
+                subsubCommandOptionActionCalled = true;
+                subsubCommandOptionActionArg = arg;
+            })
+            .
+            addCommand(subsubcommand, '', () => subsubCommandActionCalled = true)
+
+        )
+    );
+
+    const args = baseArgs.concat([command, subcommand, option, optionArgValue, subsubcommand]);
+    parseArguments(args, definition);
+
+    expect(subsubCommandActionCalled).toBeTruthy();
+    expect(subsubCommandOptionActionCalled).toBeTruthy();
+    expect(subsubCommandOptionActionArg).toEqual(optionArgValue);
 });

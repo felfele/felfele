@@ -1,14 +1,16 @@
 import { keccak256 } from 'js-sha3';
 
-import { Version } from './Version';
-import { apiTests } from './social/apiTest';
-import { syncTests } from './social/syncTest';
-import * as Swarm from './swarm/Swarm';
-import { generateUnsecureRandom } from './helpers/unsecureRandom';
-import { stringToByteArray } from './helpers/conversion';
-import { Debug } from './Debug';
+import { Version } from '../Version';
+import { apiTests } from '../social/apiTest';
+import { syncTests } from '../social/syncTest';
+import * as Swarm from '../swarm/Swarm';
+import { generateUnsecureRandom } from '../helpers/unsecureRandom';
+import { stringToByteArray } from '../helpers/conversion';
+import { Debug } from '../Debug';
 import { parseArguments, addOption } from './cliParser';
-import { makeSwarmStorage } from './swarm-social/swarmStorage';
+import { feedCommandDefinition } from './feedCommands';
+import { output, setOutput, jsonPrettyPrint } from './cliHelpers';
+import { swarmConfig } from './swarmConfig';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -25,14 +27,10 @@ global.__DEV__ = true;
 global.fetch = fetch;
 global.FormData = FormData;
 
-// tslint:disable-next-line:no-console
-let output = console.log;
 Debug.setDebug(false);
-let swarmGateway = process.env.SWARM_GATEWAY || Swarm.defaultGateway;
-const jsonPrettyPrint = (obj: any) => JSON.stringify(obj, null, 4);
 
 const definitions =
-    addOption('-q, --quiet', 'quiet mode', () => output = () => {})
+    addOption('-q, --quiet', 'quiet mode', () => setOutput(() => {}))
     .
     addOption('-v, --verbose', 'verbose mode', () => Debug.setDebug(true))
     .
@@ -55,10 +53,10 @@ const definitions =
             }
     })
     .addCommand('swarm', 'Swarm related commands',
-        addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmGateway = gatewayAddress)
+        addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmConfig.gatewayAddress = gatewayAddress)
         .
         addCommand('get <hash>', 'Download the data by hash', async (hash: string) => {
-            const bzz = Swarm.makeBzzApi(swarmGateway);
+            const bzz = Swarm.makeBzzApi(swarmConfig.gatewayAddress);
             const data = await bzz.downloadString(hash, 0);
             output(data);
         })
@@ -73,17 +71,12 @@ const definitions =
         .
         addCommand('testId', 'Generate a test identity', async () => {
             const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
-            const identityString = `{
-                privateKey: '${identity.privateKey}',
-                publicKey: '${identity.publicKey}',
-                address: '${identity.address}',
-            }`;
-            output('Generated identity:', identityString);
+            output('Generated identity:', jsonPrettyPrint(identity));
             output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
         })
         .
         addCommand('uploadImage <path-to-image>', 'Upload an image to Swarm', async (localPath) => {
-            const bzz = Swarm.makeBzzApi(swarmGateway);
+            const bzz = Swarm.makeBzzApi(swarmConfig.gatewayAddress);
             const files: Swarm.File[] = [
                 {
                     name: 'image',
@@ -95,21 +88,7 @@ const definitions =
             output(hash);
         })
         .
-        addCommand('feed <user>', 'List feed', async (user) => {
-            const feedAddress: Swarm.FeedAddress = {
-                topic: '',
-                user,
-            };
-            const dummySigner = (digest: number[]) => '';
-            const swarmApi = Swarm.makeApi(feedAddress, dummySigner, swarmGateway);
-            const storageApi = makeSwarmStorage(swarmApi);
-            const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
-            output('Recent post feed', jsonPrettyPrint(recentPostFeed));
-
-            output('Posts:');
-            const postCommandLog = await storageApi.downloadPostCommandLog();
-            output(jsonPrettyPrint(postCommandLog.commands));
-        })
+        addCommand('feed', 'Swarm Feed related commands', feedCommandDefinition)
     )
 ;
 
