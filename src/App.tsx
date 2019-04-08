@@ -47,7 +47,7 @@ YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
     'unknown call: "relay:check"',
 ]);
-Debug.setDebug(true);
+Debug.setDebugMode(true);
 Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
 initializeNotifications();

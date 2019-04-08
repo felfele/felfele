@@ -1,8 +1,9 @@
 type Logger = (s: string) => void;
 
 export class Debug {
-    public static setDebug(isDebug: boolean) {
-        Debug.isDebug = isDebug;
+    public static isDebugMode = false;
+    public static setDebugMode(isDebug: boolean) {
+        Debug.isDebugMode = isDebug;
     }
 
     public static setMaxLength(length: number) {
@@ -10,7 +11,7 @@ export class Debug {
     }
 
     public static log(...args: any[]) {
-        if (__DEV__ && Debug.isDebug) {
+        if (__DEV__ && Debug.isDebugMode) {
             // tslint:disable-next-line:no-console
             console.log.call(console, ...args);
         }
@@ -30,12 +31,11 @@ export class Debug {
         Debug.loggers.push(logger);
     }
 
-    private static isDebug = false;
     private static maxLength = 1000;
     private static loggers: Logger[] = [];
 
     private static fullLog(...args: any[]) {
-        if (Debug.isDebug) {
+        if (Debug.isDebugMode) {
             const logLine = args.map(arg => '' + arg).join(' ');
             for (const logger of Debug.loggers) {
                 logger(logLine);

@@ -8,7 +8,7 @@ import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper'
 import { Debug } from '../../src/Debug';
 import { TypedNavigation } from '../../src/helpers/navigation';
 
-Debug.setDebug(true);
+Debug.setDebugMode(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
 jest.mock('../../src/components/CardMarkdown');
 jest.mock('../../src/ui/misc/Carousel');

@@ -6,7 +6,7 @@ import { Debug } from '../../src/Debug';
 let localSwarmStorage: PostCommandLogStorage;
 const source = 'storage';
 
-beforeAll(() => Debug.setDebug(false));
+beforeAll(() => Debug.setDebugMode(false));
 beforeEach(() => localSwarmStorage = makeLocalSwarmStorage());
 
 test('Test sharing posts to storage', async () =>
