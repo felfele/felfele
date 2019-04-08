@@ -3,8 +3,6 @@ import PushNotification from 'react-native-push-notification';
 import { PushNotificationIOS, Platform, Alert } from 'react-native';
 import { Debug } from '../Debug';
 
-const localNotification = () => {};
-
 export const initializeNotifications = () => {
     PushNotification.configure({
 
@@ -53,6 +51,16 @@ export const localScheduledNotification = (message: string, millisecondsLater: n
     PushNotification.localNotificationSchedule({
         message,
         date: new Date(Date.now() + millisecondsLater),
+        id: Date.now(),
+    });
+};
+
+export const localNotification = (message: string) => {
+    PushNotification.checkPermissions((permissions: any) => {
+        Debug.log('localScheduledNotification', 'permissions', permissions);
+    });
+    PushNotification.localNotification({
+        message,
         id: Date.now(),
     });
 };

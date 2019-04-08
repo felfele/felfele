@@ -35,8 +35,13 @@ import {
     defaultLocalPosts,
     defaultMetadata,
     defaultState,
+    FELFELE_FOUNDATION_URL,
 } from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
+import { registerBackgroundTask } from '../helpers/backgroundTask';
+import { loadRecentPosts } from '../swarm-social/swarmStorage';
+import * as Swarm from '../swarm/Swarm';
+import { localNotification } from '../helpers/notifications';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -367,6 +372,27 @@ const initStore = () => {
     // @ts-ignore
     store.dispatch(AsyncActions.cleanUploadingPostState());
     store.dispatch(Actions.timeTick());
+
+    // @ts-ignore
+    const foundationFeeds = store.getState().feeds.filter(feed => feed.feedUrl === FELFELE_FOUNDATION_URL);
+    if (foundationFeeds.length > 0) {
+        const foundationFeed = foundationFeeds[0];
+        const getLatestPostCreateTime = (posts: Post[]) => posts.length > 0
+            ? posts[0].createdAt
+            : 0
+        ;
+        registerBackgroundTask(15, async () => {
+            const previousPosts = store.getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
+            const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
+            const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
+            const swarm = Swarm.makeReadableApi(address, store.getState().settings.swarmGatewayAddress);
+            const recentPosts = await loadRecentPosts(swarm, foundationFeeds);
+            if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
+                localNotification('There is a new version available!');
+            }
+        });
+    }
+
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
 

@@ -16,7 +16,7 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation, Routes } from '../helpers/navigation';
-import { localScheduledNotification } from '../helpers/notifications';
+import { localScheduledNotification, localNotification } from '../helpers/notifications';
 import { DateUtils, SECOND } from '../DateUtils';
 
 export interface StateProps {
@@ -116,10 +116,18 @@ export const DebugScreen = (props: Props) => (
                     icon={
                         <IonIcon name='md-notifications' />
                     }
+                    title='Send notification'
+                    onPress={() => localNotification('hello')}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-notifications' />
+                    }
                     title='Send scheduled notification'
                     onPress={() => {
                         localScheduledNotification('hello', 15 * SECOND);
-                        Alert.alert('Notification set!');
+                        Alert.alert('Notification set in 15 seconds!');
                     }}
                     buttonStyle='none'
                 />
