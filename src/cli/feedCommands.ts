@@ -90,6 +90,6 @@ export const feedCommandDefinition =
         };
         const postCommandLog = shareNewPost(post, source, emptyPostCommandLog);
         const storageSyncUpdate = await storageSyncApi.sync(postCommandLog, recentPostFeed);
-        output('Updated the feed', jsonPrettyPrint(storageSyncUpdate));
+        output('Updated the feed', storageSyncUpdate.updatedPosts.length);
     })
 ;
