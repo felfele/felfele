@@ -8,7 +8,7 @@ import { shareNewPost, emptyPostCommandLog, RecentPostFeed } from '../social/api
 import { Post } from '../models/Post';
 
 import fs from 'fs';
-import { generateUnsecureRandom } from '../helpers/unsecureRandom';
+import { generateUnsecureRandomHexString } from '../helpers/unsecureRandom';
 
 let privateIdentityFromFile: PrivateIdentity | undefined;
 const loadIdentityFile = (filename: string) => {
@@ -77,7 +77,7 @@ export const feedCommandDefinition =
             topic: '',
             user: privateIdentity.address,
         };
-        const source = '';
+        const source = generateUnsecureRandomHexString(32);
         const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
         const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
         const storageApi = makeSwarmStorage(swarmApi);
@@ -89,7 +89,7 @@ export const feedCommandDefinition =
             createdAt: Date.now(),
         };
         const postCommandLog = shareNewPost(post, source, emptyPostCommandLog);
-        const storageSyncUpdate = storageSyncApi.sync(postCommandLog, recentPostFeed);
-        output('Updated the feed');
+        const storageSyncUpdate = await storageSyncApi.sync(postCommandLog, recentPostFeed);
+        output('Updated the feed', jsonPrettyPrint(storageSyncUpdate));
     })
 ;

@@ -41,10 +41,10 @@ export const syncPostCommandLogWithStorage = async (postCommandLog: PostCommandL
     const storagePostCommandLog = await storage.downloadPostCommandLog(latestEpoch);
     const storageLatestEpoch = getLatestPostCommandEpochFromLog(storagePostCommandLog);
 
-    Debug.log('syncPostCommandLogWithStorage', latestEpoch, storageLatestEpoch);
+    Debug.log('syncPostCommandLogWithStorage', {latestEpoch, storageLatestEpoch});
 
     const mergedPostCommandLog = mergePostCommandLogs(postCommandLog, storagePostCommandLog);
-    Debug.log('syncPostCommandLogWithStorage', 'mergedPostCommandLog', mergedPostCommandLog);
+    Debug.log('syncPostCommandLogWithStorage', {mergedPostCommandLog});
 
     const uploadedPostCommandLog = await uploadUnsyncedPostCommandsToStorage(mergedPostCommandLog, storage);
 

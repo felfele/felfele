@@ -14,13 +14,12 @@ export const defaultFeedPrefix = 'bzz-feed:/';
 const hashLength = 64;
 
 const upload = async (data: string, swarmGateway: string): Promise<string> => {
-    Debug.log('upload: to Swarm: ', data);
     try {
         const hash = await uploadString(data, swarmGateway);
-        Debug.log('upload:', 'hash is', hash);
+        Debug.log('upload', {hash});
         return hash;
     } catch (e) {
-        Debug.log('upload:', 'failed', JSON.stringify(e));
+        Debug.log('upload:', {e});
         throw e;
     }
 };
@@ -130,7 +129,7 @@ const uploadFiles = async (files: File[], swarmGateway: string): Promise<string>
 };
 
 const uploadString = async (data: string, swarmGateway: string): Promise<string> => {
-    Debug.log('uploadString: ', data);
+    Debug.log('uploadString', {data});
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -161,7 +160,7 @@ const uploadUint8Array = async (data: Uint8Array, swarmGateway: string): Promise
 
 const downloadString = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
     const url = swarmGateway + '/bzz:/' + hash + '/';
-    Debug.log('downloadData:', url);
+    Debug.log('downloadData', {url});
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
@@ -244,7 +243,7 @@ const downloadUserFeedPreviousVersion = async (swarmGateyay: string, address: Fe
 
 const downloadFeed = async (swarmGateway: string, feedUri: string, timeout: number = 0): Promise<string> => {
     const url = swarmGateway + '/' + feedUri;
-    Debug.log('downloadFeed: ', url);
+    Debug.log('downloadFeed', {url});
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
@@ -258,14 +257,14 @@ const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate
     const addressPart = calculateFeedAddressQueryString(feedTemplate.feed);
     const signature = await signFeedDigest(digest);
     const url = swarmGateway + `/bzz-feed:/?${addressPart}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
-    Debug.log('updateFeed: ', url, data);
+    Debug.log('updateFeed', {url, data});
     const options: RequestInit = {
         method: 'POST',
         body: data,
     };
     const response = await safeFetch(url, options);
     const text = await response.text();
-    Debug.log('updateFeed: ', text);
+    Debug.log('updateFeed', {text});
 
     return feedTemplate;
 };
@@ -394,7 +393,7 @@ const updateMinLength = topicLength + userLength + timeLength + levelLength + he
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
-    Debug.log('updateUserFeed', 'digest', byteArrayToHex(digestData));
+    Debug.log('feedUpdateDigest', {digest: byteArrayToHex(digestData)});
     return keccak256.array(digestData);
 }
 

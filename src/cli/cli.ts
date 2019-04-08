@@ -34,6 +34,8 @@ const definitions =
     .
     addOption('-v, --verbose', 'verbose mode', () => Debug.setDebugMode(true))
     .
+    addOption('-n, --no-colors', 'no colors in output', () => Debug.useColors = false)
+    .
     addCommand('version', 'Print app version', () => output(Version))
     .
     addCommand('test [name]', 'Run integration tests', async (testName) => {
