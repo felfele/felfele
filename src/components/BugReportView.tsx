@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, Linking, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { Button } from './Button';
 import { restartApp } from '../helpers/restart';
@@ -12,8 +12,9 @@ import { Version } from '../Version';
 
 // @ts-ignore
 import BugIcon from '../../images/bug.svg';
+import { Debug } from '../Debug';
+import { TypedNavigation } from '../helpers/navigation';
 
-const BUG_REPORT_EMAIL_ADDRESS = 'bugreport@felfele.com';
 // personally identifiable information
 export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath', 'user' ];
 
@@ -61,52 +62,95 @@ const getBugReportBody = (): string => {
     return bugReportBody;
 };
 
-const onPressSend = () =>
-    Linking.openURL(`mailto:${BUG_REPORT_EMAIL_ADDRESS}?subject=bugReport&body=${getBugReportBody()}`);
+interface Props {
+    navigation?: TypedNavigation;
+    errorView: boolean;
+}
 
-export const BugReportView = (props: { navigation?: any, errorView: boolean }) => {
-    return (
-        <SafeAreaView style={styles.mainContainer}>
-            <NavigationHeader
-                navigation={props.navigation}
-                title='Bug Report'
-                rightButton1={{
-                    onPress: onPressSend,
-                    label: <Icon
-                        name={'send'}
-                        size={20}
-                        color={Colors.BRAND_PURPLE}
-                    />,
-                }}
-            />
-            <View style={styles.contentContainer}>
-                <View style={styles.iconContainer}>
-                    <BugIcon
-                        width={29}
-                        height={29}
-                        fill={Colors.BRAND_PURPLE}
-                    />
+interface State {
+    isSending: boolean;
+}
+
+export class BugReportView extends React.Component<Props, State> {
+    public state: State = {
+        isSending: false,
+    };
+
+    public render() {
+        return (
+            <SafeAreaView style={styles.mainContainer}>
+                <NavigationHeader
+                    navigation={this.props.navigation}
+                    title='Bug Report'
+                    rightButton1={{
+                        onPress: this.onPressSend,
+                        label: <Icon
+                            name={'send'}
+                            size={20}
+                            color={Colors.BRAND_PURPLE}
+                        />,
+                    }}
+                />
+                <View style={styles.contentContainer}>
+                    <View style={styles.iconContainer}>
+                        <BugIcon
+                            width={29}
+                            height={29}
+                            fill={Colors.BRAND_PURPLE}
+                        />
+                    </View>
+                    {this.props.errorView &&
+                        <BoldText style={[styles.text, { fontSize: 18 }]}>
+                            Yikes!{'\n\n'}
+                            We are sorry, an error has occurred.{'\n'}
+                        </BoldText>
+                    }
+                    <RegularText style={[styles.text, { fontSize: 14 }]}>
+                        As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
+                    </RegularText>
+
+                    <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
+                        By sending a bug report, you will share some of your information with us. {'\n\n'}
+                        Tap on the Send button to continue.
+                    </RegularText>
+                    {this.props.errorView &&
+                        <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
+                    }
+                    {this.state.isSending &&
+                        <ActivityIndicator style={{ paddingTop: 20 }} size='large' color='grey' />
+                    }
                 </View>
-                {props.errorView &&
-                    <BoldText style={[styles.text, { fontSize: 18 }]}>
-                        Yikes!{'\n\n'}
-                        We are sorry, an error has occurred.{'\n'}
-                    </BoldText>
-                }
-                <RegularText style={[styles.text, { fontSize: 14 }]}>
-                    As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
-                </RegularText>
-                <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
-                    By sending a bug report, you will share some of your information with us. You can review everything in your email client before sending.{'\n\n'}
-                    Tap on the Send button to continue.
-                </RegularText>
-                {props.errorView &&
-                    <Button style={styles.restartButton} text='Restart' onPress={restartApp} />
-                }
-            </View>
-        </SafeAreaView>
-    );
-};
+            </SafeAreaView>
+        );
+    }
+
+    private onPressSend = async () => {
+        this.setState({
+            isSending: true,
+        });
+
+        try {
+            const response = await fetch('https://app.felfele.com/api/v1/bugreport/', {
+                headers: {
+                    'Content-Type': 'plain/text',
+                },
+                method: 'POST',
+                body: getBugReportBody(),
+            });
+            Debug.log('success sending bugreport', response.status);
+        } catch (e) {
+            Debug.log('error sending bugreport', e);
+        }
+        this.setState({
+            isSending: false,
+        });
+        if (this.props.navigation) {
+            this.props.navigation.goBack();
+        } else if (this.props.errorView) {
+            restartApp();
+        }
+    }
+}
 
 const styles = StyleSheet.create({
     mainContainer: {
