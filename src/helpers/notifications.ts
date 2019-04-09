@@ -21,6 +21,10 @@ export const initializeNotifications = () => {
             if (Platform.OS === 'ios') {
                 // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
                 notification.finish(PushNotificationIOS.FetchResult.NoData);
+            } else {
+                // on android this needs to be called to clear the notification
+                // note that it will also clear all pending notifications!
+                PushNotification.cancelAllLocalNotifications();
             }
         },
 
