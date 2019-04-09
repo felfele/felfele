@@ -27,7 +27,7 @@ matrix:
       env:
         - JOB_NAME=ANDROID
       before_install:
-        - nvm install 9
+        - nvm install 10
         - node --version
       install:
         - npm install
