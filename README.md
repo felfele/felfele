@@ -1,4 +1,4 @@
-Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://gitter.im/felfele/purple-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://gitter.im/felfele/purple-lounge)
 [![Build Status](https://travis-ci.org/felfele/felfele.svg?branch=master)](https://travis-ci.org/felfele/felfele)
 =======
 
