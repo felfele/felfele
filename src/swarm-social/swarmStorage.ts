@@ -382,8 +382,24 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
     }
 };
 
+const safeDownloadRecentPostFeed = async (swarm: Swarm.ReadableApi, feedUrl: string): Promise<RecentPostFeed> => {
+    try {
+        const recentPostFeed = await downloadRecentPostFeed(swarm, feedUrl);
+        return recentPostFeed;
+    } catch (e) {
+        return {
+            posts: [],
+            authorImage: {},
+            name: '',
+            url: '',
+            feedUrl: '',
+            favicon: '',
+        };
+    }
+};
+
 export const loadRecentPosts = async (swarm: Swarm.ReadableApi, postFeeds: Feed[]): Promise<PublicPost[]> => {
-    const loadFeedPromises = postFeeds.map(feed => downloadRecentPostFeed(swarm, feed.feedUrl));
+    const loadFeedPromises = postFeeds.map(feed => safeDownloadRecentPostFeed(swarm, feed.feedUrl));
     const feeds = await Promise.all(loadFeedPromises);
     let posts: PublicPost[] = [];
     for (const feed of feeds) {
