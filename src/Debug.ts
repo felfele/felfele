@@ -1,4 +1,5 @@
 import * as util from 'util';
+import { Utils } from './Utils';
 
 type Logger = (s: string) => void;
 
@@ -16,7 +17,11 @@ export class Debug {
 
     public static log(...args: any[]) {
         if (__DEV__ && Debug.isDebugMode) {
-            if (args.length === 2 && typeof args[0] === 'string' && typeof args[1] === 'object') {
+            if (Utils.isNodeJS() &&
+                args.length === 2 &&
+                typeof args[0] === 'string' &&
+                typeof args[1] === 'object'
+            ) {
                 const name = args[0];
                 const obj = args[1];
                 // tslint:disable-next-line:no-console

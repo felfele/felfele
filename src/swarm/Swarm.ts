@@ -6,6 +6,7 @@ import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
+import { Utils } from '../Utils';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
@@ -96,14 +97,8 @@ export interface File {
     mimeType: MimeType;
 }
 
-const isNode = () => {
-    return typeof process === 'object'
-        && typeof process.versions === 'object'
-        && typeof process.versions.node !== 'undefined';
-};
-
 const uploadFiles = async (files: File[], swarmGateway: string): Promise<string> => {
-    if (isNode()) {
+    if (Utils.isNodeJS()) {
         // avoid metro bundler to try to load the module
         const nodeRequire = require;
         const fs = nodeRequire('fs');

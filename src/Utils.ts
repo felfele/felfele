@@ -37,4 +37,10 @@ export class Utils {
         }
         return list.slice(list.length - num);
     }
+
+    public static isNodeJS = () => {
+        return typeof process === 'object'
+            && typeof process.versions === 'object'
+            && typeof process.versions.node !== 'undefined';
+    }
 }
