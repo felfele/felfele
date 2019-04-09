@@ -129,10 +129,24 @@ export class BugReportView extends React.Component<Props, State> {
             isSending: true,
         });
 
+        await this.sendBugReport();
+
+        this.setState({
+            isSending: false,
+        });
+
+        if (this.props.navigation != null) {
+            this.props.navigation.goBack();
+        } else if (this.props.errorView) {
+            restartApp();
+        }
+    }
+
+    private sendBugReport = async () => {
         try {
-            const response = await fetch('https://app.felfele.com/api/v1/bugreport/', {
+            const response = await fetch('http://localhost:3000/api/v1/bugreport/', {
                 headers: {
-                    'Content-Type': 'plain/text',
+                    'Content-Type': 'text/plain',
                 },
                 method: 'POST',
                 body: getBugReportBody(),
@@ -140,14 +154,6 @@ export class BugReportView extends React.Component<Props, State> {
             Debug.log('success sending bugreport', response.status);
         } catch (e) {
             Debug.log('error sending bugreport', e);
-        }
-        this.setState({
-            isSending: false,
-        });
-        if (this.props.navigation) {
-            this.props.navigation.goBack();
-        } else if (this.props.errorView) {
-            restartApp();
         }
     }
 }
