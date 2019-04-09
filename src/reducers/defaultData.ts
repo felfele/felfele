@@ -25,10 +25,7 @@ export const defaultAuthor: Author = {
 
 export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
 export const FELFELE_ASSISTANT_URL = 'local/onboarding';
-
-// TODO change back to original URL after finished testing
-// export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda';
-export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xc168ddd069062f184e553369e17d66f6bc315180';
+export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda';
 
 const onboardingAuthor: Author = {
     name: FELFELE_ASSISTANT_NAME,
