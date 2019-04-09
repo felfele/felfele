@@ -144,7 +144,7 @@ export class BugReportView extends React.Component<Props, State> {
 
     private sendBugReport = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/v1/bugreport/', {
+            const response = await fetch('https://app.felfele.com/api/v1/bugreport/', {
                 headers: {
                     'Content-Type': 'text/plain',
                 },
