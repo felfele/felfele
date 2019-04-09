@@ -439,8 +439,7 @@ export const AsyncActions = {
                     ? posts[0].createdAt
                     : 0
                 ;
-                // const backgroundTaskIntervalMinutes = 24 * 60;
-                const backgroundTaskIntervalMinutes = 15;
+                const backgroundTaskIntervalMinutes = 12 * 60;
                 registerBackgroundTask(backgroundTaskIntervalMinutes, async () => {
                     const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
                     const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
