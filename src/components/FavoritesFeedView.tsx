@@ -36,15 +36,15 @@ export const FavoritesFeedView = (props: Props) => {
                 navigationHeader:
                     <NavigationHeader
                         title='Favorites'
-                        rightButton1={{
+                        leftButton={{
                             onPress: () => props.navigation.navigate(
                                 'FavoriteListViewerContainer', {
                                     feeds: props.feeds,
                                 }
                             ),
                             label: <Icon
-                                name={'view-grid'}
-                                size={20}
+                                name={'menu'}
+                                size={24}
                                 color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}

@@ -24,6 +24,7 @@ import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
 import { TypedNavigation, Routes } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -126,7 +127,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         ;
 
         return (
-            <SafeAreaView style={styles.mainContainer}>
+            <FragmentSafeAreaView>
                 <NavigationHeader
                     title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
                     rightButton1={rightButton1}
@@ -157,7 +158,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                     }
                 </View>
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 

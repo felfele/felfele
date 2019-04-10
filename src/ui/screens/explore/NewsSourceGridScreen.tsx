@@ -2,7 +2,7 @@ import * as React from 'react';
 import { FlatGrid } from 'react-native-super-grid';
 import { GridCard } from '../../misc/GridCard';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { View, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { NewsSource } from '../../../models/recommendation/NewsSource';
@@ -11,6 +11,7 @@ import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { FragmentSafeAreaView } from '../../misc/FragmentSafeAreaView';
 
 export interface StateProps {
     gatewayAddress: string;
@@ -37,7 +38,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
+            <FragmentSafeAreaView>
                 <NavigationHeader title={this.props.subCategoryName} navigation={this.props.navigation}/>
                 {this.state.feeds.length > 0 &&
                     <FlatGrid
@@ -71,7 +72,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                     </View>
                 }
                 <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 

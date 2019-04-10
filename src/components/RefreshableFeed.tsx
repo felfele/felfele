@@ -66,13 +66,6 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
     public render() {
         return (
             <FragmentSafeAreaView style={styles.container}>
-                <StatusBarView
-                    backgroundColor={ComponentColors.HEADER_COLOR}
-                    hidden={false}
-                    translucent={false}
-                    barStyle='light-content'
-                    networkActivityIndicatorVisible={true}
-                />
                 {this.props.children.navigationHeader}
                 {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
