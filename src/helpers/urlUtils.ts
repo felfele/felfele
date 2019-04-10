@@ -61,13 +61,6 @@ export const getCanonicalUrl = (url: string): string => {
     return url;
 };
 
-export const compareUrlWithoutProtocol = (url1: string, url2: string): boolean => {
-    const strippedUrl1 = url1.split('//', 2)[1];
-    const strippedUrl2 = url2.split('//', 2)[1];
-
-    return strippedUrl1 === strippedUrl2;
-};
-
 export const stripNonAscii = (s: string): string => {
     return s.replace(/[^\x00-\x7F]/g, '');
 };
@@ -87,3 +80,23 @@ export const getLinkFromText = (text: string): string | undefined => {
     }
     return undefined;
 };
+
+export const compareUrls = (url1: string, url2: string): boolean => {
+    const canonicalUrl1 = getCanonicalUrl(url1);
+    const canonicalUrl2 = getCanonicalUrl(url2);
+    if (canonicalUrl1 === canonicalUrl2) {
+        return true;
+    }
+
+    const hostname1 = Url.parse(canonicalUrl1).hostname;
+    const hostname2 = Url.parse(canonicalUrl2).hostname;
+    const wwwPrefix = 'www.';
+    const stripWWWPrefix = (url: string) => url.startsWith(wwwPrefix)
+        ? url.slice(wwwPrefix.length)
+        : url
+    ;
+    const hostname1WithoutWWW = stripWWWPrefix(hostname1);
+    const hostname2WithoutWWW = stripWWWPrefix(hostname2);
+
+    return hostname1WithoutWWW === hostname2WithoutWWW;
+}

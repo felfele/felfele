@@ -103,7 +103,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
 const fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
     try {
         const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-        Debug.log('fetchFeedFromUrl: feed: ', feed);
+        Debug.log('NewsSourceGridScreen.fetchFeedFromUrl', {feed});
         return feed;
     } catch (e) {
         Debug.log(e);

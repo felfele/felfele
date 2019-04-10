@@ -112,25 +112,9 @@ export class RSSFeedManager {
                     feed.feedUrl = feedUrl;
                 }
             }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'shortcut icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'apple-touch-icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
         }
+
+        feed.favicon = FaviconCache.findBestIconFromLinks(links) || '';
 
         const titles = HtmlUtils.findPath(document, ['html', 'head', 'title']);
         for (const title of titles) {
@@ -240,13 +224,13 @@ export class RSSFeedManager {
             return null;
         }
 
-        Debug.log('fetchFeedFromUrl contentWithMimeType: ', contentWithMimeType);
+        Debug.log('RSSFeedManager.fetchFeedFromUrl', {contentWithMimeType});
 
         if (contentWithMimeType.mimeType === 'text/html') {
             const baseUrl = urlUtils.getBaseUrl(url);
-            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
-            Debug.log('fetchFeedFromUrl feed: ', feed);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {feed});
             if (feed.feedUrl !== '') {
                 return feed;
             }
@@ -268,16 +252,16 @@ export class RSSFeedManager {
         // It looks like there is a valid feed on the url
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
             const rssFeed = await feedHelper.load(url, contentWithMimeType.content);
-            Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {rssFeed});
             const feedUrl = (rssFeed.feed && rssFeed.feed.url) || undefined;
             const baseUrl = urlUtils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
-            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
             const feed = {
                 url: baseUrl,
                 feedUrl: url,
                 name: name,
-                favicon: '',
+                favicon: rssFeed.feed.icon || '',
             };
             // Fetch the website to augment the feed data with favicon and title
             const htmlWithMimeType = await RSSFeedManager.fetchContentWithMimeType(baseUrl);
@@ -292,7 +276,7 @@ export class RSSFeedManager {
             if (urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM) {
                 feed.favicon = await FaviconCache.getFavicon(url);
             } else {
-                feed.favicon = feedFromHtml.favicon;
+                feed.favicon = feedFromHtml.favicon || rssFeed.feed.icon || '';
             }
             return feed;
         }
@@ -306,18 +290,10 @@ class _RSSPostManager {
     public readonly feedManager = new RSSFeedManager();
 
     private id = FirstId;
-    private idCache = {};
     private contentFilters: ContentFilter[] = [];
 
     public setContentFilters(contentFilters: ContentFilter[]) {
         this.contentFilters = contentFilters;
-    }
-
-    public async saveAndSyncPost(post: Post) {
-        // do nothing
-    }
-    public async deletePost(post: Post) {
-        // do nothing
     }
 
     public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
@@ -338,14 +314,14 @@ class _RSSPostManager {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
-                const storedFeed = storedFeeds.find(feed => urlUtils.compareUrlWithoutProtocol(feed.url, rssFeed.url));
-                const favicon = storedFeed && storedFeed.favicon
+                const storedFeed = storedFeeds.find(feed => urlUtils.compareUrls(feed.url, rssFeed.url));
+                const favicon = storedFeed && storedFeed.favicon && storedFeed.favicon !== ''
                     ? storedFeed.favicon
                     : rssFeed.icon
                         ? rssFeed.icon
                         : ''
                 ;
-                Debug.log('RSSPostManager.loadPosts', 'rssFeed', rssFeed, 'favicon', favicon);
+                Debug.log('RSSPostManager.loadPosts', {rssFeed, storedFeeds, favicon});
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
                 const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
