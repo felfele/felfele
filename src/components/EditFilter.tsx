@@ -79,12 +79,12 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ? <Icon
                 name='delete'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={Colors.NAVIGATION_BUTTON_COLOR}
             />
             : <Icon
                 name='add-box'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={Colors.NAVIGATION_BUTTON_COLOR}
             />
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;

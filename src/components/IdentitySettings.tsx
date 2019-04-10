@@ -93,7 +93,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                 label: <MaterialCommunityIcon
                                     name={'share'}
                                     size={20}
-                                    color={Colors.DARK_GRAY}
+                                    color={Colors.NAVIGATION_BUTTON_COLOR}
                                 />,
                                 onPress: async () => showShareDialog(props.ownFeed),
                             }

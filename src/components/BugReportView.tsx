@@ -87,7 +87,7 @@ export class BugReportView extends React.Component<Props, State> {
                         label: <Icon
                             name={'send'}
                             size={20}
-                            color={Colors.BRAND_PURPLE}
+                            color={Colors.NAVIGATION_BUTTON_COLOR}
                         />,
                     }}
                 />

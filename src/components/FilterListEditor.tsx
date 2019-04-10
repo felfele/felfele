@@ -26,7 +26,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                     navigation={this.props.navigation}
                     rightButton1={{
                         onPress: this.onAddFilter,
-                        label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
+                        label: <MaterialIcon name='add-box' size={24} color={Colors.NAVIGATION_BUTTON_COLOR} />,
                     }}
                 />
                 <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>

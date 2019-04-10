@@ -110,7 +110,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
-        const icon = (name: string) => <Icon name={name} size={20} color={Colors.DARK_GRAY} />;
+        const icon = (name: string) => <Icon name={name} size={20} color={Colors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
             label: icon(iconName),
             onPress,

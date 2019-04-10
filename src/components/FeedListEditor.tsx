@@ -83,7 +83,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         navigation={this.props.navigation}
                         rightButton1={{
                             onPress: this.onAddFeed,
-                            label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
+                            label: <MaterialIcon name='add-box' size={24} color={Colors.NAVIGATION_BUTTON_COLOR} />,
                         }}
                         title={this.props.title}
                     />

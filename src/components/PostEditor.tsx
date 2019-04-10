@@ -63,7 +63,7 @@ export class PostEditor extends React.Component<Props, State> {
     public render() {
         const isPostEmpty = this.isPostEmpty();
         const isSendEnabled = !isPostEmpty && !this.state.isSending;
-        const sendIconColor = isSendEnabled ? Colors.BRAND_PURPLE : Colors.GRAY;
+        const sendIconColor = isSendEnabled ? Colors.NAVIGATION_BUTTON_COLOR : Colors.BRAND_PURPLE;
         const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
@@ -79,7 +79,7 @@ export class PostEditor extends React.Component<Props, State> {
                             label: <Icon
                                 name={'close'}
                                 size={20}
-                                color={Colors.DARK_GRAY}
+                                color={Colors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}
                         rightButton1={{

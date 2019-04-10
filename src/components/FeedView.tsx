@@ -61,20 +61,20 @@ export const FeedView = (props: Props) => {
 
     const rightButton1 = props.isOwnFeed
         ? props.feedName.length > 0
-            ? button('dots-vertical', Colors.DARK_GRAY, navigateToFeedSettings)
+            ? button('dots-vertical', Colors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
             : undefined
         : isOnboardingFeed
             ? undefined
             : isFollowedFeed
                 ? isFavorite(props.feeds, props.feedUrl)
-                    ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
-                    : button('star', Colors.DARK_GRAY, toggleFavorite)
-                : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
+                    ? button('star', Colors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                    : button('star-outline', Colors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                : button('link-variant', Colors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
 
     const rightButton2 = isLocalFeed || isOnboardingFeed
         ? undefined
-        : button('dots-vertical', Colors.DARK_GRAY, navigateToFeedInfo)
+        : button('dots-vertical', Colors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>

@@ -15,11 +15,12 @@ export const Colors = {
     VERY_LIGHT_GRAY: '#F8F8F8',
     GRAY: '#808080',
     DARK_GRAY: '#4A4A4A',
-    BRAND_PURPLE: '#873FFF',
+    BRAND_PURPLE: '#6200EA',
     BRAND_PURPLE_LIGHT: '#BA76FA',
     STRONG_TEXT: '#303030',
     BACKGROUND_COLOR: '#DDDDDD',
     BUTTON_COLOR: '#4A4A4A',
+    NAVIGATION_BUTTON_COLOR: '#FFFFFF',
 };
 
 export const defaultBoldFont = 'Roboto-Bold';

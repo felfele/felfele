@@ -67,10 +67,10 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
         return (
             <SafeAreaView style={styles.container}>
                 <StatusBarView
-                    backgroundColor={Colors.WHITE}
+                    backgroundColor={Colors.BRAND_PURPLE}
                     hidden={false}
                     translucent={false}
-                    barStyle='dark-content'
+                    barStyle='light-content'
                     networkActivityIndicatorVisible={true}
                 />
                 {this.props.children.navigationHeader}

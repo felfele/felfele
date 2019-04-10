@@ -24,7 +24,7 @@ interface HeaderProps {
 
 export type Props = HeaderProps;
 
-const BUTTON_COLOR = Colors.DARK_GRAY;
+const BUTTON_COLOR = Colors.WHITE;
 
 export const HeaderDefaultLeftButtonIcon = <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />;
 
@@ -97,10 +97,10 @@ const styles = StyleSheet.create({
         paddingTop: 2,
         borderBottomWidth: 1,
         borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.WHITE,
+        backgroundColor: Colors.BRAND_PURPLE,
     },
     headerLeftButtonText: {
-        color: BUTTON_COLOR,
+        color: Colors.WHITE,
         fontSize: 18,
     },
     leftContainer: {
@@ -119,12 +119,12 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 15,
-        color: Colors.DARK_GRAY,
+        color: Colors.WHITE,
         textAlign: 'center',
     },
     headerRightButtonText: {
         fontSize: 18,
-        color: BUTTON_COLOR,
+        color: Colors.WHITE,
     },
     rightButtonContainer: {
         marginLeft: 30,

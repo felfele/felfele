@@ -45,7 +45,7 @@ export class AllFeedScreen extends React.Component<Props> {
                                         label: <Icon
                                             name={'view-grid'}
                                             size={20}
-                                            color={Colors.DARK_GRAY}
+                                            color={Colors.NAVIGATION_BUTTON_COLOR}
                                         />,
                                     }}
                                     onPressTitle={this.ref && this.ref.scrollToTop}
