@@ -3,7 +3,7 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader, HeaderDefaultLeftButtonIcon } from './NavigationHeader';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -61,20 +61,20 @@ export const FeedView = (props: Props) => {
 
     const rightButton1 = props.isOwnFeed
         ? props.feedName.length > 0
-            ? button('dots-vertical', Colors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
+            ? button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
             : undefined
         : isOnboardingFeed
             ? undefined
             : isFollowedFeed
                 ? isFavorite(props.feeds, props.feedUrl)
-                    ? button('star', Colors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
-                    : button('star-outline', Colors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
-                : button('link-variant', Colors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
+                    ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                    : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                : button('link-variant', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
 
     const rightButton2 = isLocalFeed || isOnboardingFeed
         ? undefined
-        : button('dots-vertical', Colors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
+        : button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>

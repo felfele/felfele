@@ -4,7 +4,7 @@ import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
@@ -45,7 +45,7 @@ export class AllFeedScreen extends React.Component<Props> {
                                         label: <Icon
                                             name={'view-grid'}
                                             size={20}
-                                            color={Colors.NAVIGATION_BUTTON_COLOR}
+                                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                         />,
                                     }}
                                     onPressTitle={this.ref && this.ref.scrollToTop}

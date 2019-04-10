@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Colors } from '../../styles';
+import { Colors, ComponentColors } from '../../styles';
 import { BoldText, RegularText } from './text';
 
 interface Props {
@@ -29,7 +29,7 @@ export const PlaceholderCard = (props: Props) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.WHITE,
-        marginBottom: 20,
+        paddingBottom: 20,
     },
     textContainer: {
         paddingHorizontal: 20,
@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingTop: 10,
         fontSize: 14,
-        color: Colors.DARK_GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
     imageContainer: {
         marginTop: 10,
         alignItems: 'center',
     },
     topPlaceholder: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         height: 10,
     },
 });

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
@@ -87,7 +87,7 @@ export class BugReportView extends React.Component<Props, State> {
                         label: <Icon
                             name={'send'}
                             size={20}
-                            color={Colors.NAVIGATION_BUTTON_COLOR}
+                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                         />,
                     }}
                 />
@@ -96,7 +96,7 @@ export class BugReportView extends React.Component<Props, State> {
                         <BugIcon
                             width={29}
                             height={29}
-                            fill={Colors.BRAND_PURPLE}
+                            fill={Colors.WHITE}
                         />
                     </View>
                     {this.props.errorView &&
@@ -160,13 +160,15 @@ export class BugReportView extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        backgroundColor: Colors.WHITE,
+        backgroundColor: Colors.BRAND_PURPLE,
         flex: 1,
     },
     contentContainer: {
         paddingTop: 25,
         flexDirection: 'column',
         alignItems: 'center',
+        backgroundColor: Colors.WHITE,
+        flex: 1,
     },
     iconContainer: {
     },

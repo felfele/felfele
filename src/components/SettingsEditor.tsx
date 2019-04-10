@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/misc/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
@@ -38,13 +38,13 @@ export const SettingsEditor = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     const itemDimension = getGridCardSize();
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
             <NavigationHeader
                 title='Settings'
             />
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
+            <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
                 <SuperGridSectionList
-                    style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
+                    style={{ flex: 1, backgroundColor: ComponentColors.BACKGROUND_COLOR }}
                     spacing={GRID_SPACING}
                     fixed={true}
                     itemDimension={itemDimension}
@@ -105,7 +105,7 @@ export const SettingsEditor = (props: Props) => {
                 { props.settings.showDebugMenu &&
                 <RowItem
                     icon={
-                        <Ionicons name='md-bug' size={24} color={Colors.GRAY}/>
+                        <Ionicons name='md-bug' size={24} color={ComponentColors.BUTTON_COLOR}/>
                     }
                     title='Debug menu'
                     buttonStyle='navigate'

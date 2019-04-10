@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Colors, DefaultNavigationBarHeight } from '../styles';
+import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
@@ -95,9 +95,9 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 2,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
         borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.BRAND_PURPLE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
     },
     headerLeftButtonText: {
         color: Colors.WHITE,

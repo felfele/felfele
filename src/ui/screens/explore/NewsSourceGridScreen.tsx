@@ -3,7 +3,7 @@ import { FlatGrid } from 'react-native-super-grid';
 import { GridCard } from '../../misc/GridCard';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { View, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
-import { Colors } from '../../../styles';
+import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { NewsSource } from '../../../models/recommendation/NewsSource';
 import { RSSFeedManager } from '../../../RSSPostManager';
@@ -37,11 +37,11 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
                 <NavigationHeader title={this.props.subCategoryName} navigation={this.props.navigation}/>
                 {this.state.feeds.length > 0 &&
                     <FlatGrid
-                       style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
+                       style={{ flex: 1, backgroundColor: ComponentColors.BACKGROUND_COLOR }}
                        spacing={10}
                        fixed={true}
                        itemDimension={170}
@@ -70,7 +70,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                         <ActivityIndicator style={styles.activityIndicator} size='large'/>
                     </View>
                 }
-                <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
+                <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
             </SafeAreaView>
         );
     }
@@ -114,10 +114,10 @@ const fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
 const styles = StyleSheet.create({
     activityIndicatorContainer: {
         flex: 1,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
     activityIndicator: {
         paddingTop: 30,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
 });

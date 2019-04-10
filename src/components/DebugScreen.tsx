@@ -10,7 +10,7 @@ import { AppState } from '../reducers/AppState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import { RowItem } from '../ui/misc/RowButton';
 import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
@@ -57,7 +57,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 );
 
 export const DebugScreen = (props: Props) => (
-    <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
         <NavigationHeader
             navigation={props.navigation}
             title='Debug menu'

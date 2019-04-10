@@ -17,7 +17,7 @@ import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import * as Swarm from '../swarm/Swarm';
 import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
@@ -110,7 +110,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
-        const icon = (name: string) => <Icon name={name} size={20} color={Colors.NAVIGATION_BUTTON_COLOR} />;
+        const icon = (name: string) => <Icon name={name} size={20} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
             label: icon(iconName),
             onPress,
@@ -191,7 +191,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
-                        backgroundColor={Colors.BACKGROUND_COLOR}
+                        backgroundColor={ComponentColors.BACKGROUND_COLOR}
                     />
                 </View>
             </View>
@@ -289,12 +289,12 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
         flex: 1,
         flexDirection: 'column',
     },
     container: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
         flexDirection: 'column',
     },
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'column',
         height: 100,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         paddingTop: 50,
     },
     qrCodeContainer: {

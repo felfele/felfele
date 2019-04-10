@@ -3,7 +3,7 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
@@ -45,7 +45,7 @@ export const FavoritesFeedView = (props: Props) => {
                             label: <Icon
                                 name={'view-grid'}
                                 size={20}
-                                color={Colors.NAVIGATION_BUTTON_COLOR}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}
                     />,

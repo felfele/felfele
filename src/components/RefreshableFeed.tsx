@@ -5,10 +5,9 @@ import {
     RefreshControl,
     StyleSheet,
     LayoutAnimation,
-    SafeAreaView,
 } from 'react-native';
 import { Post } from '../models/Post';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 import { StatusBarView } from './StatusBarView';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
@@ -16,6 +15,7 @@ import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -65,9 +65,9 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaView style={styles.container}>
                 <StatusBarView
-                    backgroundColor={Colors.BRAND_PURPLE}
+                    backgroundColor={ComponentColors.HEADER_COLOR}
                     hidden={false}
                     translucent={false}
                     barStyle='light-content'
@@ -98,11 +98,11 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                         />
                     }
                     style={{
-                        backgroundColor: Colors.BACKGROUND_COLOR,
+                        backgroundColor: ComponentColors.BACKGROUND_COLOR,
                     }}
                     ref={value => this.flatList = value || undefined}
                 />
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 
@@ -142,6 +142,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         flex: 1,
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
 });

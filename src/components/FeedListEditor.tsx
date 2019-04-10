@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
@@ -38,7 +38,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
         const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+            <View style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
                 <SuperGridSectionList
                     style={{ flex: 1 }}
@@ -77,13 +77,13 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: Colors.BRAND_PURPLE, flex: 1 }}>
                 <FeedGrid {...this.props}>
                     <NavigationHeader
                         navigation={this.props.navigation}
                         rightButton1={{
                             onPress: this.onAddFeed,
-                            label: <MaterialIcon name='add-box' size={24} color={Colors.NAVIGATION_BUTTON_COLOR} />,
+                            label: <MaterialIcon name='add-box' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />,
                         }}
                         title={this.props.title}
                     />
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.DARK_GRAY,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         fontSize: 14,
     },
 });

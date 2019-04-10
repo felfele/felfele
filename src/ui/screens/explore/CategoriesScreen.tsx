@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Colors } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
@@ -34,15 +34,15 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
         );
     });
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
             <NavigationHeader navigation={props.navigation} title='Explore'/>
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
+            <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
                 <RegularText style={styles.label}>
                     {CATEGORIES_LABEL}
                 </RegularText>
                 {categories}
             </ScrollView>
-            <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
+            <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
         </SafeAreaView>
     );
 };
