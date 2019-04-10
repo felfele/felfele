@@ -2,7 +2,7 @@ import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { getAppStateFromSerialized, migrateAppStateToCurrentVersion } from '../reducers';
+import { migrateAppStateToCurrentVersion } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
@@ -24,7 +24,10 @@ import { generateSecureRandom } from 'react-native-securerandom';
 import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
+import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defaultData';
+import { registerBackgroundTask } from '../helpers/backgroundTask';
+import { localNotification } from '../helpers/notifications';
+import { mergeUpdatedPosts } from '../helpers/postHelpers';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -161,20 +164,7 @@ export const AsyncActions = {
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
-            const uniqueAuthors = new Map<string, Author>();
-            downloadedPosts.map(post => {
-                if (post.author != null) {
-                    if (!uniqueAuthors.has(post.author.uri)) {
-                        uniqueAuthors.set(post.author.uri, post.author);
-                    }
-                }
-            });
-            const notUpdatedPosts = previousPosts.filter(post => post.author != null && !uniqueAuthors.has(post.author.uri));
-            const allPosts = notUpdatedPosts.concat(downloadedPosts);
-            const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
-            const startId = Date.now();
-            const posts = sortedPosts.map((post, index) => ({...post, _id: startId + index}));
-
+            const posts = mergeUpdatedPosts(downloadedPosts, previousPosts);
             dispatch(Actions.updateRssPosts(posts));
         };
     },
@@ -437,6 +427,31 @@ export const AsyncActions = {
                     authorImage: image,
                     favicon: undefined,
                 }));
+            }
+        };
+    },
+    registerBackgroundTasks: (): Thunk => {
+        return async (dispatch, getState) => {
+            const foundationFeeds = getState().feeds.filter(feed => feed.feedUrl === FELFELE_FOUNDATION_URL);
+            if (foundationFeeds.length > 0) {
+                const foundationFeed = foundationFeeds[0];
+                const getLatestPostCreateTime = (posts: Post[]) => posts.length > 0
+                    ? posts[0].createdAt
+                    : 0
+                ;
+                const backgroundTaskIntervalMinutes = 12 * 60;
+                registerBackgroundTask(backgroundTaskIntervalMinutes, async () => {
+                    const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
+                    const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
+                    const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
+                    const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
+                    const recentPosts = await loadRecentPosts(swarm, foundationFeeds);
+                    if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
+                        const posts = mergeUpdatedPosts(recentPosts, previousPosts);
+                        dispatch(Actions.updateRssPosts(posts));
+                        localNotification('There is a new version available!');
+                    }
+                });
             }
         };
     },

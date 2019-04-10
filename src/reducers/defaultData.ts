@@ -25,6 +25,7 @@ export const defaultAuthor: Author = {
 
 export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
 export const FELFELE_ASSISTANT_URL = 'local/onboarding';
+export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda';
 
 const onboardingAuthor: Author = {
     name: FELFELE_ASSISTANT_NAME,
@@ -80,8 +81,8 @@ export const defaultFeeds: Feed[] = [
     },
     {
         name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
-        feedUrl: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
+        url: FELFELE_FOUNDATION_URL,
+        feedUrl: FELFELE_FOUNDATION_URL,
         favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
         followed: true,
     },

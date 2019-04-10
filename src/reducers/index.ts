@@ -367,6 +367,9 @@ const initStore = () => {
     // @ts-ignore
     store.dispatch(AsyncActions.cleanUploadingPostState());
     store.dispatch(Actions.timeTick());
+    // @ts-ignore
+    store.dispatch(AsyncActions.registerBackgroundTasks());
+
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
 

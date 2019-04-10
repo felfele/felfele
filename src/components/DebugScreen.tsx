@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ViewStyle, ScrollView, SafeAreaView } from 'react-native';
+import { View, ViewStyle, ScrollView, SafeAreaView, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
@@ -16,6 +16,8 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation, Routes } from '../helpers/navigation';
+import { localScheduledNotification, localNotification } from '../helpers/notifications';
+import { DateUtils, SECOND } from '../DateUtils';
 
 export interface StateProps {
     appState: AppState;
@@ -108,6 +110,25 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Swarm settings'
                     onPress={async () => props.navigation.navigate('SwarmSettingsContainer', {})}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-notifications' />
+                    }
+                    title='Send notification'
+                    onPress={() => localNotification('hello')}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-notifications' />
+                    }
+                    title='Send scheduled notification'
+                    onPress={() => {
+                        localScheduledNotification('hello', 15 * SECOND);
+                        Alert.alert('Notification set in 15 seconds!');
+                    }}
                     buttonStyle='none'
                 />
                 <RowItem

@@ -1,7 +1,12 @@
+import * as util from 'util';
+import { Utils } from './Utils';
+
 type Logger = (s: string) => void;
 
 export class Debug {
     public static isDebugMode = false;
+    public static useColors = true;
+
     public static setDebugMode(isDebug: boolean) {
         Debug.isDebugMode = isDebug;
     }
@@ -12,8 +17,19 @@ export class Debug {
 
     public static log(...args: any[]) {
         if (__DEV__ && Debug.isDebugMode) {
-            // tslint:disable-next-line:no-console
-            console.log.call(console, ...args);
+            if (Utils.isNodeJS() &&
+                args.length === 2 &&
+                typeof args[0] === 'string' &&
+                typeof args[1] === 'object'
+            ) {
+                const name = args[0];
+                const obj = args[1];
+                // tslint:disable-next-line:no-console
+                console.log(name, util.inspect(obj, false, null, Debug.useColors));
+            } else {
+                // tslint:disable-next-line:no-console
+                console.log.call(console, ...args);
+            }
         }
         const maxLengthArgs = args.map((value) => {
             const stringValue = (value instanceof Error)
