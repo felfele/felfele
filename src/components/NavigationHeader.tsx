@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
+import { TypedNavigation } from '../helpers/navigation';
 
 interface HeaderButton {
     label: string | React.ReactNode;
@@ -18,7 +19,7 @@ interface HeaderProps {
     title?: string;
     titleImage?: React.ReactNode;
     onPressTitle?: () => void;
-    navigation?: any;
+    navigation?: TypedNavigation;
 }
 
 export type Props = HeaderProps;
@@ -33,7 +34,7 @@ export const NavigationHeader = (props: Props) => (
                 props.leftButton != null
                     ? props.leftButton.onPress
                     : props.navigation != null
-                        ? () => props.navigation.goBack(null)
+                        ? () => props.navigation!.goBack(null)
                         : undefined
             }
             style={styles.leftContainer}
