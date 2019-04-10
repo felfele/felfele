@@ -99,4 +99,4 @@ export const compareUrls = (url1: string, url2: string): boolean => {
     const hostname2WithoutWWW = stripWWWPrefix(hostname2);
 
     return hostname1WithoutWWW === hostname2WithoutWWW;
-}
+};
