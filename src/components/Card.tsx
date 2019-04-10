@@ -11,6 +11,7 @@ import {
     StyleSheet,
     Linking,
     Alert,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableView } from './TouchableView';
 import { DateUtils } from '../DateUtils';
@@ -27,7 +28,7 @@ import { CardMarkdown } from './CardMarkdown';
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 import { Author } from '../models/Author';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -50,29 +51,30 @@ type CardProps = StateProps & DispatchProps;
 export const Card = (props: CardProps) => {
     return (
         <View
-            style={styles.container}
             testID={'YourFeed/Post' + props.post._id}
+            style={{
+                paddingBottom: 12,
+            }}
         >
+            <View style={styles.container}>
+                <ActionsOverlay
+                    post={props.post}
+                    author={props.author}
+                    isSelected={props.isSelected}
+                    onDeletePost={props.onDeletePost}
+                    onSharePost={props.onSharePost}
+                    togglePostSelection={props.togglePostSelection}
+                />
 
-            <CardTop
-                post={props.post}
-                currentTimestamp={props.currentTimestamp}
-                author={props.author}
-                modelHelper={props.modelHelper}
-                navigation={props.navigation}
-                onSharePost={props.onSharePost}
-            />
-            <TouchableOpacity
-                activeOpacity={1}
-                onLongPress={() => props.togglePostSelection(props.post)}
-                onPress={() => openPost(props.post)}
-                style = {{
-                    backgroundColor: '#fff',
-                    padding: 0,
-                    paddingTop: 0,
-                    marginTop: 0,
-                }}
-            >
+                <CardTop
+                    post={props.post}
+                    currentTimestamp={props.currentTimestamp}
+                    author={props.author}
+                    modelHelper={props.modelHelper}
+                    navigation={props.navigation}
+                    onSharePost={props.onSharePost}
+                    togglePostSelection={props.togglePostSelection}
+                />
                 <DisplayImage
                     post={props.post}
                     showSquareImages={props.showSquareImages}
@@ -81,8 +83,7 @@ export const Card = (props: CardProps) => {
                 { props.post.text === '' ||
                     <CardMarkdown text={props.post.text}/>
                 }
-                <ButtonList {...props}/>
-            </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -121,9 +122,9 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean, modelHelpe
 
 export const MemoizedCard = React.memo(Card);
 
-const ActionIcon = (props: { name: string}) => {
-    const iconSize = 20;
-    return <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
+const ActionIcon = (props: { name: string, color: string, iconSize?: number }) => {
+    const iconSize = props.iconSize ||  20;
+    return <Icon name={props.name} size={iconSize} color={props.color}/>;
 };
 
 const isPostShareable = (post: Post, author: Author): boolean => {
@@ -146,48 +147,65 @@ const isPostShareable = (post: Post, author: Author): boolean => {
     return true;
 };
 
-const ShareButton = (props: {post: Post, onSharePost: (post: Post) => void, author: Author}) => {
+const ShareButton = (props: { post: Post, onSharePost: () => void, author: Author }) => {
     const isShareable = isPostShareable(props.post, props.author);
     const shareIconName = isShareable ? 'share-outline' : 'share';
-    const onPress = isShareable ? () => props.onSharePost(props.post) : undefined;
+    const onPress = isShareable ? () => props.onSharePost() : undefined;
     return (
-        <TouchableView style={styles.share} onPress={onPress}>
+        <TouchableView style={styles.actionButton} onPress={onPress}>
         { props.post.isUploading === true
-            ? <ActivityIndicator color={Colors.DARK_GRAY} />
-            : <ActionIcon name={shareIconName}/>
+            ? <ActivityIndicator color={Colors.WHITE} />
+            : <ActionIcon name={shareIconName} color={Colors.WHITE}/>
         }
         </TouchableView>
     );
 };
 
-const ButtonList = (props: CardProps) => {
-    const likeIconName = props.post.liked === true ? 'heart' : 'heart-outline';
-    if (props.isSelected) {
-        return (
-            <View
-                testID='CardButtonList'
-                style={styles.itemImageContainer}>
-                <TouchableView style={styles.like} onPress={() => props.post.liked = true}>
-                    <ActionIcon name={likeIconName}/>
-                </TouchableView>
-                <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
-                    <ActionIcon name='comment-multiple-outline'/>
-                </TouchableView>
-                <TouchableView style={styles.share} onPress={() => onDeleteConfirmation(props.post, props.onDeletePost)}>
-                    <ActionIcon name='trash-can-outline'/>
-                </TouchableView>
-                <TouchableView style={styles.share}>
-                    {/* <ActionIcon name='playlist-edit'/> */}
-                </TouchableView>
-                <ShareButton
-                    post={props.post}
-                    onSharePost={props.onSharePost}
-                    author={props.author}
-                />
-            </View>
-        );
+const ActionsOverlay = (props: {
+    post: Post,
+    author: Author,
+    isSelected: boolean,
+    togglePostSelection: (post: Post) => void,
+    onDeletePost: (post: Post) => void,
+    onSharePost: (post: Post) => void,
+}) => {
+    const post = props.post;
+    if (!props.isSelected) {
+        return null;
     }
-    return <View/>;
+    return (
+        <TouchableWithoutFeedback
+            style={styles.overlay}
+            onPress={() => props.togglePostSelection(post)}
+        >
+            <View style={styles.overlay}>
+                <DeleteButton
+                    onPress={() => {
+                        onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
+                    }
+                }/>
+                <ShareButton
+                    post={post}
+                    onSharePost={() => {
+                        props.onSharePost(post);
+                        props.togglePostSelection(post);
+                    }}
+                    author={props.author}/>
+            </View>
+        </TouchableWithoutFeedback>
+
+    );
+};
+
+const DeleteButton = (props: { onPress: () => void }) => {
+    return (
+        <TouchableView
+            style={styles.actionButton}
+            onPress={props.onPress}
+        >
+            <ActionIcon name='trash-can' color={Colors.WHITE} iconSize={24}/>
+        </TouchableView>
+    );
 };
 
 const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
@@ -231,6 +249,7 @@ const CardTop = (props: {
     modelHelper: ModelHelper,
     navigation: TypedNavigation,
     onSharePost: (post: Post) => void,
+    togglePostSelection: (post: Post) => void,
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
@@ -261,6 +280,15 @@ const CardTop = (props: {
                 </View>
                 <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
+            <TouchableView
+                style={{
+                    paddingRight: 10,
+                }}
+                onPress={() => {
+                    props.togglePostSelection(props.post);
+                }}>
+                <ActionIcon name='dots-vertical' color={Colors.DARK_GRAY}/>
+            </TouchableView>
         </TouchableOpacity>
     );
 };
@@ -273,13 +301,26 @@ const openPost = async (post: Post) => {
     }
 };
 
-const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) => {
+const onDeleteConfirmation = (
+    post: Post,
+    onDeletePost: (post: Post) => void,
+    togglePostSelection: (post: Post) => void,
+) => {
     Alert.alert(
         'Are you sure you want to delete?',
         undefined,
         [
-            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
-            { text: 'OK', onPress: async () => await onDeletePost(post) },
+            {
+                text: 'Cancel',
+                onPress: () => Debug.log('Cancel Pressed'), style: 'cancel',
+            },
+            {
+                text: 'OK',
+                onPress: async () => {
+                    await onDeletePost(post);
+                    togglePostSelection(post);
+                },
+            },
         ],
         { cancelable: false }
     );
@@ -299,14 +340,21 @@ const HeaderOffset = 20;
 const TranslucentBarHeight = Platform.OS === 'ios' ? HeaderOffset : 0;
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: Colors.WHITE,
         borderTopLeftRadius: 3,
         borderTopRightRadius: 3,
-        padding: 0,
-        paddingTop: 0,
-        paddingBottom: 0,
-        marginBottom: 12,
-        marginTop: 0,
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 100,
+        backgroundColor: 'rgba(98, 0, 234, 0.5)',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     infoContainer : {
         flexDirection: 'row',
@@ -333,22 +381,16 @@ const styles = StyleSheet.create({
         marginTop: 5,
         justifyContent: 'space-evenly',
     },
-    like: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-        marginLeft: 5,
-    },
-    comment: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-    },
-    share: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-    },
-    edit: {
-        marginHorizontal: 20,
-        marginVertical: 5,
+    actionButton: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 1,
+        borderColor: Colors.WHITE,
+        backgroundColor: Colors.BRAND_PURPLE,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 10,
     },
     likeCount: {
         flexDirection: 'row',
