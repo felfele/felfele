@@ -17,6 +17,7 @@ export const TouchableView = (props: TouchableViewProps) => (
         onPress={props.onPress}
         onLongPress={props.onLongPress}
         hitSlop={props.hitSlop ? props.hitSlop : TouchableViewDefaultHitSlop}
+        testID={props.testID}
     >
         <View {...props} >
             {props.children}

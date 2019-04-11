@@ -82,10 +82,12 @@ export class PostEditor extends React.Component<Props, State> {
                                 size={20}
                                 color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
+                            testID: 'PostEditor/CloseButton',
                         }}
                         rightButton1={{
                             onPress: sendButtonOnPress,
                             label: sendIcon,
+                            testID: 'PostEditor/SendPostButton',
                         }}
                         titleImage={
                             <Avatar

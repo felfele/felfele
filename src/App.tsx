@@ -246,6 +246,7 @@ const Root = createBottomTabNavigator(
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
                     navigation.navigate('Post', {});
                 },
+                tabBarTestID: 'TabBarPostButton',
             },
         },
         ProfileTab: {
