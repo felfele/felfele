@@ -236,7 +236,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
     private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
         const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-        Debug.log('fetchFeedFromUrl: feed: ', feed);
+        Debug.log('FeedInfo.fetchRSSFeedFromUrl', {feed});
         return feed;
     }
 

@@ -3,6 +3,11 @@ import { Debug } from './Debug';
 import { safeFetch } from './Network';
 import * as urlUtils from './helpers/urlUtils';
 
+interface Icon {
+    href: string;
+    size: number;
+}
+
 // tslint:disable:class-name
 class _FaviconCache {
     private favicons: Map<string, string> = new Map();
@@ -24,6 +29,15 @@ class _FaviconCache {
             Debug.log(e);
             return '';
         }
+    }
+
+    public findBestIconFromLinks = (links: Node[]): string | undefined => {
+        const icons = this.findIconsInLinks(links);
+        const icon = this.getBestIcon(icons);
+        return icon != null
+            ? icon.href
+            : undefined
+        ;
     }
 
     private getBaseUrl(url: string) {
@@ -60,21 +74,60 @@ class _FaviconCache {
         return json.data.icon_img;
     }
 
-    private async downloadIndexAndParseFavicon(url: string) {
+    private getBestSizeFromAttribute = (sizesAttr: string): number => {
+        const getSize = (sizeAttr: string) => parseInt(sizeAttr.split(/[xX]/)[0], 10) || 0;
+        const sizes = sizesAttr.split(' ')
+            .map(size => getSize(size))
+            .sort((a, b) => b - a)
+        ;
+        return sizes.length > 0
+            ? sizes[0]
+            : 0
+        ;
+    }
+
+    private findIconsInLinks = (links: Node[]): Icon[] => {
+        const isIcon = (icon: Partial<Icon>): icon is Icon => icon.href != null && icon.size != null;
+        return links.map(link => {
+            const href = this.matchRelAttributes(link, ['shortcut icon', 'icon', 'apple-touch-icon']) || undefined;
+            const sizes = HtmlUtils.getAttribute(link, 'sizes') || '';
+            const size = this.getBestSizeFromAttribute(sizes);
+            return {
+                href,
+                size,
+            };
+        })
+        .filter<Icon>(isIcon);
+    }
+
+    private getBestIcon = (icons: Icon[]): Icon | undefined => {
+        const iconExtensionWeight = (iconHref: string) => iconHref.endsWith('.png')
+            ? 2
+            : iconHref.endsWith('.ico')
+                ? 1
+                : 0
+        ;
+        const compareIconExtension = (a: string, b: string) => iconExtensionWeight(b) - iconExtensionWeight(a);
+        const sortedIcons = icons.sort((a, b) => b.size - a.size || compareIconExtension(a.href, b.href));
+        return sortedIcons.length > 0
+            ? sortedIcons[0]
+            : undefined
+        ;
+    }
+
+    private async downloadIndexAndParseFavicon(url: string): Promise<string> {
         const html = await this.fetchHtml(url);
         const document = HtmlUtils.parse(html);
         const links = HtmlUtils.findPath(document, ['html', 'head', 'link']);
-        for (const link of links) {
-            const icon = this.matchRelAttributes(link, ['shortcut icon', 'icon', 'apple-touch-icon']);
-            if (icon != null) {
-                if (icon.startsWith('//')) {
-                    return 'https:' + icon;
-                }
-                if (!icon.startsWith('http')) {
-                    return url + icon;
-                }
-                return icon;
+        const favicon = this.findBestIconFromLinks(links);
+        if (favicon != null) {
+            if (favicon.startsWith('//')) {
+                return 'https:' + favicon;
             }
+            if (!favicon.startsWith('http')) {
+                return url + favicon;
+            }
+            return favicon;
         }
 
         return url + 'favicon.ico';
