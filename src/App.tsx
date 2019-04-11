@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, YellowBox } from 'react-native';
+import { Platform, YellowBox, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
@@ -23,7 +23,7 @@ import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { WelcomeContainer } from './containers/WelcomeContainer';
 import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
-import { Colors, defaultTextProps } from './styles';
+import { Colors, defaultTextProps, ComponentColors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
@@ -228,11 +228,20 @@ const Root = createBottomTabNavigator(
             screen: PostEditorContainer,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'plus-box-outline'}
-                        size={24}
-                        color={Colors.BRAND_PURPLE}
-                    />
+                    <View style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: ComponentColors.TAB_ACTION_BUTTON_COLOR,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        <Icon
+                            name={'pencil'}
+                            size={24}
+                            color={ComponentColors.TAB_ACTION_BUTTON_ICON_COLOR}
+                        />
+                    </View>
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
                     navigation.navigate('Post', {});
@@ -272,8 +281,8 @@ const Root = createBottomTabNavigator(
             ?
                 {
                     showLabel: false,
-                    activeTintColor: 'gray',
-                    inactiveTintColor: 'lightgray',
+                    activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
+                    inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
                     style: {
                         opacity: 0.96,
                         position: 'absolute',
@@ -286,8 +295,8 @@ const Root = createBottomTabNavigator(
                 {
                     showLabel: false,
                     showIcon: true,
-                    activeTintColor: 'gray',
-                    inactiveTintColor: 'lightgray',
+                    activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
+                    inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
                     style: {
                         opacity: 0.96,
                     },
