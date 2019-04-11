@@ -8,7 +8,7 @@ import {
  } from 'react-native';
 
 import { Settings } from '../../../models/Settings';
-import { Colors } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/misc/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
@@ -41,12 +41,12 @@ export const FeedSettingsScreen = (props: Props) => {
         : defaultImages.userCircle
     ;
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
             <NavigationHeader
                 navigation={props.navigation}
                 title={props.feed.name}
             />
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+            <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
                 <Image
                     source={source}
                     style={styles.image}
@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
     explanation: {
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
     image: {
         width: 170,

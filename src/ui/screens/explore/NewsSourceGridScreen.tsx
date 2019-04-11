@@ -2,8 +2,8 @@ import * as React from 'react';
 import { FlatGrid } from 'react-native-super-grid';
 import { GridCard } from '../../misc/GridCard';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
-import { View, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
-import { Colors } from '../../../styles';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { NewsSource } from '../../../models/recommendation/NewsSource';
 import { RSSFeedManager } from '../../../RSSPostManager';
@@ -11,6 +11,7 @@ import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { FragmentSafeAreaView } from '../../misc/FragmentSafeAreaView';
 
 export interface StateProps {
     gatewayAddress: string;
@@ -37,11 +38,11 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+            <FragmentSafeAreaView>
                 <NavigationHeader title={this.props.subCategoryName} navigation={this.props.navigation}/>
                 {this.state.feeds.length > 0 &&
                     <FlatGrid
-                       style={{ flex: 1, backgroundColor: Colors.BACKGROUND_COLOR }}
+                       style={{ flex: 1, backgroundColor: ComponentColors.BACKGROUND_COLOR }}
                        spacing={10}
                        fixed={true}
                        itemDimension={170}
@@ -70,8 +71,8 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                         <ActivityIndicator style={styles.activityIndicator} size='large'/>
                     </View>
                 }
-                <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
-            </SafeAreaView>
+                <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
+            </FragmentSafeAreaView>
         );
     }
 
@@ -114,10 +115,10 @@ const fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
 const styles = StyleSheet.create({
     activityIndicatorContainer: {
         flex: 1,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
     activityIndicator: {
         paddingTop: 30,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
 });

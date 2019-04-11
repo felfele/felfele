@@ -11,9 +11,10 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 
 import { NavigationHeader } from './NavigationHeader';
 import { clearLog, filteredLog, setLogFilter } from '../log';
-import { Colors, DefaultTabBarHeight } from '../styles';
+import { Colors, ComponentColors, DefaultTabBarHeight } from '../styles';
 import { SimpleTextInput } from './SimpleTextInput';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     currentTimestamp: number;
@@ -39,7 +40,7 @@ export class LogViewer extends React.PureComponent<Props> {
     }
 
     public render = () => (
-        <SafeAreaView style={styles.mainContainer}>
+        <FragmentSafeAreaView style={styles.mainContainer}>
             <NavigationHeader
                 navigation={this.props.navigation}
                 rightButton1={{
@@ -78,7 +79,7 @@ export class LogViewer extends React.PureComponent<Props> {
                 }
                 keyExtractor={(item) => item[0]}
             />
-        </SafeAreaView>
+        </FragmentSafeAreaView>
     )
 }
 
@@ -86,7 +87,7 @@ const fontFamily = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const styles = StyleSheet.create({
     mainContainer: {
         height: Dimensions.get('window').height - DefaultTabBarHeight + 1,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.HEADER_COLOR,
     },
     logLineContainer: {
     },
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
         height: 40,
         paddingHorizontal: 16,
         paddingVertical: 6,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
     logFilterTextInputContainer: {
         borderRadius: 16,

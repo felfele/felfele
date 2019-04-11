@@ -18,13 +18,14 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -63,11 +64,11 @@ export class PostEditor extends React.Component<Props, State> {
     public render() {
         const isPostEmpty = this.isPostEmpty();
         const isSendEnabled = !isPostEmpty && !this.state.isSending;
-        const sendIconColor = isSendEnabled ? Colors.BRAND_PURPLE : Colors.GRAY;
+        const sendIconColor = isSendEnabled ? ComponentColors.NAVIGATION_BUTTON_COLOR : ComponentColors.HEADER_COLOR;
         const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaView style={styles.mainContainer}>
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
@@ -79,7 +80,7 @@ export class PostEditor extends React.Component<Props, State> {
                             label: <Icon
                                 name={'close'}
                                 size={20}
-                                color={Colors.DARK_GRAY}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                             testID: 'PostEditor/CloseButton',
                         }}
@@ -118,7 +119,7 @@ export class PostEditor extends React.Component<Props, State> {
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 
@@ -261,7 +262,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'camera'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
             <TouchableOpacity
@@ -271,7 +272,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'image-multiple'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
         </View>
@@ -279,10 +280,12 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
 });
 
 const styles = StyleSheet.create({
+    mainContainer: {
+    },
     container: {
+        backgroundColor: Colors.WHITE,
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: 'white',
     },
     textInput: {
         flex: 1,
