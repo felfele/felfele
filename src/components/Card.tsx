@@ -66,23 +66,28 @@ export const Card = (props: CardProps) => {
                     togglePostSelection={props.togglePostSelection}
                 />
 
-                <CardTop
-                    post={props.post}
-                    currentTimestamp={props.currentTimestamp}
-                    author={props.author}
-                    modelHelper={props.modelHelper}
-                    navigation={props.navigation}
-                    onSharePost={props.onSharePost}
-                    togglePostSelection={props.togglePostSelection}
-                />
-                <DisplayImage
-                    post={props.post}
-                    showSquareImages={props.showSquareImages}
-                    modelHelper={props.modelHelper}
-                />
-                { props.post.text === '' ||
-                    <CardMarkdown text={props.post.text}/>
-                }
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() => openPost(props.post)}
+                >
+                    <CardTop
+                        post={props.post}
+                        currentTimestamp={props.currentTimestamp}
+                        author={props.author}
+                        modelHelper={props.modelHelper}
+                        navigation={props.navigation}
+                        onSharePost={props.onSharePost}
+                        togglePostSelection={props.togglePostSelection}
+                    />
+                    <DisplayImage
+                        post={props.post}
+                        showSquareImages={props.showSquareImages}
+                        modelHelper={props.modelHelper}
+                    />
+                    { props.post.text === '' ||
+                        <CardMarkdown text={props.post.text}/>
+                    }
+                </TouchableOpacity>
             </View>
         </View>
     );
