@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, TouchableWithoutFeedback, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
@@ -14,6 +14,7 @@ import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 export interface DispatchProps {
     onPressFeed: (feed: Feed) => void;
@@ -38,7 +39,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
         const itemDimension = getGridCardSize();
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <View style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
                 <SuperGridSectionList
                     style={{ flex: 1 }}
@@ -69,7 +70,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={<TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>}
                 />
-            </View>
+            </SafeAreaView>
         );
     }
 }
@@ -77,13 +78,13 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+            <FragmentSafeAreaView>
                 <FeedGrid {...this.props}>
                     <NavigationHeader
                         navigation={this.props.navigation}
                         rightButton1={{
                             onPress: this.onAddFeed,
-                            label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
+                            label: <MaterialIcon name='add-box' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />,
                         }}
                         title={this.props.title}
                     />
@@ -105,7 +106,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         </View>
                     </TouchableWithoutFeedback>}
                 </FeedGrid>
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.DARK_GRAY,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         fontSize: 14,
     },
 });

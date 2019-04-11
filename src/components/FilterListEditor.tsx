@@ -4,7 +4,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { ContentFilter } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 import { RowItem } from '../ui/misc/RowButton';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
@@ -26,10 +26,10 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
                     navigation={this.props.navigation}
                     rightButton1={{
                         onPress: this.onAddFilter,
-                        label: <MaterialIcon name='add-box' size={24} color={Colors.BUTTON_COLOR} />,
+                        label: <MaterialIcon name='add-box' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />,
                     }}
                 />
-                <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
+                <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
                     {this.props.filters.map(filter => (
                         <RowItem
                             title={filter.text}
@@ -65,6 +65,6 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
     },
 });

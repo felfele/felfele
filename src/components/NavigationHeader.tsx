@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Colors, DefaultNavigationBarHeight } from '../styles';
+import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
@@ -24,7 +24,7 @@ interface HeaderProps {
 
 export type Props = HeaderProps;
 
-const BUTTON_COLOR = Colors.DARK_GRAY;
+const BUTTON_COLOR = Colors.WHITE;
 
 export const HeaderDefaultLeftButtonIcon = <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />;
 
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 2,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
         borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
     },
     headerLeftButtonText: {
-        color: BUTTON_COLOR,
+        color: Colors.WHITE,
         fontSize: 18,
     },
     leftContainer: {
@@ -119,12 +119,12 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 15,
-        color: Colors.DARK_GRAY,
+        color: Colors.WHITE,
         textAlign: 'center',
     },
     headerRightButtonText: {
         fontSize: 18,
-        color: BUTTON_COLOR,
+        color: Colors.WHITE,
     },
     rightButtonContainer: {
         marginLeft: 30,

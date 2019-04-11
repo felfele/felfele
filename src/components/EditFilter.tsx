@@ -10,12 +10,13 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
 
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -79,17 +80,17 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ? <Icon
                 name='delete'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
             />
             : <Icon
                 name='add-box'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
             />
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaView style={styles.container}>
                 <NavigationHeader
                     title='Edit filter'
                     navigation={this.props.navigation}
@@ -118,7 +119,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                         onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
                     />
                 </View>
-            </SafeAreaView>
+            </FragmentSafeAreaView>
         );
     }
 
@@ -157,7 +158,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.HEADER_COLOR,
         flex: 1,
         flexDirection: 'column',
     },
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     },
     sliderText: {
         flex: 1,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
         paddingTop: 20,
     },
     slider: {

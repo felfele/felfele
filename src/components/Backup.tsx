@@ -12,7 +12,7 @@ import {
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { Colors, DefaultNavigationBarHeight } from '../styles';
+import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
 import { Button } from './Button';
 import {
     backupToSwarm,
@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         height: '100%',
         flexDirection: 'column',
+        backgroundColor: ComponentColors.HEADER_COLOR,
     },
     backupTextInput: {
         fontSize: 10,

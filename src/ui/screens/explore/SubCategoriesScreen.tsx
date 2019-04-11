@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Colors } from '../../../styles';
+import { ComponentColors } from '../../../styles';
 import { RegularText } from '../../misc/text';
 import { SubCategory } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { FragmentSafeAreaView} from '../../misc/FragmentSafeAreaView';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
@@ -37,16 +38,18 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
         );
     });
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-            <NavigationHeader title={props.title} navigation={props.navigation}/>
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
-                <RegularText style={styles.label}>
-                    {SUBCATEGORIES_LABEL}
-                </RegularText>
-                {subCategories}
-            </ScrollView>
-            <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
-        </SafeAreaView>
+        <FragmentSafeAreaView>
+            <SafeAreaView style={{flex: 1}}>
+                <NavigationHeader title={props.title} navigation={props.navigation}/>
+                <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
+                    <RegularText style={styles.label}>
+                        {SUBCATEGORIES_LABEL}
+                    </RegularText>
+                    {subCategories}
+                </ScrollView>
+                <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
+            </SafeAreaView>
+        </FragmentSafeAreaView>
     );
 };
 
@@ -55,6 +58,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
 });

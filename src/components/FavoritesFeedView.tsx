@@ -3,7 +3,7 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
@@ -36,16 +36,16 @@ export const FavoritesFeedView = (props: Props) => {
                 navigationHeader:
                     <NavigationHeader
                         title='Favorites'
-                        rightButton1={{
+                        leftButton={{
                             onPress: () => props.navigation.navigate(
                                 'FavoriteListViewerContainer', {
                                     feeds: props.feeds,
                                 }
                             ),
                             label: <Icon
-                                name={'view-grid'}
-                                size={20}
-                                color={Colors.DARK_GRAY}
+                                name={'menu'}
+                                size={24}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}
                     />,
