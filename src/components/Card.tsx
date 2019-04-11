@@ -163,6 +163,11 @@ const ShareButton = (props: { post: Post, onSharePost: () => void, author: Autho
     );
 };
 
+const isOwnPost = (post: Post, author: Author): boolean =>
+    post.author != null && post.author.identity != null && author.identity != null &&
+    post.author.identity.publicKey === author.identity.publicKey
+;
+
 const ActionsOverlay = (props: {
     post: Post,
     author: Author,
@@ -181,11 +186,13 @@ const ActionsOverlay = (props: {
             onPress={() => props.togglePostSelection(post)}
         >
             <View style={styles.overlay}>
-                <DeleteButton
-                    onPress={() => {
-                        onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
-                    }
-                }/>
+                {isOwnPost(props.post, props.author) &&
+                    <DeleteButton
+                        onPress={() => {
+                            onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
+                        }}
+                    />
+                }
                 <ShareButton
                     post={post}
                     onSharePost={() => {
