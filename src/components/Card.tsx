@@ -7,7 +7,6 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Dimensions,
-    Platform,
     StyleSheet,
     Linking,
     Alert,
@@ -52,9 +51,7 @@ export const Card = (props: CardProps) => {
     return (
         <View
             testID={'YourFeed/Post' + props.post._id}
-            style={{
-                paddingBottom: 12,
-            }}
+            style={styles.containerPadding}
         >
             <View style={styles.container}>
                 <ActionsOverlay
@@ -341,13 +338,14 @@ const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSq
     return calculateImageDimensions(image, maxWidth);
 };
 
-const HeaderOffset = 20;
-const TranslucentBarHeight = Platform.OS === 'ios' ? HeaderOffset : 0;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.WHITE,
         borderTopLeftRadius: 3,
         borderTopRightRadius: 3,
+    },
+    containerPadding: {
+        paddingBottom: 12,
     },
     overlay: {
         position: 'absolute',
@@ -378,14 +376,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: Colors.DARK_GRAY,
     },
-    itemImageContainer: {
-        flexDirection: 'row',
-        height: 40,
-        alignSelf: 'stretch',
-        marginLeft: 5,
-        marginTop: 5,
-        justifyContent: 'space-evenly',
-    },
     actionButton: {
         width: 60,
         height: 60,
@@ -397,46 +387,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 10,
     },
-    likeCount: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 2,
-    },
-    commentItem: {
-        fontSize: 10 ,
-        color: 'rgba(0, 0, 0, 0.5)',
-        marginTop: 5,
-    },
-    captionContainer: {
-        marginTop: 2 ,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    captionText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    dateText: {
-        fontSize: 8,
-        color: 'rgba(0, 0, 0, 0.5)',
-        marginTop: 5,
-    },
-    seperator: {
-        height: 1,
-        alignSelf: 'stretch',
-        marginHorizontal: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    },
-    hashTag: {
-        fontStyle: 'italic',
-        color: 'blue',
-    },
-    footer: {
-        marginVertical: 5,
-        alignSelf: 'stretch',
-        marginHorizontal: 20,
-        flexDirection: 'column',
-    },
     username: {
         fontSize: 14,
         color: Colors.DARK_GRAY,
@@ -445,26 +395,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'normal',
         color: Colors.GRAY,
-    },
-    text: {
-        fontSize: 12,
-        color: Colors.DARK_GRAY,
-    },
-    likedContainer: {
-        backgroundColor: 'transparent',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    translucentBar: {
-        height: TranslucentBarHeight,
-        width: '100%',
-        position: 'absolute',
-        backgroundColor: '#e6e6e6ff',
-        opacity: 0.5,
-        top: 0,
-        left: 0,
-    },
-    refreshControl: {
     },
 });
