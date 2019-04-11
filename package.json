@@ -24,7 +24,7 @@
     "jest-fetch-mock": "=1.6.6",
     "jest-serializer": "=23.0.1",
     "metro-react-native-babel-preset": "0.48.3",
-    "mocha": "^6.1.2",
+    "mocha": "=6.1.2",
     "mock-async-storage": "=2.0.3",
     "node-fetch": "=2.3.0",
     "react-native-asset": "=1.1.2",
