@@ -10,6 +10,7 @@ export const Colors = {
     BLACK: '#000000',
     WHITE: '#FFFFFF',
     LIGHTISH_GRAY: '#9B9B9B',
+    PINKISH_GRAY: '#BBBBBB',
     LIGHT_GRAY: '#D3D3D3',
     LIGHTER_GRAY: '#E6E6E6',
     VERY_LIGHT_GRAY: '#F8F8F8',
@@ -26,6 +27,10 @@ export const ComponentColors = {
     BUTTON_COLOR: Colors.DARK_GRAY,
     NAVIGATION_BUTTON_COLOR: Colors.WHITE,
     HEADER_COLOR: Colors.BRAND_PURPLE,
+    TAB_ACTIVE_COLOR: Colors.BLACK,
+    TAB_INACTIVE_COLOR: Colors.PINKISH_GRAY,
+    TAB_ACTION_BUTTON_COLOR: Colors.BRAND_PURPLE,
+    TAB_ACTION_BUTTON_ICON_COLOR: Colors.WHITE,
 };
 
 export const defaultBoldFont = 'Roboto-Bold';
