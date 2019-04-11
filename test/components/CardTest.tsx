@@ -17,6 +17,7 @@ const mockNavigation: TypedNavigation = {
     goBack: (routeKey?: string | null) => true,
     navigate: (routeKey: any, params: any) => true,
     pop: (n?: number, params?: { immediate?: boolean }) => true,
+    popToTop: () => {},
     getParam: (param: any) => param.name,
     setParams: (newParams: any) => true,
 };
