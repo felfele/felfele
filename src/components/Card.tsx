@@ -363,6 +363,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 38,
         alignSelf: 'stretch',
+        alignItems: 'center',
         marginVertical: 14,
         marginLeft: 10,
     },
