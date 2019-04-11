@@ -52,7 +52,8 @@ matrix:
         - npm run check
         - npm run build:ios
 
-    - os: osx
+    - if: false
+      os: osx
       name: 'Detox E2E iOS'
       language: objective-c
       osx_image: xcode10.1
