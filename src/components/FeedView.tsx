@@ -121,12 +121,3 @@ const followFeed = (uri: string, feeds: Feed[], onFollowFeed: (feed: Feed) => vo
         onFollowFeed(knownFeed);
     }
 };
-
-const removeFeedAndGoBack = async (props: Props) => {
-    const confirmRemove = await AreYouSureDialog.show('Are you sure you want to delete?');
-    const feedToRemove = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed !== true);
-    if (feedToRemove != null && confirmRemove) {
-        props.onRemoveFeed(feedToRemove);
-        props.onBack();
-    }
-};
