@@ -10,6 +10,7 @@ import { TypedNavigation } from '../helpers/navigation';
 interface HeaderButton {
     label: string | React.ReactNode;
     onPress: () => void;
+    testID?: string;
 }
 
 interface HeaderProps {
@@ -38,6 +39,7 @@ export const NavigationHeader = (props: Props) => (
                         : undefined
             }
             style={styles.leftContainer}
+            testID={(props.leftButton && props.leftButton.testID) || 'NavigationHeader/LeftButton'}
         >
             <RegularText style={styles.headerLeftButtonText}>
                 {
@@ -61,21 +63,29 @@ export const NavigationHeader = (props: Props) => (
         </TouchableView>
         <View style={styles.rightContainer}>
             {props.rightButton1 &&
-                <RightButton onPress={props.rightButton1.onPress} text={props.rightButton1.label} />}
+                <RightButton
+                    onPress={props.rightButton1.onPress}
+                    text={props.rightButton1.label}
+                    testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
+                />}
             {props.rightButton2 &&
                 <View style={{paddingRight: 20}}>
-                    <RightButton onPress={props.rightButton2.onPress} text={props.rightButton2.label} />
+                    <RightButton
+                        onPress={props.rightButton2.onPress}
+                        text={props.rightButton2.label}
+                        testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
+                    />
                 </View>
             }
         </View>
     </View>
 );
 
-const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
+const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode, testID?: string }) => {
     return (
         <TouchableView
             onPress={props.onPress}
-            testID={'NavigationHeader/RightButton'}
+            testID={props.testID}
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
