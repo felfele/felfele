@@ -484,7 +484,6 @@ export const generateSecureIdentity = async (generateRandom: (length: number) =>
         entropyEnc: 'hex',
         pers: undefined,
     });
-    Debug.log('generateSecureIdentity: ', keyPair, secureRandom);
     const privateKey = '0x' + keyPair.getPrivate('hex');
     const publicKey = '0x' + keyPair.getPublic('hex');
     const address = byteArrayToHex(publicKeyToAddress(keyPair.getPublic()));
