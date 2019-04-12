@@ -299,7 +299,7 @@ const Root = createBottomTabNavigator(
                     activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
                     inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
                     style: {
-                        opacity: 0.96,
+                        opacity: 1.0,
                     },
                 },
     },
