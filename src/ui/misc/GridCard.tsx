@@ -26,7 +26,7 @@ export const GRID_CARD_COUNT_IN_ROW = 2;
 
 export const getGridCardSize = () => {
     const windowWidth = Dimensions.get('window').width;
-    return (windowWidth - GRID_SPACING * 3) / GRID_CARD_COUNT_IN_ROW;
+    return Math.floor((windowWidth - GRID_SPACING * 3) / GRID_CARD_COUNT_IN_ROW);
 };
 
 export const GridCard = React.memo((props: Props) => (
