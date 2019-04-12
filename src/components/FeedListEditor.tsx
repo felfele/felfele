@@ -32,7 +32,7 @@ export interface StateProps {
     gatewayAddress: string;
     title: string;
     showExplore: boolean;
-    headerComponent: React.ComponentType<any> | React.ReactElement<any> | null;
+    headerComponent?: React.ComponentType<any> | React.ReactElement<any> | null;
 }
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactNode}> {
@@ -102,7 +102,10 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
         return (
             <FragmentSafeAreaView>
                 <FeedGrid
-                    headerComponent={this.props.showExplore && ExploreButton(this.props.openExplore)}
+                    headerComponent={this.props.showExplore
+                        ? ExploreButton(this.props.openExplore)
+                        : undefined
+                    }
                     {...this.props}
                 >
                     <NavigationHeader
