@@ -41,9 +41,13 @@ const defaultPost1: Post = {
 
 Post text and images. If you post multiple images they will be displayed as a slide show.
 
-Follow other people using the Felfele app, or your favorite website/blog.
+Follow other people using the Felfele app, or follow your favorite website/blog.
 
-Share posts in your feed by pressing the three vertical dots on a post.
+Share interesting posts in your feed by pressing the three vertical dots on a post.
+
+We would like to hear about you! You can always ask questions or send feedback to us at [hello@felfele.org](mailto:hello@felfele.org)
+
+You can also send a bugreport from the Settings menu.
 
 `,
     author: onboardingAuthor,
