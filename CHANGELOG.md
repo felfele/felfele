@@ -1,3 +1,14 @@
+## v0.9.33 (2019-04-12)
+
+This release adds the following new features and fixes:
+
+- Feature: New header and tab bar style (https://github.com/felfele/felfele/pull/299)
+- Feature: New design for post actions (https://github.com/felfele/felfele/pull/301)
+- Feature: We added notifications when there is a new post in the Felfele Foundation feed (https://github.com/felfele/felfele/pull/290)
+- Bugfix: Sharing on android was broken sometimes (https://github.com/felfele/felfele/pull/275)
+- Bugfix: Sometime a post was accidentally posted mulitple times (https://github.com/felfele/felfele/pull/271)
+- Bugfix: The default avatar was shown too often instead of the feed avatar (https://github.com/felfele/felfele/pull/300)
+
 ## v0.9.32 (2019-03-27)
 
 This release adds the following new features and fixes:
