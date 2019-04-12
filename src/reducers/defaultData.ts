@@ -39,15 +39,15 @@ const defaultPost1: Post = {
     images: [],
     text: `Basic features:
 
-Post text and images. If you post multiple images they will be displayed as a slide show.
+- Post text and images. If you post multiple images they will be displayed as a slide show.
 
-Follow other people using the Felfele app, or follow your favorite website/blog.
+- Follow other people using the Felfele app, or follow your favorite website/blog.
 
-Share interesting posts in your feed by pressing the three vertical dots on a post.
+- Share interesting posts in your feed by pressing the three vertical dots on a post.
 
 We would like to hear about you! You can always ask questions or send feedback to us at [hello@felfele.org](mailto:hello@felfele.org)
 
-You can also send a bugreport from the Settings menu.
+If you find something is broken or you don't like please send us a bug report from the Settings menu.
 
 `,
     author: onboardingAuthor,
