@@ -37,13 +37,19 @@ const defaultPost1: Post = {
     _id: 0,
     createdAt: Date.now(),
     images: [],
-    text: `Basic features:.
+    text: `Basic features:
 
-Post text and images privately, and later add the posts to your public feed.
+- Post text and images. If you post multiple images they will be displayed as a slide show.
 
-Follow the public feed of others, or add your favorite RSS/Atom feeds.
+- Follow other people using the Felfele app, or follow your favorite website/blog.
 
-If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
+- Share interesting posts in your feed by pressing the three vertical dots on a post.
+
+We would like to hear about you! You can always ask questions or send feedback to us at [hello@felfele.org](mailto:hello@felfele.org)
+
+If you find something is broken or you don't like please send us a bug report from the Settings menu.
+
+`,
     author: onboardingAuthor,
 };
 
@@ -51,7 +57,12 @@ const defaultPost2: Post = {
     _id: 1,
     createdAt: Date.now(),
     images: [],
-    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    text: `You can follow others by getting an invite link from them or scanning a QR code on their phones. Press the + button in the top right corner to do this.
+
+Paste a link here or enter a website address.
+
+If you want to share your posts, go to the Profile tab. Press the share button in the top right corner or show your QR code.
+    `,
     author: onboardingAuthor,
 };
 
@@ -59,7 +70,12 @@ const defaultPost3: Post = {
     _id: 2,
     createdAt: Date.now(),
     images: [],
-    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
+    text: `We have added some feeds that you follow automatically. You can unfollow them if you don't like them by pressing the menu icon on the top left.
+
+You can also find new content there if you press the Explore button.
+
+Enjoy!
+`,
     author: onboardingAuthor,
 };
 

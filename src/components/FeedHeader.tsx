@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerText: {
-        color: 'gray',
+        color: Colors.PINKISH_GRAY,
         fontSize: 18,
         paddingLeft: 10,
     },

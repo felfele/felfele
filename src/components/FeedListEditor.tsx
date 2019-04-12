@@ -32,6 +32,7 @@ export interface StateProps {
     gatewayAddress: string;
     title: string;
     showExplore: boolean;
+    headerComponent?: React.ComponentType<any> | React.ReactElement<any> | null;
 }
 
 export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactNode}> {
@@ -69,17 +70,44 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                     ListFooterComponent={<TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>}
+                    ListHeaderComponent={this.props.headerComponent}
                 />
             </SafeAreaView>
         );
     }
 }
 
+const ExploreButton = (openExplore: () => void) => (
+    <TouchableWithoutFeedback
+        onPress={() => openExplore()}
+    >
+        <View style={{
+            backgroundColor: Colors.WHITE,
+            margin: 10,
+            height: 70,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }}>
+            <View style={{ paddingTop: 1, paddingRight: 4 }}>
+                <Icon name='compass' size={20} color={Colors.BRAND_PURPLE}/>
+            </View>
+            <MediumText style={{ fontSize: 12, color: Colors.BRAND_PURPLE }}>EXPLORE</MediumText>
+        </View>
+    </TouchableWithoutFeedback>
+);
+
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
             <FragmentSafeAreaView>
-                <FeedGrid {...this.props}>
+                <FeedGrid
+                    headerComponent={this.props.showExplore
+                        ? ExploreButton(this.props.openExplore)
+                        : undefined
+                    }
+                    {...this.props}
+                >
                     <NavigationHeader
                         navigation={this.props.navigation}
                         rightButton1={{
@@ -88,23 +116,6 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         }}
                         title={this.props.title}
                     />
-                    {this.props.showExplore &&
-                    <TouchableWithoutFeedback
-                        onPress={() => this.props.openExplore()}
-                    >
-                        <View style={{
-                            backgroundColor: Colors.WHITE,
-                            height: 44,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}>
-                            <View style={{ paddingTop: 1, paddingRight: 4 }}>
-                                <Icon name='compass' size={20} color={Colors.DARK_GRAY}/>
-                            </View>
-                            <MediumText style={{ fontSize: 12, color: Colors.DARK_GRAY }}>EXPLORE PUBLIC FEEDS</MediumText>
-                        </View>
-                    </TouchableWithoutFeedback>}
                 </FeedGrid>
             </FragmentSafeAreaView>
         );

@@ -296,7 +296,7 @@ const CardTop = (props: {
                 onPress={() => {
                     props.togglePostSelection(props.post);
                 }}>
-                <ActionIcon name='dots-vertical' color={Colors.DARK_GRAY}/>
+                <ActionIcon name='dots-vertical' color={Colors.PINKISH_GRAY}/>
             </TouchableView>
         </TouchableOpacity>
     );
