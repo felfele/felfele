@@ -69,7 +69,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                         <MediumText style={styles.sectionHeader}>{section.title}</MediumText>
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
-                    ListFooterComponent={<TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>}
+                    ListFooterComponent={<TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>}
                     ListHeaderComponent={this.props.headerComponent}
                 />
             </SafeAreaView>
