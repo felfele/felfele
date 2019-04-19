@@ -11,7 +11,7 @@ import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
-import { FragmentSafeAreaView } from '../../misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 
 export interface StateProps {
     gatewayAddress: string;
@@ -38,7 +38,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
-            <FragmentSafeAreaView>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader title={this.props.subCategoryName} navigation={this.props.navigation}/>
                 {this.state.feeds.length > 0 &&
                     <FlatGrid
@@ -72,7 +72,7 @@ export class NewsSourceGridScreen extends React.Component<StateProps & DispatchP
                     </View>
                 }
                 <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
-            </FragmentSafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 

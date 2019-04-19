@@ -15,6 +15,7 @@ import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -38,7 +39,7 @@ export const SettingsEditor = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     const itemDimension = getGridCardSize();
     return (
-        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
+        <FragmentSafeAreaViewForTabBar>
             <NavigationHeader
                 title='Settings'
             />
@@ -114,7 +115,7 @@ export const SettingsEditor = (props: Props) => {
                 }
             </ScrollView>
             <TabBarPlaceholder/>
-        </SafeAreaView>
+        </FragmentSafeAreaViewForTabBar>
     );
 };
 

@@ -7,7 +7,7 @@ import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
-import { FragmentSafeAreaView } from '../../misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 
@@ -35,7 +35,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
         );
     });
     return (
-        <FragmentSafeAreaView>
+        <FragmentSafeAreaViewWithoutTabBar>
             <SafeAreaView style={{flex: 1}}>
                 <NavigationHeader navigation={props.navigation} title='Explore'/>
                 <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
@@ -46,7 +46,7 @@ export const CategoriesScreen = (props: StateProps & DispatchProps) => {
                 </ScrollView>
                 <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
             </SafeAreaView>
-        </FragmentSafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     );
 };
 

@@ -24,9 +24,8 @@ import { Debug } from '../Debug';
 import { TypedNavigation } from '../helpers/navigation';
 import { SimpleTextInput } from './SimpleTextInput';
 import { WideButton } from '../ui/misc/WideButton';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar, FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
-import { StatusBarView } from './StatusBarView';
 
 // personally identifiable information
 export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath', 'user' ];
@@ -81,7 +80,19 @@ interface State {
     logInfoExpanded: boolean;
 }
 
-export class BugReportView extends React.Component<Props, State> {
+export const BugReportViewWithTabBar = (props: Props) => (
+    <FragmentSafeAreaViewForTabBar>
+        <BugReportView {...props}/>
+    </FragmentSafeAreaViewForTabBar>
+);
+
+export const BugReportViewWithoutTabBar = (props: Props) => (
+    <FragmentSafeAreaViewWithoutTabBar>
+        <BugReportView {...props}/>
+    </FragmentSafeAreaViewWithoutTabBar>
+);
+
+class BugReportView extends React.Component<Props, State> {
     public state: State = {
         isSending: false,
         feedbackText: '',
@@ -90,102 +101,101 @@ export class BugReportView extends React.Component<Props, State> {
 
     public render() {
         return (
-            <FragmentSafeAreaView style={styles.mainContainer}>
-                <KeyboardAvoidingView style={styles.keyboardAvoidingContainer}>
-                    <NavigationHeader
-                        navigation={this.props.navigation}
-                        title='Bug Report'
-                        rightButton1={{
-                            onPress: this.onPressSend,
-                            label: <Icon
-                                name={'send'}
-                                size={20}
-                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                            />,
-                        }}
+            <KeyboardAvoidingView style={styles.keyboardAvoidingContainer}>
+                <NavigationHeader
+                    navigation={this.props.navigation}
+                    title='Bug Report'
+                    rightButton1={{
+                        onPress: this.onPressSend,
+                        label: <Icon
+                            name={'send'}
+                            size={20}
+                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                        />,
+                    }}
+                />
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <View style={styles.iconContainer}>
+                        <BugIcon
+                            width={29}
+                            height={29}
+                            fill={Colors.WHITE}
+                        />
+                    </View>
+                    {this.props.errorView &&
+                    <BoldText style={[styles.text, { fontSize: 18 }]}>
+                        Yikes!{'\n\n'}
+                        We are sorry, an error has occurred.{'\n'}
+                    </BoldText>
+                    }
+                    <RegularText style={[styles.text, { fontSize: 14 }]}>
+                        As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
+                    </RegularText>
+                    <SimpleTextInput
+                        style={styles.textInput}
+                        multiline={true}
+                        numberOfLines={4}
+                        onChangeText={this.onChangeText}
+                        placeholder='Let us know what happened...'
+                        placeholderTextColor='gray'
+                        underlineColorAndroid='transparent'
                     />
-                    <ScrollView contentContainerStyle={styles.contentContainer}>
-                        <View style={styles.iconContainer}>
-                            <BugIcon
-                                width={29}
-                                height={29}
-                                fill={Colors.WHITE}
-                            />
-                        </View>
-                        {this.props.errorView &&
-                        <BoldText style={[styles.text, { fontSize: 18 }]}>
-                            Yikes!{'\n\n'}
-                            We are sorry, an error has occurred.{'\n'}
-                        </BoldText>
-                        }
-                        <RegularText style={[styles.text, { fontSize: 14 }]}>
-                            As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
-                        </RegularText>
-                        <SimpleTextInput
-                            style={styles.textInput}
-                            multiline={true}
-                            numberOfLines={4}
-                            onChangeText={this.onChangeText}
-                            placeholder='Let us know what happened...'
-                            placeholderTextColor='gray'
-                            underlineColorAndroid='transparent'
-                        />
-                        <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
-                        <View style={[
-                            styles.logContainer, {
-                                height: this.state.logInfoExpanded ? 200 : 84,
-                            }]}
-                        >
-                            <ScrollView style={styles.logTextContainer}>
-                                <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
-                            </ScrollView>
-                            <WideButton
-                                icon={
-                                    <Icon
-                                        name={this.state.logInfoExpanded ? 'chevron-up' : 'chevron-down'}
-                                        size={24}
-                                        color={Colors.BRAND_PURPLE}
-                                    />
-                                }
-                                style={{
-                                    margin: 0,
-                                    height: 24,
-                                }}
-                                onPress={this.toggleLogInfoExpand}
-                            />
-                        </View>
-                        <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
-                            By sending a bug report, you will share some of your information with us.
-                        </RegularText>
-                        <WideButton
-                            icon={!this.state.isSending ?
-                                <Icon
-                                    name={'send'}
-                                    size={24}
-                                    color={Colors.BRAND_PURPLE}
-                                /> :
-                                <ActivityIndicator size='small' color='grey' />
-                            }
-                            onPress={this.onPressSend}
-                            label={'SEND BUG REPORT'}
-                        />
-                        {this.props.errorView &&
+                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
+                    <View style={[
+                        styles.logContainer, {
+                            height: this.state.logInfoExpanded ? 200 : 84,
+                        }]}
+                    >
+                        <ScrollView style={styles.logTextContainer}>
+                            <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
+                        </ScrollView>
                         <WideButton
                             icon={
                                 <Icon
-                                    name={'refresh'}
+                                    name={this.state.logInfoExpanded ? 'chevron-up' : 'chevron-down'}
                                     size={24}
                                     color={Colors.BRAND_PURPLE}
                                 />
                             }
-                            onPress={restartApp}
-                            label={'RESTART'}
+                            style={{
+                                margin: 0,
+                                height: 24,
+                            }}
+                            onPress={this.toggleLogInfoExpand}
                         />
+                    </View>
+                    <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
+                        By sending a bug report, you will share some of your information with us.
+                    </RegularText>
+                    <WideButton
+                        style={{marginBottom: 0}}
+                        icon={!this.state.isSending ?
+                            <Icon
+                                name={'send'}
+                                size={24}
+                                color={Colors.BRAND_PURPLE}
+                            /> :
+                            <ActivityIndicator size='small' color='grey' />
                         }
-                    </ScrollView>
+                        onPress={this.onPressSend}
+                        label={'SEND BUG REPORT'}
+                    />
+                    {this.props.errorView &&
+                    <WideButton
+                        icon={
+                            <Icon
+                                name={'refresh'}
+                                size={24}
+                                color={Colors.BRAND_PURPLE}
+                            />
+                        }
+                        onPress={restartApp}
+                        label={'RESTART'}
+                    />
+                    }
                     <TabBarPlaceholder/>
-                </KeyboardAvoidingView>
-            </FragmentSafeAreaView>
+                </ScrollView>
+            </KeyboardAvoidingView>
         );
     }
 
@@ -261,6 +271,7 @@ const styles = StyleSheet.create({
     },
     keyboardAvoidingContainer: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
+      //  paddingBottom: DefaultTabBarHeight,
         flex: 1,
     },
     contentContainer: {

@@ -14,7 +14,7 @@ import { clearLog, filteredLog, setLogFilter } from '../log';
 import { Colors, ComponentColors, DefaultTabBarHeight } from '../styles';
 import { SimpleTextInput } from './SimpleTextInput';
 import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     currentTimestamp: number;
@@ -40,7 +40,7 @@ export class LogViewer extends React.PureComponent<Props> {
     }
 
     public render = () => (
-        <FragmentSafeAreaView style={styles.mainContainer}>
+        <FragmentSafeAreaViewWithoutTabBar style={styles.mainContainer}>
             <NavigationHeader
                 navigation={this.props.navigation}
                 rightButton1={{
@@ -79,7 +79,7 @@ export class LogViewer extends React.PureComponent<Props> {
                 }
                 keyExtractor={(item) => item[0]}
             />
-        </FragmentSafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     )
 }
 
