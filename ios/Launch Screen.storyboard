@@ -18,13 +18,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="splash" translatesAutoresizingMaskIntoConstraints="NO" id="nep-VJ-w3T">
-                                <rect key="frame" x="67" y="159" width="240" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash" translatesAutoresizingMaskIntoConstraints="NO" id="nep-VJ-w3T">
+                                <rect key="frame" x="65" y="211" width="245" height="245"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.38431372549019605" green="0.0" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="tintColor" red="0.38431372549999998" green="0.0" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="nep-VJ-w3T" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="VfC-47-Cvx"/>
+                            <constraint firstItem="nep-VJ-w3T" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="brn-qm-Ejb"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                     </view>
                 </viewController>
