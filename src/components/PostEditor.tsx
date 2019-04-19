@@ -25,7 +25,7 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -68,7 +68,7 @@ export class PostEditor extends React.Component<Props, State> {
         const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
-            <FragmentSafeAreaView style={styles.mainContainer}>
+            <FragmentSafeAreaViewWithoutTabBar style={styles.mainContainer}>
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
@@ -119,7 +119,7 @@ export class PostEditor extends React.Component<Props, State> {
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
-            </FragmentSafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 

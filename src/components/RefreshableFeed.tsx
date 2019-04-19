@@ -15,7 +15,7 @@ import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -65,7 +65,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <FragmentSafeAreaView style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar style={styles.container}>
                 {this.props.children.navigationHeader}
                 {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
@@ -95,7 +95,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                     }}
                     ref={value => this.flatList = value || undefined}
                 />
-            </FragmentSafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 

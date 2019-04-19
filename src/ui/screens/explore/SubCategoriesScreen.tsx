@@ -7,7 +7,7 @@ import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../misc/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
-import { FragmentSafeAreaView} from '../../misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar} from '../../misc/FragmentSafeAreaView';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
@@ -38,7 +38,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
         );
     });
     return (
-        <FragmentSafeAreaView>
+        <FragmentSafeAreaViewWithoutTabBar>
             <SafeAreaView style={{flex: 1}}>
                 <NavigationHeader title={props.title} navigation={props.navigation}/>
                 <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
@@ -49,7 +49,7 @@ export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
                 </ScrollView>
                 <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
             </SafeAreaView>
-        </FragmentSafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     );
 };
 

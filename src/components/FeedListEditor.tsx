@@ -14,7 +14,7 @@ import { MediumText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface DispatchProps {
     onPressFeed: (feed: Feed) => void;
@@ -69,7 +69,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                         <MediumText style={styles.sectionHeader}>{section.title}</MediumText>
                     )}
                     // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
-                    ListFooterComponent={<TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>}
+                    ListFooterComponent={<TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>}
                     ListHeaderComponent={this.props.headerComponent}
                 />
             </SafeAreaView>
@@ -100,7 +100,7 @@ const ExploreButton = (openExplore: () => void) => (
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
-            <FragmentSafeAreaView>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <FeedGrid
                     headerComponent={this.props.showExplore
                         ? ExploreButton(this.props.openExplore)
@@ -117,7 +117,7 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                         title={this.props.title}
                     />
                 </FeedGrid>
-            </FragmentSafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 

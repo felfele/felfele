@@ -2,13 +2,12 @@ import * as React from 'react';
 import {
     View,
     StyleSheet,
-    SafeAreaView,
 } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { Button } from './Button';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 import { ComponentColors } from '../styles';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -23,7 +22,7 @@ export interface State {
 }
 
 export const BackupRestore = (props: Props) => (
-    <FragmentSafeAreaView style={styles.mainContainer}>
+    <FragmentSafeAreaViewForTabBar style={styles.mainContainer}>
         <NavigationHeader
             title='Backup & Restore'
             navigation={props.navigation}
@@ -32,7 +31,7 @@ export const BackupRestore = (props: Props) => (
             <Button text='Backup' onPress={() => props.navigation.navigate('Backup', {})} />
             <Button text='Restore' onPress={() => props.navigation.navigate('Restore', {})} />
         </View>
-    </FragmentSafeAreaView>
+    </FragmentSafeAreaViewForTabBar>
 );
 
 const styles = StyleSheet.create({
