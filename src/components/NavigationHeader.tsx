@@ -7,16 +7,16 @@ import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
 
-interface HeaderButton {
+export interface ButtonProps {
     label: string | React.ReactNode;
     onPress: () => void;
     testID?: string;
 }
 
 interface HeaderProps {
-    leftButton?: HeaderButton;
-    rightButton1?: HeaderButton;
-    rightButton2?: HeaderButton;
+    leftButton?: ButtonProps;
+    rightButton1?: ButtonProps;
+    rightButton2?: ButtonProps;
     title?: string;
     titleImage?: React.ReactNode;
     onPressTitle?: () => void;

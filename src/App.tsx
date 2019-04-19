@@ -42,6 +42,7 @@ import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
 import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
 import { initializeNotifications } from './helpers/notifications';
+import { OnboardingContainer } from './ui/screens/onboarding/OnboardingContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -340,10 +341,22 @@ const WelcomeNavigator = createStackNavigator({
     },
 });
 
+const OnboardingNavigator = createStackNavigator({
+    Welcome: {
+        screen: OnboardingContainer,
+    },
+}, {
+    mode: 'card',
+    navigationOptions: {
+        header: null,
+    },
+    initialRouteName: 'Welcome',
+});
+
 const InitialNavigator = createSwitchNavigator({
-    Loading: LoadingScreenContainer,
+    Loading: OnboardingNavigator,
     App: AppNavigator,
-    Welcome: WelcomeNavigator,
+    Welcome: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
     backBehavior: 'initialRoute',
