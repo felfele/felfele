@@ -2,22 +2,20 @@ import * as React from 'react';
 import {
     Image,
     StyleSheet,
+    View,
 } from 'react-native';
 
 import { ImageData } from '../../../models/ImageData';
 import SplashScreen from 'react-native-splash-screen';
 import { defaultImages} from '../../../defaultImages';
-import { getDefaultUserImage } from '../../../defaultUserImage';
 import { defaultAuthor } from '../../../reducers/defaultData';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { TouchableView } from '../../../components/TouchableView';
 import { Page } from './Page';
 import { Colors } from '../../../styles';
 import { BoldText, MediumText, RegularText } from '../../../ui/misc/text';
 
 export interface DispatchProps {
     onStartDownloadFeeds: () => void;
-    onCreateUser: (name: string, image: ImageData, navigation: TypedNavigation) => void;
 }
 
 export interface StateProps {
@@ -32,7 +30,7 @@ export interface State {
     authorImage: ImageData;
 }
 
-export class Onboarding extends React.PureComponent<Props, State> {
+export class WelcomeScreen extends React.PureComponent<Props, State> {
     public state: State = {
         authorName: defaultAuthor.name,
         authorImage: defaultAuthor.image,
@@ -53,11 +51,10 @@ export class Onboarding extends React.PureComponent<Props, State> {
                 }}
                 rightButton={{
                     label: 'GET STARTED',
-                    onPress: () => {},
+                    onPress: () => this.props.navigation.navigate('ProfileOnboarding', {}),
                 }}
             >
-                <TouchableView
-                    onLongPress={this.onDone}
+                <View
                     testID='Welcome'
                     style={{
                         paddingTop: 100,
@@ -66,10 +63,13 @@ export class Onboarding extends React.PureComponent<Props, State> {
                         alignItems: 'center',
                     }}
                 >
-                    <Image source={defaultImages.iconWhiteTransparent} style={{
-                        width: 150,
-                        height: 150,
-                    }}/>
+                    <Image
+                        source={defaultImages.iconWhiteTransparent}
+                        style={{
+                            width: 150,
+                            height: 150,
+                        }}
+                    />
                     <BoldText style={[ styles.text, { fontSize: 18 } ]}>
                         Welcome to Felfele
                     </BoldText>
@@ -79,22 +79,8 @@ export class Onboarding extends React.PureComponent<Props, State> {
                     <RegularText style={[ styles.text, { fontSize: 14 } ]}>
                         We are a non-profit organization building products to help people take back the control of their personal data and privacy.
                     </RegularText>
-                </TouchableView>
+                </View>
             </Page>
-        );
-    }
-
-    private onDone = async () => {
-        this.props.onCreateUser(
-            this.state.authorName !== ''
-                ? this.state.authorName
-                : defaultAuthor.name
-            ,
-            this.state.authorImage.uri !== ''
-                ? this.state.authorImage
-                : await getDefaultUserImage()
-            ,
-            this.props.navigation,
         );
     }
 }

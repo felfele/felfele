@@ -15,6 +15,7 @@ import { ButtonProps } from '../../../components/NavigationHeader';
 
 interface Props {
     backgroundColor: string;
+    safeAreaTopBackgroundColor?: string;
     children: ReactNode | ReactNode[];
     leftButton?: ButtonProps;
     rightButton?: ButtonProps;
@@ -22,7 +23,10 @@ interface Props {
 
 export const Page = (props: Props) => {
     return (
-        <FragmentSafeAreaViewForTabBar backgroundColor={Colors.WHITE}>
+        <FragmentSafeAreaViewForTabBar
+            topBackgroundColor={props.safeAreaTopBackgroundColor}
+            bottomBackgroundColor={Colors.WHITE}
+        >
             <View style={{
                 flex: 1,
                 backgroundColor: props.backgroundColor,
@@ -32,16 +36,14 @@ export const Page = (props: Props) => {
             <View style={styles.buttonRow}>
                 {props.leftButton != null &&
                 <PageButton
-                    label={props.leftButton.label}
+                    {...props.leftButton}
                     color={Colors.DARK_GRAY}
-                    onPress={props.leftButton.onPress}
                 />
                 }
                 {props.rightButton != null &&
                 <PageButton
-                    label={props.rightButton.label}
+                    {...props.rightButton}
                     color={Colors.BRAND_PURPLE}
-                    onPress={props.rightButton.onPress}
                 />
                 }
             </View>
@@ -50,13 +52,21 @@ export const Page = (props: Props) => {
     );
 };
 
-const PageButton = (props: { label: string | ReactNode, color: string, onPress?: () => void}) => (
-    <TouchableWithoutFeedback>
+interface PageButtonProps extends ButtonProps {
+    color: string;
+}
+
+const PageButton = (props: PageButtonProps) => (
+    <TouchableWithoutFeedback
+        disabled={props.disabled}
+        onPress={props.onPress}
+    >
         <View style={styles.button}>
             <MediumText
                 style={{
                     fontSize: 12,
                     color: props.color,
+                    opacity: props.disabled ? 0.5 : 1,
                 }}
             >
                 {props.label}

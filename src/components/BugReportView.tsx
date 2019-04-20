@@ -10,7 +10,6 @@ import {
     Text,
     ScrollView,
     KeyboardAvoidingView,
-    SafeAreaView,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { restartApp } from '../helpers/restart';

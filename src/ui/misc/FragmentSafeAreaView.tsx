@@ -5,7 +5,8 @@ import { StatusBarView } from '../../components/StatusBarView';
 
 interface OwnProps {
     children: React.ReactNode | React.ReactNode[];
-    backgroundColor?: string;
+    topBackgroundColor?: string;
+    bottomBackgroundColor?: string;
 }
 
 type Props = ViewProps & OwnProps;
@@ -13,7 +14,7 @@ type Props = ViewProps & OwnProps;
 export const FragmentSafeAreaViewWithoutTabBar = (props: Props) => (
     <React.Fragment>
         <StatusBarView
-            backgroundColor={ComponentColors.HEADER_COLOR}
+            backgroundColor={props.topBackgroundColor || ComponentColors.HEADER_COLOR}
             hidden={false}
             translucent={false}
             barStyle='light-content'
@@ -27,14 +28,14 @@ export const FragmentSafeAreaViewWithoutTabBar = (props: Props) => (
 export const FragmentSafeAreaViewForTabBar = (props: Props) => (
     <React.Fragment>
         <StatusBarView
-                backgroundColor={ComponentColors.HEADER_COLOR}
+                backgroundColor={props.topBackgroundColor || ComponentColors.HEADER_COLOR}
                 hidden={false}
                 translucent={false}
                 barStyle='light-content'
                 networkActivityIndicatorVisible={true}
             />
         <SafeAreaView style={{ flex: 0, backgroundColor: ComponentColors.HEADER_COLOR }}/>
-        <SafeAreaView style={{ flex: 1, backgroundColor: props.backgroundColor || 'transparent' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: props.bottomBackgroundColor || 'transparent' }}>
             {props.children}
         </SafeAreaView>
     </React.Fragment>

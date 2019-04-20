@@ -20,10 +20,9 @@ import { PostEditorContainer } from './containers/PostEditorContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
-import { WelcomeContainer } from './containers/WelcomeContainer';
 import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
-import { Colors, defaultTextProps, ComponentColors } from './styles';
+import { defaultTextProps, ComponentColors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
@@ -42,7 +41,8 @@ import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
 import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
 import { initializeNotifications } from './helpers/notifications';
-import { OnboardingContainer } from './ui/screens/onboarding/OnboardingContainer';
+import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
+import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -330,20 +330,12 @@ const AppNavigator = createStackNavigator(Scenes,
     },
 );
 
-const WelcomeNavigator = createStackNavigator({
+const OnboardingNavigator = createStackNavigator({
     Welcome: {
         screen: WelcomeContainer,
     },
-}, {
-    mode: 'card',
-    navigationOptions: {
-        header: null,
-    },
-});
-
-const OnboardingNavigator = createStackNavigator({
-    Welcome: {
-        screen: OnboardingContainer,
+    ProfileOnboarding: {
+        screen: ProfileContainer,
     },
 }, {
     mode: 'card',
@@ -354,14 +346,13 @@ const OnboardingNavigator = createStackNavigator({
 });
 
 const InitialNavigator = createSwitchNavigator({
-    Loading: OnboardingNavigator,
+    Loading: LoadingScreenContainer,
     App: AppNavigator,
-    Welcome: OnboardingNavigator,
+    Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
     backBehavior: 'initialRoute',
-}
-);
+});
 
 export default class App extends React.Component {
     public render() {

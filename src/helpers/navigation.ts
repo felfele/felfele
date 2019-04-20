@@ -6,6 +6,8 @@ import { LocalFeed } from '../social/api';
 export interface Routes {
     App: {};
     Loading: {};
+    Onboarding: {};
+    ProfileOnboarding: {};
     Welcome: {};
     Post: {};
     Root: {};
