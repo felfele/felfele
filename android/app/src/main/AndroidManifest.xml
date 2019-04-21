@@ -27,7 +27,7 @@
         android:name=".MainActivity"
         android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-        android:windowSoftInputMode="adjustResize"
+        android:windowSoftInputMode="stateAlwaysHidden|adjustPan|adjustResize"
         android:screenOrientation="portrait"
         >
         <intent-filter>
