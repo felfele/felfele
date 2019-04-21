@@ -3,6 +3,7 @@ import {
     Image,
     StyleSheet,
     View,
+    Linking,
 } from 'react-native';
 
 import { ImageData } from '../../../models/ImageData';
@@ -47,7 +48,7 @@ export class WelcomeScreen extends React.PureComponent<Props, State> {
                 backgroundColor={Colors.BRAND_PURPLE}
                 leftButton={{
                     label: 'MORE ABOUT FELFELE',
-                    onPress: () => {},
+                    onPress: () => Linking.openURL('https://felfele.com'),
                 }}
                 rightButton={{
                     label: 'GET STARTED',
