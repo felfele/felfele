@@ -11,13 +11,13 @@ import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { ComponentColors, Colors } from '../styles';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 import { localScheduledNotification, localNotification } from '../helpers/notifications';
-import { DateUtils, SECOND } from '../DateUtils';
+import { SECOND } from '../DateUtils';
 
 export interface StateProps {
     appState: AppState;

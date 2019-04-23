@@ -5,8 +5,8 @@ import { ContentFilter } from '../models/ContentFilter';
 import { DateUtils } from '../DateUtils';
 import { NavigationHeader } from './NavigationHeader';
 import { ComponentColors } from '../styles';
-import { RowItem } from '../ui/misc/RowButton';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { RowItem } from '../ui/buttons/RowButton';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
     navigation: TypedNavigation;

@@ -2,15 +2,13 @@ import * as React from 'react';
 import { Colors } from '../../styles';
 import {
     StyleSheet,
-    Text,
     Switch,
     View,
     GestureResponderEvent,
     TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableView } from '../../components/TouchableView';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { RegularText } from './text';
+import { RegularText } from '../misc/text';
 
 interface Props {
     title: string;

@@ -6,7 +6,6 @@ import {
     ReturnKeyTypeOptions,
     StyleSheet,
 } from 'react-native';
-import { Debug } from '../Debug';
 
 interface SimpleTextInputProps {
     style: StyleProp<TextStyle>;

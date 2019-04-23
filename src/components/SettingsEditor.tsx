@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
@@ -15,6 +15,7 @@ import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -38,7 +39,7 @@ export const SettingsEditor = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
     const itemDimension = getGridCardSize();
     return (
-        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
+        <FragmentSafeAreaViewForTabBar>
             <NavigationHeader
                 title='Settings'
             />
@@ -114,7 +115,7 @@ export const SettingsEditor = (props: Props) => {
                 }
             </ScrollView>
             <TabBarPlaceholder/>
-        </SafeAreaView>
+        </FragmentSafeAreaViewForTabBar>
     );
 };
 

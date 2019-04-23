@@ -5,7 +5,6 @@ import {
     View,
     Text,
     Slider,
-    SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -16,7 +15,7 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaView } from '../ui/misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -90,7 +89,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
-            <FragmentSafeAreaView style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar style={styles.container}>
                 <NavigationHeader
                     title='Edit filter'
                     navigation={this.props.navigation}
@@ -119,7 +118,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                         onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
                     />
                 </View>
-            </FragmentSafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 

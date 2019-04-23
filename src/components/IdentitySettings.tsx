@@ -25,7 +25,7 @@ import { ComponentColors, Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';

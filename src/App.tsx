@@ -32,7 +32,7 @@ import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
-import { BugReportView } from './components/BugReportView';
+import { BugReportViewWithTabBar } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
 import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
@@ -183,7 +183,7 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     BugReportView: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <BugReportView navigation={navigation} errorView={false}/>
+            <BugReportViewWithTabBar navigation={navigation} errorView={false}/>
         ),
     },
 };
