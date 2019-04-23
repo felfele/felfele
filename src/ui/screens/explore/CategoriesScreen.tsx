@@ -4,7 +4,7 @@ import { Colors, ComponentColors } from '../../../styles';
 import { RegularText } from '../../misc/text';
 import { Category } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { RowItem } from '../../misc/RowButton';
+import { RowItem } from '../../buttons/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';

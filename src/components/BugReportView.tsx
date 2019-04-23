@@ -17,14 +17,13 @@ import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
 import { Version } from '../Version';
 
-// @ts-ignore
-import BugIcon from '../../images/bug.svg';
 import { Debug } from '../Debug';
 import { TypedNavigation } from '../helpers/navigation';
 import { SimpleTextInput } from './SimpleTextInput';
-import { WideButton } from '../ui/misc/WideButton';
+import { WideButton } from '../ui/buttons/WideButton';
 import { FragmentSafeAreaViewWithoutTabBar, FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { TwoButton } from '../ui/buttons/TwoButton';
 
 // personally identifiable information
 export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath', 'user' ];
@@ -132,6 +131,7 @@ class BugReportView extends React.Component<Props, State> {
                     <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
                         By sending a bug report, you will share some of your information with us.
                     </RegularText>
+                    {!this.props.errorView ?
                     <WideButton
                         style={{marginBottom: 0}}
                         icon={!this.state.isSending ?
@@ -144,18 +144,31 @@ class BugReportView extends React.Component<Props, State> {
                         }
                         onPress={this.onPressSend}
                         label={'SEND BUG REPORT'}
-                    />
-                    {this.props.errorView &&
-                    <WideButton
-                        icon={
-                            <Icon
-                                name={'refresh'}
-                                size={24}
-                                color={Colors.BRAND_PURPLE}
-                            />
-                        }
-                        onPress={restartApp}
-                        label={'RESTART'}
+                    /> :
+                    <TwoButton
+                        leftButton={{
+                            icon:
+                                <Icon
+                                    name={'refresh'}
+                                    size={24}
+                                    color={Colors.BRAND_PURPLE}
+                                />
+                            ,
+                            label: 'RESTART',
+                            onPress: restartApp,
+                        }}
+                        rightButton={{
+                            icon: !this.state.isSending ?
+                                <Icon
+                                    name={'send'}
+                                    size={24}
+                                    color={Colors.BRAND_PURPLE}
+                                /> :
+                                <ActivityIndicator size='small' color='grey' />
+                            ,
+                            label: 'SEND BUG REPORT',
+                            onPress: this.onPressSend,
+                        }}
                     />
                     }
                     <RegularText style={styles.label}>{'LOG INFO'}</RegularText>

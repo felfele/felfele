@@ -8,9 +8,9 @@ import {
  } from 'react-native';
 
 import { Settings } from '../../../models/Settings';
-import { Colors, ComponentColors } from '../../../styles';
+import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { RowItem } from '../../../ui/misc/RowButton';
+import { RowItem } from '../../../ui/buttons/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';

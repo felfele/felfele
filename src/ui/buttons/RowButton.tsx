@@ -8,7 +8,7 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { RegularText } from './text';
+import { RegularText } from '../misc/text';
 
 interface Props {
     title: string;
