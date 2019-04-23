@@ -29,6 +29,7 @@
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
         android:windowSoftInputMode="stateAlwaysHidden|adjustPan|adjustResize"
         android:screenOrientation="portrait"
+        android:launchMode="singleTop"
         >
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
