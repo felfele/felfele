@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
 import { Version } from '../Version';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';

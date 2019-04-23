@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors, ComponentColors, DefaultTabBarHeight } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
     View,
@@ -17,14 +17,13 @@ import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
 import { Version } from '../Version';
 
-// @ts-ignore
-import BugIcon from '../../images/bug.svg';
 import { Debug } from '../Debug';
 import { TypedNavigation } from '../helpers/navigation';
 import { SimpleTextInput } from './SimpleTextInput';
-import { WideButton } from '../ui/misc/WideButton';
+import { WideButton } from '../ui/buttons/WideButton';
 import { FragmentSafeAreaViewWithoutTabBar, FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { TwoButton } from '../ui/buttons/TwoButton';
 
 // personally identifiable information
 export const PIIKeys = [ 'privateKey', 'publicKey', 'address', 'name', 'localPath', 'user' ];
@@ -76,7 +75,6 @@ interface Props {
 interface State {
     isSending: boolean;
     feedbackText: string;
-    logInfoExpanded: boolean;
 }
 
 export const BugReportViewWithTabBar = (props: Props) => (
@@ -95,7 +93,6 @@ class BugReportView extends React.Component<Props, State> {
     public state: State = {
         isSending: false,
         feedbackText: '',
-        logInfoExpanded: false,
     };
 
     public render() {
@@ -104,21 +101,13 @@ class BugReportView extends React.Component<Props, State> {
                 <NavigationHeader
                     navigation={this.props.navigation}
                     title='Bug Report'
-                    rightButton1={{
-                        onPress: this.onPressSend,
-                        label: <Icon
-                            name={'send'}
-                            size={20}
-                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                        />,
-                    }}
                 />
                 <ScrollView contentContainerStyle={styles.contentContainer}>
                     <View style={styles.iconContainer}>
-                        <BugIcon
-                            width={29}
-                            height={29}
-                            fill={Colors.WHITE}
+                        <Icon
+                            name={'bug'}
+                            size={36}
+                            color={Colors.BLACK}
                         />
                     </View>
                     {this.props.errorView &&
@@ -139,33 +128,10 @@ class BugReportView extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                     />
-                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
-                    <View style={[
-                        styles.logContainer, {
-                            height: this.state.logInfoExpanded ? 200 : 84,
-                        }]}
-                    >
-                        <ScrollView style={styles.logTextContainer}>
-                            <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
-                        </ScrollView>
-                        <WideButton
-                            icon={
-                                <Icon
-                                    name={this.state.logInfoExpanded ? 'chevron-up' : 'chevron-down'}
-                                    size={24}
-                                    color={Colors.BRAND_PURPLE}
-                                />
-                            }
-                            style={{
-                                margin: 0,
-                                height: 24,
-                            }}
-                            onPress={this.toggleLogInfoExpand}
-                        />
-                    </View>
                     <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
                         By sending a bug report, you will share some of your information with us.
                     </RegularText>
+                    {!this.props.errorView ?
                     <WideButton
                         style={{marginBottom: 0}}
                         icon={!this.state.isSending ?
@@ -178,30 +144,41 @@ class BugReportView extends React.Component<Props, State> {
                         }
                         onPress={this.onPressSend}
                         label={'SEND BUG REPORT'}
-                    />
-                    {this.props.errorView &&
-                    <WideButton
-                        icon={
-                            <Icon
-                                name={'refresh'}
-                                size={24}
-                                color={Colors.BRAND_PURPLE}
-                            />
-                        }
-                        onPress={restartApp}
-                        label={'RESTART'}
+                    /> :
+                    <TwoButton
+                        leftButton={{
+                            icon:
+                                <Icon
+                                    name={'refresh'}
+                                    size={24}
+                                    color={Colors.BRAND_PURPLE}
+                                />
+                            ,
+                            label: 'RESTART',
+                            onPress: restartApp,
+                        }}
+                        rightButton={{
+                            icon: !this.state.isSending ?
+                                <Icon
+                                    name={'send'}
+                                    size={24}
+                                    color={Colors.BRAND_PURPLE}
+                                /> :
+                                <ActivityIndicator size='small' color='grey' />
+                            ,
+                            label: 'SEND BUG REPORT',
+                            onPress: this.onPressSend,
+                        }}
                     />
                     }
+                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
+                    <View style={styles.logContainer}>
+                        <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
+                    </View>
                     <TabBarPlaceholder/>
                 </ScrollView>
             </KeyboardAvoidingView>
         );
-    }
-
-    private toggleLogInfoExpand = () => {
-        this.setState({
-            logInfoExpanded: !this.state.logInfoExpanded,
-        });
     }
 
     private onChangeText = (feedbackText: string) => {
@@ -297,8 +274,6 @@ const styles = StyleSheet.create({
     logContainer: {
         width: '100%',
         marginBottom: 20,
-    },
-    logTextContainer: {
         backgroundColor: Colors.MEDIUM_GRAY,
         paddingHorizontal: 10,
         paddingVertical: 12,
