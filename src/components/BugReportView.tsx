@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors, ComponentColors, DefaultTabBarHeight } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
     View,
@@ -10,7 +10,6 @@ import {
     Text,
     ScrollView,
     KeyboardAvoidingView,
-    SafeAreaView,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { restartApp } from '../helpers/restart';
@@ -77,7 +76,6 @@ interface Props {
 interface State {
     isSending: boolean;
     feedbackText: string;
-    logInfoExpanded: boolean;
 }
 
 export const BugReportViewWithTabBar = (props: Props) => (
@@ -96,7 +94,6 @@ class BugReportView extends React.Component<Props, State> {
     public state: State = {
         isSending: false,
         feedbackText: '',
-        logInfoExpanded: false,
     };
 
     public render() {
@@ -105,21 +102,13 @@ class BugReportView extends React.Component<Props, State> {
                 <NavigationHeader
                     navigation={this.props.navigation}
                     title='Bug Report'
-                    rightButton1={{
-                        onPress: this.onPressSend,
-                        label: <Icon
-                            name={'send'}
-                            size={20}
-                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                        />,
-                    }}
                 />
                 <ScrollView contentContainerStyle={styles.contentContainer}>
                     <View style={styles.iconContainer}>
-                        <BugIcon
-                            width={29}
-                            height={29}
-                            fill={Colors.WHITE}
+                        <Icon
+                            name={'bug'}
+                            size={36}
+                            color={Colors.BLACK}
                         />
                     </View>
                     {this.props.errorView &&
@@ -140,30 +129,6 @@ class BugReportView extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                     />
-                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
-                    <View style={[
-                        styles.logContainer, {
-                            height: this.state.logInfoExpanded ? 200 : 84,
-                        }]}
-                    >
-                        <ScrollView style={styles.logTextContainer}>
-                            <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
-                        </ScrollView>
-                        <WideButton
-                            icon={
-                                <Icon
-                                    name={this.state.logInfoExpanded ? 'chevron-up' : 'chevron-down'}
-                                    size={24}
-                                    color={Colors.BRAND_PURPLE}
-                                />
-                            }
-                            style={{
-                                margin: 0,
-                                height: 24,
-                            }}
-                            onPress={this.toggleLogInfoExpand}
-                        />
-                    </View>
                     <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
                         By sending a bug report, you will share some of your information with us.
                     </RegularText>
@@ -193,16 +158,14 @@ class BugReportView extends React.Component<Props, State> {
                         label={'RESTART'}
                     />
                     }
+                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
+                    <View style={styles.logContainer}>
+                        <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
+                    </View>
                     <TabBarPlaceholder/>
                 </ScrollView>
             </KeyboardAvoidingView>
         );
-    }
-
-    private toggleLogInfoExpand = () => {
-        this.setState({
-            logInfoExpanded: !this.state.logInfoExpanded,
-        });
     }
 
     private onChangeText = (feedbackText: string) => {
@@ -298,8 +261,6 @@ const styles = StyleSheet.create({
     logContainer: {
         width: '100%',
         marginBottom: 20,
-    },
-    logTextContainer: {
         backgroundColor: Colors.MEDIUM_GRAY,
         paddingHorizontal: 10,
         paddingVertical: 12,
