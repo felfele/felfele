@@ -7,10 +7,9 @@ import {
     ActivityIndicator,
     Dimensions,
     Clipboard,
-    SafeAreaView,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
@@ -23,7 +22,7 @@ import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
@@ -289,19 +288,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 }
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        backgroundColor: ComponentColors.HEADER_COLOR,
-        flex: 1,
-        flexDirection: 'column',
-    },
     container: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
         flexDirection: 'column',
-    },
-    titleInfo: {
-        fontSize: 14,
-        color: '#8e8e93',
     },
     linkInput: {
         width: '100%',
@@ -313,15 +303,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         color: 'gray',
         fontSize: 16,
-    },
-    deleteButtonContainer: {
-        backgroundColor: 'white',
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
     },
     centerIcon: {
         width: '100%',
