@@ -287,7 +287,7 @@ const CardTop = (props: {
                         navigation={props.navigation}
                     />
                 </View>
-                <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
+                <RegularText numberOfLines={1} style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
             <TouchableView
                 style={{
