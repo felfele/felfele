@@ -102,34 +102,6 @@ export const defaultFeeds: Feed[] = [
         favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
         followed: true,
     },
-    {
-        name: 'The Verge',
-        url: 'https://theverge.com/',
-        feedUrl: 'https://www.theverge.com/rss/index.xml',
-        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png',
-        followed: true,
-    },
-    {
-        name: 'Wired Photos',
-        url: 'https://www.wired.com/',
-        feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: 'https://static.savings-united.com/image_setting/132/logo/wired_coupons_logo.png',
-        followed: true,
-    },
-    {
-        name: '500px Blog',
-        url: 'https://iso.500px.com',
-        feedUrl: 'https://iso.500px.com/feed',
-        favicon: 'https://iso.500px.com/wp-content/uploads/2017/10/cropped-FAVICON-180x180.png',
-        followed: true,
-    },
-    {
-        name: 'Favorite Places – Outdoor Photographer',
-        url: 'https://www.outdoorphotographer.com',
-        feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
-        favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
-        followed: true,
-    },
 ];
 
 export const defaultState: AppState = {

@@ -1,39 +1,8 @@
-export interface NewsSource {
-    title: string;
-    description: string;
-    url: string;
-    tags: string[];
-}
+import { Feed } from '../../models/Feed';
 
-export interface Category {
-    name: string;
-    subCategories: SubCategory[];
-}
+import exploreDataJSON from '../../../exploreData.json';
 
-export interface SubCategory {
-    name: string;
-    list: NewsSource[];
-}
+export type CategoryMap<T> = { [name: string]: SubCategoryMap<T> };
+export type SubCategoryMap<T> = { [name: string]: T[] };
 
-import data from '../../../news.json';
-
-type CategoryMap = { [name: string]: SubCategoryMap };
-type SubCategoryMap = { [name: string]: NewsSource[] };
-
-const convertJson = (categoryMap: CategoryMap = data) => {
-    const newsSources: Category[] = Object.keys(categoryMap).map((categoryName) => {
-        const subCategories = Object.keys(categoryMap[categoryName]).map((subCategoryName) => {
-            return {
-                name: subCategoryName,
-                list: categoryMap[categoryName][subCategoryName],
-            };
-        });
-        return {
-            name: categoryName,
-            subCategories,
-        };
-    });
-    return newsSources;
-};
-
-export const exploreData = convertJson();
+export const exploreData = exploreDataJSON as CategoryMap<Feed>;
