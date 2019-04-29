@@ -11,6 +11,8 @@ import { parseArguments, addOption } from './cliParser';
 import { feedCommandDefinition } from './feedCommands';
 import { output, setOutput, jsonPrettyPrint } from './cliHelpers';
 import { swarmConfig } from './swarmConfig';
+import { RSSFeedManager } from '../RSSPostManager';
+import * as urlUtils from '../helpers/urlUtils';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -96,6 +98,12 @@ const definitions =
         .
         addCommand('feed', 'Swarm Feed related commands', feedCommandDefinition)
     )
+    .
+    addCommand('rss <url>', 'Fetch RSS feed of url', async (url: string) => {
+        const canonicalUrl = urlUtils.getCanonicalUrl(url);
+        const feed = await RSSFeedManager.fetchFeedFromUrl(canonicalUrl);
+        output('rss feed', {feed});
+    })
 ;
 
 parseArguments(process.argv, definitions, output, output);

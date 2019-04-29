@@ -1,0 +1,1022 @@
+{
+    "animals": {
+        "cats": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/cats.rss",
+                "name": "Cats",
+                "favicon": "https://b.thumbs.redditmedia.com/tAT1hlAs4s7wGyszOHRrTVGNOnyZZWazTv6QEtlUHiQ.png"
+            }
+        ],
+        "dogs": [
+            {
+                "url": "https://dogs.tumblr.com/",
+                "feedUrl": "https://dogs.tumblr.com/rss",
+                "name": "dogs",
+                "favicon": "https://66.media.tumblr.com/avatar_3053e00fd9cc_128.pnj"
+            },
+            {
+                "url": "https://animals.tumblr.com/",
+                "feedUrl": "https://animals.tumblr.com/rss",
+                "name": "Animals",
+                "favicon": "https://66.media.tumblr.com/avatar_afeb0c873890_128.pnj"
+            }
+        ]
+    },
+    "art and creation": {
+        "art": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Art.rss",
+                "name": "Art",
+                "favicon": "https://b.thumbs.redditmedia.com/VoZlOfOxgNGkqayUrmGI96XuSOGKVT-MVI4WK-CXP3o.png"
+            },
+            {
+                "url": "https://art.tumblr.com/",
+                "feedUrl": "https://art.tumblr.com/rss",
+                "name": "Art on Tumblr",
+                "favicon": "https://66.media.tumblr.com/avatar_45eb6fd9cb75_128.pnj"
+            }
+        ],
+        "music": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Music.rss",
+                "name": "/r/Music",
+                "favicon": "https://b.thumbs.redditmedia.com/UO8Hj8ZnQmYGeE9ZIjKPQEwlX46OBPC_kj2Jqlt5nqo.png"
+            },
+            {
+                "url": "https://music.tumblr.com/",
+                "feedUrl": "https://music.tumblr.com/rss",
+                "name": "music on tumblr",
+                "favicon": "https://66.media.tumblr.com/avatar_75983fecf474_128.pnj"
+            }
+        ],
+        "photography": [
+            {
+                "url": "https://iso.500px.com",
+                "feedUrl": "https://iso.500px.com/feed",
+                "name": "500px Blog",
+                "favicon": "https://iso.500px.com/wp-content/uploads/2019/04/cropped-500px-logo-photography-social-media-design-thumb-192x192.jpg"
+            },
+            {
+                "url": "https://www.outdoorphotographer.com",
+                "feedUrl": "https://www.outdoorphotographer.com/on-location/favorite-places/feed/",
+                "name": "Favorite Places – Outdoor Photographer",
+                "favicon": "https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico"
+            }
+        ]
+    },
+    "computers": {
+        "programming": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/programming.rss",
+                "name": "programming",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://news.ycombinator.com/",
+                "feedUrl": "https://news.ycombinator.com/rss",
+                "name": "Hacker News",
+                "favicon": "https://news.ycombinator.com/favicon.ico"
+            }
+        ]
+    },
+    "entertainment": {
+        "amusements": [
+            {
+                "url": "https://amusements.tumblr.com/",
+                "feedUrl": "https://amusements.tumblr.com/rss",
+                "name": "Disclosure",
+                "favicon": "https://66.media.tumblr.com/avatar_72b861817c21_128.pnj"
+            }
+        ],
+        "comics": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/comics.rss",
+                "name": "Print Comics and Webcomics",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://comics.tumblr.com/",
+                "feedUrl": "https://comics.tumblr.com/rss",
+                "name": "The Comics Blog",
+                "favicon": "https://66.media.tumblr.com/avatar_ced6d119633f_128.pnj"
+            }
+        ],
+        "disney": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/disney.rss",
+                "name": "The Most MAGICAL Subreddit on Earth",
+                "favicon": "https://b.thumbs.redditmedia.com/eJi_qerjaLCDXpvgAc1mIAfMgGrYxyfpjFptCaILEgg.png"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/videos.rss",
+                "name": "/r/videos",
+                "favicon": "https://b.thumbs.redditmedia.com/uzAOgdCtLKNxNqirjgcwrJkpWHtTDzIr7L3vnhOMF2o.png"
+            }
+        ],
+        "animation": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/anime.rss",
+                "name": "Anime of the world, unite!",
+                "favicon": "https://b.thumbs.redditmedia.com/3Nje2BVH25RqYFX3Aod8R26GkHFzBYTep3TddA3960Q.png"
+            },
+            {
+                "url": "https://anime.tumblr.com/",
+                "feedUrl": "https://anime.tumblr.com/rss",
+                "name": "I HAVE THE POWER OF SHAWN AND ANIME ON MY SIDE",
+                "favicon": "https://66.media.tumblr.com/avatar_63110a5fff90_128.pnj"
+            }
+        ],
+        "movies": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/movies.rss",
+                "name": "Movie News and Discussion",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/moviedetails.rss",
+                "name": "MovieDetails",
+                "favicon": "https://b.thumbs.redditmedia.com/J20BfVDh6HBwBIvhlR2fGpCQXjQIZk8E8ZQFp-OE2ck.png"
+            }
+        ],
+        "television": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/television.rss",
+                "name": "Television Discussion and News",
+                "favicon": "https://b.thumbs.redditmedia.com/QMIQ5gvIbScACusodipJ1IXr8ntnfn1V17RZ57L4CdU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/series.rss",
+                "name": "Series",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "entertainment": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/videos.rss",
+                "name": "/r/videos",
+                "favicon": "https://b.thumbs.redditmedia.com/uzAOgdCtLKNxNqirjgcwrJkpWHtTDzIr7L3vnhOMF2o.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/funny.rss",
+                "name": "funny",
+                "favicon": "https://a.thumbs.redditmedia.com/kIpBoUR8zJLMQlF8azhN-kSBsjVUidHjvZNLuHDONm8.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/movies.rss",
+                "name": "Movie News and Discussion",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/television.rss",
+                "name": "Television Discussion and News",
+                "favicon": "https://b.thumbs.redditmedia.com/QMIQ5gvIbScACusodipJ1IXr8ntnfn1V17RZ57L4CdU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/marvelstudios.rss",
+                "name": "Marvel Studios and the Marvel Cinematic Universe",
+                "favicon": "https://b.thumbs.redditmedia.com/q5wEnBMrwNwf4g9s6Ju35QfuE3cpw4Gjr883zJHGBUY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/hiphopheads.rss",
+                "name": "/r/HipHopHeads on Reddit",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/dbz.rss",
+                "name": "Dragon World",
+                "favicon": "https://b.thumbs.redditmedia.com/VgpGZUKuANeo3HOjv6t-lZqF31zNAFqTTfdP6q_PYQk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/arrow.rss",
+                "name": "Arrow",
+                "favicon": "https://a.thumbs.redditmedia.com/7QLWZ6AL1lgptDNSTGSBv8H92qfU58tE2kwNjVG-Ao0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Documentaries.rss",
+                "name": "Documentaries",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/anime.rss",
+                "name": "Anime of the world, unite!",
+                "favicon": "https://b.thumbs.redditmedia.com/3Nje2BVH25RqYFX3Aod8R26GkHFzBYTep3TddA3960Q.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/youtubehaiku.rss",
+                "name": "Youtube Haiku",
+                "favicon": "https://b.thumbs.redditmedia.com/J_Q4zxlwp1j9KQIJxiwWc-ayp-lpmP2SKT4zZyO2R6M.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/rupaulsdragrace.rss",
+                "name": "RuPaul’s Drag Race",
+                "favicon": "https://a.thumbs.redditmedia.com/QzB_Fg6-4r0v2OOu8MbnvtVtms41_xRB6Gksd1efCs0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/books.rss",
+                "name": "So many books, so little time",
+                "favicon": "https://a.thumbs.redditmedia.com/8rHqHJ86uZ8iHfejG2zZbLX9ThOAZUzCVOwgms0KCq4.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/FlashTV.rss",
+                "name": "The Flash",
+                "favicon": "https://b.thumbs.redditmedia.com/Ncy9nX2Ojlg5LSnt_2f7wrag7cXssPB7arhXP0coXzg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/TumblrInAction.rss",
+                "name": "TumblrInAction: O Toucan, Where Art Thou?",
+                "favicon": "https://b.thumbs.redditmedia.com/UmT0-n0NefU-x2hh59Btg53G6Ej4yv2UjMT8UJO-iAU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/pokemon.rss",
+                "name": "Pokémon: Gotta Catch ’Em All!",
+                "favicon": "https://b.thumbs.redditmedia.com/bt5Bgfbu7g5OCCganJwwo7mJBTWBqZsEXwFY_joajMk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/nottheonion.rss",
+                "name": "Sadly, this is not the Onion.",
+                "favicon": "https://b.thumbs.redditmedia.com/t622Aw3Yrn8EWLcC5tECrHEV-pvBAZDTJBFVBBFqUaI.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/StarWars.rss",
+                "name": "Star Wars",
+                "favicon": "https://b.thumbs.redditmedia.com/HVfSXN68B2GbjB5eGwISHa74wDrU2odjafLj75VsKOU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/southpark.rss",
+                "name": "We got Tegridy",
+                "favicon": "https://b.thumbs.redditmedia.com/ipIp5ryLPvDCZ7fUrZvBUMKBe24YBeIx_6JCbS6T21E.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/comics.rss",
+                "name": "Print Comics and Webcomics",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/polandball.rss",
+                "name": "Polandball",
+                "favicon": "https://b.thumbs.redditmedia.com/T0QMzISutkIZ9Jk7PcMyl53cnR025V0Fo3NxImRLSxA.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Music.rss",
+                "name": "/r/Music",
+                "favicon": "https://b.thumbs.redditmedia.com/UO8Hj8ZnQmYGeE9ZIjKPQEwlX46OBPC_kj2Jqlt5nqo.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/kpop.rss",
+                "name": "Reddit K-Pop | Share and discover Korean music",
+                "favicon": "https://b.thumbs.redditmedia.com/bhpBhoWULKSrXzoZ8msBubfB8MP46TGcXvHlco_8Aos.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/manga.rss",
+                "name": "/r/manga: manga, on reddit.",
+                "favicon": "https://b.thumbs.redditmedia.com/k2ZzbygIc1JxxlVrv6KoDgdC8RiPs4uW2UeRR-VVIFc.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Marvel.rss",
+                "name": "Marvel Comics",
+                "favicon": "https://b.thumbs.redditmedia.com/ZUVqaGg8EVqMrjHRJIdtr1_0mKXHbT4i_5JpGssZMyA.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/gameofthrones.rss",
+                "name": "Game of Thrones",
+                "favicon": "https://b.thumbs.redditmedia.com/sbre62xgX6GkwcSGmwj8Qq-9EGmtzQ9S4phDHyRgPLA.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/rickandmorty.rss",
+                "name": "Rick and Morty News and Discussion",
+                "favicon": "https://a.thumbs.redditmedia.com/yQlJ56Lw_kU6wEfIq_vVDHcte17JNIFVeyMO05aAjZ8.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/nosleep.rss",
+                "name": "nosleep",
+                "favicon": "https://b.thumbs.redditmedia.com/YP6_2w0ol2xOZ0xsUxJkBQl73JafB78A8TcB1wZK18M.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/MURICA.rss",
+                "name": "'MURICA! FUCK YEAH!",
+                "favicon": "https://b.thumbs.redditmedia.com/DBiOs3jQlVGk1SHIhj59CJPflD1nIQtJ-v9bYq9eh4U.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/comicbooks.rss",
+                "name": "comicbooks",
+                "favicon": "https://b.thumbs.redditmedia.com/ilcc5TWPWXMSoUT5SzO3c5y0QowqjIxDpBlVV2P5-WQ.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/BoJackHorseman.rss",
+                "name": "BoJack Horseman",
+                "favicon": "https://b.thumbs.redditmedia.com/OZMUnL7picltLAvvieECwsijx7DmplC6HJ25qwDhZng.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/OnePiece.rss",
+                "name": "One Piece",
+                "favicon": "https://b.thumbs.redditmedia.com/prxU2Rr_m4w0UCpRmIO6h-FY9J-P09IudQD_EYDJ-Dc.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/IASIP.rss",
+                "name": "It's Always Sunny In Philadelphia",
+                "favicon": "https://b.thumbs.redditmedia.com/CB9BHQvJ_OIxYil2ESumqoxsQ9J7LDRGy02IkOsWzNU.png"
+            }
+        ]
+    },
+    "games": {
+        "games": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/gaming.rss",
+                "name": "r/gaming",
+                "favicon": "https://b.thumbs.redditmedia.com/0PgZl68jAxA6T1BH6uvUQ5Bz1F1GrrJLCL8oi2Gz0Ak.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/leagueoflegends.rss",
+                "name": "League of Cattitude",
+                "favicon": "https://b.thumbs.redditmedia.com/MDQjKWvNW82SfYXHbA9eFY1O-AFyT-4tpqWOWl3Xo-s.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/DestinyTheGame.rss",
+                "name": "Destiny | Reddit",
+                "favicon": "https://b.thumbs.redditmedia.com/SkqRFx9oQR34w7Ql86_jB9WJ0Jt8dgywbNqMd9dpiJg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Overwatch.rss",
+                "name": "Overwatch",
+                "favicon": "https://b.thumbs.redditmedia.com/qJkCwpRNSyZrz1maWLBdLgfCcGrLg3tLDcHjiifyugU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/hearthstone.rss",
+                "name": "Hearthstone",
+                "favicon": "https://b.thumbs.redditmedia.com/kOJ2mLk2e2e2kOto6K188zsLQzJE6Yv3AMi3Pv6kwkM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Games.rss",
+                "name": "Quality Gaming Content and Discussion -- /r/Games",
+                "favicon": "https://a.thumbs.redditmedia.com/8hr1PTpJ9iWLNWP67vZN0w3IEP8uI3eAQ1kE4XLRg88.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/wow.rss",
+                "name": "World of Warcraft",
+                "favicon": "https://a.thumbs.redditmedia.com/qoN5OJOYavQQGmCZfOcIMR5Y1AtSh9VrwsfU8sNzz54.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/pcmasterrace.rss",
+                "name": "PC Master Race",
+                "favicon": "https://b.thumbs.redditmedia.com/kVZiq5hTApUTyk572gTX7duEalx07VzM9qyrgE6OyAM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/DotA2.rss",
+                "name": "Dota 2 on Reddit",
+                "favicon": "https://a.thumbs.redditmedia.com/0bQOxAs6XMJhixOFLmta78SXPXaDxzp8jw915k7NLI4.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Rainbow6.rss",
+                "name": "Rainbow 6",
+                "favicon": "https://b.thumbs.redditmedia.com/e62kheLLz2KcSs_idYWnf8fcyQ-BJa2RySM1kXnsgGg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/StarWarsBattlefront.rss",
+                "name": "/r/StarWarsBattlefront",
+                "favicon": "https://b.thumbs.redditmedia.com/FbH7ZWrqtJ6R8MEcM587H7NJ9kf2Fp8C4o8SVxQyUVk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/GlobalOffensive.rss",
+                "name": "Counter-Strike: Global Offensive",
+                "favicon": "https://b.thumbs.redditmedia.com/RASLovykX_T0c6YEzVjDJp2mVyeFHw8HI7P5t4Wxeqw.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/2007scape.rss",
+                "name": "Old School RuneScape!",
+                "favicon": "https://b.thumbs.redditmedia.com/Q9R2vbB9_oXgNWoE3GgdDutm-rgdpDh0Ny1KEJYJMto.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/xboxone.rss",
+                "name": "/r/XboxOne",
+                "favicon": "https://b.thumbs.redditmedia.com/Cz_K0spFsxp_C_xF-SoUc_X_c1eMfeHaTiTwN6OOmAY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/tf2.rss",
+                "name": "Team Fortress 2",
+                "favicon": "https://b.thumbs.redditmedia.com/CCWFN-KMOkZqWN1TDfeUVc1UidyM8tzVIeh8NMawl2M.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/magicTCG.rss",
+                "name": "Magic: The Redditing",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/DnD.rss",
+                "name": "DnD: Roll for Initiative!",
+                "favicon": "https://a.thumbs.redditmedia.com/pPQEbaJLq9miIh1bNuEJ98yfO1pUBTMLNM12PJJGfM0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/pcgaming.rss",
+                "name": "PC Gaming",
+                "favicon": "https://b.thumbs.redditmedia.com/3yVFF-DsWBV-P3MeLPP3eTDZSv8IKONdF7_U7UU6FfY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/RocketLeague.rss",
+                "name": "Rocket League",
+                "favicon": "https://b.thumbs.redditmedia.com/Mg1Nf_mKQcmznsQsYo_zQa7ILCtAoHDNJX9wbjWnlkk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/starcitizen.rss",
+                "name": "Roberts Space Industries",
+                "favicon": "https://b.thumbs.redditmedia.com/ktXds9EySE5XNCd0ANtLT4Qaoc7AuwOTJP8GFi3h9Eg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/PS4.rss",
+                "name": "PlayStation 4",
+                "favicon": "https://b.thumbs.redditmedia.com/CJKtihAVRBG4Xg6Vur5uf_pgoY5XRTHxCW2Yjbp2qWU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Warframe.rss",
+                "name": "/r/Warframe",
+                "favicon": "https://b.thumbs.redditmedia.com/WTWANKYd2dKwhg6OPDaz4dpQCbCJTB5E14sqrP4MnEA.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/DBZDokkanBattle.rss",
+                "name": "DBZ: Dokkan Battle",
+                "favicon": "https://b.thumbs.redditmedia.com/EzAzhvv9G4X3aUGWON6FdY136Oa7VhLRv8mCqwK4OKY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/pathofexile.rss",
+                "name": "Path of Exile",
+                "favicon": "https://b.thumbs.redditmedia.com/M8uygeUbLzEZ7TAeFyGH4RTWmgl1_m8jTdjLP_TiRwY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/skyrim.rss",
+                "name": "The Elder Scrolls V: Skyrim",
+                "favicon": "https://b.thumbs.redditmedia.com/LDbthMCdrTwEFuZ4DHXZKf6y1ENP8skC6PO14Y3KEeg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/heroesofthestorm.rss",
+                "name": "Heroes of the Storm",
+                "favicon": "https://b.thumbs.redditmedia.com/zgsQgiqyKPOZGuq33X7-1tqRliXbT8GO8UZE6NtLDuA.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Guildwars2.rss",
+                "name": "/r/GuildWars2",
+                "favicon": "https://b.thumbs.redditmedia.com/QkbIRvNtgDShLZ45PLnU3ZFYqzDTL-4kH0rR6IG4jTI.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Minecraft.rss",
+                "name": "Minecraft on reddit",
+                "favicon": "https://b.thumbs.redditmedia.com/rwN0al9P6nYhGSQO-yIJb-FyF5xg-c2v61zjMom4c4E.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/lego.rss",
+                "name": "LEGO",
+                "favicon": "https://a.thumbs.redditmedia.com/-974_txZM7SyhTeL8uM01F7DOLgFQzOPYB8ylkvyS80.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/fortnite.rss",
+                "name": "Fortnite",
+                "favicon": "https://b.thumbs.redditmedia.com/CmOM2Me_m_-NYYRmWKZeRiSD3k0NzZDFqzqj45JHaqE.png"
+            }
+        ]
+    },
+    "health": {
+        "fitness": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Fitness.rss",
+                "name": "Fitness",
+                "favicon": "https://b.thumbs.redditmedia.com/Ted4KOMuRbaCYlDS55cTqjpVVZ2ENHKtYFbBFjI1i2o.png"
+            }
+        ]
+    },
+    "humanities and social sciences": {
+        "history": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/history.rss",
+                "name": "History",
+                "favicon": "https://a.thumbs.redditmedia.com/9OG_NsdiAe3xzHZSXiC9UOD8p2vdP-TgMbAMJNnW_j4.png"
+            }
+        ],
+        "philosophy": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/philosophy.rss",
+                "name": "philosophy",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    },
+    "information and learning": {
+        "education": [
+            {
+                "url": "https://education.tumblr.com/",
+                "feedUrl": "https://education.tumblr.com/rss",
+                "name": "did you know?",
+                "favicon": "https://66.media.tumblr.com/avatar_9d5210b14112_128.pnj"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/todayilearned.rss",
+                "name": "Today I Learned (TIL)",
+                "favicon": "https://b.thumbs.redditmedia.com/B7IpR8P1mEsQIjdizK5x79s5aGfJUtKk3u2ksGZ9n2Q.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/wikipedia.rss",
+                "name": "The most interesting pages on Wikipedia",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "information": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/news.rss",
+                "name": "All news, US and international.",
+                "favicon": "https://a.thumbs.redditmedia.com/E0Bkwgwe5TkVLflBA7WMe9fMSC7DV2UOeff-UpNJeb0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/books.rss",
+                "name": "So many books, so little time",
+                "favicon": "https://a.thumbs.redditmedia.com/8rHqHJ86uZ8iHfejG2zZbLX9ThOAZUzCVOwgms0KCq4.png"
+            }
+        ]
+    },
+    "money and business": {
+        "building and housing": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/architecture.rss",
+                "name": "Architecture",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    },
+    "people and society": {
+        "family": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/teenagers.rss",
+                "name": "r/teenagers",
+                "favicon": "https://b.thumbs.redditmedia.com/-TyrRGoTdh06J5srHO6ZcUUccjhBlRO7vPBD2aMJVBM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/parenting.rss",
+                "name": "Reddit Parenting",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "politics": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/politics.rss",
+                "name": "Politics",
+                "favicon": "https://a.thumbs.redditmedia.com/ZaSYxoONdAREm1_u_sid_fjcgvBTNeFQV--8tz6fZC0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/guns.rss",
+                "name": "/r/guns: Firearms and related articles",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "relationships": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/relationships.rss",
+                "name": "Relationships",
+                "favicon": "https://b.thumbs.redditmedia.com/G_B8XNBy33xqbEJxzVpN1YjV0YGgIIPbZNkpDFNjPuU.png"
+            }
+        ],
+        "religion": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Christianity.rss",
+                "name": "Christianity",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/islam.rss",
+                "name": "Islam",
+                "favicon": "https://b.thumbs.redditmedia.com/iJnyLoIiMoEFuTN_joM88BZ0mq3LzygCIlFCe8fShDQ.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/buddhism.rss",
+                "name": "Buddhism",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/hinduism.rss",
+                "name": "Hinduism",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/atheism.rss",
+                "name": "atheism",
+                "favicon": "https://b.thumbs.redditmedia.com/yIzwuhmpBLnGJgF49UHjaHowI3gl9v5bvEprgaXTi3M.png"
+            }
+        ],
+        "sex": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/sex.rss",
+                "name": "Sex",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    },
+    "popular culture": {
+        "life": [
+            {
+                "url": "https://life.tumblr.com/",
+                "feedUrl": "https://life.tumblr.com/rss",
+                "name": "LIFE",
+                "favicon": "https://66.media.tumblr.com/avatar_c1cd55ae1202_128.pnj"
+            }
+        ],
+        "food and drink": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/food.rss",
+                "name": "food",
+                "favicon": "https://b.thumbs.redditmedia.com/6rCw0815aqJAdAIl3WHdLpkN4EuKlksf87ZY4Hr25Io.png"
+            }
+        ]
+    },
+    "science": {
+        "science": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/science.rss",
+                "name": "Science",
+                "favicon": "https://b.thumbs.redditmedia.com/pkTkSME-lKZcgYyhnOLC5Byj_5SgU5G4B4u1td1F-4Y.png"
+            },
+            {
+                "url": "https://science.tumblr.com/",
+                "feedUrl": "https://science.tumblr.com/rss",
+                "name": "Science! | Best Science posts daily | Snapchat me: @Brent",
+                "favicon": "https://66.media.tumblr.com/avatar_2c187c5f0424_128.pnj"
+            }
+        ],
+        "space": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/space.rss",
+                "name": "/r/space: news, articles, images, videos, and discussion",
+                "favicon": "https://b.thumbs.redditmedia.com/Zf90LsQEOyfU9RKf5NgXRATeMlFHULaD-B6UlicR5Sc.png"
+            }
+        ],
+        "biology": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/biology.rss",
+                "name": "Biology",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/botany.rss",
+                "name": "Botany",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "environment": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/environment.rss",
+                "name": "environment",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    },
+    "sports": {
+        "baseball": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/baseball.rss",
+                "name": "America's Pastime",
+                "favicon": "https://a.thumbs.redditmedia.com/ctpsfO1kRuLsbiuKBCUlmAi1EKSbKhLup5EkvDA1lt4.png"
+            }
+        ],
+        "cricket": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Cricket.rss",
+                "name": "Cricket",
+                "favicon": "https://b.thumbs.redditmedia.com/ht-zG3FvOtDH4eBtq85nfpoSyn5Eoj8gXbwMQTO4QfU.png"
+            }
+        ],
+        "football": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/football.rss",
+                "name": "Football",
+                "favicon": "https://b.thumbs.redditmedia.com/TrLjSx5hd9A3MbcfMHl2qW9xBf6S07Rj1xzVWpRf4YM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/soccer.rss",
+                "name": "The back page of the internet",
+                "favicon": "https://b.thumbs.redditmedia.com/NojkQWzGBAau2dP3q0NTY5uJisbRx_q3ithIT5iLypE.png"
+            }
+        ],
+        "hockey": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/hockey.rss",
+                "name": "hockey: the best game on earth",
+                "favicon": "https://b.thumbs.redditmedia.com/eklFiGMB017XKBozOIZmtmCKwXdhH7y-4jq5qAnP38c.png"
+            }
+        ],
+        "soccer": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/football.rss",
+                "name": "Football",
+                "favicon": "https://b.thumbs.redditmedia.com/TrLjSx5hd9A3MbcfMHl2qW9xBf6S07Rj1xzVWpRf4YM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/soccer.rss",
+                "name": "The back page of the internet",
+                "favicon": "https://b.thumbs.redditmedia.com/NojkQWzGBAau2dP3q0NTY5uJisbRx_q3ithIT5iLypE.png"
+            }
+        ],
+        "sports": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/nba.rss",
+                "name": "NBA",
+                "favicon": "https://b.thumbs.redditmedia.com/lh3XYdayDnfF474A_Ro9fBWUViOibSr4BoTpx0ETyvg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/soccer.rss",
+                "name": "The back page of the internet",
+                "favicon": "https://b.thumbs.redditmedia.com/NojkQWzGBAau2dP3q0NTY5uJisbRx_q3ithIT5iLypE.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/CFB.rss",
+                "name": "The Internet's Tailgate",
+                "favicon": "https://b.thumbs.redditmedia.com/JGr0BtccIxlp8u8bnrEsJZf8YZKMk6g4u3C90dvhxbk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/nfl.rss",
+                "name": "NFL: National Football League Discussion",
+                "favicon": "https://b.thumbs.redditmedia.com/UF12NP6xJszOv8cVWMoRu77c2fQUI_XapgyVj3AppYY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/hockey.rss",
+                "name": "hockey: the best game on earth",
+                "favicon": "https://b.thumbs.redditmedia.com/eklFiGMB017XKBozOIZmtmCKwXdhH7y-4jq5qAnP38c.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/MMA.rss",
+                "name": "MMA: Mixed Martial Arts",
+                "favicon": "https://a.thumbs.redditmedia.com/OT_3LiWYRmrHg-clwjXQN84qauGtBNRPJykzA2GA648.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/SquaredCircle.rss",
+                "name": "r/SquaredCircle",
+                "favicon": "https://b.thumbs.redditmedia.com/xuVeCo6UD6XvAiZUjBxG3OTi7NC2EL-VEZzZeM7_fdg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/fantasyfootball.rss",
+                "name": "/r/fantasyfootball",
+                "favicon": ""
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/sports.rss",
+                "name": "redditsports",
+                "favicon": "https://a.thumbs.redditmedia.com/AUAU23uCnLkTO7M4dpkQ3Q76efRIUSgOzHNq431EOS0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/baseball.rss",
+                "name": "America's Pastime",
+                "favicon": "https://a.thumbs.redditmedia.com/ctpsfO1kRuLsbiuKBCUlmAi1EKSbKhLup5EkvDA1lt4.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/formula1.rss",
+                "name": "Formula 1",
+                "favicon": "https://b.thumbs.redditmedia.com/yi1hjB0v8PP7Or836G-wRhFv7Bi7NxVRoVS294jAfEU.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/CollegeBasketball.rss",
+                "name": "/r/CollegeBasketball: The Internet's Student Section",
+                "favicon": "https://b.thumbs.redditmedia.com/rTzVKBWmdpHE60nYPxsrEEe2nWYMZs2mNE6hJXh517M.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/LiverpoolFC.rss",
+                "name": "Liverpool FC: You'll Never Walk Alone",
+                "favicon": "https://b.thumbs.redditmedia.com/WLEzY-SqqZJeZeXu0jLQjpCm3uO-u7I2lq1OWmYTGNk.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/FIFA.rss",
+                "name": "EA Sports FIFA",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Gunners.rss",
+                "name": "The Arsenal on reddit",
+                "favicon": "https://b.thumbs.redditmedia.com/ZiAEtqQcDoI72L601xFToVXnp-VRwALa1ZviwnkZ3jg.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/tennis.rss",
+                "name": "Tennis News & Discussion",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "tennis": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/tennis.rss",
+                "name": "Tennis News & Discussion",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    },
+    "technology": {
+        "technology": [
+            {
+                "url": "https://www.theverge.com/",
+                "feedUrl": "https://www.theverge.com/rss/index.xml",
+                "name": "The Verge",
+                "favicon": "https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/technology.rss",
+                "name": "Technology",
+                "favicon": "https://b.thumbs.redditmedia.com/J_fCwTYJkoM-way-eaOHv8AOHoF_jNXNqOvPrQ7bINY.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Android.rss",
+                "name": "Android",
+                "favicon": "https://b.thumbs.redditmedia.com/fI7UdJ-vgpnLdxy28QdKIYBGg-fEo7KxQ_PS7pn4QzM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/ProgrammerHumor.rss",
+                "name": "Programmer Humor",
+                "favicon": "https://b.thumbs.redditmedia.com/4KtrAN4OLE6PG-FY0Xtfn65arqXZrFRrsFDi_JvQCWM.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/apple.rss",
+                "name": "/r/Apple",
+                "favicon": "https://b.thumbs.redditmedia.com/kV9DLxHeXceLoTrapjM8C3Ez31_5RUhLrb4_yGBNmgI.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/Futurology.rss",
+                "name": "Future(s) Studies",
+                "favicon": "https://b.thumbs.redditmedia.com/vIbbphWzTgtNGGijAzIv41LoeQFvrUASIm8AaCUUPpw.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/dataisbeautiful.rss",
+                "name": "Data Is Beautiful",
+                "favicon": "https://a.thumbs.redditmedia.com/PWqqPdsoof5lD4noSANijKfTVDalyChZWQrG9ljigy8.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/MechanicalKeyboards.rss",
+                "name": "r/MechanicalKeyboards for all the Click and None of the Clack!",
+                "favicon": "https://b.thumbs.redditmedia.com/MRKGXjJgXi8FJz39snnnTe-WbjNymvKqq44g9grEFsk.png"
+            }
+        ]
+    },
+    "transportation": {
+        "bicycles": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/bicycling.rss",
+                "name": "bicycling",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "boats": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/boating.rss",
+                "name": "boating",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "trains": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/trains.rss",
+                "name": "All stuff related to trains and railfanning!",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "transportation": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/transportation.rss",
+                "name": "All about transportation",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ],
+        "cars": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/cars.rss",
+                "name": "r/Cars",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            }
+        ]
+    }
+}
