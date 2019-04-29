@@ -197,7 +197,7 @@ export const AsyncActions = {
                     ...localFeed,
                     postCommandLog: updatedPostCommandLog,
                 }));
-                dispatch(AsyncActions.syncPostCommandLogs(localFeed));
+                dispatch(AsyncActions.syncLocalFeed(localFeed));
             }
             dispatch(Actions.deletePost(post));
         };
@@ -272,6 +272,7 @@ export const AsyncActions = {
                 autoShare: true,
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
+            dispatch(AsyncActions.syncLocalFeed(ownFeed));
         };
     },
     shareOwnPost: (post: Post): Thunk => {
@@ -287,10 +288,10 @@ export const AsyncActions = {
                 ...localFeed,
                 postCommandLog: updatedPostCommandLog,
             }));
-            dispatch(AsyncActions.syncPostCommandLogs(localFeed));
+            dispatch(AsyncActions.syncLocalFeed(localFeed));
         };
     },
-    syncPostCommandLogs: (feed: LocalFeed): Thunk => {
+    syncLocalFeed: (feed: LocalFeed): Thunk => {
         return async (dispatch, getState) => {
             Debug.log('syncPostCommandLogs', 'feed', feed);
             const localFeed = getState().ownFeeds.find(ownFeed => ownFeed.feedUrl === feed.feedUrl);
@@ -364,10 +365,12 @@ export const AsyncActions = {
                     isSyncing: false,
                 }));
 
-                if (getPreviousCommandEpochFromLog(mergedPostCommandLog) == null) {
+                if (mergedPostCommandLog.commands.length > 0 &&
+                    getPreviousCommandEpochFromLog(mergedPostCommandLog) == null
+                ) {
                     Debug.log('syncPostCommandLogs', 'waiting for resyncing');
                     await Utils.waitMillisec(60 * 1000);
-                    dispatch(AsyncActions.syncPostCommandLogs(localFeedAfterUpdate));
+                    dispatch(AsyncActions.syncLocalFeed(localFeedAfterUpdate));
                 }
             } catch (e) {
                 Debug.log('syncPostCommandLogs: ', 'error', e);
@@ -424,6 +427,7 @@ export const AsyncActions = {
                     feedUrl: ownFeed.feedUrl,
                     name,
                 }));
+                dispatch(AsyncActions.syncLocalFeed(ownFeed));
             }
         };
     },
@@ -437,6 +441,7 @@ export const AsyncActions = {
                     authorImage: image,
                     favicon: undefined,
                 }));
+                dispatch(AsyncActions.syncLocalFeed(ownFeed));
             }
         };
     },

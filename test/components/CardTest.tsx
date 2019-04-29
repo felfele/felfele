@@ -74,6 +74,8 @@ describe('card test', () => {
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -94,6 +96,8 @@ describe('card test', () => {
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -114,6 +118,8 @@ describe('card test', () => {
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -135,6 +141,8 @@ describe('card test', () => {
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -156,6 +164,8 @@ describe('card test', () => {
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));

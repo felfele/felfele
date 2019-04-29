@@ -1,6 +1,6 @@
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
-import { SubCategory, NewsSource } from '../models/recommendation/NewsSource';
+import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed } from '../social/api';
 
 export interface Routes {
@@ -53,13 +53,13 @@ export interface Routes {
     };
     SubCategoriesContainer: {
         title: string,
-        subCategories: SubCategory[],
+        subCategories: SubCategoryMap<Feed>,
     };
     NewsSourceFeed: {
         feed: Feed,
     };
     NewsSourceGridContainer: {
-        newsSources: NewsSource[],
+        feeds: Feed[],
         subCategoryName: string,
     };
     YourTab: {};
@@ -73,4 +73,3 @@ export interface TypedNavigation {
     getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => K[P];
     setParams: <K extends keyof Routes>(newParams: Routes[K]) => boolean;
 }
-//         navigation.setParams<Routes['FeedInfo']>({ feed: updatedFeed });

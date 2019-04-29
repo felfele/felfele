@@ -2,17 +2,18 @@ import * as React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { ComponentColors } from '../../../styles';
 import { RegularText } from '../../misc/text';
-import { SubCategory } from '../../../models/recommendation/NewsSource';
+import { SubCategoryMap } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../buttons/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { FragmentSafeAreaViewWithoutTabBar} from '../../misc/FragmentSafeAreaView';
+import { Feed } from '../../../models/Feed';
 
 const SUBCATEGORIES_LABEL = 'SUBCATEGORIES';
 
 export interface StateProps {
-    subCategories: SubCategory[];
+    subCategories: SubCategoryMap<Feed>;
     navigation: TypedNavigation;
     title: string;
 }
@@ -24,15 +25,15 @@ export interface OwnProps {
 export interface DispatchProps { }
 
 export const SubCategoriesScreen = (props: StateProps & DispatchProps) => {
-    const subCategories = props.subCategories.map((subCategory: SubCategory) => {
+    const subCategories = Object.keys(props.subCategories).map((subCategoryName) => {
         return (
             <RowItem
-                key={subCategory.name}
-                title={subCategory.name}
+                key={subCategoryName}
+                title={subCategoryName}
                 buttonStyle='navigate'
                 onPress={() => props.navigation.navigate('NewsSourceGridContainer', {
-                    newsSources: subCategory.list,
-                    subCategoryName: subCategory.name,
+                    feeds: props.subCategories[subCategoryName],
+                    subCategoryName,
                 })}
             />
         );

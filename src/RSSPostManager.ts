@@ -76,7 +76,7 @@ const HEADERS_WITH_CURL = {
 
 // this is needed for reddit (https://github.com/reddit-archive/reddit/wiki/API)
 const HEADERS_WITH_FELFELE = {
-    'User-Agent': `react-native:org.felfele.felfele:${Version}`,
+    'User-Agent': `org.felfele.felfele:${Version}`,
     'Accept': '*/*',
 };
 
@@ -181,6 +181,7 @@ export class RSSFeedManager {
 
     public static isRssMimeType(mimeType: string): boolean {
         if (mimeType === 'application/rss+xml' ||
+            mimeType === 'application/x-rss+xml' ||
             mimeType === 'application/atom+xml' ||
             mimeType === 'application/xml' ||
             mimeType === 'text/xml'
@@ -235,7 +236,14 @@ export class RSSFeedManager {
                 return feed;
             }
 
-            const altFeedLocations = ['/rss', '/feed', '/social-media/feed/', '/rss/', '/feed/'];
+            const altFeedLocations = [
+                '/rss',
+                '/rss/',
+                '/rss/index.rss',
+                '/feed',
+                '/social-media/feed/',
+                '/feed/',
+            ];
             if (baseUrl !== url) {
                 altFeedLocations.unshift('/');
             }
@@ -269,7 +277,6 @@ export class RSSFeedManager {
                 return null;
             }
             const feedFromHtml = RSSFeedManager.getFeedFromHtml(baseUrl, htmlWithMimeType.content);
-            // Override feedUrl if it's a valid RSS feed url
             if (feed.name === '') {
                 feed.name = feedFromHtml.name;
             }

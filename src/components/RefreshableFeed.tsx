@@ -6,7 +6,7 @@ import {
     LayoutAnimation,
 } from 'react-native';
 import { Post } from '../models/Post';
-import { ComponentColors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
@@ -86,6 +86,8 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                             refreshing={this.state.isRefreshing}
                             onRefresh={() => this.onRefresh() }
                             progressViewOffset={HeaderOffset}
+                            tintColor={Colors.BRAND_PURPLE}
+                            colors={[Colors.BRAND_PURPLE]}
                         />
                     }
                     style={{

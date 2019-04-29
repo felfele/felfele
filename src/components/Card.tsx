@@ -26,8 +26,13 @@ import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 import { Author } from '../models/Author';
+import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
+
+export interface OriginalAuthorFeed extends Feed {
+    isKnownFeed: boolean;
+}
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -38,11 +43,13 @@ export interface StateProps {
     modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
     navigation: TypedNavigation;
+    originalAuthorFeed: OriginalAuthorFeed | undefined;
 }
 
 export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
+    onDownloadFeedPosts: (feed: Feed) => void;
 }
 
 type CardProps = StateProps & DispatchProps;
@@ -73,8 +80,10 @@ export const Card = (props: CardProps) => {
                         author={props.author}
                         modelHelper={props.modelHelper}
                         navigation={props.navigation}
+                        originalAuthorFeed={props.originalAuthorFeed}
                         onSharePost={props.onSharePost}
                         togglePostSelection={props.togglePostSelection}
+                        onDownloadFeedPosts={props.onDownloadFeedPosts}
                     />
                     <DisplayImage
                         post={props.post}
@@ -229,23 +238,32 @@ const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
 };
 
 const CardTopOriginalAuthorText = (props: {
-    references: PostReferences | undefined,
     navigation: TypedNavigation,
+    originalAuthorFeed: OriginalAuthorFeed | undefined,
+    onDownloadFeedPosts: (feed: Feed) => void,
 }) => {
-    if (props.references == null || props.references.originalAuthor == null) {
+    if (props.originalAuthorFeed == null) {
         return null;
     } else {
-        const feedUrl = props.references.originalAuthor.uri;
-        const name = props.references.originalAuthor.name;
+        const originalAuthorFeed = props.originalAuthorFeed;
+        const onPress = props.originalAuthorFeed.isKnownFeed
+            ? () => props.navigation.navigate('Feed', {
+                feedUrl: originalAuthorFeed.feedUrl,
+                name: originalAuthorFeed.name,
+            })
+            : () => {
+                props.onDownloadFeedPosts(originalAuthorFeed);
+                props.navigation.navigate('NewsSourceFeed', {
+                    feed: originalAuthorFeed,
+                });
+            }
+        ;
         return (
             <TouchableView
                 style={{flexDirection: 'row'}}
-                onPress={() => props.navigation.navigate('Feed', {
-                    feedUrl,
-                    name,
-                })}
+                onPress={onPress}
             >
-                <RegularText style={styles.originalAuthor}> via {props.references.originalAuthor.name}</RegularText>
+                <RegularText style={styles.originalAuthor}> via {props.originalAuthorFeed.name}</RegularText>
             </TouchableView>
             );
     }
@@ -257,8 +275,10 @@ const CardTop = (props: {
     author: Author,
     modelHelper: ModelHelper,
     navigation: TypedNavigation,
+    originalAuthorFeed: OriginalAuthorFeed | undefined,
     onSharePost: (post: Post) => void,
     togglePostSelection: (post: Post) => void,
+    onDownloadFeedPosts: (feed: Feed) => void,
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
@@ -283,11 +303,12 @@ const CardTop = (props: {
                 <View style={{flexDirection: 'row'}}>
                     <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
                     <CardTopOriginalAuthorText
-                        references={props.post.references}
                         navigation={props.navigation}
+                        originalAuthorFeed={props.originalAuthorFeed}
+                        onDownloadFeedPosts={props.onDownloadFeedPosts}
                     />
                 </View>
-                <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
+                <RegularText numberOfLines={1} style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
             <TouchableView
                 style={{
