@@ -17,8 +17,8 @@ interface Props {
     backgroundColor: string;
     safeAreaTopBackgroundColor?: string;
     children: ReactNode | ReactNode[];
-    leftButton?: ButtonProps;
-    rightButton?: ButtonProps;
+    leftButton?: PageButtonProps;
+    rightButton?: PageButtonProps;
 }
 
 export const Page = (props: Props) => {
@@ -53,7 +53,8 @@ export const Page = (props: Props) => {
 };
 
 interface PageButtonProps extends ButtonProps {
-    color: string;
+    color?: string;
+    alignItems: 'center' | 'flex-start' | 'flex-end';
 }
 
 const PageButton = (props: PageButtonProps) => (
@@ -61,7 +62,7 @@ const PageButton = (props: PageButtonProps) => (
         disabled={props.disabled}
         onPress={props.onPress}
     >
-        <View style={styles.button}>
+        <View style={[styles.button, { alignItems: props.alignItems }]}>
             <MediumText
                 style={{
                     fontSize: 12,
@@ -85,6 +86,8 @@ const styles = StyleSheet.create({
     button: {
         justifyContent: 'center',
         alignItems: 'center',
+        paddingRight: 10,
+        paddingLeft: 18,
         flex: 0.5,
     },
 });

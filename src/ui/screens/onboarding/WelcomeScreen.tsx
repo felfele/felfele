@@ -43,10 +43,12 @@ export class WelcomeScreen extends React.PureComponent<Props> {
                 leftButton={{
                     label: 'MORE ABOUT FELFELE',
                     onPress: () => Linking.openURL(WEBSITE_URL),
+                    alignItems: 'center',
                 }}
                 rightButton={{
                     label: 'GET STARTED',
                     onPress: () => this.props.navigation.navigate('ProfileOnboarding', {}),
+                    alignItems: 'center',
                 }}
             >
                 <TouchableWithoutFeedback

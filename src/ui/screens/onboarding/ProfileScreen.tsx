@@ -42,21 +42,20 @@ type Props = DispatchProps & StateProps;
 export const ProfileScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const authorImageUri = modelHelper.getImageUri(props.author.image);
-    const isFormFilled = props.author.image.uri !== defaultAuthor.image.uri
-        && props.author.name !== ''
-        && props.author.name !== defaultAuthor.name
-    ;
+    const isFormFilled = props.author.name !== '' && props.author.name !== defaultAuthor.name;
     return (
         <Page
             backgroundColor={ComponentColors.BACKGROUND_COLOR}
             leftButton={{
                 label: isFormFilled ? 'Looks good!' : '',
                 onPress: () => {},
+                alignItems: 'flex-start',
             }}
             rightButton={{
                 label: 'NEXT',
                 disabled: !isFormFilled,
                 onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser),
+                alignItems: 'flex-end',
             }}
         >
             <KeyboardAvoidingView behavior='position'>

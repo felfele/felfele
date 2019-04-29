@@ -395,7 +395,7 @@ export const AsyncActions = {
     },
     createUser: (name: string, image: ImageData): Thunk => {
         return async (dispatch, getState) => {
-            dispatch(AsyncActions.chainActions([
+            await dispatch(AsyncActions.chainActions([
                 AsyncActions.updateProfileName(name),
                 AsyncActions.updateProfileImage(image),
                 AsyncActions.createUserIdentity(),
