@@ -11,7 +11,7 @@ import {
     HEADERS_WITH_FELFELE,
     HEADERS_WITH_CURL,
     rssFeedHelper,
-    FeedWithMetrics,
+    RSSFeedWithMetrics,
     RSSFeed,
     RSSMedia,
     RSSEnclosure,
@@ -257,7 +257,7 @@ class _RSSPostManager {
     public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
         const startTime = Date.now();
         const posts: Post[] = [];
-        const metrics: FeedWithMetrics[] = [];
+        const metrics: RSSFeedWithMetrics[] = [];
 
         const feedMap: { [index: string]: string } = {};
         for (const feed of storedFeeds) {
@@ -379,7 +379,7 @@ class _RSSPostManager {
         return isSame;
     }
 
-    private async loadFeed(feedUrl: string): Promise<FeedWithMetrics | null> {
+    private async loadFeed(feedUrl: string): Promise<RSSFeedWithMetrics | null> {
         try {
             const rss = await rssFeedHelper.fetch(feedUrl);
             return rss;

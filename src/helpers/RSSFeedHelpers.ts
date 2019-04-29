@@ -2,6 +2,7 @@ import * as urlUtils from './urlUtils';
 import { Utils } from '../Utils';
 import { Version } from '../Version';
 import { DateUtils } from '../DateUtils';
+import { loadRedditFeed, redditFeedUrl } from './redditFeedHelpers';
 
 // tslint:disable-next-line:no-var-requires
 const util = require('react-native-util');
@@ -26,7 +27,7 @@ export interface RSSEnclosure {
     type: string;
 }
 
-interface RSSThumbnail {
+export interface RSSThumbnail {
     height: number[];
     width: number[];
     url: string[];
@@ -36,7 +37,7 @@ export interface RSSMedia {
     thumbnail: RSSThumbnail[];
 }
 
-interface RSSItem {
+export interface RSSItem {
     title: string;
     description: string;
     link: string;
@@ -54,7 +55,7 @@ export interface RSSFeed {
     items: RSSItem[];
 }
 
-export interface FeedWithMetrics {
+export interface RSSFeedWithMetrics {
     feed: RSSFeed;
     url: string;
     size: number;
@@ -65,39 +66,44 @@ export interface FeedWithMetrics {
 
 interface RSSFeedHelper {
     DefaultTimeout: number;
-    fetch: (url: string) => Promise<FeedWithMetrics>;
-    load: (url: string, xml: string, startTime?: number, downloadTime?: number) => Promise<FeedWithMetrics>;
+    fetch: (url: string) => Promise<RSSFeedWithMetrics>;
+    load: (url: string, xml: string, startTime?: number, downloadTime?: number) => Promise<RSSFeedWithMetrics>;
     parser: any;
     getDate: any;
-    parseAtom: any;
-    parseRSS: any;
+    parseAtomFeed: any;
+    parseRSSFeed: any;
 }
 
 export const rssFeedHelper: RSSFeedHelper = {
     DefaultTimeout: 10000,
-    fetch: async (url: string): Promise<FeedWithMetrics> => {
+    fetch: async (url: string): Promise<RSSFeedWithMetrics> => {
         const startTime = Date.now();
         const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
-        const response = await Utils.timeout(rssFeedHelper.DefaultTimeout, fetch(url, {
+        const fetchUrl = isRedditUrl ? redditFeedUrl(url) : url;
+        const response = await Utils.timeout(rssFeedHelper.DefaultTimeout, fetch(fetchUrl, {
             headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
         }));
         const downloadTime = Date.now();
         if (response.status === 200) {
-            const xml = await response.text();
+            const text = await response.text();
+            const feed = isRedditUrl
+                ? await loadRedditFeed(url, text, startTime, downloadTime)
+                : await rssFeedHelper.load(url, text, startTime, downloadTime)
+            ;
 
-            return rssFeedHelper.load(url, xml, startTime, downloadTime);
+            return feed;
         } else {
             throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
         }
     },
 
-    load: async (url: string, xml: string, startTime = 0, downloadTime = 0): Promise<FeedWithMetrics> => {
+    load: async (url: string, xml: string, startTime = 0, downloadTime = 0): Promise<RSSFeedWithMetrics> => {
         const xmlTime = Date.now();
         const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
         parser.addListener('error', (err: string) => {
             throw new Error(err);
         });
-        return await new Promise<FeedWithMetrics>((resolve, reject) => {
+        return await new Promise<RSSFeedWithMetrics>((resolve, reject) => {
             parser.parseString(xml, (err: string, result: any) => {
                 if (err) {
                     reject(err);
@@ -105,7 +111,7 @@ export const rssFeedHelper: RSSFeedHelper = {
                 }
                 const parseTime = Date.now();
                 const rss = rssFeedHelper.parser(result);
-                const feedWithMetrics: FeedWithMetrics = {
+                const feedWithMetrics: RSSFeedWithMetrics = {
                     feed: rss,
                     url: url,
                     size: xml.length,
@@ -120,9 +126,9 @@ export const rssFeedHelper: RSSFeedHelper = {
 
     parser: (json: any) => {
         if (json.feed) {
-            return rssFeedHelper.parseAtom(json);
+            return rssFeedHelper.parseAtomFeed(json);
         } else if (json.rss) {
-            return rssFeedHelper.parseRSS(json);
+            return rssFeedHelper.parseRSSFeed(json);
         }
     },
 
@@ -136,8 +142,7 @@ export const rssFeedHelper: RSSFeedHelper = {
         return null;
     },
 
-    // TODO is this atom?
-    parseAtom: (json: any) => {
+    parseAtomFeed: (json: any) => {
         const feed = json.feed;
         const rss: any = { items: [] };
 
@@ -166,7 +171,7 @@ export const rssFeedHelper: RSSFeedHelper = {
         return rss;
     },
 
-    parseRSS: (json: any) => {
+    parseRSSFeed: (json: any) => {
         let channel = json.rss.channel;
         const rss: any = { items: [] };
         if (util.isArray(json.rss.channel)) {
