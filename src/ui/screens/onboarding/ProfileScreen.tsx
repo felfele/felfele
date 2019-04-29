@@ -25,8 +25,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { defaultAuthor } from '../../../reducers/defaultData';
 import { getDefaultUserImage } from '../../../defaultUserImage';
 
+export type CreateUserCallback = (name: string, image: ImageData, navigation: TypedNavigation) => void;
+
 export interface DispatchProps extends IdentitySettingsDispatchProps {
-    onCreateUser: (name: string, image: ImageData, navigation: TypedNavigation) => void;
+    onCreateUser: CreateUserCallback;
 }
 
 export interface StateProps {
@@ -54,14 +56,13 @@ export const ProfileScreen = (props: Props) => {
             rightButton={{
                 label: 'NEXT',
                 disabled: !isFormFilled,
-                onPress: () => onDone(props),
+                onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser),
             }}
         >
             <KeyboardAvoidingView behavior='position'>
                 <NavigationHeader
                     title='Your profile'
                     navigation={props.navigation}
-                    onLongPressTitle={() => onDone(props)}
                 />
                 <View style={styles.imagePickerContainer}>
                     <TouchableView
@@ -110,17 +111,17 @@ export const ProfileScreen = (props: Props) => {
     );
 };
 
-const onDone = async (props: Props) => {
-    props.onCreateUser(
-        props.author.name !== ''
-            ? props.author.name
+export const onDoneCreatingProfile = async (author: Author, navigation: TypedNavigation, onCreateUser: CreateUserCallback) => {
+    onCreateUser(
+        author.name !== ''
+            ? author.name
             : defaultAuthor.name
         ,
-        props.author.image.uri !== ''
-            ? props.author.image
+        author.image.uri !== ''
+            ? author.image
             : await getDefaultUserImage()
         ,
-        props.navigation,
+        navigation,
     );
 };
 

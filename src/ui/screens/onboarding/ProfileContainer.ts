@@ -22,12 +22,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.updateProfileImage(image));
         },
         onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
-            await dispatch(AsyncActions.chainActions([
-                AsyncActions.updateProfileName(name),
-                AsyncActions.updateProfileImage(image),
-                AsyncActions.createUserIdentity(),
-                AsyncActions.createOwnFeed(),
-            ]));
+            await dispatch(AsyncActions.createUser(name, image));
             navigation.navigate('Loading', {});
         },
     };

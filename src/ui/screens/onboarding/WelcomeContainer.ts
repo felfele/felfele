@@ -21,6 +21,10 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onStartDownloadFeeds: () => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
+        onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
+            await dispatch(AsyncActions.createUser(name, image));
+            navigation.navigate('Loading', {});
+        },
     };
 };
 
