@@ -50,9 +50,8 @@ const findBestResolutionRedditImage = (redditImage: RedditImage): RedditImageDat
 };
 
 const redditPostDataImages = (postData: RedditPostData): RSSThumbnail[] => {
-    const hasPreview = postData.preview != null;
-    const image = hasPreview
-        ? findBestResolutionRedditImage(postData.preview!.images[0])
+    const image = postData.preview != null
+        ? findBestResolutionRedditImage(postData.preview.images[0])
         : undefined
     ;
     return image != null
@@ -68,8 +67,8 @@ const redditPostDataImages = (postData: RedditPostData): RSSThumbnail[] => {
 const redditPostDataToRSSItem = (postData: RedditPostData): RSSItem => {
     const redditMobileLink = urlUtils.getCanonicalUrl('m.' + urlUtils.REDDIT_COM).slice(0, -1) + postData.permalink;
     const created = Math.floor(postData.created_utc * 1000);
-    switch (postData.post_hint) {
-    case undefined: return {
+    if (postData.post_hint == null) {
+        return {
             title: '',
             description: postData.title + `<p/>[Comments](${redditMobileLink})`,
             link: postData.url,
@@ -79,7 +78,9 @@ const redditPostDataToRSSItem = (postData: RedditPostData): RSSItem => {
                 thumbnail: redditPostDataImages(postData),
             },
         };
-    default: return {
+    }
+    else {
+        return {
             title: '',
             description: postData.title,
             link: redditMobileLink,
