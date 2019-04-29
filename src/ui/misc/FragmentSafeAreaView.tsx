@@ -1,15 +1,13 @@
 import * as React from 'react';
-import { SafeAreaView, ViewProps } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { ComponentColors } from '../../styles';
 import { StatusBarView } from '../../components/StatusBarView';
 
-interface OwnProps {
+interface Props {
     children: React.ReactNode | React.ReactNode[];
     topBackgroundColor?: string;
     bottomBackgroundColor?: string;
 }
-
-type Props = ViewProps & OwnProps;
 
 export const FragmentSafeAreaViewWithoutTabBar = (props: Props) => (
     <React.Fragment>

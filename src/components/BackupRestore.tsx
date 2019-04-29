@@ -6,7 +6,6 @@ import {
 import { NavigationHeader } from './NavigationHeader';
 import { Button } from './Button';
 import { TypedNavigation } from '../helpers/navigation';
-import { ComponentColors } from '../styles';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
@@ -22,7 +21,7 @@ export interface State {
 }
 
 export const BackupRestore = (props: Props) => (
-    <FragmentSafeAreaViewForTabBar style={styles.mainContainer}>
+    <FragmentSafeAreaViewForTabBar>
         <NavigationHeader
             title='Backup & Restore'
             navigation={props.navigation}
@@ -35,11 +34,6 @@ export const BackupRestore = (props: Props) => (
 );
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        height: '100%',
-        flexDirection: 'column',
-        backgroundColor: ComponentColors.BACKGROUND_COLOR,
-    },
     buttonContainer: {
         flex: 1,
         flexDirection: 'column',

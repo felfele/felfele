@@ -31,6 +31,8 @@ export interface State {
     authorImage: ImageData;
 }
 
+const WEBSITE_URL = 'https://felfele.com';
+
 export class WelcomeScreen extends React.PureComponent<Props, State> {
     public state: State = {
         authorName: defaultAuthor.name,
@@ -48,7 +50,7 @@ export class WelcomeScreen extends React.PureComponent<Props, State> {
                 backgroundColor={Colors.BRAND_PURPLE}
                 leftButton={{
                     label: 'MORE ABOUT FELFELE',
-                    onPress: () => Linking.openURL('https://felfele.com'),
+                    onPress: () => Linking.openURL(WEBSITE_URL),
                 }}
                 rightButton={{
                     label: 'GET STARTED',

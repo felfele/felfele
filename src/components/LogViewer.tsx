@@ -5,7 +5,6 @@ import { View,
     FlatList,
     Platform,
     Dimensions,
-    SafeAreaView,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
@@ -40,7 +39,7 @@ export class LogViewer extends React.PureComponent<Props> {
     }
 
     public render = () => (
-        <FragmentSafeAreaViewWithoutTabBar style={styles.mainContainer}>
+        <FragmentSafeAreaViewWithoutTabBar>
             <NavigationHeader
                 navigation={this.props.navigation}
                 rightButton1={{
@@ -85,10 +84,6 @@ export class LogViewer extends React.PureComponent<Props> {
 
 const fontFamily = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const styles = StyleSheet.create({
-    mainContainer: {
-        height: Dimensions.get('window').height - DefaultTabBarHeight + 1,
-        backgroundColor: ComponentColors.HEADER_COLOR,
-    },
     logLineContainer: {
     },
     logFilterContainer: {

@@ -5,6 +5,7 @@ import {
     View,
     Dimensions,
     ImageBackground,
+    KeyboardAvoidingView,
 } from 'react-native';
 import { Author } from '../../../models/Author';
 import { ImageData } from '../../../models/ImageData';
@@ -56,53 +57,55 @@ export const ProfileScreen = (props: Props) => {
                 onPress: () => onDone(props),
             }}
         >
-            <NavigationHeader
-                title='Your profile'
-                navigation={props.navigation}
-                onLongPressTitle={() => onDone(props)}
-            />
-            <View style={styles.imagePickerContainer}>
-                <TouchableView
-                    onPress={async () => {
-                        await openImagePicker(props.onUpdatePicture);
-                    }}
-                >
-                    <ImageBackground
-                        source={authorImageUri === ''
-                        ? defaultUserImage
-                        : { uri: authorImageUri }
-                        }
-                        style={styles.imageBackground}
-                        imageStyle={styles.image}
+            <KeyboardAvoidingView behavior='position'>
+                <NavigationHeader
+                    title='Your profile'
+                    navigation={props.navigation}
+                    onLongPressTitle={() => onDone(props)}
+                />
+                <View style={styles.imagePickerContainer}>
+                    <TouchableView
+                        onPress={async () => {
+                            await openImagePicker(props.onUpdatePicture);
+                        }}
                     >
-                        <View style={styles.imagePickerIcon}>
-                            <Icon
-                                name={'pencil'}
-                                size={18}
-                                color={Colors.BLACK}
-                            />
-                        </View>
-                    </ImageBackground>
+                        <ImageBackground
+                            source={authorImageUri === ''
+                            ? defaultUserImage
+                            : { uri: authorImageUri }
+                            }
+                            style={styles.imageBackground}
+                            imageStyle={styles.image}
+                        >
+                            <View style={styles.imagePickerIcon}>
+                                <Icon
+                                    name={'pencil'}
+                                    size={18}
+                                    color={Colors.BLACK}
+                                />
+                            </View>
+                        </ImageBackground>
 
-                </TouchableView>
-            </View>
-            <RegularText style={styles.tooltip}>NAME</RegularText>
-            <SimpleTextInput
-                style={styles.textInput}
-                defaultValue={props.author.name}
-                placeholder={'Your name'}
-                placeholderTextColor={Colors.GRAY}
-                autoCapitalize='none'
-                autoFocus={false}
-                autoCorrect={false}
-                selectTextOnFocus={true}
-                returnKeyType={'done'}
-                onSubmitEditing={props.onUpdateAuthor}
-                onChangeText={props.onUpdateAuthor}
-            />
-            <RegularText style={styles.tooltip}>
-                We will automatically create a channel using your name and picture. You can change this anytime.
-            </RegularText>
+                    </TouchableView>
+                </View>
+                <RegularText style={styles.tooltip}>NAME</RegularText>
+                <SimpleTextInput
+                    style={styles.textInput}
+                    defaultValue={props.author.name}
+                    placeholder={'Your name'}
+                    placeholderTextColor={Colors.GRAY}
+                    autoCapitalize='none'
+                    autoFocus={false}
+                    autoCorrect={false}
+                    selectTextOnFocus={true}
+                    returnKeyType={'done'}
+                    onSubmitEditing={props.onUpdateAuthor}
+                    onChangeText={props.onUpdateAuthor}
+                />
+                <RegularText style={styles.tooltip}>
+                    We will automatically create a channel using your name and picture. You can change this anytime.
+                </RegularText>
+            </KeyboardAvoidingView>
         </Page>
     );
 };

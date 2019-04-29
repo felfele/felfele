@@ -5,7 +5,6 @@ import {
     Platform,
     Alert,
     AlertIOS,
-    SafeAreaView,
     KeyboardAvoidingView,
     StyleSheet,
 } from 'react-native';
@@ -68,7 +67,7 @@ export class PostEditor extends React.Component<Props, State> {
         const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
-            <FragmentSafeAreaViewWithoutTabBar style={styles.mainContainer}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
@@ -280,8 +279,6 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
 });
 
 const styles = StyleSheet.create({
-    mainContainer: {
-    },
     container: {
         backgroundColor: Colors.WHITE,
         flex: 1,
