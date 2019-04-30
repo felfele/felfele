@@ -12,7 +12,7 @@ import {
     Alert,
     TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableView } from './TouchableView';
+import { TouchableView, TouchableViewProps, TouchableViewDefaultHitSlop } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import * as urlUtils from '../helpers/urlUtils';
 import { ImageDataView } from './ImageDataView';
@@ -158,17 +158,29 @@ const isPostShareable = (post: Post, author: Author): boolean => {
     return true;
 };
 
+const ActionButton = (props: TouchableViewProps) => (
+    <TouchableView
+        style={styles.actionButton}
+        hitSlop={{
+            ...TouchableViewDefaultHitSlop,
+            right: 10,
+            left: 10,
+        }}
+        {...props}
+    >{props.children}</TouchableView>
+);
+
 const ShareButton = (props: { post: Post, onSharePost: () => void, author: Author }) => {
     const isShareable = isPostShareable(props.post, props.author);
     const shareIconName = isShareable ? 'share-outline' : 'share';
     const onPress = isShareable ? () => props.onSharePost() : undefined;
     return (
-        <TouchableView style={styles.actionButton} onPress={onPress}>
+        <ActionButton onPress={onPress}>
         { props.post.isUploading === true
             ? <ActivityIndicator color={Colors.WHITE} />
             : <ActionIcon name={shareIconName} color={Colors.WHITE}/>
         }
-        </TouchableView>
+        </ActionButton>
     );
 };
 
@@ -195,20 +207,31 @@ const ActionsOverlay = (props: {
             onPress={() => props.togglePostSelection(post)}
         >
             <View style={styles.overlay}>
-                {isOwnPost(props.post, props.author) &&
-                    <DeleteButton
-                        onPress={() => {
-                            onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
+                <View style={styles.infoContainer}>
+                    {isOwnPost(props.post, props.author) &&
+                        <DeleteButton
+                            onPress={() => {
+                                onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
+                            }}
+                        />
+                    }
+                    <ShareButton
+                        post={post}
+                        onSharePost={() => {
+                            props.onSharePost(post);
+                            props.togglePostSelection(post);
                         }}
-                    />
-                }
-                <ShareButton
-                    post={post}
-                    onSharePost={() => {
-                        props.onSharePost(post);
-                        props.togglePostSelection(post);
-                    }}
-                    author={props.author}/>
+                        author={props.author}/>
+                    <TouchableView
+                        style={{
+                            paddingRight: 10,
+                        }}
+                        onPress={() => {
+                            props.togglePostSelection(props.post);
+                        }}>
+                        <ActionIcon name='dots-vertical' color={Colors.WHITE}/>
+                    </TouchableView>
+                </View>
             </View>
         </TouchableWithoutFeedback>
 
@@ -217,12 +240,11 @@ const ActionsOverlay = (props: {
 
 const DeleteButton = (props: { onPress: () => void }) => {
     return (
-        <TouchableView
-            style={styles.actionButton}
+        <ActionButton
             onPress={props.onPress}
         >
             <ActionIcon name='trash-can' color={Colors.WHITE} iconSize={24}/>
-        </TouchableView>
+        </ActionButton>
     );
 };
 
@@ -384,8 +406,8 @@ const styles = StyleSheet.create({
         zIndex: 100,
         backgroundColor: 'rgba(98, 0, 234, 0.5)',
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
     },
     infoContainer : {
         flexDirection: 'row',
@@ -406,15 +428,15 @@ const styles = StyleSheet.create({
         color: Colors.DARK_GRAY,
     },
     actionButton: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
         borderWidth: 1,
         borderColor: Colors.WHITE,
         backgroundColor: Colors.BRAND_PURPLE,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 10,
+        marginHorizontal: 10,
     },
     username: {
         fontSize: 14,
