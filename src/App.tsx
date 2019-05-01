@@ -43,6 +43,9 @@ import { FavoriteListViewerContainer } from './containers/FavoriteListViewerCont
 import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
+// @ts-ignore
+import { BottomTabBar } from 'react-navigation-tabs';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -303,6 +306,7 @@ const Root = createBottomTabNavigator(
                         opacity: 1.0,
                     },
                 },
+        tabBarComponent: props => <HideWhenKeyboardShownComponent><BottomTabBar {...props}/></HideWhenKeyboardShownComponent>,
     },
 );
 

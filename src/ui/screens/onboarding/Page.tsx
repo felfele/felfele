@@ -12,6 +12,7 @@ import {
 } from '../../../styles';
 import { MediumText } from '../../../ui/misc/text';
 import { ButtonProps } from '../../../components/NavigationHeader';
+import { HideWhenKeyboardShownComponent } from '../../misc/HideWhenKeyboardShownComponent';
 
 interface Props {
     backgroundColor: string;
@@ -33,22 +34,23 @@ export const Page = (props: Props) => {
             }}>
                 {props.children}
             </View>
-            <View style={styles.buttonRow}>
-                {props.leftButton != null &&
-                <PageButton
-                    {...props.leftButton}
-                    color={Colors.DARK_GRAY}
-                />
-                }
-                {props.rightButton != null &&
-                <PageButton
-                    {...props.rightButton}
-                    color={Colors.BRAND_PURPLE}
-                />
-                }
-            </View>
+            <HideWhenKeyboardShownComponent>
+                <View style={styles.buttonRow}>
+                    {props.leftButton != null &&
+                    <PageButton
+                        {...props.leftButton}
+                        color={Colors.DARK_GRAY}
+                    />
+                    }
+                    {props.rightButton != null &&
+                    <PageButton
+                        {...props.rightButton}
+                        color={Colors.BRAND_PURPLE}
+                    />
+                    }
+                </View>
+            </HideWhenKeyboardShownComponent>
         </FragmentSafeAreaViewForTabBar>
-
     );
 };
 
