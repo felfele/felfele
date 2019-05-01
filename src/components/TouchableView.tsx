@@ -8,7 +8,7 @@ export const TouchableViewDefaultHitSlop = {
     right: 30,
 };
 
-interface TouchableViewProps extends TouchableWithoutFeedbackProps {
+export interface TouchableViewProps extends TouchableWithoutFeedbackProps {
     children: React.ReactNode;
 }
 
