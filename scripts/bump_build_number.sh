@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-plist="ios/postmodern/Info.plist"
+plist="ios/Felfele/Info.plist"
 if [ ! -f "$plist" ]; then
     echo "Cannot find $plist file!"
     echo "Run this script from the project root!"

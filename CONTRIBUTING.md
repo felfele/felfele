@@ -1,6 +1,6 @@
 # Contributing
 
-Please always follow our [Code of Conduct](https://github.com/agazso/postmodern/blob/master/CODE_OF_CONDUCT.md) in all your interactions with the project and the community.
+Please always follow our [Code of Conduct](https://github.com/felfele/felfele/blob/master/CODE_OF_CONDUCT.md) in all your interactions with the project and the community.
 
 ## Communication
 
@@ -38,7 +38,7 @@ can fix it as fast as possible:
   screenshot](https://github.com/blog/1347-issue-attachments) or video
   illustrating the issue
 - If you're having trouble with a specific post or other kind of content, please include a link to it if it's possible
-- Include all this information in a new issue on our [Issue Tracker](https://github.com/agazso/postmodern/issues)
+- Include all this information in a new issue on our [Issue Tracker](https://github.com/felfele/felfele/issues)
 
 ### Pull Request Process
 

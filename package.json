@@ -121,8 +121,8 @@
     "specs": "",
     "configurations": {
       "ios.sim.debug": {
-        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/postmodern.app",
-        "build": "xcodebuild -project ios/postmodern.xcodeproj -scheme postmodern -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/Felfele.app",
+        "build": "xcodebuild -project ios/Felfele.xcodeproj -scheme Felfele -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
         "name": "iPhone 7"
       }
