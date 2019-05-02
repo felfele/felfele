@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         paddingTop: 2,
         backgroundColor: ComponentColors.HEADER_COLOR,
+        zIndex: 100,
     },
     headerLeftButtonText: {
         color: Colors.WHITE,

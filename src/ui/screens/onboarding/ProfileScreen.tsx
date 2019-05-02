@@ -58,11 +58,11 @@ export const ProfileScreen = (props: Props) => {
                 alignItems: 'flex-end',
             }}
         >
+            <NavigationHeader
+                title='Your profile'
+                navigation={props.navigation}
+            />
             <KeyboardAvoidingView behavior='position'>
-                <NavigationHeader
-                    title='Your profile'
-                    navigation={props.navigation}
-                />
                 <View style={styles.imagePickerContainer}>
                     <TouchableView
                         onPress={async () => {
