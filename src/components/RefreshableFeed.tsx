@@ -3,12 +3,10 @@ import {
     View,
     FlatList,
     RefreshControl,
-    StyleSheet,
     LayoutAnimation,
 } from 'react-native';
 import { Post } from '../models/Post';
 import { ComponentColors, Colors } from '../styles';
-import { StatusBarView } from './StatusBarView';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
@@ -65,7 +63,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <FragmentSafeAreaViewWithoutTabBar style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 {this.props.children.navigationHeader}
                 {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
@@ -132,11 +130,3 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 }
 
 const HeaderOffset = 20;
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        flex: 1,
-        backgroundColor: ComponentColors.BACKGROUND_COLOR,
-    },
-});

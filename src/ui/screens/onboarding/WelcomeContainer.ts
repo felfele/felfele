@@ -1,9 +1,13 @@
 import { connect } from 'react-redux';
-import { StateProps, DispatchProps, Welcome } from '../components/Welcome';
-import { AppState } from '../reducers/AppState';
-import { AsyncActions, Actions } from '../actions/Actions';
-import { ImageData } from '../models/ImageData';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import {
+    StateProps,
+    DispatchProps,
+    WelcomeScreen,
+} from './WelcomeScreen';
+import { AppState } from '../../../reducers/AppState';
+import { AsyncActions } from '../../../actions/Actions';
+import { ImageData } from '../../../models/ImageData';
+import { TypedNavigation } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -18,12 +22,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
         onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
-            await dispatch(AsyncActions.chainActions([
-                AsyncActions.updateProfileName(name),
-                AsyncActions.updateProfileImage(image),
-                AsyncActions.createUserIdentity(),
-                AsyncActions.createOwnFeed(),
-            ]));
+            await dispatch(AsyncActions.createUser(name, image));
             navigation.navigate('Loading', {});
         },
     };
@@ -32,4 +31,4 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
 export const WelcomeContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Welcome);
+)(WelcomeScreen);

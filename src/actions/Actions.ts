@@ -396,6 +396,16 @@ export const AsyncActions = {
             }
         };
     },
+    createUser: (name: string, image: ImageData): Thunk => {
+        return async (dispatch, getState) => {
+            await dispatch(AsyncActions.chainActions([
+                AsyncActions.updateProfileName(name),
+                AsyncActions.updateProfileImage(image),
+                AsyncActions.createUserIdentity(),
+                AsyncActions.createOwnFeed(),
+            ]));
+        };
+    },
     createUserIdentity: (): Thunk => {
         return async (dispatch, getState) => {
             const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);

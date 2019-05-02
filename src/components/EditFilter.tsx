@@ -89,7 +89,7 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
-            <FragmentSafeAreaViewWithoutTabBar style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
                     title='Edit filter'
                     navigation={this.props.navigation}
@@ -156,11 +156,6 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: ComponentColors.HEADER_COLOR,
-        flex: 1,
-        flexDirection: 'column',
-    },
     titleInfo: {
         fontSize: 14,
         color: '#8e8e93',

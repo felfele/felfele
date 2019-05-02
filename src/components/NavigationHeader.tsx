@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
@@ -7,20 +7,23 @@ import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
 
-interface HeaderButton {
+export interface ButtonProps {
     label: string | React.ReactNode;
     onPress: () => void;
+    disabled?: boolean;
     testID?: string;
 }
 
 interface HeaderProps {
-    leftButton?: HeaderButton;
-    rightButton1?: HeaderButton;
-    rightButton2?: HeaderButton;
+    leftButton?: ButtonProps;
+    rightButton1?: ButtonProps;
+    rightButton2?: ButtonProps;
     title?: string;
     titleImage?: React.ReactNode;
     onPressTitle?: () => void;
+    onLongPressTitle?: () => void;
     navigation?: TypedNavigation;
+    style?: StyleProp<ViewStyle>;
 }
 
 export type Props = HeaderProps;
@@ -30,7 +33,7 @@ const BUTTON_COLOR = Colors.WHITE;
 export const HeaderDefaultLeftButtonIcon = <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />;
 
 export const NavigationHeader = (props: Props) => (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerContainer, props.style]}>
         <TouchableView onPress={
                 props.leftButton != null
                     ? props.leftButton.onPress
@@ -51,7 +54,11 @@ export const NavigationHeader = (props: Props) => (
                 }
             </RegularText>
         </TouchableView>
-        <TouchableView onPress={props.onPressTitle} style={styles.middleContainer}>
+        <TouchableView
+            onPress={props.onPressTitle}
+            onLongPress={props.onLongPressTitle}
+            style={styles.middleContainer}
+        >
             {props.titleImage}
             <MediumText
                 style={styles.titleText}
@@ -105,9 +112,8 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 2,
-        borderBottomWidth: 0,
-        borderBottomColor: Colors.LIGHT_GRAY,
         backgroundColor: ComponentColors.HEADER_COLOR,
+        zIndex: 100,
     },
     headerLeftButtonText: {
         color: Colors.WHITE,

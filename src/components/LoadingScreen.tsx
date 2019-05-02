@@ -16,7 +16,7 @@ export const LoadingScreen = (props: DispatchProps & StateProps) => {
     return (
         <View>
             {props.author.identity == null
-                ? props.navigation.navigate('Welcome', {}) :
+                ? props.navigation.navigate('Onboarding', {}) :
                 props.navigation.navigate('App', {})}
         </View>
     );
