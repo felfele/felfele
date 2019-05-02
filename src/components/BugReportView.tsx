@@ -110,11 +110,15 @@ class BugReportView extends React.Component<Props, State> {
                             color={Colors.BLACK}
                         />
                     </View>
-                    {this.props.errorView &&
-                    <BoldText style={[styles.text, { fontSize: 18 }]}>
-                        Yikes!{'\n\n'}
-                        We are sorry, an error has occurred.{'\n'}
-                    </BoldText>
+                    {this.props.errorView
+                        ? <BoldText style={[styles.text, { fontSize: 18 }]}>
+                            An error has occured!{'\n'}
+                            We need to restart the app.
+                        </BoldText>
+                        :  <BoldText style={[styles.text, { fontSize: 18 }]}>
+                            Yikes!{'\n'}
+                            What happened?
+                        </BoldText>
                     }
                     <RegularText style={[styles.text, { fontSize: 14 }]} textBreakStrategy='simple'>
                         As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
@@ -251,7 +255,6 @@ const styles = StyleSheet.create({
     },
     keyboardAvoidingContainer: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
-      //  paddingBottom: DefaultTabBarHeight,
         flex: 1,
     },
     contentContainer: {
@@ -265,7 +268,7 @@ const styles = StyleSheet.create({
     text: {
         textAlign: 'center',
         paddingHorizontal: 10,
-        paddingBottom: 20,
+        paddingBottom: 10,
     },
     label: {
         alignSelf: 'flex-start',
@@ -277,7 +280,7 @@ const styles = StyleSheet.create({
     },
     logContainer: {
         width: '100%',
-        marginBottom: 20,
+        marginVertical: 20,
         backgroundColor: Colors.MEDIUM_GRAY,
         paddingHorizontal: 10,
         paddingVertical: 12,
