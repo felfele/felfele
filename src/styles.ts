@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const IconSize = {
     LARGE_LIST_ICON: 40,
@@ -19,6 +19,7 @@ export const Colors = {
     DARK_GRAY: '#4A4A4A',
     BRAND_PURPLE: '#6200EA',
     BRAND_PURPLE_LIGHT: '#BA76FA',
+    BRAND_PURPLE_DARK: '#3700B4',
 };
 export const ComponentColors = {
     STRONG_TEXT: '#303030',
