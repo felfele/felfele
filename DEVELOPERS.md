@@ -57,3 +57,9 @@ Set the environment variable `REACT_DEBUGGER`, e.g.:
 `REACT_DEBUGGER="node node_modules/react-native-debugger-open/bin/rndebugger-open.js --open --port 8081"`
 
 Then start the packager as normal.
+
+## Running E2E tests
+
+It is iOS only for now.
+
+`npm run e2e:ios`

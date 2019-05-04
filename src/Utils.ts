@@ -1,10 +1,23 @@
+const clearTimeoutIfSet = (timeout: any) => {
+    if (timeout != null) {
+        clearTimeout(timeout);
+    }
+};
+
 export class Utils {
     public static async timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            if (ms > 0) {
-                setTimeout(() => reject(new Error('timeout')), ms);
-            }
-            promise.then(resolve, reject);
+            const timeout = ms > 0
+                ? setTimeout(() => reject(new Error('timeout')), ms)
+                : undefined
+            ;
+            promise.then((value) => {
+                clearTimeoutIfSet(timeout);
+                resolve(value);
+            }, (reason) => {
+                clearTimeoutIfSet(timeout);
+                reject(reason);
+            });
         });
     }
 
@@ -36,5 +49,11 @@ export class Utils {
             return [defaultReturn];
         }
         return list.slice(list.length - num);
+    }
+
+    public static isNodeJS = () => {
+        return typeof process === 'object'
+            && typeof process.versions === 'object'
+            && typeof process.versions.node !== 'undefined';
     }
 }

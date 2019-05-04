@@ -3,7 +3,7 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader, HeaderDefaultLeftButtonIcon } from './NavigationHeader';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -61,20 +61,20 @@ export const FeedView = (props: Props) => {
 
     const rightButton1 = props.isOwnFeed
         ? props.feedName.length > 0
-            ? button('dots-vertical', Colors.DARK_GRAY, navigateToFeedSettings)
+            ? button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
             : undefined
         : isOnboardingFeed
             ? undefined
             : isFollowedFeed
                 ? isFavorite(props.feeds, props.feedUrl)
-                    ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
-                    : button('star', Colors.DARK_GRAY, toggleFavorite)
-                : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
+                    ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                    : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                : button('link-variant', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
 
     const rightButton2 = isLocalFeed || isOnboardingFeed
         ? undefined
-        : button('dots-vertical', Colors.DARK_GRAY, navigateToFeedInfo)
+        : button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...props}>
@@ -119,14 +119,5 @@ const followFeed = (uri: string, feeds: Feed[], onFollowFeed: (feed: Feed) => vo
     const knownFeed = feeds.find(feed => feed.feedUrl === uri && feed.followed !== true);
     if (knownFeed != null) {
         onFollowFeed(knownFeed);
-    }
-};
-
-const removeFeedAndGoBack = async (props: Props) => {
-    const confirmRemove = await AreYouSureDialog.show('Are you sure you want to delete?');
-    const feedToRemove = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed !== true);
-    if (feedToRemove != null && confirmRemove) {
-        props.onRemoveFeed(feedToRemove);
-        props.onBack();
     }
 };

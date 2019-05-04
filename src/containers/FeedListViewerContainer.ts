@@ -34,7 +34,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
         addSection('Your feeds', ownFeeds),
-        addSection('Public feeds you follow', followedFeeds),
+        addSection('Feeds you follow', followedFeeds),
         addSection('Other feeds', knownFeeds),
     );
 

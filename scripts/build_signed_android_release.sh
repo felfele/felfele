@@ -2,7 +2,7 @@
 #
 # Build a release version and sign with debug key
 
-cd android && ./gradlew --quiet --console plain assembleRelease && cd ..
+(cd android && ./gradlew --quiet --console plain assembleRelease)
 jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore android/debug.keystore -storepass android -keypass android android/app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey
 
 echo

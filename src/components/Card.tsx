@@ -7,12 +7,12 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Dimensions,
-    Platform,
     StyleSheet,
     Linking,
     Alert,
+    TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableView } from './TouchableView';
+import { TouchableView, TouchableViewProps, TouchableViewDefaultHitSlop } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import * as urlUtils from '../helpers/urlUtils';
 import { ImageDataView } from './ImageDataView';
@@ -26,8 +26,13 @@ import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
 import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
 import { Author } from '../models/Author';
+import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+
+export interface OriginalAuthorFeed extends Feed {
+    isKnownFeed: boolean;
+}
 
 export interface StateProps {
     showSquareImages: boolean;
@@ -38,11 +43,13 @@ export interface StateProps {
     modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
     navigation: TypedNavigation;
+    originalAuthorFeed: OriginalAuthorFeed | undefined;
 }
 
 export interface DispatchProps {
     onDeletePost: (post: Post) => void;
     onSharePost: (post: Post) => void;
+    onDownloadFeedPosts: (feed: Feed) => void;
 }
 
 type CardProps = StateProps & DispatchProps;
@@ -50,39 +57,44 @@ type CardProps = StateProps & DispatchProps;
 export const Card = (props: CardProps) => {
     return (
         <View
-            style={styles.container}
             testID={'YourFeed/Post' + props.post._id}
+            style={styles.containerPadding}
         >
-
-            <CardTop
-                post={props.post}
-                currentTimestamp={props.currentTimestamp}
-                author={props.author}
-                modelHelper={props.modelHelper}
-                navigation={props.navigation}
-                onSharePost={props.onSharePost}
-            />
-            <TouchableOpacity
-                activeOpacity={1}
-                onLongPress={() => props.togglePostSelection(props.post)}
-                onPress={() => openPost(props.post)}
-                style = {{
-                    backgroundColor: '#fff',
-                    padding: 0,
-                    paddingTop: 0,
-                    marginTop: 0,
-                }}
-            >
-                <DisplayImage
+            <View style={styles.container}>
+                <ActionsOverlay
                     post={props.post}
-                    showSquareImages={props.showSquareImages}
-                    modelHelper={props.modelHelper}
+                    author={props.author}
+                    isSelected={props.isSelected}
+                    onDeletePost={props.onDeletePost}
+                    onSharePost={props.onSharePost}
+                    togglePostSelection={props.togglePostSelection}
                 />
-                { props.post.text === '' ||
-                    <CardMarkdown text={props.post.text}/>
-                }
-                <ButtonList {...props}/>
-            </TouchableOpacity>
+
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() => openPost(props.post)}
+                >
+                    <CardTop
+                        post={props.post}
+                        currentTimestamp={props.currentTimestamp}
+                        author={props.author}
+                        modelHelper={props.modelHelper}
+                        navigation={props.navigation}
+                        originalAuthorFeed={props.originalAuthorFeed}
+                        onSharePost={props.onSharePost}
+                        togglePostSelection={props.togglePostSelection}
+                        onDownloadFeedPosts={props.onDownloadFeedPosts}
+                    />
+                    <DisplayImage
+                        post={props.post}
+                        showSquareImages={props.showSquareImages}
+                        modelHelper={props.modelHelper}
+                    />
+                    { props.post.text === '' ||
+                        <CardMarkdown text={props.post.text}/>
+                    }
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -121,9 +133,9 @@ const DisplayImage = (props: { post: Post, showSquareImages: boolean, modelHelpe
 
 export const MemoizedCard = React.memo(Card);
 
-const ActionIcon = (props: { name: string}) => {
-    const iconSize = 20;
-    return <Icon name={props.name} size={iconSize} color={Colors.DARK_GRAY} />;
+const ActionIcon = (props: { name: string, color: string, iconSize?: number }) => {
+    const iconSize = props.iconSize ||  20;
+    return <Icon name={props.name} size={iconSize} color={props.color}/>;
 };
 
 const isPostShareable = (post: Post, author: Author): boolean => {
@@ -146,48 +158,94 @@ const isPostShareable = (post: Post, author: Author): boolean => {
     return true;
 };
 
-const ShareButton = (props: {post: Post, onSharePost: (post: Post) => void, author: Author}) => {
+const ActionButton = (props: TouchableViewProps) => (
+    <TouchableView
+        style={styles.actionButton}
+        hitSlop={{
+            ...TouchableViewDefaultHitSlop,
+            right: 10,
+            left: 10,
+        }}
+        {...props}
+    >{props.children}</TouchableView>
+);
+
+const ShareButton = (props: { post: Post, onSharePost: () => void, author: Author }) => {
     const isShareable = isPostShareable(props.post, props.author);
     const shareIconName = isShareable ? 'share-outline' : 'share';
-    const onPress = isShareable ? () => props.onSharePost(props.post) : undefined;
+    const onPress = isShareable ? () => props.onSharePost() : undefined;
     return (
-        <TouchableView style={styles.share} onPress={onPress}>
+        <ActionButton onPress={onPress}>
         { props.post.isUploading === true
-            ? <ActivityIndicator color={Colors.DARK_GRAY} />
-            : <ActionIcon name={shareIconName}/>
+            ? <ActivityIndicator color={Colors.WHITE} />
+            : <ActionIcon name={shareIconName} color={Colors.WHITE}/>
         }
-        </TouchableView>
+        </ActionButton>
     );
 };
 
-const ButtonList = (props: CardProps) => {
-    const likeIconName = props.post.liked === true ? 'heart' : 'heart-outline';
-    if (props.isSelected) {
-        return (
-            <View
-                testID='CardButtonList'
-                style={styles.itemImageContainer}>
-                <TouchableView style={styles.like} onPress={() => props.post.liked = true}>
-                    <ActionIcon name={likeIconName}/>
-                </TouchableView>
-                <TouchableView style={styles.comment} onPress={() => alert('go comment!')}>
-                    <ActionIcon name='comment-multiple-outline'/>
-                </TouchableView>
-                <TouchableView style={styles.share} onPress={() => onDeleteConfirmation(props.post, props.onDeletePost)}>
-                    <ActionIcon name='trash-can-outline'/>
-                </TouchableView>
-                <TouchableView style={styles.share}>
-                    {/* <ActionIcon name='playlist-edit'/> */}
-                </TouchableView>
-                <ShareButton
-                    post={props.post}
-                    onSharePost={props.onSharePost}
-                    author={props.author}
-                />
-            </View>
-        );
+const isOwnPost = (post: Post, author: Author): boolean =>
+    post.author != null && post.author.identity != null && author.identity != null &&
+    post.author.identity.publicKey === author.identity.publicKey
+;
+
+const ActionsOverlay = (props: {
+    post: Post,
+    author: Author,
+    isSelected: boolean,
+    togglePostSelection: (post: Post) => void,
+    onDeletePost: (post: Post) => void,
+    onSharePost: (post: Post) => void,
+}) => {
+    const post = props.post;
+    if (!props.isSelected) {
+        return null;
     }
-    return <View/>;
+    return (
+        <TouchableWithoutFeedback
+            style={styles.overlay}
+            onPress={() => props.togglePostSelection(post)}
+        >
+            <View style={styles.overlay}>
+                <View style={styles.infoContainer}>
+                    {isOwnPost(props.post, props.author) &&
+                        <DeleteButton
+                            onPress={() => {
+                                onDeleteConfirmation(post, props.onDeletePost, props.togglePostSelection);
+                            }}
+                        />
+                    }
+                    <ShareButton
+                        post={post}
+                        onSharePost={() => {
+                            props.onSharePost(post);
+                            props.togglePostSelection(post);
+                        }}
+                        author={props.author}/>
+                    <TouchableView
+                        style={{
+                            paddingRight: 10,
+                        }}
+                        onPress={() => {
+                            props.togglePostSelection(props.post);
+                        }}>
+                        <ActionIcon name='dots-vertical' color={Colors.WHITE}/>
+                    </TouchableView>
+                </View>
+            </View>
+        </TouchableWithoutFeedback>
+
+    );
+};
+
+const DeleteButton = (props: { onPress: () => void }) => {
+    return (
+        <ActionButton
+            onPress={props.onPress}
+        >
+            <ActionIcon name='trash-can' color={Colors.WHITE} iconSize={24}/>
+        </ActionButton>
+    );
 };
 
 const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
@@ -202,23 +260,32 @@ const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
 };
 
 const CardTopOriginalAuthorText = (props: {
-    references: PostReferences | undefined,
     navigation: TypedNavigation,
+    originalAuthorFeed: OriginalAuthorFeed | undefined,
+    onDownloadFeedPosts: (feed: Feed) => void,
 }) => {
-    if (props.references == null || props.references.originalAuthor == null) {
+    if (props.originalAuthorFeed == null) {
         return null;
     } else {
-        const feedUrl = props.references.originalAuthor.uri;
-        const name = props.references.originalAuthor.name;
+        const originalAuthorFeed = props.originalAuthorFeed;
+        const onPress = props.originalAuthorFeed.isKnownFeed
+            ? () => props.navigation.navigate('Feed', {
+                feedUrl: originalAuthorFeed.feedUrl,
+                name: originalAuthorFeed.name,
+            })
+            : () => {
+                props.onDownloadFeedPosts(originalAuthorFeed);
+                props.navigation.navigate('NewsSourceFeed', {
+                    feed: originalAuthorFeed,
+                });
+            }
+        ;
         return (
             <TouchableView
                 style={{flexDirection: 'row'}}
-                onPress={() => props.navigation.navigate('Feed', {
-                    feedUrl,
-                    name,
-                })}
+                onPress={onPress}
             >
-                <RegularText style={styles.originalAuthor}> via {props.references.originalAuthor.name}</RegularText>
+                <RegularText style={styles.originalAuthor}> via {props.originalAuthorFeed.name}</RegularText>
             </TouchableView>
             );
     }
@@ -230,7 +297,10 @@ const CardTop = (props: {
     author: Author,
     modelHelper: ModelHelper,
     navigation: TypedNavigation,
+    originalAuthorFeed: OriginalAuthorFeed | undefined,
     onSharePost: (post: Post) => void,
+    togglePostSelection: (post: Post) => void,
+    onDownloadFeedPosts: (feed: Feed) => void,
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
@@ -255,12 +325,22 @@ const CardTop = (props: {
                 <View style={{flexDirection: 'row'}}>
                     <MediumText style={styles.username} numberOfLines={1}>{authorName}</MediumText>
                     <CardTopOriginalAuthorText
-                        references={props.post.references}
                         navigation={props.navigation}
+                        originalAuthorFeed={props.originalAuthorFeed}
+                        onDownloadFeedPosts={props.onDownloadFeedPosts}
                     />
                 </View>
-                <RegularText style={styles.location}>{printableTime}{hostnameText}</RegularText>
+                <RegularText numberOfLines={1} style={styles.location}>{printableTime}{hostnameText}</RegularText>
             </View>
+            <TouchableView
+                style={{
+                    paddingRight: 10,
+                }}
+                onPress={() => {
+                    props.togglePostSelection(props.post);
+                }}>
+                <ActionIcon name='dots-vertical' color={Colors.PINKISH_GRAY}/>
+            </TouchableView>
         </TouchableOpacity>
     );
 };
@@ -273,13 +353,26 @@ const openPost = async (post: Post) => {
     }
 };
 
-const onDeleteConfirmation = (post: Post, onDeletePost: (post: Post) => void) => {
+const onDeleteConfirmation = (
+    post: Post,
+    onDeletePost: (post: Post) => void,
+    togglePostSelection: (post: Post) => void,
+) => {
     Alert.alert(
         'Are you sure you want to delete?',
         undefined,
         [
-            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
-            { text: 'OK', onPress: async () => await onDeletePost(post) },
+            {
+                text: 'Cancel',
+                onPress: () => Debug.log('Cancel Pressed'), style: 'cancel',
+            },
+            {
+                text: 'OK',
+                onPress: async () => {
+                    await onDeletePost(post);
+                    togglePostSelection(post);
+                },
+            },
         ],
         { cancelable: false }
     );
@@ -295,23 +388,32 @@ const calculateCardImageDimensions = (image: ImageData, maxWidth: number, showSq
     return calculateImageDimensions(image, maxWidth);
 };
 
-const HeaderOffset = 20;
-const TranslucentBarHeight = Platform.OS === 'ios' ? HeaderOffset : 0;
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: Colors.WHITE,
         borderTopLeftRadius: 3,
         borderTopRightRadius: 3,
-        padding: 0,
-        paddingTop: 0,
-        paddingBottom: 0,
-        marginBottom: 12,
-        marginTop: 0,
+    },
+    containerPadding: {
+        paddingBottom: 12,
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 100,
+        backgroundColor: 'rgba(98, 0, 234, 0.5)',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
     },
     infoContainer : {
         flexDirection: 'row',
         height: 38,
         alignSelf: 'stretch',
+        alignItems: 'center',
         marginVertical: 14,
         marginLeft: 10,
     },
@@ -325,70 +427,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: Colors.DARK_GRAY,
     },
-    itemImageContainer: {
-        flexDirection: 'row',
-        height: 40,
-        alignSelf: 'stretch',
-        marginLeft: 5,
-        marginTop: 5,
-        justifyContent: 'space-evenly',
-    },
-    like: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-        marginLeft: 5,
-    },
-    comment: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-    },
-    share: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-    },
-    edit: {
-        marginHorizontal: 20,
-        marginVertical: 5,
-    },
-    likeCount: {
-        flexDirection: 'row',
+    actionButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        borderWidth: 1,
+        borderColor: Colors.WHITE,
+        backgroundColor: Colors.BRAND_PURPLE,
+        justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 2,
-    },
-    commentItem: {
-        fontSize: 10 ,
-        color: 'rgba(0, 0, 0, 0.5)',
-        marginTop: 5,
-    },
-    captionContainer: {
-        marginTop: 2 ,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    captionText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    dateText: {
-        fontSize: 8,
-        color: 'rgba(0, 0, 0, 0.5)',
-        marginTop: 5,
-    },
-    seperator: {
-        height: 1,
-        alignSelf: 'stretch',
         marginHorizontal: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    },
-    hashTag: {
-        fontStyle: 'italic',
-        color: 'blue',
-    },
-    footer: {
-        marginVertical: 5,
-        alignSelf: 'stretch',
-        marginHorizontal: 20,
-        flexDirection: 'column',
     },
     username: {
         fontSize: 14,
@@ -398,26 +446,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'normal',
         color: Colors.GRAY,
-    },
-    text: {
-        fontSize: 12,
-        color: Colors.DARK_GRAY,
-    },
-    likedContainer: {
-        backgroundColor: 'transparent',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    translucentBar: {
-        height: TranslucentBarHeight,
-        width: '100%',
-        position: 'absolute',
-        backgroundColor: '#e6e6e6ff',
-        opacity: 0.5,
-        top: 0,
-        left: 0,
-    },
-    refreshControl: {
     },
 });

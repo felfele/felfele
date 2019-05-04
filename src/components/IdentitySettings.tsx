@@ -4,7 +4,6 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    Text,
     Image,
     TouchableOpacity,
     Dimensions,
@@ -22,11 +21,11 @@ import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
@@ -93,7 +92,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                 label: <MaterialCommunityIcon
                                     name={'share'}
                                     size={20}
-                                    color={Colors.DARK_GRAY}
+                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
                                 onPress: async () => showShareDialog(props.ownFeed),
                             }
@@ -146,7 +145,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                 value={qrCodeValue}
                                 size={QRCodeWidth}
                                 color={Colors.DARK_GRAY}
-                                backgroundColor={Colors.BACKGROUND_COLOR}
+                                backgroundColor={ComponentColors.BACKGROUND_COLOR}
                             />
                         </View>
                     }
@@ -166,11 +165,11 @@ const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) 
 
 const styles = StyleSheet.create({
     safeAreaContainer: {
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
         flex: 1,
     },
     mainContainer: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
     },
     row: {

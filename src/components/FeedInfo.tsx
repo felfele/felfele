@@ -7,23 +7,23 @@ import {
     ActivityIndicator,
     Dimensions,
     Clipboard,
-    SafeAreaView,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import QRCodeScanner, { Event as ScanEvent } from 'react-native-qrcode-scanner';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import * as Swarm from '../swarm/Swarm';
 import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 const QRCodeHeight = QRCodeWidth;
@@ -110,7 +110,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
-        const icon = (name: string) => <Icon name={name} size={20} color={Colors.DARK_GRAY} />;
+        const icon = (name: string) => <Icon name={name} size={20} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
             label: icon(iconName),
             onPress,
@@ -126,7 +126,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         ;
 
         return (
-            <SafeAreaView style={styles.mainContainer}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
                     title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
                     rightButton1={rightButton1}
@@ -157,7 +157,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         : <this.NewItemView showQRCamera={this.state.showQRCamera} />
                     }
                 </View>
-            </SafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 
@@ -191,7 +191,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         value={qrCodeValue}
                         size={QRCodeWidth}
                         color={Colors.DARK_GRAY}
-                        backgroundColor={Colors.BACKGROUND_COLOR}
+                        backgroundColor={ComponentColors.BACKGROUND_COLOR}
                     />
                 </View>
             </View>
@@ -236,7 +236,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
     private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
         const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-        Debug.log('fetchFeedFromUrl: feed: ', feed);
+        Debug.log('FeedInfo.fetchRSSFeedFromUrl', {feed});
         return feed;
     }
 
@@ -288,19 +288,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 }
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        backgroundColor: Colors.WHITE,
-        flex: 1,
-        flexDirection: 'column',
-    },
     container: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
         flexDirection: 'column',
-    },
-    titleInfo: {
-        fontSize: 14,
-        color: '#8e8e93',
     },
     linkInput: {
         width: '100%',
@@ -313,21 +304,12 @@ const styles = StyleSheet.create({
         color: 'gray',
         fontSize: 16,
     },
-    deleteButtonContainer: {
-        backgroundColor: 'white',
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
     centerIcon: {
         width: '100%',
         justifyContent: 'center',
         flexDirection: 'column',
         height: 100,
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         paddingTop: 50,
     },
     qrCodeContainer: {

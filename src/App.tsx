@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, YellowBox } from 'react-native';
+import { Platform, YellowBox, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
@@ -20,10 +20,9 @@ import { PostEditorContainer } from './containers/PostEditorContainer';
 import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
-import { WelcomeContainer } from './containers/WelcomeContainer';
 import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
-import { Colors, defaultTextProps } from './styles';
+import { defaultTextProps, ComponentColors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
@@ -32,7 +31,7 @@ import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
 import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
-import { BugReportView } from './components/BugReportView';
+import { BugReportViewWithTabBar } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
 import { FeedSettingsContainer } from './ui/screens/feed-settings/FeedSettingsContainer';
 import { CategoriesContainer } from './ui/screens/explore/CategoriesContainer';
@@ -41,14 +40,21 @@ import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridCont
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
 import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
+import { initializeNotifications } from './helpers/notifications';
+import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
+import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
+// @ts-ignore
+import { BottomTabBar } from 'react-navigation-tabs';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
     'unknown call: "relay:check"',
 ]);
-Debug.setDebug(true);
+Debug.setDebugMode(true);
 Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
+initializeNotifications();
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
@@ -181,7 +187,7 @@ const settingsTabScenes: NavigationRouteConfigMap = {
     },
     BugReportView: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <BugReportView navigation={navigation} errorView={false}/>
+            <BugReportViewWithTabBar navigation={navigation} errorView={false}/>
         ),
     },
 };
@@ -226,15 +232,25 @@ const Root = createBottomTabNavigator(
             screen: PostEditorContainer,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'plus-box-outline'}
-                        size={24}
-                        color={Colors.BRAND_PURPLE}
-                    />
+                    <View style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: ComponentColors.TAB_ACTION_BUTTON_COLOR,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        <Icon
+                            name={'pencil'}
+                            size={24}
+                            color={ComponentColors.TAB_ACTION_BUTTON_ICON_COLOR}
+                        />
+                    </View>
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
                     navigation.navigate('Post', {});
                 },
+                tabBarTestID: 'TabBarPostButton',
             },
         },
         ProfileTab: {
@@ -270,8 +286,8 @@ const Root = createBottomTabNavigator(
             ?
                 {
                     showLabel: false,
-                    activeTintColor: 'gray',
-                    inactiveTintColor: 'lightgray',
+                    activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
+                    inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
                     style: {
                         opacity: 0.96,
                         position: 'absolute',
@@ -284,12 +300,13 @@ const Root = createBottomTabNavigator(
                 {
                     showLabel: false,
                     showIcon: true,
-                    activeTintColor: 'gray',
-                    inactiveTintColor: 'lightgray',
+                    activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
+                    inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
                     style: {
-                        opacity: 0.96,
+                        opacity: 1.0,
                     },
                 },
+        tabBarComponent: props => <HideWhenKeyboardShownComponent><BottomTabBar {...props}/></HideWhenKeyboardShownComponent>,
     },
 );
 
@@ -317,26 +334,29 @@ const AppNavigator = createStackNavigator(Scenes,
     },
 );
 
-const WelcomeNavigator = createStackNavigator({
+const OnboardingNavigator = createStackNavigator({
     Welcome: {
         screen: WelcomeContainer,
+    },
+    ProfileOnboarding: {
+        screen: ProfileContainer,
     },
 }, {
     mode: 'card',
     navigationOptions: {
         header: null,
     },
+    initialRouteName: 'Welcome',
 });
 
 const InitialNavigator = createSwitchNavigator({
     Loading: LoadingScreenContainer,
     App: AppNavigator,
-    Welcome: WelcomeNavigator,
+    Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
     backBehavior: 'initialRoute',
-}
-);
+});
 
 export default class App extends React.Component {
     public render() {

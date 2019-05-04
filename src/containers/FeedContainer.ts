@@ -28,7 +28,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
         : feedPosts
         ;
     return {
-        onBack: () => ownProps.navigation.goBack(null),
+        onBack: () => ownProps.navigation.popToTop(),
         navigation: ownProps.navigation,
         feedUrl,
         feedName,

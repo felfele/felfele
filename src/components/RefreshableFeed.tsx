@@ -3,19 +3,17 @@ import {
     View,
     FlatList,
     RefreshControl,
-    StyleSheet,
     LayoutAnimation,
-    SafeAreaView,
 } from 'react-native';
 import { Post } from '../models/Post';
-import { Colors } from '../styles';
-import { StatusBarView } from './StatusBarView';
+import { ComponentColors, Colors } from '../styles';
 import { Feed } from '../models/Feed';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -65,14 +63,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 
     public render() {
         return (
-            <SafeAreaView style={styles.container}>
-                <StatusBarView
-                    backgroundColor={Colors.WHITE}
-                    hidden={false}
-                    translucent={false}
-                    barStyle='dark-content'
-                    networkActivityIndicatorVisible={true}
-                />
+            <FragmentSafeAreaViewWithoutTabBar>
                 {this.props.children.navigationHeader}
                 {this.props.feeds.length === 0 && this.props.children.placeholder}
                 <FlatList
@@ -95,14 +86,16 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                             refreshing={this.state.isRefreshing}
                             onRefresh={() => this.onRefresh() }
                             progressViewOffset={HeaderOffset}
+                            tintColor={Colors.BRAND_PURPLE}
+                            colors={[Colors.BRAND_PURPLE]}
                         />
                     }
                     style={{
-                        backgroundColor: Colors.BACKGROUND_COLOR,
+                        backgroundColor: ComponentColors.BACKGROUND_COLOR,
                     }}
                     ref={value => this.flatList = value || undefined}
                 />
-            </SafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 
@@ -137,11 +130,3 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
 }
 
 const HeaderOffset = 20;
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        flex: 1,
-        backgroundColor: Colors.WHITE,
-    },
-});
