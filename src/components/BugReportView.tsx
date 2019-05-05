@@ -110,13 +110,17 @@ class BugReportView extends React.Component<Props, State> {
                             color={Colors.BLACK}
                         />
                     </View>
-                    {this.props.errorView &&
-                    <BoldText style={[styles.text, { fontSize: 18 }]}>
-                        Yikes!{'\n\n'}
-                        We are sorry, an error has occurred.{'\n'}
-                    </BoldText>
+                    {this.props.errorView
+                        ? <BoldText style={[styles.text, { fontSize: 18 }]}>
+                            An error has occured!{'\n'}
+                            We need to restart the app.
+                        </BoldText>
+                        :  <BoldText style={[styles.text, { fontSize: 18 }]}>
+                            Yikes!{'\n'}
+                            What happened?
+                        </BoldText>
                     }
-                    <RegularText style={[styles.text, { fontSize: 14 }]}>
+                    <RegularText style={[styles.text, { fontSize: 14 }]} textBreakStrategy='simple'>
                         As we never collect information automatically, it would be truly helpful if you could take a moment to let us know what happened.
                     </RegularText>
                     <SimpleTextInput
@@ -128,58 +132,62 @@ class BugReportView extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                     />
-                    <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
-                        By sending a bug report, you will share some of your information with us.
-                    </RegularText>
-                    {!this.props.errorView ?
-                    <WideButton
-                        style={{marginBottom: 0}}
-                        icon={!this.state.isSending ?
-                            <Icon
-                                name={'send'}
-                                size={24}
-                                color={Colors.BRAND_PURPLE}
-                            /> :
-                            <ActivityIndicator size='small' color='grey' />
-                        }
-                        onPress={this.onPressSend}
-                        label={'SEND BUG REPORT'}
-                    /> :
-                    <TwoButton
-                        leftButton={{
-                            icon:
-                                <Icon
-                                    name={'refresh'}
-                                    size={24}
-                                    color={Colors.BRAND_PURPLE}
-                                />
-                            ,
-                            label: 'RESTART',
-                            onPress: restartApp,
-                        }}
-                        rightButton={{
-                            icon: !this.state.isSending ?
-                                <Icon
-                                    name={'send'}
-                                    size={24}
-                                    color={Colors.BRAND_PURPLE}
-                                /> :
-                                <ActivityIndicator size='small' color='grey' />
-                            ,
-                            label: 'SEND BUG REPORT',
-                            onPress: this.onPressSend,
-                        }}
-                    />
+                    {!this.props.errorView
+                        ? <this.SendBugReportButton/>
+                        : <TwoButton
+                            leftButton={{
+                                icon:
+                                    <Icon
+                                        name={'refresh'}
+                                        size={24}
+                                        color={Colors.BRAND_PURPLE}
+                                    />
+                                ,
+                                label: 'RESTART',
+                                onPress: restartApp,
+                            }}
+                            rightButton={{
+                                icon: !this.state.isSending ?
+                                    <Icon
+                                        name={'send'}
+                                        size={24}
+                                        color={Colors.BRAND_PURPLE}
+                                    /> :
+                                    <ActivityIndicator size='small' color='grey' />
+                                ,
+                                label: 'SEND BUG REPORT',
+                                onPress: this.onPressSend,
+                            }}
+                        />
                     }
-                    <RegularText style={styles.label}>{'LOG INFO'}</RegularText>
+                    <RegularText style={[styles.text, { fontSize: 14, color: Colors.BRAND_PURPLE }]}>
+                        By sending a bug report, you will share some information (shown below) with us.
+                    </RegularText>
                     <View style={styles.logContainer}>
                         <Text style={styles.logText}>{this.getDeviceInfoAndLogs()}</Text>
                     </View>
+                    <this.SendBugReportButton/>
                     <TabBarPlaceholder/>
                 </ScrollView>
             </KeyboardAvoidingView>
         );
     }
+
+    private SendBugReportButton = () => (
+        <WideButton
+            style={{marginBottom: 20}}
+            icon={!this.state.isSending ?
+                <Icon
+                    name={'send'}
+                    size={24}
+                    color={Colors.BRAND_PURPLE}
+                /> :
+                <ActivityIndicator size='small' color='grey' />
+            }
+            onPress={this.onPressSend}
+            label={'SEND BUG REPORT'}
+        />
+    )
 
     private onChangeText = (feedbackText: string) => {
         this.setState({ feedbackText });
@@ -247,7 +255,6 @@ const styles = StyleSheet.create({
     },
     keyboardAvoidingContainer: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
-      //  paddingBottom: DefaultTabBarHeight,
         flex: 1,
     },
     contentContainer: {
@@ -260,7 +267,7 @@ const styles = StyleSheet.create({
     },
     text: {
         textAlign: 'center',
-        maxWidth: '80%',
+        paddingHorizontal: 10,
         paddingBottom: 10,
     },
     label: {
@@ -273,13 +280,14 @@ const styles = StyleSheet.create({
     },
     logContainer: {
         width: '100%',
-        marginBottom: 20,
+        marginVertical: 20,
         backgroundColor: Colors.MEDIUM_GRAY,
         paddingHorizontal: 10,
         paddingVertical: 12,
     },
     logText: {
         fontFamily: fontFamily,
+        fontSize: 14,
         color: Colors.DARK_GRAY,
         backgroundColor: Colors.MEDIUM_GRAY,
     },
@@ -294,5 +302,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         height: 190,
         width: '100%',
+        textAlignVertical: 'top',
     },
 });
