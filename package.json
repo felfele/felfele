@@ -32,7 +32,7 @@
     "react-native-svg-transformer": "=0.12.1",
     "react-native-typescript-transformer": "=1.2.10",
     "react-test-renderer": "16.6.1",
-    "typescript": "=3.0.3"
+    "typescript": "=3.4.3"
   },
   "scripts": {
     "start": "react-native start",
