@@ -4,7 +4,7 @@ import { Feed } from '../models/Feed';
 
 export const showShareFeedDialog = async (feed?: Feed) => {
     const url = feed != null ? feed.url : '';
-    const title = 'Share your feed';
+    const title = 'Share your channel';
     const message = Platform.OS === 'android' ? url : undefined;
     const content: ShareContent = {
         url,

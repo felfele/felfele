@@ -10,7 +10,7 @@ import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
 
 // @ts-ignore
 import SnorkelingIcon from '../../images/snorkeling.svg';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -25,8 +25,8 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-const PLACEHOLDER_TEXT_1 = "You don't have any favorite feed yet.";
-const PLACEHOLDER_TEXT_2 = 'Go to any feed and simply tap the star icon to add it to your favorites.';
+const PLACEHOLDER_TEXT_1 = "You don't have any favorite channel yet.";
+const PLACEHOLDER_TEXT_2 = 'Go to any channel and simply tap the star icon to add it to your favorites.';
 
 export const FavoritesFeedView = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);

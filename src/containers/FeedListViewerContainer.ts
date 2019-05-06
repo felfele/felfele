@@ -33,16 +33,16 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     ;
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
-        addSection('Your feeds', ownFeeds),
-        addSection('Feeds you follow', followedFeeds),
-        addSection('Other feeds', knownFeeds),
+        addSection('Your channels', ownFeeds),
+        addSection('Channels you follow', followedFeeds),
+        addSection('Other channels', knownFeeds),
     );
 
     return {
         sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'All feeds',
+        title: 'All channels',
         showExplore: navParamShowExplore,
     };
 };

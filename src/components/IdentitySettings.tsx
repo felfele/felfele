@@ -29,6 +29,7 @@ import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
+import { TwoButton } from '../ui/buttons/TwoButton';
 
 const defaultUserImage = defaultImages.userCircle;
 
@@ -127,11 +128,30 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             <QRCode
                                 value={qrCodeValue}
                                 size={QRCodeWidth}
-                                color={Colors.DARK_GRAY}
+                                color={Colors.BLACK}
                                 backgroundColor={ComponentColors.BACKGROUND_COLOR}
                             />
                         </View>
                     }
+                    <TwoButton
+                        leftButton={{
+                            label: 'Share',
+                            icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: async () => showShareFeedDialog(props.ownFeed),
+                        }}
+                        rightButton={{
+                            label: 'Add channel',
+                            icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: () => props.navigation.navigate('FeedInfo', {
+                                feed: {
+                                    name: '',
+                                    url: '',
+                                    feedUrl: '',
+                                    favicon: '',
+                                },
+                           }),
+                        }}
+                    />
                 </ScrollView>
                 <TabBarPlaceholder/>
             </KeyboardAvoidingView>

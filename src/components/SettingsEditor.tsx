@@ -31,7 +31,7 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const YOUR_FEEDS = 'YOUR FEEDS';
+const YOUR_FEEDS = 'YOUR CHANNELS';
 const PREFERENCES_LABEL = 'PREFERENCES';
 
 export const SettingsEditor = (props: Props) => {

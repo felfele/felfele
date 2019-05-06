@@ -140,9 +140,6 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     FeedSettings: {
         screen: FeedSettingsContainer,
     },
-    FeedInfo: {
-        screen: FeedInfoContainer,
-    },
 };
 
 const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
@@ -322,6 +319,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     Backup: {
         screen: BackupContainer,
+    },
+    FeedInfo: {
+        screen: FeedInfoContainer,
     },
 };
 

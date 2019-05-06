@@ -87,7 +87,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
         this.setState({
             loading: true,
-            activityText: 'Loading feed',
+            activityText: 'Loading channel...',
         });
 
         const url = feedUrl != null ? feedUrl : this.state.url;
@@ -128,7 +128,8 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         return (
             <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
-                    title={isExistingFeed ? this.props.feed.name : 'Add Feed'}
+                    title={isExistingFeed ? this.props.feed.name : 'Add channel'}
+                    leftButton={button('close', () => this.props.navigation.goBack(null))}
                     rightButton1={rightButton1}
                     navigation={this.props.navigation}
                 />
@@ -257,7 +258,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
-        Alert.alert('Are you sure you want to delete the feed?',
+        Alert.alert('Are you sure you want to delete the channel?',
             undefined,
             options,
             { cancelable: true },
@@ -269,7 +270,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
-        Alert.alert('Failed to load feed!',
+        Alert.alert('Failed to load channel!',
             undefined,
             options,
             { cancelable: true },
