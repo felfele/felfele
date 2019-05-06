@@ -4,13 +4,12 @@ import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { ComponentColors } from '../styles';
 import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import SplashScreen from 'react-native-splash-screen';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -45,7 +44,7 @@ export class AllFeedScreen extends React.Component<Props> {
                                     showExplore: true,
                                 }),
                                 label: <Icon
-                                    name={'menu'}
+                                    name={'apps'}
                                     size={24}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
@@ -59,8 +58,8 @@ export class AllFeedScreen extends React.Component<Props> {
                                          favicon: '',
                                      },
                                 }),
-                                label: <MaterialIcon
-                                    name='add-box'
+                                label: <Icon
+                                    name='account-plus'
                                     size={24}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
