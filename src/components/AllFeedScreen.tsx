@@ -59,8 +59,8 @@ export class AllFeedScreen extends React.Component<Props> {
                                          favicon: '',
                                      },
                                 }),
-                                label: <MaterialIcon
-                                    name='add-box'
+                                label: <Icon
+                                    name='account-plus'
                                     size={24}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
