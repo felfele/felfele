@@ -4,7 +4,7 @@ import { StateProps, DispatchProps, FeedView } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts, getYourPosts } from '../selectors/selectors';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const feedUrl = ownProps.navigation.getParam<'Feed', 'feedUrl'>('feedUrl');

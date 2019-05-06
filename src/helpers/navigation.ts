@@ -70,6 +70,6 @@ export interface TypedNavigation {
     navigate: <K extends keyof Routes>(routeKey: K, params: Routes[K]) => boolean;
     pop: (n?: number, params?: { immediate?: boolean }) => boolean;
     popToTop: () => void;
-    getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => K[P];
+    getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => Routes[K][P];
     setParams: <K extends keyof Routes>(newParams: Routes[K]) => boolean;
 }

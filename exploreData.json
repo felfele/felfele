@@ -65,6 +65,27 @@
                 "name": "Favorite Places – Outdoor Photographer",
                 "favicon": "https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico"
             }
+        ],
+        "architecture": [
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/architecture.rss",
+                "name": "Architecture",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/brutalism.rss",
+                "name": "Brutalism",
+                "favicon": "https://www.redditstatic.com/icon.png"
+            },
+            {
+                "url": "https://www.reddit.com/",
+                "feedUrl": "https://www.reddit.com/r/CityPorn.rss",
+                "name": "City Porn",
+                "favicon": "https://b.thumbs.redditmedia.com/4KKF9mkNZECNka_ExAeyJlec1Vg6iz__kfujrBSEbuU.png"
+            }
+
         ]
     },
     "computers": {
@@ -614,14 +635,6 @@
         ]
     },
     "money and business": {
-        "building and housing": [
-            {
-                "url": "https://www.reddit.com/",
-                "feedUrl": "https://www.reddit.com/r/architecture.rss",
-                "name": "Architecture",
-                "favicon": "https://www.redditstatic.com/icon.png"
-            }
-        ]
     },
     "people and society": {
         "family": [
