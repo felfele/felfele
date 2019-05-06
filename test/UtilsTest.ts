@@ -79,6 +79,14 @@ test('Test canonical url with path', () => {
     }
 });
 
+test('Test getLinkFromText with https link without trailing slash', () => {
+    const link = 'https://swarm-gateways.net';
+    const input = `Lorem ipsum ${link}`;
+    const result = urlUtils.getLinkFromText(input);
+
+    expect(result).toBe(link);
+});
+
 test('Test getLinkFromText with https link', () => {
     const link = 'https://swarm-gateways.net/';
     const input = `Lorem ipsum ${link}`;

@@ -76,7 +76,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.props.onAddFeed(feed);
     }
 
-    public async fetchFeed(onSuccess?: () => void, feedUrl?: string) {
+    public async fetchFeed(feedUrl?: string) {
         Debug.log('fetchFeed', 'this.state', this.state);
         if (this.state.loading === true) {
             return;
@@ -93,9 +93,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.setState({
                 loading: false,
             });
-            if (onSuccess != null) {
-                onSuccess();
-            }
             this.onAdd(feed);
             this.props.navigation.navigate('Feed', {
                 feedUrl: feed.feedUrl,
@@ -202,13 +199,14 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         if (!isExistingFeed) {
             const value = await Clipboard.getString();
+            console.log('tryToAddFeedFromClipboard', {value});
             const link = urlUtils.getLinkFromText(value);
             if (link != null) {
                 this.setState({
                     url: link,
                 });
-                const clearClipboard = () => Clipboard.setString('');
-                await this.fetchFeed(clearClipboard, link);
+                Clipboard.setString('');
+                await this.fetchFeed(link);
             }
         }
     }
@@ -280,7 +278,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.setState({
                 url: feedUrl,
             });
-            await this.fetchFeed(undefined, feedUrl);
+            await this.fetchFeed(feedUrl);
         } catch (e) {
             Debug.log(e);
         }
