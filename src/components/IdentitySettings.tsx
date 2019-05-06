@@ -7,10 +7,6 @@ import {
     Image,
     TouchableOpacity,
     Dimensions,
-    Share,
-    ShareContent,
-    ShareOptions,
-    Platform,
     ScrollView,
     SafeAreaView,
 } from 'react-native';
@@ -32,6 +28,7 @@ import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
+import { showShareFeedDialog } from '../helpers/shareDialogs';
 
 const defaultUserImage = defaultImages.userCircle;
 
@@ -63,20 +60,6 @@ const generateQRCodeValue = (feed?: Feed): string => {
     return feed.url;
 };
 
-const showShareDialog = async (feed?: Feed) => {
-    const url = feed != null ? feed.url : '';
-    const title = 'Share your feed';
-    const message = Platform.OS === 'android' ? url : undefined;
-    const content: ShareContent = {
-        url,
-        title,
-        message,
-    };
-    const options: ShareOptions = {
-    };
-    await Share.share(content, options);
-};
-
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
@@ -94,7 +77,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                     size={20}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
-                                onPress: async () => showShareDialog(props.ownFeed),
+                                onPress: async () => showShareFeedDialog(props.ownFeed),
                             }
                             : undefined
                     }
