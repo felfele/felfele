@@ -4,12 +4,12 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
         return [{
-            title: `${title} ${feeds.length}`,
+            title: `${title} (${feeds.length})`,
             data: feeds,
         }];
     }
@@ -33,8 +33,8 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     ;
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
-        addSection('Your channels', ownFeeds),
         addSection('Channels you follow', followedFeeds),
+        addSection('Your channels', ownFeeds),
         addSection('Other channels', knownFeeds),
     );
 

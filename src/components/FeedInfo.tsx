@@ -110,7 +110,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
-        const icon = (name: string) => <Icon name={name} size={20} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
+        const icon = (name: string, size: number = 20) => <Icon name={name} size={size} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
             label: icon(iconName),
             onPress,
@@ -129,7 +129,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
                     title={isExistingFeed ? this.props.feed.name : 'Add channel'}
-                    leftButton={button('close', () => this.props.navigation.goBack(null))}
+                    leftButton={{
+                        label: icon('close', 24),
+                        onPress: () => this.props.navigation.goBack(null),
+                    }}
                     rightButton1={rightButton1}
                     navigation={this.props.navigation}
                 />
