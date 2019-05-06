@@ -43,7 +43,7 @@ export const FavoritesFeedView = (props: Props) => {
                                 }
                             ),
                             label: <Icon
-                                name={'menu'}
+                                name={'apps'}
                                 size={24}
                                 color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
