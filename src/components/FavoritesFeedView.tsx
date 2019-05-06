@@ -10,7 +10,7 @@ import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
 
 // @ts-ignore
 import SnorkelingIcon from '../../images/snorkeling.svg';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -43,7 +43,7 @@ export const FavoritesFeedView = (props: Props) => {
                                 }
                             ),
                             label: <Icon
-                                name={'menu'}
+                                name={'apps'}
                                 size={24}
                                 color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
