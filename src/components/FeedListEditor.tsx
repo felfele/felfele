@@ -42,6 +42,8 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
         return (
             <SafeAreaView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
+                {
+                // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                 <SuperGridSectionList
                     style={{ flex: 1 }}
                     spacing={10}
@@ -72,6 +74,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     ListFooterComponent={<TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>}
                     ListHeaderComponent={this.props.headerComponent}
                 />
+                }
             </SafeAreaView>
         );
     }
