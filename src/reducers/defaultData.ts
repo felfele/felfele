@@ -12,7 +12,7 @@ export const defaultSettings: Settings = {
     swarmGatewayAddress: Swarm.defaultGateway,
 };
 
-export const DEFAULT_AUTHOR_NAME = 'Space Cowboy';
+export const DEFAULT_AUTHOR_NAME = '';
 
 export const defaultAuthor: Author = {
     name: DEFAULT_AUTHOR_NAME,
