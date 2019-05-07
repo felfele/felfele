@@ -7,10 +7,6 @@ import {
     Image,
     TouchableOpacity,
     Dimensions,
-    Share,
-    ShareContent,
-    ShareOptions,
-    Platform,
     ScrollView,
     SafeAreaView,
 } from 'react-native';
@@ -32,6 +28,8 @@ import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
+import { showShareFeedDialog } from '../helpers/shareDialogs';
+import { TwoButton } from '../ui/buttons/TwoButton';
 
 const defaultUserImage = defaultImages.userCircle;
 
@@ -63,20 +61,6 @@ const generateQRCodeValue = (feed?: Feed): string => {
     return feed.url;
 };
 
-const showShareDialog = async (feed?: Feed) => {
-    const url = feed != null ? feed.url : '';
-    const title = 'Share your feed';
-    const message = Platform.OS === 'android' ? url : undefined;
-    const content: ShareContent = {
-        url,
-        title,
-        message,
-    };
-    const options: ShareOptions = {
-    };
-    await Share.share(content, options);
-};
-
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
@@ -94,7 +78,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                     size={20}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
-                                onPress: async () => showShareDialog(props.ownFeed),
+                                onPress: async () => showShareFeedDialog(props.ownFeed),
                             }
                             : undefined
                     }
@@ -144,11 +128,30 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             <QRCode
                                 value={qrCodeValue}
                                 size={QRCodeWidth}
-                                color={Colors.DARK_GRAY}
+                                color={Colors.BLACK}
                                 backgroundColor={ComponentColors.BACKGROUND_COLOR}
                             />
                         </View>
                     }
+                    <TwoButton
+                        leftButton={{
+                            label: 'Share',
+                            icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: async () => showShareFeedDialog(props.ownFeed),
+                        }}
+                        rightButton={{
+                            label: 'Add channel',
+                            icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: () => props.navigation.navigate('FeedInfo', {
+                                feed: {
+                                    name: '',
+                                    url: '',
+                                    feedUrl: '',
+                                    favicon: '',
+                                },
+                           }),
+                        }}
+                    />
                 </ScrollView>
                 <TabBarPlaceholder/>
             </KeyboardAvoidingView>

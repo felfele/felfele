@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, Vibration } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -16,6 +16,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { TouchableView } from './TouchableView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -31,7 +32,7 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const YOUR_FEEDS = 'YOUR FEEDS';
+const YOUR_FEEDS = 'YOUR CHANNELS';
 const PREFERENCES_LABEL = 'PREFERENCES';
 
 export const SettingsEditor = (props: Props) => {
@@ -83,26 +84,18 @@ export const SettingsEditor = (props: Props) => {
                     buttonStyle='switch'
                 />
                 <RowItem
-                    title='Show square images'
-                    switchState={props.settings.showSquareImages}
-                    onSwitchValueChange={props.onShowSquareImagesValueChange}
-                    buttonStyle='switch'
-                />
-                <RowItem
-                    title='Filters'
-                    buttonStyle='navigate'
-                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
-                />
-                <RowItem
                     title='Send bug report'
                     buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('BugReportView', {})}
-                    />
-                <RowItem
-                    title={version}
-                    buttonStyle='none'
-                    onLongPress={() => props.onShowDebugMenuValueChange(!props.settings.showDebugMenu)}
                 />
+                <TouchableView
+                    onLongPress={() => {
+                        Vibration.vibrate(500, false);
+                        props.onShowDebugMenuValueChange(!props.settings.showDebugMenu);
+                    }}
+                >
+                    <RegularText style={styles.versionLabel}>{version}</RegularText>
+                </TouchableView>
                 { props.settings.showDebugMenu &&
                 <RowItem
                     icon={
@@ -125,5 +118,12 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 7,
         color: Colors.GRAY,
+    },
+    versionLabel: {
+        color: ComponentColors.HINT_TEXT_COLOR,
+        paddingTop: 25,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        fontSize: 14,
     },
 });

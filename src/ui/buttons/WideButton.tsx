@@ -9,6 +9,7 @@ import {
     ViewStyle,
 } from 'react-native';
 import { Colors } from '../../styles';
+import { MediumText } from '../misc/text';
 
 interface Props {
     label?: string;
@@ -23,7 +24,7 @@ export const WideButton = (props: Props) => {
             <View style={[styles.mainContainer, props.style]}>
                 <View style={styles.container}>
                     <View style={styles.icon}>{props.icon}</View>
-                    <Text style={styles.label}>{props.label}</Text>
+                    <MediumText style={styles.label}>{props.label}</MediumText>
                 </View>
             </View>
         </TouchableWithoutFeedback>

@@ -7,6 +7,7 @@ export const MONTH28 = 28 * DAY;
 export const MONTH29 = 29 * DAY;
 export const MONTH30 = 30 * DAY;
 export const MONTH31 = 31 * DAY;
+export const YEAR = 365 * DAY;
 
 export class DateUtils {
     public static parseDateString(dateString: string): number {

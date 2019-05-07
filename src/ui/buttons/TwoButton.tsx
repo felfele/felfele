@@ -4,11 +4,11 @@ import {
     TouchableWithoutFeedback,
     StyleSheet,
     View,
-    Text,
     StyleProp,
     ViewStyle,
 } from 'react-native';
 import { Colors } from '../../styles';
+import { MediumText } from '../misc/text';
 
 interface Props {
     leftButton: ButtonProps;
@@ -37,7 +37,7 @@ const Button = (props: ButtonProps) => {
             <View style={[styles.mainContainer, props.style]}>
                 <View style={styles.container}>
                     <View style={styles.icon}>{props.icon}</View>
-                    <Text style={styles.label}>{props.label}</Text>
+                    <MediumText style={styles.label}>{props.label}</MediumText>
                 </View>
             </View>
         </TouchableWithoutFeedback>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     label: {
-        fontSize: 12,
+        fontSize: 14,
         color: Colors.BRAND_PURPLE,
     },
     icon: {

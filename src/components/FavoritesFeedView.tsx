@@ -25,8 +25,8 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-const PLACEHOLDER_TEXT_1 = "You don't have any favorite feed yet.";
-const PLACEHOLDER_TEXT_2 = 'Go to any feed and simply tap the star icon to add it to your favorites.';
+const PLACEHOLDER_TEXT_1 = "You don't have favorite channels.";
+const PLACEHOLDER_TEXT_2 = 'Go to a channel and simply tap the star icon on the top-right corner to add it here.';
 
 export const FavoritesFeedView = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
@@ -52,10 +52,10 @@ export const FavoritesFeedView = (props: Props) => {
                 placeholder: <PlaceholderCard
                                  boldText={PLACEHOLDER_TEXT_1}
                                  regularText={PLACEHOLDER_TEXT_2}
-                                 image={<SnorkelingIcon
-                                            width={29}
-                                            height={29}
-                                            fill={Colors.BRAND_PURPLE}
+                                 image={<Icon
+                                            name='star-outline'
+                                            size={48}
+                                            color={Colors.BLACK}
                                 />}
                              />,
             }}
