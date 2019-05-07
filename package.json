@@ -1,6 +1,6 @@
 {
   "name": "Felfele",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "@microsoft/tsdoc": "=0.12.5",
@@ -52,7 +52,8 @@
     "build:ios": "scripts/build_xcode_archive.sh build CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=\"NO\" CODE_SIGN_ENTITLEMENTS=\"\" CODE_SIGNING_ALLOWED=\"NO\"",
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "e2e:build:ios": "detox build",
-    "e2e:ios": "detox test -c ios.sim.debug --cleanup"
+    "e2e:ios": "detox test -c ios.sim.debug --cleanup",
+    "postversion": "react-native-version --never-amend"
   },
   "dependencies": {
     "base64-arraybuffer": "=0.1.5",

@@ -1,3 +1,13 @@
+## v1.0.0 (2019-05-07) Alpha release
+
+This release adds the following new features and fixes:
+
+- Feature: Improved onboarding (https://github.com/felfele/felfele/pull/322)
+- Feature: Better news recommendation (https://github.com/felfele/felfele/pull/334)
+- Feature: Automatically fetch feeds on app start (https://github.com/felfele/felfele/pull/331)
+- Feature: Updated icons and action button placement (https://github.com/felfele/felfele/pull/341)
+- Many small bugfixes and style changes
+
 ## v0.9.33 (2019-04-12)
 
 This release adds the following new features and fixes:
