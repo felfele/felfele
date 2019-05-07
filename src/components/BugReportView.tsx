@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     logContainer: {
         width: '100%',
         marginVertical: 20,
-        backgroundColor: Colors.MEDIUM_GRAY,
+        backgroundColor: Colors.LIGHTER_GRAY,
         paddingHorizontal: 10,
         paddingVertical: 12,
     },
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
         fontFamily: fontFamily,
         fontSize: 14,
         color: Colors.DARK_GRAY,
-        backgroundColor: Colors.MEDIUM_GRAY,
+        backgroundColor: Colors.LIGHTER_GRAY,
     },
     restartButton: {
         paddingTop: 50,

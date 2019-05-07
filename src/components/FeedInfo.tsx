@@ -16,7 +16,7 @@ import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { ComponentColors, Colors } from '../styles';
+import { ComponentColors, Colors, defaultMediumFont } from '../styles';
 import * as Swarm from '../swarm/Swarm';
 import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
@@ -24,10 +24,13 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { WideButton } from '../ui/buttons/WideButton';
+import { RegularText } from '../ui/misc/text';
+import { showShareFeedDialog } from '../helpers/shareDialogs';
 
-const QRCodeWidth = Dimensions.get('window').width * 0.6;
+const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
-const QRCameraWidth = Dimensions.get('window').width * 0.6;
+const QRCameraWidth = Dimensions.get('window').width;
 const QRCameraHeight = QRCameraWidth;
 
 interface FeedInfoState {
@@ -76,7 +79,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.props.onAddFeed(feed);
     }
 
-    public async fetchFeed(onSuccess?: () => void, feedUrl?: string) {
+    public async fetchFeed(feedUrl?: string) {
         Debug.log('fetchFeed', 'this.state', this.state);
         if (this.state.loading === true) {
             return;
@@ -84,7 +87,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
         this.setState({
             loading: true,
-            activityText: 'Loading feed',
+            activityText: 'Loading channel...',
         });
 
         const url = feedUrl != null ? feedUrl : this.state.url;
@@ -93,9 +96,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.setState({
                 loading: false,
             });
-            if (onSuccess != null) {
-                onSuccess();
-            }
             this.onAdd(feed);
             this.props.navigation.navigate('Feed', {
                 feedUrl: feed.feedUrl,
@@ -110,7 +110,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
-        const icon = (name: string) => <Icon name={name} size={20} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
+        const icon = (name: string, size: number = 20) => <Icon name={name} size={size} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
             label: icon(iconName),
             onPress,
@@ -118,17 +118,21 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
         const rightButton1 = isExistingFeed
             ? isFollowed
-                ? button('link-variant-off', this.onUnfollowFeed)
+                ? button('link-off', this.onUnfollowFeed)
                 : this.props.isKnownFeed
                     ? button('delete', this.onDelete)
                     : undefined
-            : button('download', async () => await this.fetchFeed())
+            : undefined
         ;
 
         return (
             <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
-                    title={isExistingFeed ? 'Feed Info' : 'Add Feed'}
+                    title={isExistingFeed ? this.props.feed.name : 'Add channel'}
+                    leftButton={{
+                        label: icon('close', 24),
+                        onPress: () => this.props.navigation.goBack(null),
+                    }}
                     rightButton1={rightButton1}
                     navigation={this.props.navigation}
                 />
@@ -137,9 +141,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         defaultValue={this.state.url}
                         style={styles.linkInput}
                         onChangeText={(text) => this.setState({ url: text })}
-                        placeholder='Link of the feed'
+                        placeholder='Scan QR code or paste link here'
+                        placeholderTextColor={Colors.MEDIUM_GRAY}
                         autoCapitalize='none'
-                        autoFocus={true}
+                        autoFocus={false}
                         autoCorrect={false}
                         editable={!isExistingFeed}
                         returnKeyType='done'
@@ -174,7 +179,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                             cameraProps={{ratio: '1:1'}}
                         />
                     </View>
-                    <Text style={styles.qrCameraText}>You can scan a QR code too</Text>
                 </View>
             );
         } else {
@@ -190,10 +194,17 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     <QRCode
                         value={qrCodeValue}
                         size={QRCodeWidth}
-                        color={Colors.DARK_GRAY}
+                        color={Colors.BLACK}
                         backgroundColor={ComponentColors.BACKGROUND_COLOR}
                     />
                 </View>
+                <RegularText style={styles.qrCodeText}>Show this QR code or use the link</RegularText>
+                <WideButton
+                    label='SHARE'
+                    icon={<Icon name='share' size={24} color={Colors.BRAND_PURPLE} />}
+                    style={{marginTop: 20}}
+                    onPress={async () => showShareFeedDialog(this.props.feed)}
+                />
             </View>
         );
     }
@@ -207,8 +218,8 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 this.setState({
                     url: link,
                 });
-                const clearClipboard = () => Clipboard.setString('');
-                await this.fetchFeed(clearClipboard, link);
+                Clipboard.setString('');
+                await this.fetchFeed(link);
             }
         }
     }
@@ -250,7 +261,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
-        Alert.alert('Are you sure you want to delete the feed?',
+        Alert.alert('Are you sure you want to delete the channel?',
             undefined,
             options,
             { cancelable: true },
@@ -262,7 +273,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
-        Alert.alert('Failed to load feed!',
+        Alert.alert('Failed to load channel!',
             undefined,
             options,
             { cancelable: true },
@@ -280,7 +291,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.setState({
                 url: feedUrl,
             });
-            await this.fetchFeed(undefined, feedUrl);
+            await this.fetchFeed(feedUrl);
         } catch (e) {
             Debug.log(e);
         }
@@ -296,13 +307,12 @@ const styles = StyleSheet.create({
     linkInput: {
         width: '100%',
         backgroundColor: 'white',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 1,
-        borderTopColor: 'lightgray',
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        color: 'gray',
-        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 14,
+        color: Colors.DARK_GRAY,
+        fontSize: 14,
+        fontFamily: defaultMediumFont,
+        marginTop: 10,
     },
     centerIcon: {
         width: '100%',
@@ -318,6 +328,12 @@ const styles = StyleSheet.create({
         height: QRCodeHeight,
         padding: 0,
         alignSelf: 'center',
+    },
+    qrCodeText: {
+        fontSize: 14,
+        color: Colors.GRAY,
+        marginTop: 20,
+        marginLeft: 10,
     },
     qrCameraContainer: {
         width: QRCameraWidth,

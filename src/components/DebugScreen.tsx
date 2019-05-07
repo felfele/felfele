@@ -102,7 +102,7 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Backup & Restore'
                     onPress={() => props.navigation.navigate('BackupRestore', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                 />
                 <RowItem
                     icon={
@@ -110,26 +110,15 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Swarm settings'
                     onPress={async () => props.navigation.navigate('SwarmSettingsContainer', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-notifications' />
+                        <MaterialCommunityIcon name='filter-outline' />
                     }
-                    title='Send notification'
-                    onPress={() => localNotification('hello')}
-                    buttonStyle='none'
-                />
-                <RowItem
-                    icon={
-                        <IonIcon name='md-notifications' />
-                    }
-                    title='Send scheduled notification'
-                    onPress={() => {
-                        localScheduledNotification('hello', 15 * SECOND);
-                        Alert.alert('Notification set in 15 seconds!');
-                    }}
-                    buttonStyle='none'
+                    title='Mute keywords and phrases'
+                    buttonStyle='navigate'
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
                 />
                 <RowItem
                     icon={
@@ -137,7 +126,7 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='View logs'
                     onPress={() => props.navigation.navigate('LogViewer', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                 />
             </ScrollView>
         </View>

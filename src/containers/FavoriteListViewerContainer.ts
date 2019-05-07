@@ -16,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'Favorite feeds',
+        title: 'Favorite channels',
         showExplore: false,
     };
 };

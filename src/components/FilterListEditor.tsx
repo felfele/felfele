@@ -22,7 +22,7 @@ export class FilterListEditor extends React.Component<StateProps & DispatchProps
         return (
             <SafeAreaView style={styles.container}>
                 <NavigationHeader
-                    title='Filters'
+                    title='Mute keywords'
                     navigation={this.props.navigation}
                     rightButton1={{
                         onPress: this.onAddFilter,
