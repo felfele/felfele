@@ -1,4 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const IconSize = {
     LARGE_LIST_ICON: 40,
@@ -11,6 +11,7 @@ export const Colors = {
     WHITE: '#FFFFFF',
     LIGHTISH_GRAY: '#9B9B9B',
     PINKISH_GRAY: '#BBBBBB',
+    BROWNISH_GRAY: '#696969',
     LIGHT_GRAY: '#DDDDDD',
     LIGHTER_GRAY: '#E6E6E6',
     VERY_LIGHT_GRAY: '#F8F8F8',
@@ -24,6 +25,7 @@ export const Colors = {
 export const ComponentColors = {
     STRONG_TEXT: '#303030',
     TEXT_COLOR: Colors.GRAY,
+    HINT_TEXT_COLOR: Colors.BROWNISH_GRAY,
     BACKGROUND_COLOR: Colors.LIGHT_GRAY,
     DISABLED_BUTTON_COLOR: Colors.LIGHT_GRAY,
     BUTTON_COLOR: Colors.DARK_GRAY,
