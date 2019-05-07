@@ -175,12 +175,15 @@ const ShareButton = (props: { post: Post, onSharePost: () => void, author: Autho
     const shareIconName = isShareable ? 'share-outline' : 'share';
     const onPress = isShareable ? () => props.onSharePost() : undefined;
     return (
-        <ActionButton onPress={onPress}>
-        { props.post.isUploading === true
-            ? <ActivityIndicator color={Colors.WHITE} />
-            : <ActionIcon name={shareIconName} color={Colors.WHITE}/>
-        }
-        </ActionButton>
+        isShareable
+        ?
+            <ActionButton onPress={onPress}>
+            { props.post.isUploading === true
+                ? <ActivityIndicator color={Colors.WHITE} />
+                : <ActionIcon name={shareIconName} color={Colors.WHITE}/>
+            }
+            </ActionButton>
+        : null
     );
 };
 
@@ -243,7 +246,7 @@ const DeleteButton = (props: { onPress: () => void }) => {
         <ActionButton
             onPress={props.onPress}
         >
-            <ActionIcon name='trash-can' color={Colors.WHITE} iconSize={24}/>
+            <ActionIcon name='delete' color={Colors.WHITE} iconSize={22}/>
         </ActionButton>
     );
 };

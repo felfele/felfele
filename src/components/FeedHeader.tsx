@@ -69,7 +69,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={styles.cameraIconContainer}
                 >
                     <Icon
-                        name='camera-alt'
+                        name='photo-camera'
                         size={30}
                         color={Colors.BRAND_PURPLE}
                     />

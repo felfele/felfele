@@ -92,7 +92,7 @@ export const ProfileScreen = (props: Props) => {
                 <SimpleTextInput
                     style={styles.textInput}
                     defaultValue={props.author.name}
-                    placeholder={'Your name'}
+                    placeholder={'Type your name here'}
                     placeholderTextColor={Colors.GRAY}
                     autoCapitalize='none'
                     autoFocus={false}
