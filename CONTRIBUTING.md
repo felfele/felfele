@@ -18,7 +18,7 @@ Our [slack](https://join.slack.com/t/felfele/shared_invite/enQtNTM1MjUwNTI1NzI5L
 
 ### Meetings
 
-We have an open call every Monday, 10 am (CEST) 
+We have an open call every Monday, 11 am (CEST) 
 Link: https://zoom.us/j/2597260543
 
 ## Development
