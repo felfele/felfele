@@ -15,7 +15,7 @@ cp -f $android_release_dir/$unsigned_apk_name $android_release_dir/$debug_signed
 jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore android/debug.keystore -storepass android -keypass android $android_release_dir/$debug_signed_apk_name androiddebugkey
 
 cp -f $android_release_dir/$unsigned_apk_name $android_release_dir/$signed_apk_name
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore android/app/felfele.keystore -storepass $FELFELE_KEYSTORE_STOREPASS -keypass $FELFELE_KEYSTORE_KEYPASS $android_release_dir/$signed_apk_name upload
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore android/felfele.keystore -storepass $FELFELE_KEYSTORE_STOREPASS -keypass $FELFELE_KEYSTORE_KEYPASS $android_release_dir/$signed_apk_name upload
 
 $ANDROID_HOME/build-tools/28.0.3/zipalign -f -v 4 $android_release_dir/$signed_apk_name $android_release_dir/$target_apk_name
 
