@@ -96,11 +96,11 @@ android {
     buildToolsVersion "27.0.3"
 
     defaultConfig {
-        applicationId "com.postmodern"
+        applicationId "org.felfele.mobile"
         minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 26
+        versionCode 3
+        versionName "1.0.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

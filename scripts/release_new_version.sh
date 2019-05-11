@@ -16,8 +16,8 @@ ask "Write an update to CHANGELOG.md with the changes since last release"
 echo "Running checks locally..."
 npm run check
 
-echo "Bumping the build number..."
-./scripts/bump_build_number.sh
+echo "Increasing the version number..."
+./scripts/increase_version_number.sh
 
 echo "Determining the version number..."
 version="$(./scripts/cli.sh version)"
@@ -37,10 +37,12 @@ ask "Upload the build to the App Store"
 ask "In AppstoreConnect provide the crypto information to enable the new build"
 
 echo "Building the android release version signed with debug key..."
-./scripts/build_signed_android_release.sh
+./scripts/build_android_signed_release.sh
 
 echo "Uploading the android version to https://app.felfele.com..."
 ./scripts/upload_android_release.sh "$version"
+
+ask "Upload the build to the Play Store"
 
 ask "Download the released versions and do manual QA (both android and iOS)"
 

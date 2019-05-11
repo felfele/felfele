@@ -303,7 +303,7 @@ class _RSSPostManager {
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
                 author: {
-                    name: 'Postmodern',
+                    name: 'Felfele',
                     uri: '',
                     image: {
                     },
