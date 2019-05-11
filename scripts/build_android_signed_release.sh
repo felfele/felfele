@@ -20,6 +20,15 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore android/app/fel
 $ANDROID_HOME/build-tools/28.0.3/zipalign -f -v 4 $android_release_dir/$signed_apk_name $android_release_dir/$target_apk_name
 
 echo
-echo "Now you can upload the apk to the device with the following command:"
+echo "You can upload this file to the Play Store:"
+echo
+echo " $android_release_dir/$target_apk_name"
+echo
+echo "You can upload this file to the website for direct download:"
+echo
+echo " $android_release_dir/$debug_signed_apk_name"
+echo
+echo "You can upload the apk to the device with the following command:"
 echo
 echo " adb -d push $android_release_dir/$debug_signed_apk_name /storage/self/primary/Download"
+echo
