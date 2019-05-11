@@ -37,7 +37,7 @@ ask "Upload the build to the App Store"
 ask "In AppstoreConnect provide the crypto information to enable the new build"
 
 echo "Building the android release version signed with debug key..."
-./scripts/build_signed_android_release.sh
+./scripts/build_android_signed_release.sh
 
 echo "Uploading the android version to https://app.felfele.com..."
 ./scripts/upload_android_release.sh "$version"
