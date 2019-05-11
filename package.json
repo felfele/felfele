@@ -1,5 +1,5 @@
 {
-  "name": "Felfele",
+  "name": "felfele",
   "version": "1.0.1",
   "private": true,
   "devDependencies": {
@@ -44,7 +44,7 @@
     "watchTest": "node node_modules/jest/bin/jest.js --watch",
     "check": "npm run tsc && npm run lint && npm run test",
     "extended-check": "npm run tsc && npm run lint && npm run test && cd android && ./gradlew assembleRelease",
-    "tsc": "tsc --skipLibCheck",
+    "tsc": "tsc",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
@@ -53,7 +53,7 @@
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "e2e:build:ios": "detox build",
     "e2e:ios": "detox test -c ios.sim.debug --cleanup",
-    "postversion": "react-native-version --never-amend"
+    "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
   },
   "dependencies": {
     "base64-arraybuffer": "=0.1.5",

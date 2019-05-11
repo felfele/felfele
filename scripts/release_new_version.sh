@@ -16,8 +16,8 @@ ask "Write an update to CHANGELOG.md with the changes since last release"
 echo "Running checks locally..."
 npm run check
 
-echo "Bumping the build number..."
-./scripts/bump_build_number.sh
+echo "Increasing the version number..."
+./scripts/increase_version_number.sh
 
 echo "Determining the version number..."
 version="$(./scripts/cli.sh version)"
