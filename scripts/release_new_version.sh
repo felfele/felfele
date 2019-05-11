@@ -42,6 +42,8 @@ echo "Building the android release version signed with debug key..."
 echo "Uploading the android version to https://app.felfele.com..."
 ./scripts/upload_android_release.sh "$version"
 
+ask "Upload the build to the Play Store"
+
 ask "Download the released versions and do manual QA (both android and iOS)"
 
 echo "Tagging the git release with v$version..."
