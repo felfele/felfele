@@ -6,5 +6,6 @@ export const defaultImages = {
     iconWhiteTransparent: require('../images/icon-white-transparent.png'),
     link: require('../images/link.svg'),
     snorkeling: require('../images/snorkeling.svg'),
-    userCircle: require('../images/assets/user_circle.png'),
+    defaultUser: require('../images/assets/defaultuser.png'),
+    felfeleAssistant: require('../images/felfele-assistant.png'),
 };

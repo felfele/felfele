@@ -5,7 +5,7 @@ import { defaultImages } from '../../defaultImages';
 
 export const Avatar = React.memo((props: { imageUri: string, style?: ImageStyle, size: 'medium' | 'large' }) => {
     const imageSource = props.imageUri === ''
-        ? defaultImages.userCircle
+        ? defaultImages.defaultUser
         : { uri: props.imageUri };
     const defaultStyle = props.size === 'large' ? DefaultStyle.faviconLarge : DefaultStyle.faviconMedium;
     return (

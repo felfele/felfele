@@ -38,7 +38,7 @@ export const FeedSettingsScreen = (props: Props) => {
     const sourceImageUri = modelHelper.getImageUri(props.feed.authorImage);
     const source = sourceImageUri !== ''
         ? { uri: sourceImageUri }
-        : defaultImages.userCircle
+        : defaultImages.defaultUser
     ;
     return (
         <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>

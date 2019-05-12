@@ -62,7 +62,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(item)}
                                 size={itemDimension}
-                                defaultImage={defaultImages.userCircle}
+                                defaultImage={defaultImages.defaultUser}
                                 modelHelper={modelHelper}
                             />
                         );

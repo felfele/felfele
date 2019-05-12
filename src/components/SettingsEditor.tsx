@@ -61,7 +61,7 @@ export const SettingsEditor = (props: Props) => {
                                     imageUri={modelHelper.getImageUri(item.authorImage)}
                                     onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
                                     size={itemDimension}
-                                    defaultImage={defaultImages.userCircle}
+                                    defaultImage={defaultImages.defaultUser}
                                     modelHelper={modelHelper}
                                 />
                         );
