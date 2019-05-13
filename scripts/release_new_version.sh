@@ -17,10 +17,11 @@ function output {
     echo -e "$color-> $1$reset_color"
 }
 
-ask "Write an update to CHANGELOG.md with the changes since last release"
-
 output "Running checks locally..."
+(git_output=$(git status --porcelain) && [ -z "$git_output" ]) || (echo "Has uncommitted changes, exiting..." && exit 1)
 npm run check
+
+ask "Write an update to CHANGELOG.md with the changes since last release"
 
 output "Increasing the version number..."
 ./scripts/increase_version_number.sh
@@ -35,7 +36,7 @@ output "Commit and push changes to the repo"
 commit_message="Bumped version to $version"
 git commit -am "$commit_message" && git push origin "$release_branch"
 
-ask "Check if the CI is green"
+ask "Make a PR with release branch, check if the CI is green"
 
 output "Build the iOS version with XCode for archive..."
 #./scripts/build_xcode_archive.sh
