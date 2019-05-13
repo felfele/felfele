@@ -4,9 +4,7 @@
 
 release_branch=$1
 
-git stash
 git checkout release
 git merge $release_branch
 git push origin release
 git co $release_branch
-git stash pop
