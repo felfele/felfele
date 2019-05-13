@@ -18,7 +18,7 @@ function output {
 }
 
 output "Running checks locally..."
-(git_output=$(git status --porcelain) && [ -z "$git_output" ]) || (echo "Has uncommitted changes, exiting..." && exit 1)
+(git_output=$(git status --untracked-files=no --porcelain) && [ -z "$git_output" ]) || (echo "Has uncommitted changes, exiting..." && exit 1)
 npm run check
 
 ask "Write an update to CHANGELOG.md with the changes since last release"
