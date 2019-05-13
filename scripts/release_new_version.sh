@@ -12,9 +12,9 @@ function ask {
 }
 
 function output {
-    color="\033[0;32m"
+    color="\033[0;92m"
     reset_color="\033[0m"
-    echo "$color->$1$reset_color"
+    echo -e "$color-> $1$reset_color"
 }
 
 ask "Write an update to CHANGELOG.md with the changes since last release"
