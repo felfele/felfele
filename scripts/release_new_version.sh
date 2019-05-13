@@ -23,9 +23,11 @@ echo "Determining the version number..."
 version="$(./scripts/cli.sh version)"
 echo "Version: $version"
 
+release_branch="release-$version"
+git checkout -b $release_branch
 echo "Commit and push changes to the repo"
 commit_message="Bumped version to $version"
-ask "TODO: git commit -am \"$commit_message\" && git push"
+git commit -am "$commit_message" && git push origin "$release_branch"
 
 ask "Check if the CI is green"
 
@@ -47,10 +49,12 @@ ask "Upload the build to the Play Store"
 ask "Download the released versions and do manual QA (both android and iOS)"
 
 echo "Tagging the git release with v$version..."
-ask "TODO: ./scripts/git_tag_release.sh $version"
+./scripts/git_tag_release.sh "$version"
 
 echo "Updating the git release branch with to the master..."
-ask "TODO: ./scripts/git_update_release_branch.sh"
+ask "TODO: ./scripts/git_update_release_branch.sh $release_branch"
+
+ask "Merge the release branch to master on Github"
 
 ask "Announce the release on Slack in the #releases channel"
 echo "Release of version $version was successful!"
