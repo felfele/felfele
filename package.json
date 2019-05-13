@@ -71,7 +71,6 @@
     "react-native-communications": "=2.2.1",
     "react-native-crypto": "=2.1.2",
     "react-native-device-info": "=0.29.1",
-    "react-native-easy-markdown": "=1.2.0",
     "react-native-fs": "=2.12.1",
     "react-native-get-real-path": "git+https://github.com/Wraptime/react-native-get-real-path.git",
     "react-native-global-props": "=1.1.5",
