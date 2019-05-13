@@ -1,6 +1,6 @@
 {
   "name": "felfele",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "devDependencies": {
     "@microsoft/tsdoc": "=0.12.5",

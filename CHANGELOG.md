@@ -1,4 +1,4 @@
-## v1.0.0 (2019-05-07) Alpha release
+## v1.0.2 (2019-05-13) Alpha release
 
 This release adds the following new features and fixes:
 
