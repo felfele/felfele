@@ -123,7 +123,7 @@ export class RSSFeedManager {
         if (feed.feedUrl !== '') {
             feed.feedUrl = urlUtils.createUrlFromUrn(feed.feedUrl, baseUrl);
         }
-        if (feed.favicon !== '') {
+        if (typeof feed.favicon === 'string' && feed.favicon !== '') {
             feed.favicon = urlUtils.createUrlFromUrn(feed.favicon, baseUrl);
         }
         if (feed.name.search(' - ') >= 0) {
@@ -216,7 +216,7 @@ export class RSSFeedManager {
             const baseUrl = urlUtils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
             Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
-            const feed = {
+            const feed: Feed = {
                 url: baseUrl,
                 feedUrl: url,
                 name: name,
@@ -242,6 +242,10 @@ export class RSSFeedManager {
         return null;
     }
 }
+
+const feedFaviconString = (favicon: string | number): string => {
+    return typeof favicon === 'number' ? '' : favicon;
+};
 
 // tslint:disable-next-line:class-name
 class _RSSPostManager {
@@ -279,9 +283,10 @@ class _RSSPostManager {
                         ? rssFeed.icon
                         : ''
                 ;
+                const faviconString = feedFaviconString(favicon);
                 Debug.log('RSSPostManager.loadPosts', {rssFeed, storedFeeds, favicon});
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, faviconString, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }

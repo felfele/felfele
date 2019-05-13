@@ -212,7 +212,7 @@ const uploadImage = async (
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
-        if (image.localPath == null || image.localPath === '') {
+        if (image.localPath == null || image.localPath === '' || typeof image.localPath === 'number') {
             return image;
         }
         const path = getLocalPath(image.localPath);

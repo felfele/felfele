@@ -7,7 +7,7 @@ export interface Rectangle {
 
 export interface ModelHelper {
     getLocalPath: (localPath: string) => string;
-    getImageUri: (image: ImageData) => string;
+    getImageUri: (image: ImageData) => string | number;
 }
 
 export const calculateImageDimensions = (image: ImageData, maxWidth: number): Rectangle => {

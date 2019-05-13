@@ -4,6 +4,7 @@ import * as Swarm from '../swarm/Swarm';
 import { Author } from '../models/Author';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
+import { defaultImages } from '../defaultImages';
 
 export const defaultSettings: Settings = {
     saveToCameraRoll: true,
@@ -30,7 +31,9 @@ export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce4604
 const onboardingAuthor: Author = {
     name: FELFELE_ASSISTANT_NAME,
     uri: FELFELE_ASSISTANT_URL,
-    image: {},
+    image: {
+        localPath: defaultImages.felfeleAssistant,
+    },
 };
 
 const defaultPost1: Post = {
@@ -90,7 +93,7 @@ export const defaultFeeds: Feed[] = [
         name: 'Felfele Assistant',
         url: FELFELE_ASSISTANT_URL,
         feedUrl: FELFELE_ASSISTANT_URL,
-        favicon: '',
+        favicon: defaultImages.felfeleAssistant,
         followed: true,
     },
     {

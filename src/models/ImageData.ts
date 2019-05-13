@@ -3,5 +3,5 @@ export interface ImageData {
     width?: number;
     height?: number;
     data?: string;
-    localPath?: string;
+    localPath?: string | number;
 }

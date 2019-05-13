@@ -19,7 +19,10 @@ export class ReactNativeModelHelper implements ModelHelper {
         return documentPath + localPath;
     }
 
-    public getImageUri(image: ImageData): string {
+    public getImageUri(image: ImageData): string | number {
+        if (typeof image.localPath === 'number') {
+            return image.localPath;
+        }
         if (image.localPath != null) {
             return this.getLocalPath(image.localPath);
         }

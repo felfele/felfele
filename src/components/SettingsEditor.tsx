@@ -58,7 +58,7 @@ export const SettingsEditor = (props: Props) => {
                         return (
                                 <GridCard
                                     title={item.name}
-                                    imageUri={modelHelper.getImageUri(item.authorImage)}
+                                    image={item.authorImage}
                                     onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
                                     size={itemDimension}
                                     defaultImage={defaultImages.defaultUser}
