@@ -15,7 +15,7 @@ import { DispatchProps as IdentitySettingsDispatchProps } from '../../../compone
 import { TouchableView } from '../../../components/TouchableView';
 import { defaultImages } from '../../../defaultImages';
 
-const defaultUserImage = defaultImages.userCircle;
+const defaultUserImage = defaultImages.defaultUser;
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';
@@ -92,7 +92,7 @@ export const ProfileScreen = (props: Props) => {
                 <SimpleTextInput
                     style={styles.textInput}
                     defaultValue={props.author.name}
-                    placeholder={'Your name'}
+                    placeholder={'Type your name here'}
                     placeholderTextColor={Colors.GRAY}
                     autoCapitalize='none'
                     autoFocus={false}
@@ -125,7 +125,7 @@ export const onDoneCreatingProfile = async (author: Author, navigation: TypedNav
 };
 
 const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
-    const imageData = await AsyncImagePicker.launchImageLibrary();
+    const imageData = await AsyncImagePicker.showImagePicker();
     if (imageData != null) {
         onUpdatePicture(imageData);
     }

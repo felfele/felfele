@@ -12,7 +12,7 @@ export const defaultSettings: Settings = {
     swarmGatewayAddress: Swarm.defaultGateway,
 };
 
-export const DEFAULT_AUTHOR_NAME = 'Space Cowboy';
+export const DEFAULT_AUTHOR_NAME = '';
 
 export const defaultAuthor: Author = {
     name: DEFAULT_AUTHOR_NAME,
@@ -70,9 +70,7 @@ const defaultPost3: Post = {
     _id: 2,
     createdAt: Date.now(),
     images: [],
-    text: `We have added some feeds that you follow automatically. You can unfollow them if you don't like them by pressing the menu icon on the top left.
-
-You can also find new content there if you press the Explore button.
+    text: `You can also find new content if you press the All channels button on the top left, then the Explore button.
 
 Enjoy!
 `,

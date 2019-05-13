@@ -69,7 +69,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={styles.cameraIconContainer}
                 >
                     <Icon
-                        name='camera-alt'
+                        name='photo-camera'
                         size={30}
                         color={Colors.BRAND_PURPLE}
                     />
@@ -83,7 +83,7 @@ const ProfileIcon = (props: { profileImage: ImageData, gatewayAddress: string })
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const imageUri = modelHelper.getImageUri(props.profileImage);
     const imageSource = imageUri === ''
-        ? defaultImages.userCircle
+        ? defaultImages.defaultUser
         : { uri: imageUri };
     return (
         <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>

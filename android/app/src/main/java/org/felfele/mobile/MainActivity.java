@@ -1,4 +1,4 @@
-package com.postmodern;
+package org.felfele.mobile;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
@@ -12,7 +12,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "postmodern";
+        return "Felfele";
     }
 
     @Override

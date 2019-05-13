@@ -66,7 +66,7 @@ export const stripNonAscii = (s: string): string => {
 };
 
 export const getLinkFromText = (text: string): string | undefined => {
-    const httpLink = text.match(/(http.?:\/\/.*?\/)( |$)/);
+    const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
     if (httpLink != null) {
         return httpLink[1];
     }

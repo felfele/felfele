@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import { ImageData } from './models/ImageData';
 
 const USER_IMAGE_ASSET_DIR = 'custom';
-const USER_IMAGE_NAME = 'user_circle.png';
+const USER_IMAGE_NAME = 'defaultuser.png';
 const FILE_PROTOCOL = 'file://';
 
 export const getDefaultUserImage = async (): Promise<ImageData> => {

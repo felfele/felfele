@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, TouchableWithoutFeedback, SafeAreaView } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
@@ -15,6 +14,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { TwoButton } from '../ui/buttons/TwoButton';
 
 export interface DispatchProps {
     onPressFeed: (feed: Feed) => void;
@@ -42,6 +42,8 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
         return (
             <SafeAreaView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
                 {this.props.children}
+                {
+                // @ts-ignore - SuperGridSectionList is passing props to internal SectionList, typings is missing
                 <SuperGridSectionList
                     style={{ flex: 1 }}
                     spacing={10}
@@ -60,7 +62,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 imageUri={imageUri}
                                 onPress={() => this.props.onPressFeed(item)}
                                 size={itemDimension}
-                                defaultImage={defaultImages.userCircle}
+                                defaultImage={defaultImages.defaultUser}
                                 modelHelper={modelHelper}
                             />
                         );
@@ -72,29 +74,25 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     ListFooterComponent={<TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>}
                     ListHeaderComponent={this.props.headerComponent}
                 />
+                }
             </SafeAreaView>
         );
     }
 }
 
-const ExploreButton = (openExplore: () => void) => (
-    <TouchableWithoutFeedback
-        onPress={() => openExplore()}
-    >
-        <View style={{
-            backgroundColor: Colors.WHITE,
-            margin: 10,
-            height: 70,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <View style={{ paddingTop: 1, paddingRight: 4 }}>
-                <Icon name='compass' size={20} color={Colors.BRAND_PURPLE}/>
-            </View>
-            <MediumText style={{ fontSize: 12, color: Colors.BRAND_PURPLE }}>EXPLORE</MediumText>
-        </View>
-    </TouchableWithoutFeedback>
+const ActionButtons = (openExplore: () => void, openAddChannel: () => void) => (
+    <TwoButton
+        leftButton={{
+            label: 'Add channel',
+            icon: <Icon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+            onPress: openAddChannel,
+        }}
+        rightButton={{
+            label: 'Explore',
+            icon: <Icon name='compass' size={24} color={Colors.BRAND_PURPLE}/>,
+            onPress: openExplore,
+        }}
+    />
 );
 
 export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
@@ -103,17 +101,13 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
             <FragmentSafeAreaViewWithoutTabBar>
                 <FeedGrid
                     headerComponent={this.props.showExplore
-                        ? ExploreButton(this.props.openExplore)
+                        ? ActionButtons(this.props.openExplore, this.onAddFeed)
                         : undefined
                     }
                     {...this.props}
                 >
                     <NavigationHeader
                         navigation={this.props.navigation}
-                        rightButton1={{
-                            onPress: this.onAddFeed,
-                            label: <MaterialIcon name='add-box' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />,
-                        }}
                         title={this.props.title}
                     />
                 </FeedGrid>

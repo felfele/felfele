@@ -1,4 +1,4 @@
-package com.postmodern;
+package org.felfele.mobile;
 
 import android.app.Application;
 
