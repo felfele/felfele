@@ -39,17 +39,17 @@ git commit -am "$commit_message" && git push origin "$release_branch"
 ask "Make a PR with release branch, check if the CI is green"
 
 output "Build the iOS version with XCode for archive..."
-#./scripts/build_xcode_archive.sh
+./scripts/build_xcode_archive.sh
 
 ask "Upload the build to the App Store"
 
 ask "In AppstoreConnect provide the crypto information to enable the new build"
 
 output "Building the android release version signed with debug key..."
-#./scripts/build_android_signed_release.sh
+./scripts/build_android_signed_release.sh
 
 output "Uploading the android version to https://app.felfele.com..."
-#./scripts/upload_android_release.sh "$version"
+./scripts/upload_android_release.sh "$version"
 
 ask "Upload the build to the Play Store"
 
