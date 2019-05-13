@@ -1,32 +1,16 @@
 import * as React from 'react';
-import { TouchableWithoutFeedback, Text, Linking, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-// @ts-ignore
-import Markdown from 'react-native-easy-markdown';
+import Markdown from 'react-native-markdown-renderer';
 import { ErrorBoundary } from './ErrorBoundary';
 
-export const CardMarkdown = (props: { text: string }) => {
-    let counter = 0;
-    return (
-        <ErrorBoundary>
-            <Markdown
-                style={styles.markdownStyle}
-                renderLink={(href: string, title: string, children: React.ReactNode) => {
-                    return (
-                        <TouchableWithoutFeedback
-                            key={'linkWrapper_' + href + counter++}
-                            onPress={() => Linking.openURL(href).catch(() => { /* nothing */ })}
-                        >
-                            <Text key={'linkWrapperText_' + href + counter++} style={{textDecorationLine: 'underline'}}>
-                                {children}
-                            </Text>
-                        </TouchableWithoutFeedback>
-                    );
-                }}
-            >{props.text}</Markdown>
-        </ErrorBoundary>
-    );
-};
+export const CardMarkdown = (props: { text: string }) => (
+    <ErrorBoundary>
+        <View style={styles.markdownStyle}>
+            <Markdown>{props.text}</Markdown>
+        </View>
+    </ErrorBoundary>
+);
 
 const styles = StyleSheet.create({
     markdownStyle: {
