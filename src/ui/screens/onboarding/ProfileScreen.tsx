@@ -125,7 +125,7 @@ export const onDoneCreatingProfile = async (author: Author, navigation: TypedNav
 };
 
 const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
-    const imageData = await AsyncImagePicker.launchImageLibrary();
+    const imageData = await AsyncImagePicker.showImagePicker();
     if (imageData != null) {
         onUpdatePicture(imageData);
     }
