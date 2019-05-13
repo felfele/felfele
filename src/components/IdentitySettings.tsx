@@ -31,7 +31,7 @@ import { LocalFeed } from '../social/api';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { TwoButton } from '../ui/buttons/TwoButton';
 
-const defaultUserImage = defaultImages.userCircle;
+const defaultUserImage = defaultImages.defaultUser;
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;

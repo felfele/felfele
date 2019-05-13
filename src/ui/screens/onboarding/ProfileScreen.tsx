@@ -15,7 +15,7 @@ import { DispatchProps as IdentitySettingsDispatchProps } from '../../../compone
 import { TouchableView } from '../../../components/TouchableView';
 import { defaultImages } from '../../../defaultImages';
 
-const defaultUserImage = defaultImages.userCircle;
+const defaultUserImage = defaultImages.defaultUser;
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';

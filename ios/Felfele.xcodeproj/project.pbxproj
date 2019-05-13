@@ -32,6 +32,7 @@
 		5D324A66EF7D49E3A19E9BD8 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EDEAC26023B94CD5B26D863A /* SimpleLineIcons.ttf */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		5F8BA18F66164AFF817725B4 /* libRNSecureRandom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0935BE43C03F4A86A7D7D244 /* libRNSecureRandom.a */; };
+		66031EC8CFEF4E5EBF63EBAD /* defaultuser.png in Resources */ = {isa = PBXBuildFile; fileRef = 13BFD6C7C7C84BBCB4A49D83 /* defaultuser.png */; };
 		7408AC3FEB814182B2E3FF49 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 26AC1C5AFB364E60AA34A2FB /* FontAwesome5_Brands.ttf */; };
 		75E4D965E9574E3FAD25F309 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B467920DF2C4F6A8F9EBC12 /* libRNFS.a */; };
 		77F7381D6839444D8F349DCA /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3961119899504AD8AD6378B7 /* MaterialIcons.ttf */; };
@@ -51,7 +52,6 @@
 		BB86BC0D8E5245DBA9869327 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A14657958194306BDD7454C /* libRNSVG.a */; };
 		BC07DDEC2269C80F00A4200A /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC07DDEB2269C80F00A4200A /* Launch Screen.storyboard */; };
 		C5430E3289DB4BF9B2D510DE /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2626095CA0404F308AD61EED /* libRNVectorIcons.a */; };
-		D8A729BD711B47C08169B207 /* user_circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CA15BD83829431189DCB227 /* user_circle.png */; };
 		DF4F9F98D92F4CE2A7CE51E9 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C8AF205986984C049387326C /* FontAwesome5_Solid.ttf */; };
 		E30923C7F8F143919539DA56 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DB08C89EC6DD4453821EEA70 /* Ionicons.ttf */; };
 		E3C45210537C40F88E1917B3 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 12BA3E515AA747A7A844BD36 /* EvilIcons.ttf */; };
@@ -478,6 +478,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Felfele/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Felfele/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Felfele/main.m; sourceTree = "<group>"; };
+		13BFD6C7C7C84BBCB4A49D83 /* defaultuser.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = defaultuser.png; path = ../images/assets/defaultuser.png; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1C8C752989814C059130DC5B /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		25228633BBCC4AA08D3C34D8 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
@@ -485,7 +486,6 @@
 		26AC1C5AFB364E60AA34A2FB /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		29E5C06C079B4D46A80B19C7 /* libSplashScreen.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libSplashScreen.a; sourceTree = "<group>"; };
 		2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
-		2CA15BD83829431189DCB227 /* user_circle.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = user_circle.png; path = ../images/assets/user_circle.png; sourceTree = "<group>"; };
 		2F3D42F657F549E5B24AE8F0 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		3961119899504AD8AD6378B7 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		3AF40CED3A514651BA4276B2 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
@@ -941,7 +941,7 @@
 				3CB8FCBE95F64A8D9329D593 /* Roboto-Bold.ttf */,
 				AD0280660E554F2DAC350F31 /* Roboto-Medium.ttf */,
 				8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */,
-				2CA15BD83829431189DCB227 /* user_circle.png */,
+				13BFD6C7C7C84BBCB4A49D83 /* defaultuser.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1531,7 +1531,7 @@
 				B96EC6087B3A4BE79F0DF72D /* Roboto-Bold.ttf in Resources */,
 				3A71C102C9F543238ED15939 /* Roboto-Medium.ttf in Resources */,
 				2AF1ED3028F34C3F8FAA9738 /* Roboto-Regular.ttf in Resources */,
-				D8A729BD711B47C08169B207 /* user_circle.png in Resources */,
+				66031EC8CFEF4E5EBF63EBAD /* defaultuser.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

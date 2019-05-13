@@ -14,8 +14,12 @@
       "sha1": "1d1d41fcadc571decb6444211b7993b99ce926e2"
     },
     {
-      "path": "images/assets/user_circle.png",
-      "sha1": "123f5ee2a4304b80ced77b073043b362b910d9d2"
+      "path": "images/assets/defaultuser.png",
+      "sha1": "6cbd9e47f004652893fc96b42e58f5e07d0de4b8"
+    },
+    {
+      "path": "images/assets/felfele-assistant.png",
+      "sha1": "3d0fa3f2a58f819d2004a03213e01a9f90545db2"
     }
   ]
 }
