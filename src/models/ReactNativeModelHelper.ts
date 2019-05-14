@@ -2,7 +2,7 @@
 import * as RNFS from 'react-native-fs';
 
 import { ModelHelper } from './ModelHelper';
-import { ImageData } from './ImageData';
+import { ImageData, ImageDataRequiredSource } from './ImageData';
 import { getSwarmGatewayUrl } from '../swarm/Swarm';
 
 const FILE_PROTOCOL = 'file://';
@@ -19,7 +19,7 @@ export class ReactNativeModelHelper implements ModelHelper {
         return documentPath + localPath;
     }
 
-    public getImageUri(image: ImageData): string | number {
+    public getImageUri(image: ImageData): string | ImageDataRequiredSource {
         if (typeof image.localPath === 'number') {
             return image.localPath;
         }
