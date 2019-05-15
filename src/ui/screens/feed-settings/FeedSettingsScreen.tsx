@@ -15,6 +15,7 @@ import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';
 import { LocalFeed } from '../../../social/api';
+import { ImageDataView } from '../../../components/ImageDataView';
 
 export interface StateProps {
     navigation: any;
@@ -35,11 +36,6 @@ const UNLISTED_EXPLANATION = 'Anyone with a link to your channel can follow it.'
 
 export const FeedSettingsScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
-    const sourceImageUri = modelHelper.getImageUri(props.feed.authorImage);
-    const source = sourceImageUri !== ''
-        ? { uri: sourceImageUri }
-        : defaultImages.defaultUser
-    ;
     return (
         <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
             <NavigationHeader
@@ -47,8 +43,10 @@ export const FeedSettingsScreen = (props: Props) => {
                 title={props.feed.name}
             />
             <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
-                <Image
-                    source={source}
+                <ImageDataView
+                    source={props.feed.authorImage}
+                    defaultImage={defaultImages.defaultUser}
+                    modelHelper={modelHelper}
                     style={styles.image}
                     resizeMode='cover'
                 />

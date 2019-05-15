@@ -11,12 +11,13 @@ import { Colors } from '../../styles';
 import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
 import { ModelHelper } from '../../models/ModelHelper';
+import { ImageData, BundledImage } from '../../models/ImageData';
 
 interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
-    imageUri: string;
-    defaultImage?: number;
+    image: ImageData;
+    defaultImage?: BundledImage;
     size: number;
     modelHelper: ModelHelper;
 }
@@ -32,7 +33,7 @@ export const getGridCardSize = () => {
 export const GridCard = React.memo((props: Props) => (
     <TouchableView style={styles.feedCard} onPress={props.onPress}>
         <ImageDataView
-            source={{uri: props.imageUri}}
+            source={props.image}
             defaultImage={props.defaultImage}
             modelHelper={props.modelHelper}
             style={{

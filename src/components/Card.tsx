@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Post, PostReferences } from '../models/Post';
+import { Post } from '../models/Post';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 import {
@@ -253,9 +253,8 @@ const DeleteButton = (props: { onPress: () => void }) => {
 
 const CardTopIcon = (props: { post: Post, modelHelper: ModelHelper }) => {
     if (props.post.author) {
-        const imageUri = props.modelHelper.getImageUri(props.post.author.image);
         return (
-            <Avatar imageUri={imageUri} size='large'/>
+            <Avatar image={props.post.author.image} modelHelper={props.modelHelper} size='large'/>
         );
     } else {
         return <View/>;

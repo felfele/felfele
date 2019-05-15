@@ -92,7 +92,8 @@ export class PostEditor extends React.Component<Props, State> {
                             <Avatar
                                 size='medium'
                                 style={{ marginRight: 10 }}
-                                imageUri={this.modelHelper.getImageUri(this.props.avatar)}
+                                image={this.props.avatar}
+                                modelHelper={this.modelHelper}
                             />
                         }
                         title={this.props.name}

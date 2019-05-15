@@ -3,7 +3,6 @@ import { StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Feed } from '../models/Feed';
-import { ImageData } from '../models/ImageData';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
@@ -15,6 +14,7 @@ import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TwoButton } from '../ui/buttons/TwoButton';
+import { getFeedImage } from '../helpers/feedHelpers';
 
 export interface DispatchProps {
     onPressFeed: (feed: Feed) => void;
@@ -51,15 +51,11 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                     itemDimension={itemDimension}
                     sections={this.props.sections}
                     renderItem={({ item }: any) => {
-                        const image: ImageData = item.authorImage != null
-                            ? item.authorImage
-                            : { uri: item.favicon }
-                            ;
-                        const imageUri = modelHelper.getImageUri(image);
+                        const image = getFeedImage(item);
                         return (
                             <GridCard
                                 title={item.name}
-                                imageUri={imageUri}
+                                image={image}
                                 onPress={() => this.props.onPressFeed(item)}
                                 size={itemDimension}
                                 defaultImage={defaultImages.defaultUser}

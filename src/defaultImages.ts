@@ -1,3 +1,7 @@
+import { BundledImage } from './models/ImageData';
+
+declare var require: (id: string) => BundledImage;
+
 export const defaultImages = {
     balloon: require('../images/balloon.svg'),
     bug: require('../images/bug.svg'),

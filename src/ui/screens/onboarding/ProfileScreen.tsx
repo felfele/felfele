@@ -24,6 +24,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { defaultAuthor } from '../../../reducers/defaultData';
 import { getDefaultUserImage } from '../../../defaultUserImage';
+import { getImageSource } from '../../../helpers/imageDataHelpers';
 
 export type CreateUserCallback = (name: string, image: ImageData, navigation: TypedNavigation) => void;
 
@@ -41,7 +42,7 @@ type Props = DispatchProps & StateProps;
 
 export const ProfileScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImageUri = modelHelper.getImageUri(props.author.image);
+    const authorImage = getImageSource(props.author.image, modelHelper, defaultImages.defaultUser);
     const isFormFilled = props.author.name !== '' && props.author.name !== defaultAuthor.name;
     return (
         <Page
@@ -70,10 +71,7 @@ export const ProfileScreen = (props: Props) => {
                         }}
                     >
                         <ImageBackground
-                            source={authorImageUri === ''
-                            ? defaultUserImage
-                            : { uri: authorImageUri }
-                            }
+                            source={authorImage}
                             style={styles.imageBackground}
                             imageStyle={styles.image}
                         >
