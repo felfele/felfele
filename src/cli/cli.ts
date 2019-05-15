@@ -60,6 +60,15 @@ const definitions =
                 await test();
             }
     })
+    .addCommand('bugreport [endpoint]', 'Send bugreport to endpoint', async (endpoint) => {
+        const response = await fetch(endpoint, {
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            method: 'POST',
+            body: 'Bugreport',
+        });
+    })
     .addCommand('swarm', 'Swarm related commands',
         addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmConfig.gatewayAddress = gatewayAddress)
         .
