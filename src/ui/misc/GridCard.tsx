@@ -11,13 +11,13 @@ import { Colors } from '../../styles';
 import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
 import { ModelHelper } from '../../models/ModelHelper';
-import { ImageData } from '../../models/ImageData';
+import { ImageData, BundledImage } from '../../models/ImageData';
 
 interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
     image: ImageData;
-    defaultImage?: number;
+    defaultImage?: BundledImage;
     size: number;
     modelHelper: ModelHelper;
 }

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageStyle, ImageProps } from 'react-native';
 
-import { ImageData } from '../models/ImageData';
+import { ImageData, BundledImage } from '../models/ImageData';
 import { ModelHelper } from '../models/ModelHelper';
 import { getImageSource } from '../helpers/imageDataHelpers';
 
 export interface StateProps extends ImageProps {
     source: ImageData;
-    defaultImage?: number;
+    defaultImage?: BundledImage;
     style: StyleProp<ImageStyle>;
     modelHelper: ModelHelper;
 }

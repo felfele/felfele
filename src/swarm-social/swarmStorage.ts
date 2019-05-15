@@ -21,6 +21,7 @@ import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Feed } from '../models/Feed';
 import { uploadUnsyncedPostCommandsToStorage, syncPostCommandLogWithStorage} from '../social/sync';
+import { isBundledImage } from '../helpers/imageDataHelpers';
 
 const NUMBER_OF_RECENT_POSTS = 20;
 const DEFAULT_POST_COMMAND_LOG_TOPIC = `felfele:posts:v${PostCommandProtocolVersion}`;
@@ -212,7 +213,7 @@ const uploadImage = async (
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData> => {
     if (!isImageUploaded(image)) {
-        if (image.localPath == null || image.localPath === '' || typeof image.localPath === 'number') {
+        if (image.localPath == null || image.localPath === '' || isBundledImage(image.localPath)) {
             return image;
         }
         const path = getLocalPath(image.localPath);

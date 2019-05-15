@@ -1,9 +1,10 @@
 import { Feed } from '../models/Feed';
 import { LocalFeed } from '../social/api';
 import { ImageData } from '../models/ImageData';
+import { isBundledImage } from './imageDataHelpers';
 
 export const getFeedImage = (feed: Feed): ImageData => {
-    if (typeof feed.favicon === 'number') {
+    if (isBundledImage(feed.favicon)) {
         return {
             localPath: feed.favicon,
         };
