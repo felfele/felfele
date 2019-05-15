@@ -158,14 +158,16 @@ const isPostShareable = (post: Post, author: Author): boolean => {
     return true;
 };
 
+const ACTION_BUTTON_HIT_SLOP = {
+    ...TouchableViewDefaultHitSlop,
+    right: 10,
+    left: 10,
+};
+
 const ActionButton = (props: TouchableViewProps) => (
     <TouchableView
         style={styles.actionButton}
-        hitSlop={{
-            ...TouchableViewDefaultHitSlop,
-            right: 10,
-            left: 10,
-        }}
+        hitSlop={ACTION_BUTTON_HIT_SLOP}
         {...props}
     >{props.children}</TouchableView>
 );
@@ -227,7 +229,11 @@ const ActionsOverlay = (props: {
                         author={props.author}/>
                     <TouchableView
                         style={{
-                            paddingRight: 10,
+                            paddingRight: 20,
+                        }}
+                        hitSlop={{
+                            left: 0,
+                            right: 0,
                         }}
                         onPress={() => {
                             props.togglePostSelection(props.post);
@@ -284,10 +290,14 @@ const CardTopOriginalAuthorText = (props: {
         ;
         return (
             <TouchableView
-                style={{flexDirection: 'row'}}
+                style={{
+                    flexDirection: 'row',
+                    flex: 1,
+                    paddingRight: 10,
+                }}
                 onPress={onPress}
             >
-                <RegularText style={styles.originalAuthor}> via {props.originalAuthorFeed.name}</RegularText>
+                <RegularText ellipsizeMode='tail' numberOfLines={1} style={styles.originalAuthor}> via {props.originalAuthorFeed.name}</RegularText>
             </TouchableView>
             );
     }
@@ -336,7 +346,7 @@ const CardTop = (props: {
             </View>
             <TouchableView
                 style={{
-                    paddingRight: 10,
+                    paddingRight: 20,
                 }}
                 onPress={() => {
                     props.togglePostSelection(props.post);
@@ -438,7 +448,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.BRAND_PURPLE,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 10,
+        marginHorizontal: 15,
     },
     username: {
         fontSize: 14,
