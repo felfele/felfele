@@ -7,9 +7,9 @@ Please always follow our [Code of Conduct](https://github.com/felfele/felfele/bl
 ### Task management 
 
 We aim to document all our work on GitHub. The processing of a new issue is the following:
-1. new issue is submitted, _todo_ label added automatically
+1. new issue is submitted, _unscheduled_ label added automatically
 2. labels and comments can be added
-3. prioritization happens every monday, when issues is prioritized, the _todo_ label is removed
+3. prioritization happens every monday, when issues is prioritized, the _unscheduled_ label is removed
 4. issue is normally closed when a PR resolves it and is merged to master
 
 ### How to contact us
