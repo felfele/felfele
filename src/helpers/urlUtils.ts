@@ -66,17 +66,33 @@ export const stripNonAscii = (s: string): string => {
 };
 
 export const getLinkFromText = (text: string): string | undefined => {
-    const bzzFeedLink = text.match(/(bzz-feed:\/\?user=0x[a-f0-9]{40})( |$)/);
+    const bzzFeedLink = getBzzFeedLinkFromText(text);
     if (bzzFeedLink != null) {
-        return bzzFeedLink[1];
+        return bzzFeedLink;
     }
-    const bzzLink = text.match(/(bzz:\/\/[a-f0-9]{64})( |$)/);
+    const bzzLink = getBzzLinkFromText(text);
     if (bzzLink != null) {
-        return bzzLink[1];
+        return bzzLink;
     }
     const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
     if (httpLink != null) {
         return httpLink[1];
+    }
+    return undefined;
+};
+
+export const getBzzFeedLinkFromText = (text: string): string | undefined => {
+    const bzzFeedLink = text.match(/(bzz-feed:\/\?user=0x[a-f0-9]{40})( |$)/);
+    if (bzzFeedLink != null) {
+        return bzzFeedLink[1];
+    }
+    return undefined;
+};
+
+export const getBzzLinkFromText = (text: string): string | undefined => {
+    const bzzLink = text.match(/(bzz:\/\/[a-f0-9]{64})( |$)/);
+    if (bzzLink != null) {
+        return bzzLink[1];
     }
     return undefined;
 };
