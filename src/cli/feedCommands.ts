@@ -87,6 +87,11 @@ export const feedCommandDefinition =
             text: markdownText,
             images: [],
             createdAt: Date.now(),
+            author: {
+                image: recentPostFeed.authorImage,
+                name: recentPostFeed.name,
+                uri: recentPostFeed.url,
+            },
         };
         const postCommandLog = shareNewPost(post, source, emptyPostCommandLog);
         const storageSyncUpdate = await storageSyncApi.sync(postCommandLog, recentPostFeed);
