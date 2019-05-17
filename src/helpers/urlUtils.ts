@@ -41,6 +41,9 @@ export const getBaseUrl = (url: string): string => {
 };
 
 export const getCanonicalUrl = (url: string): string => {
+    if (url === '') {
+        return '';
+    }
     const parts = url.split('//', 2);
     if (parts.length === 1) {
         if (!url.includes('/')) {
@@ -57,6 +60,14 @@ export const getCanonicalUrl = (url: string): string => {
     }
     if (!url.startsWith('http')) {
         url = 'https://' + url;
+    }
+    return url;
+};
+
+export const getHttpsUrl = (url: string): string => {
+    const httpProtocol = 'http:';
+    if (url.startsWith(httpProtocol)) {
+        return 'https:' + url.slice(httpProtocol.length);
     }
     return url;
 };

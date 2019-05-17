@@ -235,7 +235,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 Debug.log('fetchFeedFromUrl', 'url', url);
                 const canonicalUrl = urlUtils.getCanonicalUrl(url);
                 Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-                const feed = await this.fetchRSSFeedFromUrl(canonicalUrl);
+                const feed = await RSSFeedManager.fetchFeedFromUrl(url);
                 Debug.log('fetchFeedFromUrl', 'feed', feed);
                 return feed;
             }
@@ -243,12 +243,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             Debug.log(e);
             return null;
         }
-    }
-
-    private fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-        Debug.log('FeedInfo.fetchRSSFeedFromUrl', {feed});
-        return feed;
     }
 
     private onUnfollowFeed = () => {

@@ -33,6 +33,7 @@ class _FaviconCache {
 
     public findBestIconFromLinks = (links: Node[]): string | undefined => {
         const icons = this.findIconsInLinks(links);
+        console.log('findBestIconFromLinks', {icons});
         const icon = this.getBestIcon(icons);
         return icon != null
             ? icon.href

@@ -19,7 +19,7 @@ import { ImageDataView } from './ImageDataView';
 import { isSwarmLink } from '../swarm/Swarm';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
-import { MediumText, RegularText } from '../ui/misc/text';
+import { MediumText, RegularText, BoldText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
 import { Carousel } from '../ui/misc/Carousel';
 import { Rectangle } from '../models/ModelHelper';
@@ -29,6 +29,9 @@ import { Author } from '../models/Author';
 import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
+import { CardLinkPreviewDownloader} from './CardLinkPreviewDownloader';
+import { markdownUnescape } from '../markdown';
+import { HtmlMetaData } from '../helpers/htmlMetaData';
 
 export interface OriginalAuthorFeed extends Feed {
     isKnownFeed: boolean;
@@ -55,6 +58,8 @@ export interface DispatchProps {
 type CardProps = StateProps & DispatchProps;
 
 export const Card = (props: CardProps) => {
+    const httpLink = markdownUnescape(props.post.text).match(/^(http.?:\/\/.*?)($)/);
+    const isHttpLink = httpLink != null;
     return (
         <View
             testID={'YourFeed/Post' + props.post._id}
@@ -90,12 +95,87 @@ export const Card = (props: CardProps) => {
                         showSquareImages={props.showSquareImages}
                         modelHelper={props.modelHelper}
                     />
-                    { props.post.text === '' ||
-                        <CardMarkdown text={props.post.text}/>
+                    {
+                        isHttpLink
+                        ? <CardLinkPreviewDownloader
+                            url={httpLink![1]}
+                            childrenComponent={CardLinkPreview}
+                            htmlMetaData={null}
+                            modelHelper={props.modelHelper}
+                            currentTimestamp={props.currentTimestamp}
+                            navigation={props.navigation}
+                            onDownloadFeedPosts={props.onDownloadFeedPosts}
+                        />
+                        : props.post.text === '' || <CardMarkdown text={props.post.text}/>
                     }
                 </TouchableOpacity>
             </View>
         </View>
+    );
+};
+
+const CardLinkPreview = (
+    props: {
+        htmlMetaData: HtmlMetaData | null,
+        modelHelper: ModelHelper,
+        currentTimestamp: number,
+        navigation: TypedNavigation,
+        onDownloadFeedPosts: (feed: Feed) => void,
+    }
+) => {
+    const imageWidth = Dimensions.get('window').width - 22;
+    const imageHeight = Math.floor(imageWidth * 9 / 16);
+    const feedTitle = props.htmlMetaData && props.htmlMetaData.feedTitle || '';
+    const name = props.htmlMetaData && props.htmlMetaData.name || feedTitle;
+    const title = props.htmlMetaData && props.htmlMetaData.title;
+    const description = props.htmlMetaData && props.htmlMetaData.description;
+    const postUpdateTime = props.htmlMetaData && props.htmlMetaData.createdAt || 0;
+    const printableTime = postUpdateTime !== 0
+        ? DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago'
+        : ''
+    ;
+    const url = props.htmlMetaData && props.htmlMetaData.url || '';
+    const hostnameText = url === '' ? '' : urlUtils.getHumanHostname(url);
+    const timeHostSeparator = printableTime !== '' && hostnameText !== '' ? ' - ' : '';
+    const onPress = props.htmlMetaData && props.htmlMetaData.feedUrl !== ''
+        ? () => {
+            const feed: Feed = {
+                feedUrl: props.htmlMetaData!.feedUrl,
+                name,
+                url,
+                favicon: props.htmlMetaData!.icon,
+            };
+            props.onDownloadFeedPosts(feed);
+            props.navigation.navigate('NewsSourceFeed', { feed });
+        }
+        : undefined
+    ;
+    return (
+        <TouchableView style={styles.previewContainer} onPress={() => Linking.openURL(url)}>
+            <TouchableView style={styles.infoContainer} onPress={onPress}>
+                <Avatar image={{uri: props.htmlMetaData && props.htmlMetaData.icon || undefined}} modelHelper={props.modelHelper} size='large' />
+                <View style={styles.usernameContainer}>
+                    <View style={{flexDirection: 'row'}}>
+                        <MediumText style={styles.username} numberOfLines={1}>{name}</MediumText>
+                    </View>
+                    <RegularText numberOfLines={1} style={styles.location}>{printableTime}{timeHostSeparator}{hostnameText}</RegularText>
+                </View>
+            </TouchableView>
+
+            <View>
+                <ImageDataView
+                    source={{
+                        uri: props.htmlMetaData ? props.htmlMetaData.image : '',
+                        width: imageWidth,
+                        height: imageHeight,
+                    }}
+                    modelHelper={props.modelHelper}
+                />
+            </View>
+            <View  style={{padding: 0 }}>
+                <CardMarkdown text={`**${title}**\n\n${description}`} />
+            </View>
+        </TouchableView>
     );
 };
 
@@ -458,5 +538,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'normal',
         color: Colors.GRAY,
+    },
+    previewContainer: {
+        marginHorizontal: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: Colors.LIGHT_GRAY,
+        flexDirection: 'column',
     },
 });
