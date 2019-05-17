@@ -43,7 +43,6 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
         post: ownProps.post,
         currentTimestamp: state.currentTimestamp,
         isSelected: ownProps.isSelected,
-        showSquareImages: state.settings.showSquareImages,
         author: state.author,
         modelHelper: ownProps.modelHelper,
         togglePostSelection: ownProps.togglePostSelection,
