@@ -70,7 +70,6 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
@@ -92,7 +91,6 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
@@ -114,7 +112,6 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
@@ -137,7 +134,6 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
@@ -160,7 +156,6 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
