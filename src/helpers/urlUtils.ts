@@ -85,6 +85,14 @@ export const getLinkFromText = (text: string): string | undefined => {
     if (bzzLink != null) {
         return bzzLink;
     }
+    const httpLink = getHttpLinkFromText(text);
+    if (httpLink != null) {
+        return httpLink;
+    }
+    return undefined;
+};
+
+export const getHttpLinkFromText = (text: string): string | undefined => {
     const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
     if (httpLink != null) {
         return httpLink[1];

@@ -28,6 +28,7 @@ import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
+import { getHttpLinkFromText } from '../helpers/urlUtils';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -241,10 +242,10 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private createPostFromState = async (): Promise<Post> => {
-        const httpLink = this.state.post.text.match(/^(http.?:\/\/.*?)($)/);
+        const httpLink = getHttpLinkFromText(this.state.post.text);
 
         if (httpLink != null) {
-            const url = httpLink[0];
+            const url = httpLink;
             const htmlMetaData = await fetchHtmlMetaData(url);
             const post = convertPostToParentPost(convertHtmlMetaDataToPost({
                 ...htmlMetaData,
