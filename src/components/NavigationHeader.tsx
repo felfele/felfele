@@ -75,7 +75,7 @@ export const NavigationHeader = (props: Props) => (
                     testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
                 />}
             {props.rightButton2 &&
-                <View style={{paddingRight: 20}}>
+                <View style={{paddingRight: 10}}>
                     <RightButton
                         onPress={props.rightButton2.onPress}
                         label={props.rightButton2.label}
@@ -145,6 +145,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     rightButtonContainer: {
-        marginLeft: 30,
+        marginLeft: 20,
     },
 });
