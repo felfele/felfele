@@ -32,18 +32,11 @@ export const stringToHex = (s: string) => byteArrayToHex(stringToByteArray(s));
 export const byteArrayToHex = (byteArray: number[] | Uint8Array, withPrefix: boolean = true): HexString => {
     const prefix = withPrefix ? '0x' : '';
     return prefix + Array.from(byteArray, (byte) => {
-        // tslint:disable-next-line:no-bitwise
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('') as HexString;
 };
 
-// equally cheekily borrowed from https://stackoverflow.com/questions/17720394/javascript-string-to-byte-to-string
 export const stringToByteArray = (str: string): number[] => {
-    // const result = new Array<number>();
-    // for (let i = 0; i < str.length; i++) {
-    //     result.push(str.charCodeAt(i));
-    // }
-    // return result;
     return toUTF8Array(str);
 };
 
@@ -106,6 +99,5 @@ const toUTF8Array = (str: string): number[] => {
                       0x80 | (charcode & 0x3f));
         }
     }
-    console.log('toUTF8Array', utf8);
     return utf8;
 };
