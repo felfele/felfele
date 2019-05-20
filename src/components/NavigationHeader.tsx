@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
         maxWidth: '50%',
         flexDirection: 'row',
         alignItems: 'center',
+        marginRight: 5,
     },
     rightContainer: {
         flex: 1,
@@ -145,6 +146,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     rightButtonContainer: {
-        marginLeft: 20,
+        marginLeft: 30,
     },
 });
