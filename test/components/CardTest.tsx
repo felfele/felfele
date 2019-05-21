@@ -75,6 +75,7 @@ describe('card test', () => {
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -96,6 +97,7 @@ describe('card test', () => {
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -117,6 +119,7 @@ describe('card test', () => {
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -139,6 +142,7 @@ describe('card test', () => {
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -161,6 +165,7 @@ describe('card test', () => {
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
