@@ -7,7 +7,7 @@ import { Clipboard } from 'react-native';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const feedUrlParam = ownProps.navigation.getParam<'FeedInfoDeepLink', 'feedUrl'>('feedUrl');
-    const feedUrl = 'bzz-feed:/?'.concat(feedUrlParam);
+    const feedUrl = 'bzz-feed:/?user='.concat(feedUrlParam);
     Clipboard.setString(feedUrl);
 
     return {
