@@ -30,7 +30,7 @@ import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 
-export interface OriginalAuthorFeed extends Feed {
+export interface AuthorFeed extends Feed {
     isKnownFeed: boolean;
 }
 
@@ -42,7 +42,8 @@ export interface StateProps {
     modelHelper: ModelHelper;
     togglePostSelection: (post: Post) => void;
     navigation: TypedNavigation;
-    originalAuthorFeed: OriginalAuthorFeed | undefined;
+    authorFeed: AuthorFeed | undefined;
+    originalAuthorFeed: AuthorFeed | undefined;
 }
 
 export interface DispatchProps {
@@ -90,7 +91,8 @@ const CardBody = (props: {
     width: number,
     modelHelper: ModelHelper,
     navigation: TypedNavigation,
-    originalAuthorFeed: OriginalAuthorFeed | undefined,
+    originalAuthorFeed: AuthorFeed | undefined,
+    authorFeed: AuthorFeed | undefined;
     togglePostSelection?: (post: Post) => void;
     onDownloadFeedPosts: (feed: Feed) => void;
 }) => {
@@ -104,24 +106,30 @@ const CardBody = (props: {
         author: originalAuthor,
         references: undefined,
     };
-    const originalAuthorFeed = props.post.references != null
-        ? undefined
-        : props.originalAuthorFeed
-    ;
+    const authorFeed = props.authorFeed;
+    const cardTopOnPress = authorFeed == null
+        ? () => props.navigation.navigate('Feed', {
+            feedUrl: props.post.author!.uri,
+            name: props.post.author!.name,
+        })
+        : () => {
+            props.onDownloadFeedPosts(authorFeed);
+            props.navigation.navigate('NewsSourceFeed', {
+                feed: authorFeed,
+        });
+    };
     return (
         <View>
             <CardTop
                 post={props.post}
                 currentTimestamp={props.currentTimestamp}
                 modelHelper={props.modelHelper}
-                navigation={props.navigation}
-                originalAuthorFeed={originalAuthorFeed}
                 togglePostSelection={props.togglePostSelection}
-                onDownloadFeedPosts={props.onDownloadFeedPosts}
+                onPress={cardTopOnPress}
             />
             {
                 isOriginalPost
-                ?
+                    ?
                     <View>
                         <DisplayImage
                             post={props.post}
@@ -129,15 +137,16 @@ const CardBody = (props: {
                             width={props.width}
                         />
                         {
-                            props.post.text === '' || <CardMarkdown text={props.post.text}/>
+                            props.post.text === '' || <CardMarkdown text={props.post.text} />
                         }
                     </View>
-                :
+                    :
                     <View style={styles.previewContainer}>
                         <CardBody
                             {...props}
+                            authorFeed={props.originalAuthorFeed}
+                            originalAuthorFeed={undefined}
                             togglePostSelection={undefined}
-                            originalAuthorFeed={props.originalAuthorFeed}
                             post={originalPost}
                             width={props.width - 22}
                         />
@@ -324,10 +333,8 @@ const CardTop = (props: {
     post: Post,
     currentTimestamp: number,
     modelHelper: ModelHelper,
-    navigation: TypedNavigation,
-    originalAuthorFeed: OriginalAuthorFeed | undefined,
     togglePostSelection?: (post: Post) => void,
-    onDownloadFeedPosts: (feed: Feed) => void,
+    onPress: () => void;
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';
@@ -335,26 +342,10 @@ const CardTop = (props: {
     const url = props.post.link || '';
     const hostnameText = url === '' ? '' : urlUtils.getHumanHostname(url);
     const timeHostSeparator = printableTime !== '' && hostnameText !== '' ? ' - ' : '';
-    const originalAuthorFeed = props.originalAuthorFeed;
-    const onPress = originalAuthorFeed != null && originalAuthorFeed.feedUrl !== ''
-        ? originalAuthorFeed.isKnownFeed
-            ? () => props.navigation.navigate('Feed', {
-                feedUrl: originalAuthorFeed.feedUrl,
-                name: originalAuthorFeed.name,
-            })
-            : () => {
-                props.onDownloadFeedPosts(originalAuthorFeed);
-                props.navigation.navigate('NewsSourceFeed', {
-                    feed: originalAuthorFeed,
-                });
-            }
-        : undefined
-    ;
-
     return (
         <TouchableOpacity
             testID={'CardTop'}
-            onPress={onPress}
+            onPress={props.onPress}
             style={styles.infoContainer}
         >
             <CardTopIcon post={props.post} modelHelper={props.modelHelper}/>

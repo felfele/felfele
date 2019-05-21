@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { StateProps, DispatchProps, MemoizedCard, OriginalAuthorFeed } from '../components/Card';
+import { StateProps, DispatchProps, MemoizedCard, AuthorFeed } from '../components/Card';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/Actions';
@@ -16,7 +16,7 @@ interface OwnProps {
     navigation: TypedNavigation;
 }
 
-const getOriginalAuthorFeed = (post: Post, state: AppState): OriginalAuthorFeed | undefined => {
+const getOriginalAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
     if (post.references == null) {
         return;
     }
@@ -37,7 +37,23 @@ const getOriginalAuthorFeed = (post: Post, state: AppState): OriginalAuthorFeed 
     ;
 };
 
+const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
+    if (post.author == null) {
+        return;
+    }
+    const postAuthor = post.author;
+    const knownFeed = getAllFeeds(state).find(feed => feed.feedUrl === postAuthor.uri);
+    return knownFeed != null
+        ? {
+            ...knownFeed,
+            isKnownFeed: true,
+        }
+        : undefined
+    ;
+};
+
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
+    const authorFeed = getAuthorFeed(ownProps.post, state);
     const originalAuthorFeed = getOriginalAuthorFeed(ownProps.post, state);
     return {
         post: ownProps.post,
@@ -47,6 +63,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
         modelHelper: ownProps.modelHelper,
         togglePostSelection: ownProps.togglePostSelection,
         navigation: ownProps.navigation,
+        authorFeed,
         originalAuthorFeed,
     };
 };
