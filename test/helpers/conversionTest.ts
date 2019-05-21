@@ -1,4 +1,4 @@
-import { isHexString } from '../../src/helpers/conversion';
+import { isHexString, stringToByteArray } from '../../src/helpers/conversion';
 
 test('should work with valid hex string', () => {
     const input = '0xcafe';
@@ -33,4 +33,25 @@ test('should fail with invalid hex string without prefix', () => {
     const result = isHexString(input);
 
     expect(result).toBeFalsy();
+});
+
+test('should convert JS string to hex properly with unicode chars', () => {
+    const input = 'Á';
+    const result = stringToByteArray(input);
+
+    expect(result).toEqual([195, 129]);
+});
+
+test('should convert JS string to hex properly with unicode chinese char', () => {
+    const input = '汉';
+    const result = stringToByteArray(input);
+
+    expect(result).toEqual([230, 177, 137]);
+});
+
+test('should convert JS string to hex properly with unicode emoji', () => {
+    const input = '😎';
+    const result = stringToByteArray(input);
+
+    expect(result).toEqual([240, 159, 152, 142]);
 });
