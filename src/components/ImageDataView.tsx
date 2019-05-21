@@ -8,7 +8,7 @@ import { getImageSource } from '../helpers/imageDataHelpers';
 export interface StateProps extends ImageProps {
     source: ImageData;
     defaultImage?: BundledImage;
-    style: StyleProp<ImageStyle>;
+    style?: StyleProp<ImageStyle>;
     modelHelper: ModelHelper;
 }
 

@@ -184,7 +184,11 @@ export class RSSFeedManager {
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
             Debug.log('RSSFeedManager.fetchFeedFromUrl', {feed});
             if (feed.feedUrl !== '') {
-                return feed;
+                const rssFeed = await rssFeedHelper.fetch(feed.feedUrl);
+                return {
+                    ...feed,
+                    name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                };
             }
 
             const altFeedLocations = [
@@ -201,9 +205,14 @@ export class RSSFeedManager {
             for (const altFeedLocation of altFeedLocations) {
                 const altUrl = urlUtils.createUrlFromUrn(altFeedLocation, baseUrl);
                 const altFeedUrl = await RSSFeedManager.fetchRSSFeedUrlFromUrl(altUrl);
-                if (altFeedUrl !== '') {
+                const rssContentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+                if (rssContentWithMimeType != null && RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
                     feed.feedUrl = altFeedUrl;
-                    return feed;
+                    const rssFeed = await rssFeedHelper.load(altFeedUrl, rssContentWithMimeType.content);
+                    return {
+                        ...feed,
+                        name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                    };
                 }
             }
         }
