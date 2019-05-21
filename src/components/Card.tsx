@@ -107,17 +107,22 @@ const CardBody = (props: {
         references: undefined,
     };
     const authorFeed = props.authorFeed;
-    const cardTopOnPress = authorFeed == null
-        ? () => props.navigation.navigate('Feed', {
-            feedUrl: props.post.author!.uri,
-            name: props.post.author!.name,
-        })
-        : () => {
-            props.onDownloadFeedPosts(authorFeed);
-            props.navigation.navigate('NewsSourceFeed', {
-                feed: authorFeed,
-        });
-    };
+    const cardTopOnPress = authorFeed != null
+        ? authorFeed.isKnownFeed
+            ? () => props.navigation.navigate('Feed', {
+                feedUrl: authorFeed.feedUrl,
+                name: authorFeed.name,
+            })
+            : authorFeed.feedUrl !== ''
+                ?   () => {
+                    props.onDownloadFeedPosts(authorFeed);
+                    props.navigation.navigate('NewsSourceFeed', {
+                        feed: authorFeed,
+                    });
+                }
+            : undefined
+        : undefined
+    ;
     return (
         <View>
             <CardTop
@@ -334,7 +339,7 @@ const CardTop = (props: {
     currentTimestamp: number,
     modelHelper: ModelHelper,
     togglePostSelection?: (post: Post) => void,
-    onPress: () => void;
+    onPress?: () => void;
 }) => {
     const postUpdateTime = props.post.updatedAt || props.post.createdAt;
     const printableTime = DateUtils.printableElapsedTime(postUpdateTime, props.currentTimestamp) + ' ago';

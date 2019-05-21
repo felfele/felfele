@@ -42,7 +42,9 @@ const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
         return;
     }
     const postAuthor = post.author;
-    const knownFeed = getAllFeeds(state).find(feed => feed.feedUrl === postAuthor.uri);
+    const knownFeed = state.feeds.find(feed => feed.feedUrl === postAuthor.uri)
+        || state.ownFeeds.find(feed => feed.name === postAuthor.name)
+    ;
     return knownFeed != null
         ? {
             ...knownFeed,
