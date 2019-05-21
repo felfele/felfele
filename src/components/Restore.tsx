@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { View, StyleSheet, Clipboard, Alert, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Clipboard } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
-import { Button } from './Button';
+import { Colors, ComponentColors, DefaultNavigationBarHeight, defaultMediumFont } from '../styles';
 import {
     isValidBackupLinkData,
     downloadBackupFromSwarm,
@@ -14,6 +13,13 @@ import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
 import { AppState } from '../reducers/AppState';
 import { HexString } from '../helpers/opaqueTypes';
+import { TouchableView } from './TouchableView';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MediumText } from '../ui/misc/text';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import * as AreYouSureDialog from './AreYouSureDialog';
+import { Utils } from '../Utils';
+import { restartApp } from '../helpers/restart';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -32,6 +38,28 @@ export interface State {
     backupInfo: string;
     appState: AppState | undefined;
 }
+
+const RestoreButton = (props: {
+    onPress: () => void;
+    enabled: boolean;
+}) => {
+    const onPress = props.enabled
+        ? props.onPress
+        : undefined
+    ;
+    const color = props.enabled
+        ? Colors.BRAND_PURPLE
+        : Colors.LIGHT_GRAY
+    ;
+    return (
+        <TouchableView onPress={onPress} style={styles.buttonContainer}>
+            <View style={styles.buttonIcon}>
+                <Icon name='cloud-download' color={color} size={24} />
+            </View>
+            <MediumText style={[styles.buttonLabel, {color}]}>Restore</MediumText>
+        </TouchableView>
+    );
+};
 
 export class Restore extends React.PureComponent<Props, State> {
     public state: State = {
@@ -53,7 +81,7 @@ export class Restore extends React.PureComponent<Props, State> {
     }
 
     public render = () => (
-        <SafeAreaView style={styles.mainContainer}>
+        <FragmentSafeAreaViewWithoutTabBar>
             <NavigationHeader
                 title='Restore'
                 navigation={this.props.navigation}
@@ -69,13 +97,11 @@ export class Restore extends React.PureComponent<Props, State> {
                     defaultValue={this.state.backupPassword}
                     onChangeText={async (text) => this.onChangePassword(text)}
                 />
-                <Button
-                    enabled={this.state.appState != null}
-                    style={styles.restoreButton}
-                    text='Restore'
-                    onPress={() => this.onRestoreData()}
-                />
             </View>
+            <RestoreButton
+                enabled={this.state.appState != null}
+                onPress={() => this.onRestoreData()}
+            />
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
@@ -83,7 +109,7 @@ export class Restore extends React.PureComponent<Props, State> {
                 defaultValue={this.state.backupInfo}
                 multiline={true}
             />
-        </SafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     )
 
     private onChangePassword = async (password: string) => {
@@ -108,8 +134,14 @@ export class Restore extends React.PureComponent<Props, State> {
     }
 
     private onRestoreData = async () => {
-        if (this.state.appState != null) {
+        const confirmUnfollow = await AreYouSureDialog.show(
+            'Are you sure you want to restore data?',
+            'This will delete all your data and there is no undo!'
+        );
+        if (confirmUnfollow && this.state.appState != null) {
             this.props.onRestoreData(this.state.appState!);
+            await Utils.waitMillisec(3 * 1000);
+            restartApp();
         }
     }
 }
@@ -124,7 +156,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         flex: 1,
         padding: 3,
-        margin: 10,
         color: Colors.GRAY,
         backgroundColor: Colors.WHITE,
         marginBottom: DefaultNavigationBarHeight + 10,
@@ -138,13 +169,29 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     secretTextInput: {
-        fontSize: 12,
-        flex: 1,
-        padding: 3,
-        margin: 10,
-        borderRadius: 2,
-        height: 60,
+        width: '100%',
+        backgroundColor: 'white',
+        paddingHorizontal: 10,
+        paddingVertical: 14,
         color: Colors.DARK_GRAY,
+        fontSize: 14,
+        fontFamily: defaultMediumFont,
+        marginTop: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: Colors.WHITE,
+        margin: 10,
+        height: 44,
+    },
+    buttonIcon: {
+        alignItems: 'center',
+        paddingRight: 6,
+    },
+    buttonLabel: {
+        fontSize: 12,
+        color: Colors.BRAND_PURPLE,
     },
 });

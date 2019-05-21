@@ -11,7 +11,7 @@ import {
 import { Colors } from '../../styles';
 import { MediumText } from '../misc/text';
 
-interface Props {
+export interface Props {
     label?: string;
     icon?: React.ReactNode;
     onPress?: (event?: GestureResponderEvent) => void;

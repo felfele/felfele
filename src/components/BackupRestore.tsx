@@ -3,10 +3,12 @@ import {
     View,
     StyleSheet,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationHeader } from './NavigationHeader';
-import { Button } from './Button';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { TwoButton } from '../ui/buttons/TwoButton';
+import { Colors } from '../styles';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -27,8 +29,18 @@ export const BackupRestore = (props: Props) => (
             navigation={props.navigation}
         />
         <View style={styles.buttonContainer}>
-            <Button text='Backup' onPress={() => props.navigation.navigate('Backup', {})} />
-            <Button text='Restore' onPress={() => props.navigation.navigate('Restore', {})} />
+            <TwoButton
+                leftButton={{
+                    label: 'Backup',
+                    icon: <Icon name='cloud-upload' color={Colors.BRAND_PURPLE} size={24} />,
+                    onPress: () => props.navigation.navigate('Backup', {}),
+                }}
+                rightButton={{
+                    label: 'Restore',
+                    icon: <Icon name='cloud-download' color={Colors.BRAND_PURPLE} size={24} />,
+                    onPress: () => props.navigation.navigate('Restore', {}),
+                }}
+            />
         </View>
     </FragmentSafeAreaViewForTabBar>
 );

@@ -6,14 +6,13 @@ import {
     ShareContent,
     ShareOptions,
     Share,
-    SafeAreaView,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
-import { Button } from './Button';
+import { Colors, ComponentColors, DefaultNavigationBarHeight, defaultMediumFont } from '../styles';
 import {
     backupToSwarm,
     encryptBackupLinkData,
@@ -25,6 +24,9 @@ import { AppState } from '../reducers/AppState';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
 import { HexString } from '../helpers/opaqueTypes';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { TouchableView } from './TouchableView';
+import { MediumText } from '../ui/misc/text';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -44,6 +46,28 @@ export interface State {
     serializedAppState?: string;
 }
 
+const BackupButton = (props: {
+    onPress: () => void;
+    enabled: boolean;
+}) => {
+    const onPress = props.enabled
+        ? props.onPress
+        : undefined
+    ;
+    const color = props.enabled
+        ? Colors.BRAND_PURPLE
+        : Colors.LIGHT_GRAY
+    ;
+    return (
+        <TouchableView onPress={onPress} style={styles.buttonContainer}>
+            <View style={styles.buttonIcon}>
+                <Icon name='cloud-upload' color={color} size={24} />
+            </View>
+            <MediumText style={[styles.buttonLabel, {color}]}>Backup</MediumText>
+        </TouchableView>
+    );
+};
+
 export class Backup extends React.PureComponent<Props, State> {
     public state: State = {
         backupPassword: '',
@@ -62,7 +86,7 @@ export class Backup extends React.PureComponent<Props, State> {
     }
 
     public render = () => (
-        <SafeAreaView style={styles.mainContainer}>
+        <FragmentSafeAreaViewWithoutTabBar>
             <NavigationHeader
                 title='Backup'
                 navigation={this.props.navigation}
@@ -71,20 +95,18 @@ export class Backup extends React.PureComponent<Props, State> {
                 <SimpleTextInput
                     style={styles.secretTextInput}
                     multiline={true}
-                    numberOfLines={4}
+                    numberOfLines={1}
                     placeholder='Enter your backup password here'
                     autoCapitalize='none'
                     autoCorrect={false}
                     defaultValue={this.state.backupPassword}
                     onChangeText={async (text) => await this.setBackupPassword(text)}
                 />
-                <Button
-                    style={styles.backupButton}
-                    text='Backup'
-                    onPress={async () => await this.onBackupData()}
-                    enabled={this.state.contentHash === ''}
-                />
             </View>
+            <BackupButton
+                onPress={async () => await this.onBackupData()}
+                enabled={this.state.contentHash === ''}
+            />
             <SimpleTextInput
                 style={styles.backupTextInput}
                 editable={false}
@@ -92,7 +114,7 @@ export class Backup extends React.PureComponent<Props, State> {
                 placeholder='Saving backup...'
                 multiline={true}
             />
-        </SafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     )
 
     private completeSetState = <K extends keyof State>(state: ((prevState: Readonly<State>, props: Readonly<Props>) => (Pick<State, K> | State | null)) | (Pick<State, K> | State | null)): Promise<void> => {
@@ -167,27 +189,37 @@ const styles = StyleSheet.create({
         fontSize: 10,
         flex: 1,
         padding: 3,
-        margin: 10,
         color: Colors.GRAY,
         backgroundColor: Colors.WHITE,
         marginBottom: DefaultNavigationBarHeight + 10,
-    },
-    backupButton: {
-        paddingVertical: 20,
-        paddingLeft: 20,
-        width: 100,
     },
     secretContainer: {
         flexDirection: 'row',
     },
     secretTextInput: {
-        fontSize: 12,
-        flex: 1,
-        padding: 3,
-        margin: 10,
-        borderRadius: 2,
-        height: 60,
+        width: '100%',
+        backgroundColor: 'white',
+        paddingHorizontal: 10,
+        paddingVertical: 14,
         color: Colors.DARK_GRAY,
+        fontSize: 14,
+        fontFamily: defaultMediumFont,
+        marginTop: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: Colors.WHITE,
+        margin: 10,
+        height: 44,
+    },
+    buttonIcon: {
+        alignItems: 'center',
+        paddingRight: 6,
+    },
+    buttonLabel: {
+        fontSize: 12,
+        color: Colors.BRAND_PURPLE,
     },
 });
