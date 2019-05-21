@@ -332,7 +332,7 @@ const Scenes: NavigationRouteConfigMap = {
     },
     FeedInfoDeepLink: {
         screen: FeedInfoDeepLinkContainer,
-        path: 'channel/:feedUrl',
+        path: 'follow/:feedUrl',
     },
 };
 
