@@ -38,6 +38,9 @@ export interface Routes {
     FeedInfo: {
         feed: Feed;
     };
+    FeedInfoDeepLink: {
+        feedUrl: string;
+    };
     EditFilter: {
         filter: ContentFilter,
     };

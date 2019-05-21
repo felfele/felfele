@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { NavigationRouteConfigMap, createStackNavigator, createBottomTabNavigator, createSwitchNavigator, NavigationScreenProps } from 'react-navigation';
+import {
+    NavigationRouteConfigMap,
+    createStackNavigator,
+    createBottomTabNavigator,
+    createSwitchNavigator,
+    NavigationScreenProps,
+} from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Platform, YellowBox, View } from 'react-native';
@@ -46,6 +52,7 @@ import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 // @ts-ignore
 import { BottomTabBar } from 'react-navigation-tabs';
+import { FeedInfoDeepLinkContainer } from './containers/FeedInfoDeepLinkContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -323,6 +330,10 @@ const Scenes: NavigationRouteConfigMap = {
     FeedInfo: {
         screen: FeedInfoContainer,
     },
+    FeedInfoDeepLink: {
+        screen: FeedInfoDeepLinkContainer,
+        path: 'follow/:feedUrl',
+    },
 };
 
 const AppNavigator = createStackNavigator(Scenes,
@@ -349,9 +360,11 @@ const OnboardingNavigator = createStackNavigator({
     initialRouteName: 'Welcome',
 });
 
+const incomingUriPrefix = 'https://app.felfele.org/';
+
 const InitialNavigator = createSwitchNavigator({
     Loading: LoadingScreenContainer,
-    App: AppNavigator,
+    App: () => <AppNavigator uriPrefix={incomingUriPrefix}/>,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
