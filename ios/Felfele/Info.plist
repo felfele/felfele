@@ -68,6 +68,8 @@
 	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need permission to access your photos</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need permission to access your photos</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
 	<key>UIAppFonts</key>
