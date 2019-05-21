@@ -14,7 +14,7 @@ export const CardMarkdown = (props: { text: string }) => (
 
 const styles = StyleSheet.create({
     markdownStyle: {
-        marginVertical: 10,
+        marginBottom: 10,
         marginHorizontal: 10,
     },
 });

@@ -10,11 +10,11 @@ export interface ModelHelper {
     getImageUri: (image: ImageData) => string | BundledImage;
 }
 
-export const calculateImageDimensions = (image: ImageData, maxWidth: number): Rectangle => {
+export const calculateImageDimensions = (image: ImageData, maxWidth: number, maxHeight: number): Rectangle => {
     if (image.width == null || image.height == null) {
         return {
             width: maxWidth,
-            height: maxWidth,
+            height: maxHeight,
         };
     }
     const ratio = image.width / maxWidth;

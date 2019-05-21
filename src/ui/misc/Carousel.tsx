@@ -12,8 +12,7 @@ import { ImageDataView } from '../../components/ImageDataView';
 
 interface Props {
     post: Post;
-    showSquareImages: boolean;
-    calculateImageDimensions: (image: ImageData, maxWidth: number, showSquareImages: boolean) => Rectangle;
+    calculateImageDimensions: (image: ImageData, maxWidth: number, maxHeight: number) => Rectangle;
     testID?: string;
     modelHelper: ModelHelper;
 }
@@ -31,7 +30,7 @@ export class Carousel extends React.PureComponent<Props, { index: number }> {
             <View>
                 <AutoPlaySwipeableViews disabled onChangeIndex={this.handleChangeIndex}>
                     {this.props.post.images.map((image, index) => {
-                        const { width, height } = this.props.calculateImageDimensions(image, windowWidth, true);
+                        const { width, height } = this.props.calculateImageDimensions(image, windowWidth, windowWidth);
                         return (
                             <ImageDataView
                                 testID={(image.uri || '') + index}

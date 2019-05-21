@@ -41,6 +41,9 @@ export const getBaseUrl = (url: string): string => {
 };
 
 export const getCanonicalUrl = (url: string): string => {
+    if (url === '') {
+        return '';
+    }
     const parts = url.split('//', 2);
     if (parts.length === 1) {
         if (!url.includes('/')) {
@@ -61,6 +64,14 @@ export const getCanonicalUrl = (url: string): string => {
     return url;
 };
 
+export const getHttpsUrl = (url: string): string => {
+    const httpProtocol = 'http:';
+    if (url.startsWith(httpProtocol)) {
+        return 'https:' + url.slice(httpProtocol.length);
+    }
+    return url;
+};
+
 export const stripNonAscii = (s: string): string => {
     return s.replace(/[^\x00-\x7F]/g, '');
 };
@@ -74,6 +85,14 @@ export const getLinkFromText = (text: string): string | undefined => {
     if (bzzLink != null) {
         return bzzLink;
     }
+    const httpLink = getHttpLinkFromText(text);
+    if (httpLink != null) {
+        return httpLink;
+    }
+    return undefined;
+};
+
+export const getHttpLinkFromText = (text: string): string | undefined => {
     const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
     if (httpLink != null) {
         return httpLink[1];
