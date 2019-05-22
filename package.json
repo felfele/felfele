@@ -1,6 +1,6 @@
 {
   "name": "felfele",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "devDependencies": {
     "@microsoft/tsdoc": "=0.12.5",
@@ -31,6 +31,7 @@
     "react-native-debugger-open": "=0.3.17",
     "react-native-svg-transformer": "=0.12.1",
     "react-native-typescript-transformer": "=1.2.10",
+    "react-native-version": "=3.1.0",
     "react-test-renderer": "16.6.1",
     "typescript": "=3.4.3"
   },
