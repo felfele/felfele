@@ -1,12 +1,3 @@
-## v1.0.3 (2019-05-13) First Alpha update
-
-This release adds the following new features and fixes:
-
-- Feature: You can take a picture during profile creation (https://github.com/felfele/felfele/pull/360)
-- Feature: More descriptive link sharing, which opens in the app (https://github.com/felfele/felfele/pull/379)
-- Feature: Sharing links in posts preview the content  (https://github.com/felfele/felfele/pull/331)
-- Many small bugfixes and style changes
-
 ## v1.0.2 (2019-05-13) Alpha release
 
 This release adds the following new features and fixes:

@@ -99,8 +99,8 @@ android {
         applicationId "org.felfele.mobile"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 5
-        versionName "1.0.3"
+        versionCode 4
+        versionName "1.0.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
