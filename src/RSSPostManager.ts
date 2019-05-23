@@ -123,7 +123,7 @@ export class RSSFeedManager {
         if (feed.feedUrl !== '') {
             feed.feedUrl = urlUtils.createUrlFromUrn(feed.feedUrl, baseUrl);
         }
-        if (feed.favicon !== '') {
+        if (typeof feed.favicon === 'string' && feed.favicon !== '') {
             feed.favicon = urlUtils.createUrlFromUrn(feed.favicon, baseUrl);
         }
         if (feed.name.search(' - ') >= 0) {
@@ -184,7 +184,11 @@ export class RSSFeedManager {
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
             Debug.log('RSSFeedManager.fetchFeedFromUrl', {feed});
             if (feed.feedUrl !== '') {
-                return feed;
+                const rssFeed = await rssFeedHelper.fetch(feed.feedUrl);
+                return {
+                    ...feed,
+                    name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                };
             }
 
             const altFeedLocations = [
@@ -201,9 +205,14 @@ export class RSSFeedManager {
             for (const altFeedLocation of altFeedLocations) {
                 const altUrl = urlUtils.createUrlFromUrn(altFeedLocation, baseUrl);
                 const altFeedUrl = await RSSFeedManager.fetchRSSFeedUrlFromUrl(altUrl);
-                if (altFeedUrl !== '') {
+                const rssContentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+                if (rssContentWithMimeType != null && RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
                     feed.feedUrl = altFeedUrl;
-                    return feed;
+                    const rssFeed = await rssFeedHelper.load(altFeedUrl, rssContentWithMimeType.content);
+                    return {
+                        ...feed,
+                        name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                    };
                 }
             }
         }
@@ -216,7 +225,7 @@ export class RSSFeedManager {
             const baseUrl = urlUtils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
             Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
-            const feed = {
+            const feed: Feed = {
                 url: baseUrl,
                 feedUrl: url,
                 name: name,
@@ -242,6 +251,10 @@ export class RSSFeedManager {
         return null;
     }
 }
+
+const feedFaviconString = (favicon: string | number): string => {
+    return typeof favicon === 'number' ? '' : favicon;
+};
 
 // tslint:disable-next-line:class-name
 class _RSSPostManager {
@@ -279,9 +292,10 @@ class _RSSPostManager {
                         ? rssFeed.icon
                         : ''
                 ;
+                const faviconString = feedFaviconString(favicon);
                 Debug.log('RSSPostManager.loadPosts', {rssFeed, storedFeeds, favicon});
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, faviconString, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }

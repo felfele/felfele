@@ -30,6 +30,7 @@ import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { TwoButton } from '../ui/buttons/TwoButton';
+import { ImageDataView } from '../components/ImageDataView';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -64,8 +65,6 @@ const generateQRCodeValue = (feed?: Feed): string => {
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImageUri = modelHelper.getImageUri(props.author.image);
-    Debug.log('IdentitySettings', authorImageUri);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <KeyboardAvoidingView style={styles.mainContainer}>
@@ -93,12 +92,11 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         }}
                         style={styles.imagePickerContainer}
                     >
-                        <Image
-                            source={authorImageUri === ''
-                                ? defaultUserImage
-                                : { uri: authorImageUri }
-                            }
+                        <ImageDataView
+                            source={props.author.image}
+                            defaultImage={defaultUserImage}
                             style={styles.imagePicker}
+                            modelHelper={modelHelper}
                         />
                     </TouchableOpacity>
                     <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>

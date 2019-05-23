@@ -70,12 +70,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -92,12 +92,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -114,12 +114,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -137,12 +137,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -160,12 +160,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
                 onDownloadFeedPosts={() => {}}
                 originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));

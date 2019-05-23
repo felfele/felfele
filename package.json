@@ -31,6 +31,7 @@
     "react-native-debugger-open": "=0.3.17",
     "react-native-svg-transformer": "=0.12.1",
     "react-native-typescript-transformer": "=1.2.10",
+    "react-native-version": "=3.1.0",
     "react-test-renderer": "16.6.1",
     "typescript": "=3.4.3"
   },
@@ -56,6 +57,7 @@
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
   },
   "dependencies": {
+    "base-64": "^0.1.0",
     "base64-arraybuffer": "=0.1.5",
     "buffer": "=5.2.1",
     "ecma-nacl": "=2.4.2",
@@ -71,13 +73,13 @@
     "react-native-communications": "=2.2.1",
     "react-native-crypto": "=2.1.2",
     "react-native-device-info": "=0.29.1",
-    "react-native-easy-markdown": "=1.2.0",
     "react-native-fs": "=2.12.1",
     "react-native-get-real-path": "git+https://github.com/Wraptime/react-native-get-real-path.git",
     "react-native-global-props": "=1.1.5",
     "react-native-gravatar": "=1.0.2",
     "react-native-image-picker": "=0.27.1",
     "react-native-image-resizer": "=1.0.0",
+    "react-native-markdown-renderer": "=3.2.8",
     "react-native-parse-html": "=2.2.6",
     "react-native-push-notification": "=3.1.2",
     "react-native-qrcode-scanner": "=1.1.2",

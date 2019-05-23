@@ -44,15 +44,14 @@ export const NavigationHeader = (props: Props) => (
             style={styles.leftContainer}
             testID={(props.leftButton && props.leftButton.testID) || 'NavigationHeader/LeftButton'}
         >
-            <RegularText style={styles.headerLeftButtonText}>
-                {
+            <ButtonLabel label={
                     props.leftButton != null
                         ? props.leftButton.label
                         : props.navigation != null
                             ? HeaderDefaultLeftButtonIcon
                             : undefined
                 }
-            </RegularText>
+            />
         </TouchableView>
         <TouchableView
             onPress={props.onPressTitle}
@@ -72,14 +71,14 @@ export const NavigationHeader = (props: Props) => (
             {props.rightButton1 &&
                 <RightButton
                     onPress={props.rightButton1.onPress}
-                    text={props.rightButton1.label}
+                    label={props.rightButton1.label}
                     testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
                 />}
             {props.rightButton2 &&
-                <View style={{paddingRight: 20}}>
+                <View style={{paddingRight: 10}}>
                     <RightButton
                         onPress={props.rightButton2.onPress}
-                        text={props.rightButton2.label}
+                        label={props.rightButton2.label}
                         testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
                     />
                 </View>
@@ -88,7 +87,16 @@ export const NavigationHeader = (props: Props) => (
     </View>
 );
 
-const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode, testID?: string }) => {
+const ButtonLabel = (props: { label?: string | React.ReactNode }) => {
+    return typeof props.label === 'string'
+        ? <RegularText style={styles.headerButtonText}>
+                {props.label}
+            </RegularText>
+        : <View>{props.label}</View>
+    ;
+};
+
+const RightButton = (props: { onPress?: () => void, label?: string | React.ReactNode, testID?: string }) => {
     return (
         <TouchableView
             onPress={props.onPress}
@@ -96,9 +104,7 @@ const RightButton = (props: { onPress?: () => void, text?: string | React.ReactN
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
-            <RegularText style={styles.headerRightButtonText}>
-                {props.text ? props.text : ''}
-            </RegularText>
+            <ButtonLabel label={props.label} />
         </TouchableView>
     );
 };
@@ -115,7 +121,7 @@ const styles = StyleSheet.create({
         backgroundColor: ComponentColors.HEADER_COLOR,
         zIndex: 100,
     },
-    headerLeftButtonText: {
+    headerButtonText: {
         color: Colors.WHITE,
         fontSize: 18,
     },
@@ -126,6 +132,7 @@ const styles = StyleSheet.create({
         maxWidth: '50%',
         flexDirection: 'row',
         alignItems: 'center',
+        marginRight: 5,
     },
     rightContainer: {
         flex: 1,
@@ -137,10 +144,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: Colors.WHITE,
         textAlign: 'center',
-    },
-    headerRightButtonText: {
-        fontSize: 18,
-        color: Colors.WHITE,
     },
     rightButtonContainer: {
         marginLeft: 30,

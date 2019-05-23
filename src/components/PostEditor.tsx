@@ -7,6 +7,7 @@ import {
     AlertIOS,
     KeyboardAvoidingView,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
@@ -25,6 +26,9 @@ import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
+import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
+import { getHttpLinkFromText } from '../helpers/urlUtils';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -64,7 +68,10 @@ export class PostEditor extends React.Component<Props, State> {
         const isPostEmpty = this.isPostEmpty();
         const isSendEnabled = !isPostEmpty && !this.state.isSending;
         const sendIconColor = isSendEnabled ? ComponentColors.NAVIGATION_BUTTON_COLOR : ComponentColors.HEADER_COLOR;
-        const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
+        const sendIcon = this.state.isSending
+            ? <ActivityIndicator size='small' color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
+            : <Icon name='send' size={20} color={sendIconColor} />
+        ;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
             <FragmentSafeAreaViewWithoutTabBar>
@@ -92,7 +99,8 @@ export class PostEditor extends React.Component<Props, State> {
                             <Avatar
                                 size='medium'
                                 style={{ marginRight: 10 }}
-                                imageUri={this.modelHelper.getImageUri(this.props.avatar)}
+                                image={this.props.avatar}
+                                modelHelper={this.modelHelper}
                             />
                         }
                         title={this.props.name}
@@ -228,25 +236,42 @@ export class PostEditor extends React.Component<Props, State> {
         }
     }
 
-    private onPressSubmit = () => {
-        this.sendUpdate();
+    private onPressSubmit = async () => {
+        await this.sendUpdate();
         this.props.navigation.goBack();
     }
 
-    private sendUpdate = () => {
+    private createPostFromState = async (): Promise<Post> => {
+        const httpLink = getHttpLinkFromText(this.state.post.text);
+
+        if (httpLink != null) {
+            const url = httpLink;
+            const htmlMetaData = await fetchHtmlMetaData(url);
+            const post = convertPostToParentPost(convertHtmlMetaDataToPost({
+                ...htmlMetaData,
+                description: '',
+            }));
+            return {
+                ...post,
+                createdAt: this.state.post.createdAt,
+                updatedAt: this.state.post.createdAt,
+            };
+        } else {
+            const markdownText = markdownEscape(this.state.post.text);
+            const post = {
+                ...this.state.post,
+                text: markdownText,
+            };
+            return post;
+        }
+    }
+
+    private sendUpdate = async () => {
         this.setState({
             isSending: true,
         });
-        const markdownText = markdownEscape(this.state.post.text);
-        this.setState({
-           post: {
-            ...this.state.post,
-            text: markdownText,
-           },
-        }, () => {
-            Debug.log('PostEditor.sendUpdate', 'this.state.post', this.state.post);
-            this.props.onPost(this.state.post);
-        });
+        const post = await this.createPostFromState();
+        this.props.onPost(post);
     }
 }
 

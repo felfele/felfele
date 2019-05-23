@@ -1,4 +1,4 @@
-import { ImageData } from './ImageData';
+import { ImageData, BundledImage } from './ImageData';
 
 export interface Rectangle {
     width: number;
@@ -7,14 +7,14 @@ export interface Rectangle {
 
 export interface ModelHelper {
     getLocalPath: (localPath: string) => string;
-    getImageUri: (image: ImageData) => string;
+    getImageUri: (image: ImageData) => string | BundledImage;
 }
 
-export const calculateImageDimensions = (image: ImageData, maxWidth: number): Rectangle => {
+export const calculateImageDimensions = (image: ImageData, maxWidth: number, maxHeight: number): Rectangle => {
     if (image.width == null || image.height == null) {
         return {
             width: maxWidth,
-            height: maxWidth,
+            height: maxHeight,
         };
     }
     const ratio = image.width / maxWidth;

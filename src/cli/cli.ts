@@ -13,6 +13,8 @@ import { output, setOutput, jsonPrettyPrint } from './cliHelpers';
 import { swarmConfig } from './swarmConfig';
 import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
+import { fetchOpenGraphData } from '../helpers/openGraph';
+import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -60,6 +62,15 @@ const definitions =
                 await test();
             }
     })
+    .addCommand('bugreport [endpoint]', 'Send bugreport to endpoint', async (endpoint) => {
+        const response = await fetch(endpoint, {
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            method: 'POST',
+            body: 'Bugreport',
+        });
+    })
     .addCommand('swarm', 'Swarm related commands',
         addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmConfig.gatewayAddress = gatewayAddress)
         .
@@ -103,6 +114,18 @@ const definitions =
         const canonicalUrl = urlUtils.getCanonicalUrl(url);
         const feed = await RSSFeedManager.fetchFeedFromUrl(canonicalUrl);
         output('rss feed', {feed});
+    })
+    .
+    addCommand('opengraph <url>', 'Fetch OpenGraph data of url', async (url: string) => {
+        const canonicalUrl = urlUtils.getHttpsUrl(urlUtils.getCanonicalUrl(url));
+        const data = await fetchOpenGraphData(canonicalUrl);
+        output({data});
+    })
+    .
+    addCommand('metadata <url>', 'Fetch metadata of url', async (url: string) => {
+        const canonicalUrl = urlUtils.getHttpsUrl(urlUtils.getCanonicalUrl(url));
+        const data = await fetchHtmlMetaData(canonicalUrl);
+        output({data});
     })
 ;
 

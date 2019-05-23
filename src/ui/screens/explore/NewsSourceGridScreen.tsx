@@ -8,6 +8,7 @@ import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
+import { getFeedImage } from '../../../helpers/feedHelpers';
 
 export interface StateProps {
     gatewayAddress: string;
@@ -34,11 +35,11 @@ export const NewsSourceGridScreen = (props: StateProps & DispatchProps) => {
                     itemDimension={itemDimension}
                     items={props.feeds}
                     renderItem={({ item }: any) => {
-                        const imageUri = item.authorImage ? modelHelper.getImageUri(item.authorImage) : item.favicon;
+                        const image = getFeedImage(item);
                         return (
                             <GridCard
                                 title={item.name}
-                                imageUri={imageUri}
+                                image={image}
                                 onPress={() => {
                                     props.downloadPostsForNewsSource(item);
                                     props.navigation.navigate('NewsSourceFeed', {

@@ -29,7 +29,7 @@ const updateNavParam = (feeds: Feed[], navigation: TypedNavigation) => {
     }
 };
 
-const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onAddFeed: (feed: Feed) => {
             dispatch(Actions.addFeed(feed));

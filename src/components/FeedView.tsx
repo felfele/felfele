@@ -69,7 +69,7 @@ export const FeedView = (props: Props) => {
                 ? isFavorite(props.feeds, props.feedUrl)
                     ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
                     : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
-                : button('link-variant', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
+                : button('link', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
 
     const rightButton2 = isLocalFeed || isOnboardingFeed
