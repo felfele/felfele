@@ -69,6 +69,8 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
+    addFeed: (feed: Feed) =>
+        createAction(ActionTypes.ADD_FEED, { feed }),
     addOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
@@ -88,8 +90,6 @@ export const Actions = {
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilter: (filter: ContentFilter) =>
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
-    addFeed: (feed: Feed) =>
-        createAction(ActionTypes.ADD_FEED, { feed }),
     removeFeed: (feed: Feed) =>
         createAction(ActionTypes.REMOVE_FEED, { feed }),
     followFeed: (feed: Feed) =>
@@ -131,6 +131,14 @@ export const Actions = {
 };
 
 export const AsyncActions = {
+    addFeed: (feed: Feed): Thunk => {
+        return async (dispatch, getState) => {
+            const ownFeeds = getState().ownFeeds.map(ownFeed => ownFeed.feedUrl);
+            if (!ownFeeds.includes(feed.feedUrl)) {
+                dispatch(InternalActions.addFeed(feed));
+            }
+        };
+    },
     cleanupContentFilters: (currentTimestamp: number = Date.now()): Thunk => {
         return async (dispatch, getState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
