@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 

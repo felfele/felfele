@@ -9,7 +9,6 @@ import thunkMiddleware from 'redux-thunk';
 import {
     persistStore,
     persistReducer,
-    PersistedState,
     createMigrate,
     getStoredState,
     KEY_PREFIX,
@@ -21,140 +20,23 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
 import { Post } from '../models/Post';
-import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
+import { Author } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
-import { migrateAppState, currentAppStateVersion } from './migration';
+import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
-import * as Swarm from '../swarm/Swarm';
-
-export interface AppState extends PersistedState {
-    contentFilters: ContentFilter[];
-    feeds: Feed[];
-    ownFeeds: LocalFeed[];
-    settings: Settings;
-    author: Author;
-    currentTimestamp: number;
-    rssPosts: Post[];
-    localPosts: Post[];
-    draft: Post | null;
-    metadata: Metadata;
-}
-
-const defaultSettings: Settings = {
-    saveToCameraRoll: true,
-    showSquareImages: false,
-    showDebugMenu: false,
-    swarmGatewayAddress: Swarm.defaultGateway,
-};
-
-export const defaultAuthor: Author = {
-    name: DEFAULT_AUTHOR_NAME,
-    uri: '',
-    image: {
-        uri: '',
-    },
-    identity: undefined,
-};
-
-export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
-
-const onboardingAuthor: Author = {
-    name: FELFELE_ASSISTANT_NAME,
-    uri: '',
-    image: {},
-};
-
-const defaultPost1: Post = {
-    _id: 0,
-    createdAt: Date.now(),
-    images: [],
-    text: `Basic features:.
-
-Post text and images privately, and later add the posts to your public feed.
-
-Follow the public feed of others, or add your favorite RSS/Atom feeds.
-
-If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
-    author: onboardingAuthor,
-};
-
-const defaultPost2: Post = {
-    _id: 1,
-    createdAt: Date.now(),
-    images: [],
-    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
-    author: onboardingAuthor,
-};
-
-const defaultPost3: Post = {
-    _id: 2,
-    createdAt: Date.now(),
-    images: [],
-    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
-    author: onboardingAuthor,
-};
-
-export const defaultLocalPosts = [defaultPost1, defaultPost2, defaultPost3];
-
-const defaultCurrentTimestamp = 0;
-
-const defaultMetadata = {
-    highestSeenPostId: defaultLocalPosts.length - 1,
-};
-
-const defaultFeeds: Feed[] = [
-    {
-        name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        feedUrl: 'bzz-feed:/?user=0x71f770a561f55d84be1c53551c771115daf8aaf7',
-        favicon: 'https://swarm-gateways.net/bzz:/c9cdca819b043fd07394ca1f85be18eaaa6073f0cd16e585fdc7dfd79119b5f5/icon.png',
-        followed: true,
-    },
-    {
-        name: 'The Verge',
-        url: 'https://theverge.com/',
-        feedUrl: 'https://www.theverge.com/rss/index.xml',
-        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png',
-        followed: true,
-    },
-    {
-        name: 'Wired Photos',
-        url: 'https://www.wired.com/',
-        feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: 'https://static.savings-united.com/image_setting/132/logo/wired_coupons_logo.png',
-        followed: true,
-    },
-    {
-        name: '500px Blog',
-        url: 'https://iso.500px.com',
-        feedUrl: 'https://iso.500px.com/feed',
-        favicon: 'https://iso.500px.com/wp-content/uploads/2017/10/cropped-FAVICON-180x180.png',
-        followed: true,
-    },
-    {
-        name: 'Favorite Places – Outdoor Photographer',
-        url: 'https://www.outdoorphotographer.com',
-        feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
-        favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
-        followed: true,
-    },
-];
-
-export const defaultState: AppState = {
-    contentFilters: [],
-    feeds: defaultFeeds,
-    ownFeeds: [],
-    settings: defaultSettings,
-    author: defaultAuthor,
-    currentTimestamp: defaultCurrentTimestamp,
-    rssPosts: [],
-    localPosts: defaultLocalPosts,
-    draft: null,
-    metadata: defaultMetadata,
-};
+import {
+    defaultFeeds,
+    defaultSettings,
+    defaultAuthor,
+    defaultCurrentTimestamp,
+    defaultLocalPosts,
+    defaultMetadata,
+    defaultState,
+} from './defaultData';
+import { AppState, currentAppStateVersion } from './AppState';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -255,13 +137,13 @@ const ownFeedsReducer = (ownFeeds: LocalFeed[] = [], action: Actions): LocalFeed
             return [...ownFeeds, action.payload.feed];
         }
         case 'UPDATE-OWN-FEED': {
-            const ind = ownFeeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
+            const ind = ownFeeds.findIndex(feed => action.payload.partialFeed.feedUrl === feed.feedUrl);
             if (ind === -1) {
                 return ownFeeds;
             }
             return updateArrayItem(ownFeeds, ind, (feed) => ({
                 ...feed,
-                ...action.payload.feed,
+                ...action.payload.partialFeed,
             }));
 
         }
@@ -348,9 +230,6 @@ const rssPostsReducer = (rssPosts: Post[] = [], action: Actions): Post[] => {
 const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Post[] => {
     switch (action.type) {
         case 'ADD-POST': {
-            if (action.payload.post._id === defaultLocalPosts.length) {
-                return [action.payload.post];
-            }
             return insertInArray(localPosts, action.payload.post, 0);
         }
         case 'DELETE-POST': {
@@ -412,7 +291,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
-    Debug.log('appStateReducer', 'action', action);
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -424,7 +302,12 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
         }
         default: {
             try {
-                return combinedReducers(state, action);
+                const newState = combinedReducers(state, action);
+                if (action.type !== 'TIME-TICK') {
+                    // tslint:disable-next-line:no-console
+                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                }
+                return newState;
             } catch (e) {
                 Debug.log('reducer error: ', e);
                 return state;
@@ -484,6 +367,11 @@ const initStore = () => {
     // @ts-ignore
     store.dispatch(AsyncActions.cleanUploadingPostState());
     store.dispatch(Actions.timeTick());
+    // @ts-ignore
+    store.dispatch(AsyncActions.registerBackgroundTasks());
+    // @ts-ignore
+    store.dispatch(AsyncActions.downloadFollowedFeedPosts());
+
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
 

@@ -5,9 +5,9 @@ import {
     Platform,
     Alert,
     AlertIOS,
-    SafeAreaView,
     KeyboardAvoidingView,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
@@ -18,15 +18,20 @@ import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
+import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
+import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
+import { getHttpLinkFromText } from '../helpers/urlUtils';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     draft: Post | null;
     name: string;
     avatar: ImageData;
@@ -43,6 +48,7 @@ type Props = StateProps & DispatchProps;
 
 interface State {
     post: Post;
+    isSending: boolean;
 }
 
 export class PostEditor extends React.Component<Props, State> {
@@ -53,13 +59,22 @@ export class PostEditor extends React.Component<Props, State> {
         super(props);
         this.state = {
             post: this.getPostFromDraft(this.props.draft),
+            isSending: false,
         };
         this.modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
     }
 
     public render() {
+        const isPostEmpty = this.isPostEmpty();
+        const isSendEnabled = !isPostEmpty && !this.state.isSending;
+        const sendIconColor = isSendEnabled ? ComponentColors.NAVIGATION_BUTTON_COLOR : ComponentColors.HEADER_COLOR;
+        const sendIcon = this.state.isSending
+            ? <ActivityIndicator size='small' color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
+            : <Icon name='send' size={20} color={sendIconColor} />
+        ;
+        const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
@@ -71,22 +86,21 @@ export class PostEditor extends React.Component<Props, State> {
                             label: <Icon
                                 name={'close'}
                                 size={20}
-                                color={Colors.DARK_GRAY}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
+                            testID: 'PostEditor/CloseButton',
                         }}
                         rightButton1={{
-                            onPress: this.onPressSubmit,
-                            label: <Icon
-                                name={'send'}
-                                size={20}
-                                color={Colors.BRAND_PURPLE}
-                            />,
+                            onPress: sendButtonOnPress,
+                            label: sendIcon,
+                            testID: 'PostEditor/SendPostButton',
                         }}
                         titleImage={
                             <Avatar
                                 size='medium'
                                 style={{ marginRight: 10 }}
-                                imageUri={this.modelHelper.getImageUri(this.props.avatar)}
+                                image={this.props.avatar}
+                                modelHelper={this.modelHelper}
                             />
                         }
                         title={this.props.name}
@@ -112,8 +126,12 @@ export class PostEditor extends React.Component<Props, State> {
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
-            </SafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
+    }
+
+    private isPostEmpty = () => {
+        return this.state.post.text === '' && this.state.post.images.length === 0;
     }
 
     private onRemoveImage = (removedImage: ImageData) => {
@@ -218,21 +236,42 @@ export class PostEditor extends React.Component<Props, State> {
         }
     }
 
-    private onPressSubmit = () => {
-        this.sendUpdate();
+    private onPressSubmit = async () => {
+        await this.sendUpdate();
         this.props.navigation.goBack();
     }
 
-    private sendUpdate = () => {
+    private createPostFromState = async (): Promise<Post> => {
+        const httpLink = getHttpLinkFromText(this.state.post.text);
+
+        if (httpLink != null) {
+            const url = httpLink;
+            const htmlMetaData = await fetchHtmlMetaData(url);
+            const post = convertPostToParentPost(convertHtmlMetaDataToPost({
+                ...htmlMetaData,
+                description: '',
+            }));
+            return {
+                ...post,
+                createdAt: this.state.post.createdAt,
+                updatedAt: this.state.post.createdAt,
+            };
+        } else {
+            const markdownText = markdownEscape(this.state.post.text);
+            const post = {
+                ...this.state.post,
+                text: markdownText,
+            };
+            return post;
+        }
+    }
+
+    private sendUpdate = async () => {
         this.setState({
-           post: {
-            ...this.state.post,
-            text: markdownEscape(this.state.post.text),
-           },
-        }, () => {
-            Debug.log(this.state.post);
-            this.props.onPost(this.state.post);
+            isSending: true,
         });
+        const post = await this.createPostFromState();
+        this.props.onPost(post);
     }
 }
 
@@ -247,7 +286,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'camera'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
             <TouchableOpacity
@@ -257,7 +296,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'image-multiple'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
         </View>
@@ -266,9 +305,9 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: Colors.WHITE,
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: 'white',
     },
     textInput: {
         flex: 1,

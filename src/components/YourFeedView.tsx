@@ -6,6 +6,7 @@ import { FeedHeader } from './FeedHeader';
 import { NavigationHeader } from './NavigationHeader';
 import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -13,7 +14,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     posts: Post[];
     feeds: Feed[];
     profileImage: ImageData;

@@ -1,4 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const IconSize = {
     LARGE_LIST_ICON: 40,
@@ -10,16 +10,31 @@ export const Colors = {
     BLACK: '#000000',
     WHITE: '#FFFFFF',
     LIGHTISH_GRAY: '#9B9B9B',
-    LIGHT_GRAY: '#D3D3D3',
+    PINKISH_GRAY: '#BBBBBB',
+    BROWNISH_GRAY: '#696969',
+    LIGHT_GRAY: '#DDDDDD',
     LIGHTER_GRAY: '#E6E6E6',
     VERY_LIGHT_GRAY: '#F8F8F8',
+    MEDIUM_GRAY: '#A4A4A4',
     GRAY: '#808080',
     DARK_GRAY: '#4A4A4A',
-    BRAND_PURPLE: '#873FFF',
+    BRAND_PURPLE: '#6200EA',
     BRAND_PURPLE_LIGHT: '#BA76FA',
+    BRAND_PURPLE_DARK: '#3700B4',
+};
+export const ComponentColors = {
     STRONG_TEXT: '#303030',
-    BACKGROUND_COLOR: '#DDDDDD',
-    BUTTON_COLOR: '#4A4A4A',
+    TEXT_COLOR: Colors.GRAY,
+    HINT_TEXT_COLOR: Colors.BROWNISH_GRAY,
+    BACKGROUND_COLOR: Colors.LIGHT_GRAY,
+    DISABLED_BUTTON_COLOR: Colors.LIGHT_GRAY,
+    BUTTON_COLOR: Colors.DARK_GRAY,
+    NAVIGATION_BUTTON_COLOR: Colors.WHITE,
+    HEADER_COLOR: Colors.BRAND_PURPLE,
+    TAB_ACTIVE_COLOR: Colors.BLACK,
+    TAB_INACTIVE_COLOR: Colors.PINKISH_GRAY,
+    TAB_ACTION_BUTTON_COLOR: Colors.BRAND_PURPLE,
+    TAB_ACTION_BUTTON_ICON_COLOR: Colors.WHITE,
 };
 
 export const defaultBoldFont = 'Roboto-Bold';

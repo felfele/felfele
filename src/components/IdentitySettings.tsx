@@ -4,33 +4,35 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    Text,
     Image,
     TouchableOpacity,
     Dimensions,
-    Share,
-    ShareContent,
-    ShareOptions,
-    Platform,
     ScrollView,
     SafeAreaView,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SimpleTextInput } from './SimpleTextInput';
-import { Author, DEFAULT_AUTHOR_NAME } from '../models/Author';
+import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
-import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Colors } from '../styles';
-import { NavigationHeader } from './NavigationHeader';
-// tslint:disable-next-line:no-var-requires
-const defaultUserImage = require('../../images/user_circle.png');
 import { Feed } from '../models/Feed';
+import { AsyncImagePicker } from '../AsyncImagePicker';
+import { ComponentColors, Colors } from '../styles';
+import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { RowItem } from '../ui/misc/RowButton';
+import { RowItem } from '../ui/buttons/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
+import { defaultImages } from '../defaultImages';
+import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
+import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
+import { showShareFeedDialog } from '../helpers/shareDialogs';
+import { TwoButton } from '../ui/buttons/TwoButton';
+import { ImageDataView } from '../components/ImageDataView';
+
+const defaultUserImage = defaultImages.defaultUser;
 
 export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
@@ -40,8 +42,8 @@ export interface DispatchProps {
 
 export interface StateProps {
     author: Author;
-    ownFeed?: Feed;
-    navigation: any;
+    ownFeed?: LocalFeed;
+    navigation: TypedNavigation;
     gatewayAddress: string;
 }
 
@@ -60,25 +62,9 @@ const generateQRCodeValue = (feed?: Feed): string => {
     return feed.url;
 };
 
-const showShareDialog = async (feed?: Feed) => {
-    const url = feed != null ? feed.url : '';
-    const title = 'Share your feed';
-    const message = Platform.OS === 'android' ? url : undefined;
-    const content: ShareContent = {
-        url,
-        title,
-        message,
-    };
-    const options: ShareOptions = {
-    };
-    await Share.share(content, options);
-};
-
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = generateQRCodeValue(props.ownFeed);
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImageUri = modelHelper.getImageUri(props.author.image);
-    Debug.log('IdentitySettings: ', authorImageUri);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <KeyboardAvoidingView style={styles.mainContainer}>
@@ -89,9 +75,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                                 label: <MaterialCommunityIcon
                                     name={'share'}
                                     size={20}
-                                    color={Colors.DARK_GRAY}
+                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
-                                onPress: async () => showShareDialog(props.ownFeed),
+                                onPress: async () => showShareFeedDialog(props.ownFeed),
                             }
                             : undefined
                     }
@@ -106,12 +92,11 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         }}
                         style={styles.imagePickerContainer}
                     >
-                        <Image
-                            source={authorImageUri === ''
-                                ? defaultUserImage
-                                : { uri: authorImageUri }
-                            }
+                        <ImageDataView
+                            source={props.author.image}
+                            defaultImage={defaultUserImage}
                             style={styles.imagePicker}
+                            modelHelper={modelHelper}
                         />
                     </TouchableOpacity>
                     <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
@@ -134,18 +119,37 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     <RowItem
                         title={VIEW_POSTS_LABEL}
                         buttonStyle='navigate'
-                        onPress={() => props.navigation.navigate('YourTab')}
+                        onPress={() => props.navigation.navigate('YourTab', {})}
                     />
                     { props.ownFeed &&
                         <View style={styles.qrCodeContainer}>
                             <QRCode
                                 value={qrCodeValue}
                                 size={QRCodeWidth}
-                                color={Colors.DARK_GRAY}
-                                backgroundColor={Colors.BACKGROUND_COLOR}
+                                color={Colors.BLACK}
+                                backgroundColor={ComponentColors.BACKGROUND_COLOR}
                             />
                         </View>
                     }
+                    <TwoButton
+                        leftButton={{
+                            label: 'Share',
+                            icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: async () => showShareFeedDialog(props.ownFeed),
+                        }}
+                        rightButton={{
+                            label: 'Add channel',
+                            icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+                            onPress: () => props.navigation.navigate('FeedInfo', {
+                                feed: {
+                                    name: '',
+                                    url: '',
+                                    feedUrl: '',
+                                    favicon: '',
+                                },
+                           }),
+                        }}
+                    />
                 </ScrollView>
                 <TabBarPlaceholder/>
             </KeyboardAvoidingView>
@@ -162,11 +166,11 @@ const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) 
 
 const styles = StyleSheet.create({
     safeAreaContainer: {
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
         flex: 1,
     },
     mainContainer: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
     },
     row: {

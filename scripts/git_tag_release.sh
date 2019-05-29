@@ -3,6 +3,8 @@
 version="$1"
 
 git_commit_id=$(git rev-parse HEAD)
+tag_name="v$version"
 
-git tag -a v"$version" "$git_commit_id" -m "Tagged $version"
-echo "TODO: git push --tags origin master"
+git tag -a "$tag_name" "$git_commit_id" -m "Tagged $version"
+git push origin $tag_name
+

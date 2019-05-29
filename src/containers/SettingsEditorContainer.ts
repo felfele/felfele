@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
+import { AppState } from '../reducers/AppState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, SettingsEditor } from '../components/SettingsEditor';
+import { TypedNavigation } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
         navigation: ownProps.navigation,
         settings: state.settings,

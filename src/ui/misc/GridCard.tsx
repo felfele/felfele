@@ -9,12 +9,17 @@ import {
 } from 'react-native';
 import { Colors } from '../../styles';
 import { MediumText } from './text';
+import { ImageDataView } from '../../components/ImageDataView';
+import { ModelHelper } from '../../models/ModelHelper';
+import { ImageData, BundledImage } from '../../models/ImageData';
 
 interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
-    imageUri: string;
+    image: ImageData;
+    defaultImage?: BundledImage;
     size: number;
+    modelHelper: ModelHelper;
 }
 
 export const GRID_SPACING = 10;
@@ -22,15 +27,15 @@ export const GRID_CARD_COUNT_IN_ROW = 2;
 
 export const getGridCardSize = () => {
     const windowWidth = Dimensions.get('window').width;
-    return (windowWidth - GRID_SPACING * 3) / GRID_CARD_COUNT_IN_ROW;
+    return Math.floor((windowWidth - GRID_SPACING * 3) / GRID_CARD_COUNT_IN_ROW);
 };
 
 export const GridCard = React.memo((props: Props) => (
     <TouchableView style={styles.feedCard} onPress={props.onPress}>
-        <Image
-            source={{
-                uri: props.imageUri,
-            }}
+        <ImageDataView
+            source={props.image}
+            defaultImage={props.defaultImage}
+            modelHelper={props.modelHelper}
             style={{
                 width: props.size,
                 height: props.size,

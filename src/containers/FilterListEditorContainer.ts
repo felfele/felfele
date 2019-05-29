@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FilterListEditor } from '../components/FilterListEditor';
 import { ContentFilter } from '../models/ContentFilter';
+import { TypedNavigation } from '../helpers/navigation';
 
 const sortFilters = (a: ContentFilter, b: ContentFilter): number => {
     const aTimeUntil = a.createdAt + a.validUntil;
@@ -19,7 +20,7 @@ const sortFilters = (a: ContentFilter, b: ContentFilter): number => {
     return 0;
 };
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
    return {
        navigation: ownProps.navigation,
        filters: state.contentFilters.sort(sortFilters),

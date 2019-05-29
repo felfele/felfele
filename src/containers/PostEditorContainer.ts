@@ -1,18 +1,16 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
-import { Debug } from '../Debug';
+import { TypedNavigation, Routes } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
-    Debug.log('PostEditorContainer.mapStateToProps: ', ownProps.navigation);
-    const post = ownProps.navigation.state.params ! = null ? ownProps.navigation.state.params.post : null;
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
         name: state.author.name,
         avatar: state.author.image,
         navigation: ownProps.navigation,
-        draft: post != null ? post : state.draft,
+        draft: state.draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
    };
 };

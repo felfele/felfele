@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     View,
-    Alert,
     StyleSheet,
     Image,
 } from 'react-native';
@@ -14,9 +13,12 @@ import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
+import { defaultImages } from '../defaultImages';
+import { TypedNavigation } from '../helpers/navigation';
+import { ImageDataView } from '../components/ImageDataView';
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     profileImage: ImageData;
     gatewayAddress: string;
 }
@@ -40,7 +42,7 @@ export class FeedHeader extends React.PureComponent<Props> {
             createdAt: Date.now(),
         };
         this.props.onSaveDraft(post);
-        this.props.navigation.navigate('Post');
+        this.props.navigation.navigate('Post', {});
     }
 
     public render() {
@@ -52,7 +54,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                 <ProfileIcon profileImage={this.props.profileImage} gatewayAddress={this.props.gatewayAddress}/>
                 <TouchableView
                     onPress={() =>
-                        this.props.navigation.navigate('Post')
+                        this.props.navigation.navigate('Post', {})
                     }
                     style={styles.headerTextContainer}
                     hitSlop={{
@@ -68,7 +70,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={styles.cameraIconContainer}
                 >
                     <Icon
-                        name='camera-alt'
+                        name='photo-camera'
                         size={30}
                         color={Colors.BRAND_PURPLE}
                     />
@@ -80,14 +82,15 @@ export class FeedHeader extends React.PureComponent<Props> {
 
 const ProfileIcon = (props: { profileImage: ImageData, gatewayAddress: string }) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const imageUri = modelHelper.getImageUri(props.profileImage);
-    const imageSource = imageUri === ''
-        ? require('../../images/user_circle.png')
-        : { uri: imageUri };
     return (
-        <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
+        <ImageDataView
+            source={props.profileImage}
+            modelHelper={modelHelper}
+            defaultImage={defaultImages.defaultUser}
+            style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
@@ -103,7 +106,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerText: {
-        color: 'gray',
+        color: Colors.PINKISH_GRAY,
         fontSize: 18,
         paddingLeft: 10,
     },

@@ -1,37 +1,64 @@
 import { connect } from 'react-redux';
 
-import { AppState } from '../reducers';
-import { StateProps, DispatchProps, FeedListEditor } from '../components/FeedListEditor';
+import { AppState } from '../reducers/AppState';
+import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
+import { TypedNavigation } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps & DispatchProps => {
-    // TODO: update favicons?
-    const ownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
+const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
+    if (feeds.length > 0) {
+        return [{
+            title: `${title} (${feeds.length})`,
+            data: feeds,
+        }];
+    }
+    return [];
+};
+
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
+    const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
+    const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
+    const ownFeeds = navParamFeeds
         ? []
         : state.ownFeeds
     ;
-    const followedFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
-        ? ownProps.navigation.state.params.feeds
+    const followedFeeds = navParamFeeds
+        ? navParamFeeds
         : getFollowedFeeds(state)
     ;
-    const knownFeeds = ownProps.navigation.state.params && ownProps.navigation.state.params.feeds
+    const knownFeeds = navParamFeeds
         ? []
         : getKnownFeeds(state)
     ;
+
+    const sections: FeedSection[] = ([] as FeedSection[]).concat(
+        addSection('Channels you follow', followedFeeds),
+        addSection('Your channels', ownFeeds),
+        addSection('Other channels', knownFeeds),
+    );
+
     return {
-        ownFeeds: ownFeeds,
-        followedFeeds: followedFeeds,
-        knownFeeds: knownFeeds,
+        sections,
         navigation: ownProps.navigation,
-        onPressFeed: onPressFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'All feeds',
+        title: 'All channels',
+        showExplore: navParamShowExplore,
     };
 };
 
-const onPressFeed = (navigation: any, feed: Feed) => {
-    navigation.navigate('FeedFromList', { feedUrl: feed.feedUrl, name: feed.name });
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
+    return {
+        openExplore: () => {
+            ownProps.navigation.navigate('CategoriesContainer', {});
+        },
+        onPressFeed: (feed: Feed) => {
+            ownProps.navigation.navigate('FeedFromList', {
+                feedUrl: feed.feedUrl,
+                name: feed.name,
+            });
+        },
+    };
 };
 
-export const FeedListViewerContainer = connect(mapStateToProps)(FeedListEditor);
+export const FeedListViewerContainer = connect(mapStateToProps, mapDispatchToProps)(FeedListEditor);

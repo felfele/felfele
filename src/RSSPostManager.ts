@@ -2,56 +2,22 @@ import { Post, PublicPost } from './models/Post';
 import { ImageData } from './models/ImageData';
 import { Feed } from './models/Feed';
 import { FaviconCache } from './FaviconCache';
-import { DateUtils } from './DateUtils';
 import { Utils } from './Utils';
+import * as urlUtils from './helpers/urlUtils';
 import { HtmlUtils } from './HtmlUtils';
 import { ContentFilter } from './models/ContentFilter';
 import { Debug } from './Debug';
+import {
+    HEADERS_WITH_FELFELE,
+    HEADERS_WITH_CURL,
+    rssFeedHelper,
+    RSSFeedWithMetrics,
+    RSSFeed,
+    RSSMedia,
+    RSSEnclosure,
+} from './helpers/RSSFeedHelpers';
 // tslint:disable-next-line:no-var-requires
 const he = require('he');
-
-interface RSSEnclosure {
-    url: string;
-    length: string;
-    type: string;
-}
-
-interface RSSThumbnail {
-    height: number[];
-    width: number[];
-    url: string[];
-}
-
-interface RSSMedia {
-    thumbnail: RSSThumbnail[];
-}
-
-interface RSSItem {
-    title: string;
-    description: string;
-    link: string;
-    url: string;
-    created: number;
-    enclosures?: RSSEnclosure[];
-    media?: RSSMedia;
-}
-
-interface RSSFeed {
-    title: string;
-    description: string;
-    url: string;
-    icon?: string;
-    items: RSSItem[];
-}
-
-interface FeedWithMetrics {
-    feed: RSSFeed;
-    url: string;
-    size: number;
-    downloadTime: number;
-    xmlTime: number;
-    parseTime: number;
-}
 
 interface ContentWithMimeType {
     content: string;
@@ -62,6 +28,8 @@ const FirstId = 1;
 
 const RSSMimeTypes = [
     'application/rss+xml',
+    'application/x-rss+xml',
+    'application/atom+xml',
     'application/xml',
     'text/xml',
 ];
@@ -98,25 +66,9 @@ export class RSSFeedManager {
                     feed.feedUrl = feedUrl;
                 }
             }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'shortcut icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
-            if (feed.favicon === '' && HtmlUtils.matchAttributes(link, [{name: 'rel', value: 'apple-touch-icon'}])) {
-                const favicon = HtmlUtils.getAttribute(link, 'href') || '';
-                if (favicon !== '') {
-                    feed.favicon = favicon;
-                }
-            }
         }
+
+        feed.favicon = FaviconCache.findBestIconFromLinks(links) || '';
 
         const titles = HtmlUtils.findPath(document, ['html', 'head', 'title']);
         for (const title of titles) {
@@ -141,7 +93,10 @@ export class RSSFeedManager {
     }
 
     public static async fetchContentWithMimeType(url: string): Promise<ContentWithMimeType | null> {
-        const response = await fetch(url);
+        const isRedditUrl = urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM;
+        const response = await fetch(url, {
+            headers: isRedditUrl ? HEADERS_WITH_FELFELE : HEADERS_WITH_CURL,
+        });
         if (response.status !== 200) {
             Debug.log('fetch failed: ', response);
             return null;
@@ -166,10 +121,10 @@ export class RSSFeedManager {
     public static getFeedFromHtml(baseUrl: string, html: string): Feed {
         const feed = RSSFeedManager.parseFeedFromHtml(html);
         if (feed.feedUrl !== '') {
-            feed.feedUrl = Utils.createUrlFromUrn(feed.feedUrl, baseUrl);
+            feed.feedUrl = urlUtils.createUrlFromUrn(feed.feedUrl, baseUrl);
         }
-        if (feed.favicon !== '') {
-            feed.favicon = Utils.createUrlFromUrn(feed.favicon, baseUrl);
+        if (typeof feed.favicon === 'string' && feed.favicon !== '') {
+            feed.favicon = urlUtils.createUrlFromUrn(feed.favicon, baseUrl);
         }
         if (feed.name.search(' - ') >= 0) {
             feed.name = feed.name.replace(/ - .*/, '');
@@ -179,12 +134,10 @@ export class RSSFeedManager {
     }
 
     public static isRssMimeType(mimeType: string): boolean {
-        if (mimeType === 'application/rss+xml' ||
-            mimeType === 'application/atom+xml' ||
-            mimeType === 'application/xml' ||
-            mimeType === 'text/xml'
-        ) {
-            return true;
+        for (const rssMimeType of RSSMimeTypes) {
+            if (mimeType === rssMimeType) {
+                return true;
+            }
         }
 
         return false;
@@ -223,44 +176,60 @@ export class RSSFeedManager {
             return null;
         }
 
-        Debug.log('fetchFeedFromUrl contentWithMimeType: ', contentWithMimeType);
+        Debug.log('RSSFeedManager.fetchFeedFromUrl', {contentWithMimeType});
 
         if (contentWithMimeType.mimeType === 'text/html') {
-            const baseUrl = Utils.getBaseUrl(url);
-            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            const baseUrl = urlUtils.getBaseUrl(url);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const feed = RSSFeedManager.getFeedFromHtml(baseUrl, contentWithMimeType.content);
-            Debug.log('fetchFeedFromUrl feed: ', feed);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {feed});
             if (feed.feedUrl !== '') {
-                return feed;
+                const rssFeed = await rssFeedHelper.fetch(feed.feedUrl);
+                return {
+                    ...feed,
+                    name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                };
             }
 
-            const altFeedLocations = ['/rss', '/feed', '/social-media/feed/', '/rss/', '/feed/'];
+            const altFeedLocations = [
+                '/rss',
+                '/rss/',
+                '/rss/index.rss',
+                '/feed',
+                '/social-media/feed/',
+                '/feed/',
+            ];
             if (baseUrl !== url) {
                 altFeedLocations.unshift('/');
             }
             for (const altFeedLocation of altFeedLocations) {
-                const altUrl = Utils.createUrlFromUrn(altFeedLocation, baseUrl);
+                const altUrl = urlUtils.createUrlFromUrn(altFeedLocation, baseUrl);
                 const altFeedUrl = await RSSFeedManager.fetchRSSFeedUrlFromUrl(altUrl);
-                if (altFeedUrl !== '') {
+                const rssContentWithMimeType = await RSSFeedManager.fetchContentWithMimeType(url);
+                if (rssContentWithMimeType != null && RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
                     feed.feedUrl = altFeedUrl;
-                    return feed;
+                    const rssFeed = await rssFeedHelper.load(altFeedUrl, rssContentWithMimeType.content);
+                    return {
+                        ...feed,
+                        name: rssFeed.feed.title === '' ? feed.name : rssFeed.feed.title,
+                    };
                 }
             }
         }
 
         // It looks like there is a valid feed on the url
         if (RSSFeedManager.isRssMimeType(contentWithMimeType.mimeType)) {
-            const rssFeed = await feedHelper.load(url, contentWithMimeType.content);
-            Debug.log('fetchFeedFromUrl rssFeed: ', rssFeed);
+            const rssFeed = await rssFeedHelper.load(url, contentWithMimeType.content);
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {rssFeed});
             const feedUrl = (rssFeed.feed && rssFeed.feed.url) || undefined;
-            const baseUrl = Utils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
-            Debug.log('fetchFeedFromUrl baseUrl: ', baseUrl);
+            const baseUrl = urlUtils.getBaseUrl(feedUrl || url).replace('http://', 'https://');
+            Debug.log('RSSFeedManager.fetchFeedFromUrl', {baseUrl});
             const name = Utils.take(rssFeed.feed.title.split(' - '), 1, rssFeed.feed.title)[0];
-            const feed = {
+            const feed: Feed = {
                 url: baseUrl,
                 feedUrl: url,
                 name: name,
-                favicon: '',
+                favicon: rssFeed.feed.icon || '',
             };
             // Fetch the website to augment the feed data with favicon and title
             const htmlWithMimeType = await RSSFeedManager.fetchContentWithMimeType(baseUrl);
@@ -268,11 +237,14 @@ export class RSSFeedManager {
                 return null;
             }
             const feedFromHtml = RSSFeedManager.getFeedFromHtml(baseUrl, htmlWithMimeType.content);
-            // Override feedUrl if it's a valid RSS feed url
             if (feed.name === '') {
                 feed.name = feedFromHtml.name;
             }
-            feed.favicon = feedFromHtml.favicon;
+            if (urlUtils.getHumanHostname(url) === urlUtils.REDDIT_COM) {
+                feed.favicon = await FaviconCache.getFavicon(url);
+            } else {
+                feed.favicon = feedFromHtml.favicon || rssFeed.feed.icon || '';
+            }
             return feed;
         }
 
@@ -280,29 +252,25 @@ export class RSSFeedManager {
     }
 }
 
+const feedFaviconString = (favicon: string | number): string => {
+    return typeof favicon === 'number' ? '' : favicon;
+};
+
 // tslint:disable-next-line:class-name
 class _RSSPostManager {
     public readonly feedManager = new RSSFeedManager();
 
     private id = FirstId;
-    private idCache = {};
     private contentFilters: ContentFilter[] = [];
 
     public setContentFilters(contentFilters: ContentFilter[]) {
         this.contentFilters = contentFilters;
     }
 
-    public async saveAndSyncPost(post: Post) {
-        // do nothing
-    }
-    public async deletePost(post: Post) {
-        // do nothing
-    }
-
     public async loadPosts(storedFeeds: Feed[]): Promise<PublicPost[]> {
         const startTime = Date.now();
         const posts: Post[] = [];
-        const metrics: FeedWithMetrics[] = [];
+        const metrics: RSSFeedWithMetrics[] = [];
 
         const feedMap: { [index: string]: string } = {};
         for (const feed of storedFeeds) {
@@ -317,10 +285,17 @@ class _RSSPostManager {
             if (feedWithMetrics) {
                 downloadSize += feedWithMetrics.size;
                 const rssFeed = feedWithMetrics.feed;
-                const favicon = rssFeed.icon ? rssFeed.icon : await FaviconCache.getFavicon(rssFeed.url);
-                Debug.log('RSSPostManager: ', rssFeed, favicon);
+                const storedFeed = storedFeeds.find(feed => urlUtils.compareUrls(feed.url, rssFeed.url));
+                const favicon = storedFeed && storedFeed.favicon && storedFeed.favicon !== ''
+                    ? storedFeed.favicon
+                    : rssFeed.icon
+                        ? rssFeed.icon
+                        : ''
+                ;
+                const faviconString = feedFaviconString(favicon);
+                Debug.log('RSSPostManager.loadPosts', {rssFeed, storedFeeds, favicon});
                 const feedName = feedMap[feedWithMetrics.url] || feedWithMetrics.feed.title;
-                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, favicon, feedWithMetrics.url);
+                const convertedPosts = this.convertRSSFeedtoPosts(rssFeed, feedName, faviconString, feedWithMetrics.url);
                 posts.push.apply(posts, convertedPosts);
                 metrics.push(feedWithMetrics);
             }
@@ -332,7 +307,7 @@ class _RSSPostManager {
 
         if (__DEV__) {
             const stats = metrics
-                .map(metric => `${Utils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
+                .map(metric => `${urlUtils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
                 .join('\n');
 
             const elapsed = Date.now() - startTime;
@@ -342,7 +317,7 @@ class _RSSPostManager {
                 text: `Debug message: downloaded ${downloadSize} bytes, elapsed ${elapsed}\n${stats}`,
                 createdAt: Date.now(),
                 author: {
-                    name: 'Postmodern',
+                    name: 'Felfele',
                     uri: '',
                     image: {
                     },
@@ -412,15 +387,15 @@ class _RSSPostManager {
     }
 
     public isTitleSameAsText(title: string, text: string): boolean {
-        const replacedText = Utils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
-        const trimmedTitle = Utils.stripNonAscii(title.trim());
+        const replacedText = urlUtils.stripNonAscii(text.replace(/\[(.*?)\]\(.*?\)/g, '$1').trim());
+        const trimmedTitle = urlUtils.stripNonAscii(title.trim());
         const isSame =  this.matchString(trimmedTitle, replacedText);
         return isSame;
     }
 
-    private async loadFeed(feedUrl: string): Promise<FeedWithMetrics | null> {
+    private async loadFeed(feedUrl: string): Promise<RSSFeedWithMetrics | null> {
         try {
-            const rss = await feedHelper.fetch(feedUrl);
+            const rss = await rssFeedHelper.fetch(feedUrl);
             return rss;
         } catch (e) {
             Debug.log(e, feedUrl);
@@ -437,7 +412,6 @@ class _RSSPostManager {
 
     private convertRSSFeedtoPosts(rssFeed: RSSFeed, feedName: string, favicon: string, feedUrl: string): Post[] {
         const links: Set<string> = new Set();
-        const uniques: Set<string> = new Set();
         const strippedFavicon = this.stripTrailing(favicon, '/');
         const posts = rssFeed.items.map(item => {
             const markdown = this.htmlToMarkdown(item.description);
@@ -478,11 +452,6 @@ class _RSSPostManager {
             if (post.link != null) {
                 links.add(post.link);
             }
-
-            if (uniques.has(post.text)) {
-                return false;
-            }
-            uniques.add(post.text);
 
             return true;
         });
@@ -532,173 +501,3 @@ class _RSSPostManager {
 }
 
 export const RSSPostManager = new _RSSPostManager();
-
-// tslint:disable-next-line:no-var-requires
-const util = require('react-native-util');
-// tslint:disable-next-line:no-var-requires
-const xml2js = require('react-native-xml2js');
-
-interface FeedHelper {
-    DefaultTimeout: number;
-    fetch: any;
-    load: any;
-    parser: any;
-    getDate: any;
-    parseAtom: any;
-    parseRSS: any;
-}
-const feedHelper: FeedHelper = {
-    DefaultTimeout: 10000,
-    fetch: async (url: string): Promise<FeedWithMetrics> => {
-        const startTime = Date.now();
-        const response = await Utils.timeout(feedHelper.DefaultTimeout, fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-                'Accept': 'text/html,application/xhtml+xml',
-            },
-        }));
-        const downloadTime = Date.now();
-        if (response.status === 200) {
-            const xml = await response.text();
-            return feedHelper.load(url, xml, startTime, downloadTime);
-        } else {
-            throw new Error('Bad status code: ' + response.status + ': ' + response.statusText);
-        }
-    },
-
-    load: async (url: string, xml: string, startTime = 0, downloadTime = 0): Promise<FeedWithMetrics> => {
-        const xmlTime = Date.now();
-        const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
-        parser.addListener('error', (err: string) => {
-            throw new Error(err);
-        });
-        return await new Promise<FeedWithMetrics>((resolve, reject) => {
-            parser.parseString(xml, (err: string, result: any) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                const parseTime = Date.now();
-                const rss = feedHelper.parser(result);
-                const feedWithMetrics: FeedWithMetrics = {
-                    feed: rss,
-                    url: url,
-                    size: xml.length,
-                    downloadTime: downloadTime - startTime,
-                    xmlTime: xmlTime - downloadTime,
-                    parseTime: parseTime - xmlTime,
-                };
-                resolve(feedWithMetrics);
-            });
-        });
-    },
-
-    parser: (json: any) => {
-        if (json.feed) {
-            return feedHelper.parseAtom(json);
-        } else if (json.rss) {
-            return feedHelper.parseRSS(json);
-        }
-    },
-
-    getDate: (entry: any): string | null => {
-        if (entry.published != null) {
-            return entry.published[0];
-        }
-        if (entry.updated != null) {
-            return entry.updated[0];
-        }
-        return null;
-    },
-
-    parseAtom: (json: any) => {
-        const feed = json.feed;
-        const rss: any = { items: [] };
-
-        if (feed.title) {
-            rss.title = feed.title[0];
-        }
-        if (feed.icon) {
-            rss.icon = feed.icon[0];
-        }
-        if (feed.link) {
-            rss.url = feed.link[0].href[0];
-        }
-
-        rss.items = feed.entry.map((entry: any) => {
-            const entryDate = feedHelper.getDate(entry);
-            const item: RSSItem = {
-                title: entry.title ? entry.title[0] : '',
-                description: entry.content ? entry.content[0]._ : '',
-                created: entryDate ? DateUtils.parseDateString(entryDate) : Date.now(),
-                link: entry.link ? entry.link[0].href[0] : '',
-                url: entry.link ? entry.link[0].href[0] : '',
-            };
-            return item;
-        });
-
-        return rss;
-    },
-
-    parseRSS: (json: any) => {
-        let channel = json.rss.channel;
-        const rss: any = { items: [] };
-        if (util.isArray(json.rss.channel)) {
-            channel = json.rss.channel[0];
-        }
-        if (channel.title) {
-            rss.title = channel.title[0];
-        }
-        if (channel.description) {
-            rss.description = channel.description[0];
-        }
-        if (channel.link) {
-            rss.url = channel.link[0];
-        }
-        if (channel.item) {
-            if (!util.isArray(channel.item)) {
-                channel.item = [channel.item];
-            }
-            channel.item.forEach((val: any) => {
-                const obj: any = {};
-                obj.title = !util.isNullOrUndefined(val.title) ? val.title[0] : '';
-                obj.description = !util.isNullOrUndefined(val.description) ? val.description[0] : '';
-                obj.url = obj.link = !util.isNullOrUndefined(val.link) ? val.link[0] : '';
-
-                if (val.pubDate) {
-                    obj.created = Date.parse(val.pubDate[0]);
-                }
-                if (val['media:content']) {
-                    obj.media = val.media || {};
-                    obj.media.content = val['media:content'];
-                }
-                if (val['media:thumbnail']) {
-                    obj.media = val.media || {};
-                    obj.media.thumbnail = val['media:thumbnail'];
-                }
-                if (val.enclosure) {
-                    obj.enclosures = [];
-                    if (!util.isArray(val.enclosure)) {
-                        val.enclosure = [val.enclosure];
-                    }
-                    val.enclosure.forEach((enclosure: any) => {
-                        const enc: { [index: string]: any } = {};
-
-                        // tslint:disable-next-line:forin
-                        for (const x in enclosure) {
-                            enc[x] = enclosure[x][0];
-                        }
-                        obj.enclosures.push(enc);
-                    });
-
-                }
-                rss.items.push(obj);
-
-            });
-
-        }
-        return rss;
-
-    },
-
-};

@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 version="$1"
-apk_source="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+apk_source="android/app/build/outputs/apk/release/debug-release.apk"
 server_name="app.felfele.com"
 server_dir="/var/www/$server_name"
 apk_versioned_target="felfele-$version.apk"

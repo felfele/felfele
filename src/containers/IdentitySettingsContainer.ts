@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers/index';
-import { Actions } from '../actions/Actions';
+import { AppState } from '../reducers/AppState';
+import { AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
+import { TypedNavigation } from '../helpers/navigation';
 
-export const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const ownFeed = state.ownFeeds.length > 0
         ? state.ownFeeds[0]
         : undefined;
@@ -19,10 +20,10 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: any }):
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onUpdateAuthor: (text: string) => {
-            dispatch(Actions.updateAuthorName(text));
+            dispatch(AsyncActions.updateProfileName(text));
         },
         onUpdatePicture: (image: ImageData) => {
-            dispatch(Actions.updateAuthorImage(image));
+            dispatch(AsyncActions.updateProfileImage(image));
         },
     };
 };

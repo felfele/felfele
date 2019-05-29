@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Platform } from 'react-native';
-import { DefaultTabBarHeight, Colors } from '../../styles';
+import { DefaultTabBarHeight, ComponentColors } from '../../styles';
 
 export const TabBarPlaceholder = (props: { color?: string }) => {
     if (Platform.OS === 'ios') {
@@ -8,7 +8,7 @@ export const TabBarPlaceholder = (props: { color?: string }) => {
             <View
                 style={{
                     height: DefaultTabBarHeight,
-                    backgroundColor: props.color ? props.color : Colors.BACKGROUND_COLOR,
+                    backgroundColor: props.color ? props.color : ComponentColors.BACKGROUND_COLOR,
                 }}
             />
         );

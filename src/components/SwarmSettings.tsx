@@ -10,11 +10,12 @@ import {
 
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface StateProps {
     swarmGatewayAddress: string;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 export interface DispatchProps {
@@ -28,7 +29,7 @@ export interface State {
 
 export const SwarmSettings = (props: Props) => (
     <SafeAreaView style={styles.mainContainer}>
-        <KeyboardAvoidingView style={styles.mainContainer}>
+        <KeyboardAvoidingView style={styles.container}>
             <NavigationHeader
                 navigation={props.navigation}
                 title={'Swarm settings'}
@@ -53,6 +54,11 @@ export const SwarmSettings = (props: Props) => (
 const styles = StyleSheet.create({
     mainContainer: {
         height: '100%',
+        backgroundColor: ComponentColors.HEADER_COLOR,
+    },
+    container: {
+        height: '100%',
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
     },
     row: {
         width: '100%',

@@ -5,29 +5,26 @@ import {
     View,
     Text,
     Slider,
-    SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
-import { Colors } from '../styles';
-import { HOUR, DAY, MONTH31, WEEK } from '../DateUtils';
+import { ComponentColors } from '../styles';
+import { DAY, MONTH31, WEEK, YEAR } from '../DateUtils';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
+import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
-type SliderValue = 0 | 1 | 2 | 3 | 4 | 5;
-
-const FOREVER = 0;
+type SliderValue = 0 | 1 | 2 | 3;
 
 const sliderValueToDateDiff = (value: SliderValue): number => {
     switch (value) {
-        case 0: return FOREVER;
-        case 1: return HOUR;
-        case 2: return DAY;
-        case 3: return WEEK;
-        case 4: return MONTH31;
-        case 5: return FOREVER;
+        case 0: return DAY;
+        case 1: return WEEK;
+        case 2: return MONTH31;
+        case 3: return YEAR;
     }
 };
 
@@ -38,11 +35,11 @@ const sliderValueToText = (value: SliderValue): string => {
 
 const filterValidUntilToSliderValue = (dateDiff: number): SliderValue => {
     switch (dateDiff) {
-        case HOUR: return 1;
-        case DAY: return 2;
-        case WEEK: return 3;
-        case MONTH31: return 4;
-        default: return FOREVER;
+        case DAY: return 0;
+        case WEEK: return 1;
+        case MONTH31: return 2;
+        case YEAR: return 3;
+        default: return 0;
     }
 };
 
@@ -53,7 +50,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     filter: ContentFilter;
-    navigation: any;
+    navigation: TypedNavigation;
 }
 
 type Props = DispatchProps & StateProps;
@@ -78,19 +75,19 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
             ? <Icon
                 name='delete'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
             />
             : <Icon
                 name='add-box'
                 size={20}
-                color={Colors.DARK_GRAY}
+                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
             />
             ;
         const rightButtonAction = isDelete ? this.onDeleteFilter : this.onAddFilter;
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
-                    title='Edit filter'
+                    title='Edit keyword'
                     navigation={this.props.navigation}
                     rightButton1={{
                         onPress: rightButtonAction,
@@ -101,8 +98,11 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                     defaultValue={this.state.filterText}
                     style={styles.linkInput}
                     onChangeText={(text) => this.setState({ filterText: text })}
-                    placeholder='Text to be filtered'
+                    placeholder='Keywords to be filtered'
                     autoCapitalize='none'
+                    returnKeyType='done'
+                    onSubmitEditing={rightButtonAction}
+                    onEndEditing={() => {}}
                     autoFocus={true}
                     autoCorrect={false}
                 />
@@ -111,13 +111,13 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
                     <Slider
                         style={styles.slider}
                         minimumValue={0}
-                        maximumValue={5}
+                        maximumValue={3}
                         step={1}
                         value={this.state.filterSliderValue}
                         onValueChange={(value) => this.setState({ filterSliderValue: value as SliderValue })}
                     />
                 </View>
-            </SafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 
@@ -155,11 +155,6 @@ export class EditFilter extends React.Component<DispatchProps & StateProps, Edit
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: Colors.BACKGROUND_COLOR,
-        flex: 1,
-        flexDirection: 'column',
-    },
     titleInfo: {
         fontSize: 14,
         color: '#8e8e93',
@@ -198,7 +193,7 @@ const styles = StyleSheet.create({
     },
     sliderText: {
         flex: 1,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
         paddingTop: 20,
     },
     slider: {

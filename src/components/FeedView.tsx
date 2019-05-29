@@ -3,12 +3,15 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader, HeaderDefaultLeftButtonIcon } from './NavigationHeader';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { FELFELE_ASSISTANT_NAME } from '../reducers';
+import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
+import { TypedNavigation } from '../helpers/navigation';
+import { LocalFeed } from '../social/api';
+import { feedCommandDefinition } from '../cli/feedCommands';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -24,7 +27,7 @@ export interface ViewFeed extends Feed {
 }
 
 export interface StateProps {
-    navigation: any;
+    navigation: TypedNavigation;
     onBack: () => void;
     feed: ViewFeed;
     posts: Post[];
@@ -34,6 +37,8 @@ export interface StateProps {
 type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
+    const isOnboardingFeed = props.feed.feedUrl === FELFELE_ASSISTANT_URL;
+
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     const icon = (name: string, color: string) => <Icon name={name} size={20} color={color} />;
     const button = (iconName: string, color: string, onPress: () => void) => ({
@@ -43,29 +48,35 @@ export const FeedView = (props: Props) => {
     const toggleFavorite = () => props.onToggleFavorite(props.feed.feedUrl);
     const navigateToFeedSettings = () => props.navigation.navigate(
         'FeedSettings',
-        { feed: props.feed },
+        { feed: props.feed as unknown as LocalFeed },
     );
-    const onLinkPressed = async () => onFollowPressed(props.feed,
+    const navigateToFeedInfo = () => props.navigation.navigate(
+        'FeedInfo', {
+            feed: props.feed,
+        }
+    );
+    const onLinkPressed = async () => onFollowPressed(props.feed.feedUrl,
+        props.feed,
         props.onUnfollowFeed,
         props.onFollowFeed
-    );
+);
+
     const rightButton1 = props.feed.isOwnFeed
         ? props.feed.name.length > 0
-            ? button('settings-box', Colors.DARK_GRAY, navigateToFeedSettings)
+            ? button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
             : undefined
-        : props.feed.followed === true
-            ? props.feed.favorite === true
-                ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
-                : button('star', Colors.DARK_GRAY, toggleFavorite)
-            : props.feed.name === FELFELE_ASSISTANT_NAME
-                ? undefined
-                : button('delete', Colors.DARK_GRAY, () => removeFeedAndGoBack(props))
+        : isOnboardingFeed
+            ? undefined
+            : props.feed.followed === true
+                ? props.feed.favorite === true
+                    ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                    : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                : button('link', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
-    const rightButton2 = props.feed.isLocalFeed
+
+    const rightButton2 = props.feed.isLocalFeed || isOnboardingFeed
         ? undefined
-        : props.feed.followed === true
-            ? button('link-variant-off', Colors.DARK_GRAY, onLinkPressed)
-            : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
+        : button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
     const refreshableFeedProps = {
         ...props,
@@ -89,7 +100,7 @@ export const FeedView = (props: Props) => {
     );
 };
 
-const onFollowPressed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
+const onFollowPressed = async (uri: string, feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
     if (feed.followed === true) {
         await unfollowFeed(feed, onUnfollowFeed);
     } else {
@@ -101,13 +112,5 @@ export const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => v
     const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
     if (confirmUnfollow) {
         onUnfollowFeed(feed);
-    }
-};
-
-const removeFeedAndGoBack = async (props: Props) => {
-    const confirmRemove = await AreYouSureDialog.show('Are you sure you want to delete?');
-    if (confirmRemove) {
-        props.onRemoveFeed(props.feed);
-        props.onBack();
     }
 };

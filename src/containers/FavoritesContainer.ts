@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
-import { AppState } from '../reducers';
+import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps } from '../components/FavoritesFeedView';
 import { AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { FavoritesFeedView } from '../components/FavoritesFeedView';
 import { getFavoriteFeedsPosts, getFavoriteFeeds } from '../selectors/selectors';
+import { TypedNavigation } from '../helpers/navigation';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: any }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const posts = getFavoriteFeedsPosts(state);
     const favoriteFeeds = getFavoriteFeeds(state);
 

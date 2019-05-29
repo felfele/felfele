@@ -1,15 +1,15 @@
 # Contributing
 
-Please always follow our [Code of Conduct](https://github.com/agazso/postmodern/blob/master/CODE_OF_CONDUCT.md) in all your interactions with the project and the community.
+Please always follow our [Code of Conduct](https://github.com/felfele/felfele/blob/master/CODE_OF_CONDUCT.md) in all your interactions with the project and the community.
 
 ## Communication
 
 ### Task management 
 
 We aim to document all our work on GitHub. The processing of a new issue is the following:
-1. new issue is submitted, _todo_ label added automatically
+1. new issue is submitted, _unscheduled_ label added automatically
 2. labels and comments can be added
-3. prioritization happens every monday, when issues is prioritized, the _todo_ label is removed
+3. prioritization happens every monday, when issues is prioritized, the _unscheduled_ label is removed
 4. issue is normally closed when a PR resolves it and is merged to master
 
 ### How to contact us
@@ -18,7 +18,7 @@ Our [slack](https://join.slack.com/t/felfele/shared_invite/enQtNTM1MjUwNTI1NzI5L
 
 ### Meetings
 
-We have an open call every Monday, 10 am (CEST) 
+We have an open call every Monday, 11 am (CEST) 
 Link: https://zoom.us/j/2597260543
 
 ## Development
@@ -38,7 +38,7 @@ can fix it as fast as possible:
   screenshot](https://github.com/blog/1347-issue-attachments) or video
   illustrating the issue
 - If you're having trouble with a specific post or other kind of content, please include a link to it if it's possible
-- Include all this information in a new issue on our [Issue Tracker](https://github.com/agazso/postmodern/issues)
+- Include all this information in a new issue on our [Issue Tracker](https://github.com/felfele/felfele/issues)
 
 ### Pull Request Process
 

@@ -6,11 +6,17 @@ import { Debug } from '../../src/Debug';
 let localSwarmStorage: PostCommandLogStorage;
 const source = 'storage';
 
-beforeAll(() => Debug.setDebug(false));
+beforeAll(() => Debug.setDebugMode(false));
 beforeEach(() => localSwarmStorage = makeLocalSwarmStorage());
 
 test('Test sharing posts to storage', async () =>
     syncTests.testSharePostsStorage(source, localSwarmStorage));
+
+test('Test unsynced post command log with no unsynced commands ', async () =>
+    syncTests.testUnsyncedPostCommandLogWithNoUnsyncedCommands(source, localSwarmStorage));
+
+test('Test unsynced post command log with one unsynced command ', async () =>
+    syncTests.testUnsyncedPostCommandLogWithOneUnsyncedCommand(source, localSwarmStorage));
 
 test('Test latest posts after first sync', async () =>
     syncTests.testLatestPostsAfterFirstSync(source, localSwarmStorage));
