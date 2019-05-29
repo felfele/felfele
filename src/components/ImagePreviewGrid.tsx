@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View, StyleSheet, LayoutChangeEvent, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
 import { ImageDataView } from './ImageDataView';
 import { ModelHelper } from '../models/ModelHelper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 
 export interface StateProps {
@@ -32,7 +33,6 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
 
         const images = this.props.images.map((image) =>
             <TouchableView
-                onLongPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
                 key={image.localPath}
                 style={{ padding: 5 }}
             >
@@ -43,7 +43,15 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
                         height: maxHeight != null ? this.notGreaterThan(image.height, maxHeight) : maxWidth,
                     }}
                     modelHelper={this.props.modelHelper}
-                />
+                    background={true}
+                >
+                    <TouchableView
+                        style={styles.delete}
+                        onPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
+                    >
+                        <Icon name={'close-circle'} size={24}/>
+                    </TouchableView>
+                </ImageDataView>
             </TouchableView>
         );
 
@@ -69,5 +77,16 @@ const styles = StyleSheet.create({
     gridContainer: {
         flexDirection: 'column',
         padding: 5,
+    },
+    delete: {
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: Colors.WHITE,
+        top: 2,
+        right: 2,
     },
 });
