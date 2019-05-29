@@ -61,6 +61,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
     CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
+    CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
 }
 
 const InternalActions = {
@@ -68,6 +69,8 @@ const InternalActions = {
         createAction(ActionTypes.ADD_POST, { post }),
     increaseHighestSeenPostId: () =>
         createAction(ActionTypes.INCREASE_HIGHEST_SEEN_POST_ID),
+    addFeed: (feed: Feed) =>
+        createAction(ActionTypes.ADD_FEED, { feed }),
     addOwnFeed: (feed: LocalFeed) =>
         createAction(ActionTypes.ADD_OWN_FEED, { feed }),
     updateAuthorIdentity: (privateIdentity: PrivateIdentity) =>
@@ -87,8 +90,6 @@ export const Actions = {
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilter: (filter: ContentFilter) =>
         createAction(ActionTypes.REMOVE_CONTENT_FILTER, { filter }),
-    addFeed: (feed: Feed) =>
-        createAction(ActionTypes.ADD_FEED, { feed }),
     removeFeed: (feed: Feed) =>
         createAction(ActionTypes.REMOVE_FEED, { feed }),
     followFeed: (feed: Feed) =>
@@ -125,9 +126,19 @@ export const Actions = {
         createAction(ActionTypes.CHANGE_SETTING_SWARM_GATEWAY_ADDRESS, { value }),
     updateOwnFeed: (partialFeed: Partial<LocalFeed>) =>
         createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
+    cleanFeedsFromOwnFeeds: (feedUrls: string[]) =>
+        createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
 };
 
 export const AsyncActions = {
+    addFeed: (feed: Feed): Thunk => {
+        return async (dispatch, getState) => {
+            const ownFeeds = getState().ownFeeds.map(ownFeed => ownFeed.feedUrl);
+            if (!ownFeeds.includes(feed.feedUrl)) {
+                dispatch(InternalActions.addFeed(feed));
+            }
+        };
+    },
     cleanupContentFilters: (currentTimestamp: number = Date.now()): Thunk => {
         return async (dispatch, getState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>

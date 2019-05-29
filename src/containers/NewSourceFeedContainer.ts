@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView, ViewFeed } from '../components/FeedView';
-import { Actions } from '../actions/Actions';
+import { Actions, AsyncActions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts } from '../selectors/selectors';
 import { mapDispatchToProps as defaultMapDispatchToProps } from '../containers/FeedContainer';
@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         ...defaultMapDispatchToProps(dispatch),
         onFollowFeed: (feed: Feed) => {
-            dispatch(Actions.addFeed(feed));
+            dispatch(AsyncActions.addFeed(feed));
             dispatch(Actions.followFeed(feed));
         },
     };
