@@ -5,6 +5,7 @@ import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
 import { ImageDataView } from './ImageDataView';
 import { ModelHelper } from '../models/ModelHelper';
+import { Colors } from '../styles';
 
 export interface StateProps {
     columns: number;
@@ -20,28 +21,26 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 export class ImagePreviewGrid extends React.Component<Props, any> {
-    private width = Dimensions.get('window').width;
-
     public render() {
+        const windowWidth = Dimensions.get('window').width;
         if (this.props.images.length === 0) {
             return null;
         }
-        const columns = Math.max(this.props.columns, this.props.images.length);
-        const maxWidth = Math.floor(this.width / columns);
-        const maxHeight = this.notGreaterThan(maxWidth, this.props.height);
+        const spacing = 10;
+        const maxWidth = Math.floor((windowWidth - spacing * 4) / this.props.columns);
+        const maxHeight = maxWidth;
 
         const images = this.props.images.map((image) =>
             <TouchableView
                 onLongPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
                 key={image.localPath}
+                style={{ padding: 5 }}
             >
                 <ImageDataView
                     source={image}
                     style={{
                         width: this.notGreaterThan(image.width, maxWidth),
                         height: maxHeight != null ? this.notGreaterThan(image.height, maxHeight) : maxWidth,
-                        borderWidth: 1,
-                        borderColor: 'white',
                     }}
                     modelHelper={this.props.modelHelper}
                 />
@@ -49,20 +48,12 @@ export class ImagePreviewGrid extends React.Component<Props, any> {
         );
 
         return (
-            <View
-                onLayout={(event) => this.onLayout(event)}
-                style={[styles.gridContainer, {height: maxHeight}]}
-            >
-                <View style={{flexDirection: 'row', width: '100%'}}>
+            <View style={[styles.gridContainer, {height: maxHeight}]}>
+                <View style={{ flexDirection: 'row' }}>
                     {images}
                 </View>
             </View>
         );
-    }
-
-    private onLayout(event: LayoutChangeEvent) {
-        const { width } = event.nativeEvent.layout;
-        this.width = width;
     }
 
     private notGreaterThan(value: number | undefined, maxValue: number) {
@@ -77,7 +68,6 @@ const styles = StyleSheet.create({
     },
     gridContainer: {
         flexDirection: 'column',
-        padding: 0,
-        width: '100%',
+        padding: 5,
     },
 });

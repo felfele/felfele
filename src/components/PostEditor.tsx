@@ -105,6 +105,13 @@ export class PostEditor extends React.Component<Props, State> {
                         }
                         title={this.props.name}
                     />
+                    <ImagePreviewGrid
+                        columns={3}
+                        images={this.state.post.images}
+                        onRemoveImage={this.onRemoveImage}
+                        height={100}
+                        modelHelper={this.modelHelper}
+                    />
                     <SimpleTextInput
                         style={styles.textInput}
                         multiline={true}
@@ -116,13 +123,6 @@ export class PostEditor extends React.Component<Props, State> {
                         underlineColorAndroid='transparent'
                         autoFocus={true}
                         testID='PostEditor/TextInput'
-                    />
-                    <ImagePreviewGrid
-                        columns={4}
-                        images={this.state.post.images}
-                        onRemoveImage={this.onRemoveImage}
-                        height={100}
-                        modelHelper={this.modelHelper}
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
@@ -312,8 +312,7 @@ const styles = StyleSheet.create({
     textInput: {
         flex: 1,
         fontSize: 16,
-        padding: 10,
-        paddingVertical: 10,
+        margin: 10,
         textAlignVertical: 'top',
     },
     photoWidget: {
