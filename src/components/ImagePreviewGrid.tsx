@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import {
+    Platform,
+    StyleSheet,
+    Animated,
+    Easing,
+} from 'react-native';
 
 import { ImageData } from '../models/ImageData';
 import { TouchableView } from './TouchableView';
@@ -7,66 +12,126 @@ import { ImageDataView } from './ImageDataView';
 import { ModelHelper } from '../models/ModelHelper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
+import SortableList, { RowProps } from 'react-native-sortable-list';
 
 export interface StateProps {
-    columns: number;
     images: ImageData[];
-    height: number;
+    imageSize: number;
     modelHelper: ModelHelper;
 }
 
 export interface DispatchProps {
-    onRemoveImage?: (image: ImageData) => void;
+    onRemoveImage: (image: ImageData) => void;
 }
 
 type Props = StateProps & DispatchProps;
 
-export class ImagePreviewGrid extends React.Component<Props, any> {
+export const GRID_SPACING = 10;
+
+export class ImagePreviewGrid extends React.Component<Props> {
     public render() {
-        const windowWidth = Dimensions.get('window').width;
         if (this.props.images.length === 0) {
             return null;
         }
-        const spacing = 10;
-        const maxWidth = Math.floor((windowWidth - spacing * 4) / this.props.columns);
-        const maxHeight = maxWidth;
 
-        const images = this.props.images.map((image) =>
-            <TouchableView
-                key={image.localPath}
-                style={{ padding: 5 }}
+        return (
+            <SortableList
+                style={[styles.gridContainer, { height: this.props.imageSize }]}
+                horizontal={true}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    scrollEnabled={false}
+                data={this.props.images}
+                renderRow={(props: RowProps) => (
+                    <Item
+                        data={props.data}
+                        active={props.active}
+                        imageSize={this.props.imageSize}
+                        modelHelper={this.props.modelHelper}
+                        onRemoveImage={this.props.onRemoveImage}
+                    />
+                )}
+            />
+        );
+    }
+}
+
+interface ItemProps {
+    data: any;
+    active: boolean;
+    imageSize: number;
+    modelHelper: ModelHelper;
+    onRemoveImage: (image: ImageData) => void;
+}
+
+class Item extends React.Component<ItemProps> {
+    private active = new Animated.Value(0);
+    private itemStyle = {
+        ...Platform.select({
+            ios: {
+                transform: [{
+                    scale: this.active.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.1],
+                    }),
+                }],
+            },
+            android: {
+                transform: [{
+                    scale: this.active.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.07],
+                    }),
+                }],
+                elevation: this.active.interpolate({
+                inputRange: [0, 1],
+                outputRange: [2, 6],
+                }),
+            },
+        }),
+    };
+
+    public componentWillReceiveProps(nextProps: ItemProps) {
+        if (this.props.active !== nextProps.active) {
+            Animated.timing(this.active, {
+                duration: 300,
+                easing: Easing.exp,
+                toValue: Number(nextProps.active),
+            }).start();
+        }
+    }
+
+    public render() {
+        return (
+            <Animated.View
+                style={[
+                    styles.item,
+                    this.itemStyle,
+                ]}
             >
                 <ImageDataView
-                    source={image}
+                    source={this.props.data}
                     style={{
-                        width: this.notGreaterThan(image.width, maxWidth),
-                        height: maxHeight != null ? this.notGreaterThan(image.height, maxHeight) : maxWidth,
+                        width: this.notGreaterThan(this.props.data.width, this.props.imageSize),
+                        height: this.notGreaterThan(this.props.data.height, this.props.imageSize),
                     }}
                     modelHelper={this.props.modelHelper}
                     background={true}
                 >
                     <TouchableView
                         style={styles.delete}
-                        onPress={() => this.props.onRemoveImage && this.props.onRemoveImage(image)}
+                        onPress={() => this.props.onRemoveImage(this.props.data)}
                     >
                         <Icon name={'close-circle'} size={24}/>
                     </TouchableView>
                 </ImageDataView>
-            </TouchableView>
-        );
-
-        return (
-            <View style={[styles.gridContainer, {height: maxHeight}]}>
-                <View style={{ flexDirection: 'row' }}>
-                    {images}
-                </View>
-            </View>
+            </Animated.View>
         );
     }
 
     private notGreaterThan(value: number | undefined, maxValue: number) {
-        return value != null && value > maxValue ? maxValue : value;
-    }
+            return value != null && value > maxValue ? maxValue : value;
+        }
 }
 
 const styles = StyleSheet.create({
@@ -88,5 +153,17 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.WHITE,
         top: 2,
         right: 2,
+    },
+    item: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        backgroundColor: Colors.WHITE,
+        padding: 5,
+        ...Platform.select({
+            android: {
+                elevation: 0,
+                marginHorizontal: 30,
+            },
+        }),
     },
 });

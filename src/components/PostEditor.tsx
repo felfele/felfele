@@ -8,10 +8,11 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     ActivityIndicator,
+    Dimensions,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
-import { ImagePreviewGrid } from './ImagePreviewGrid';
+import { ImagePreviewGrid, GRID_SPACING } from './ImagePreviewGrid';
 import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
@@ -73,6 +74,8 @@ export class PostEditor extends React.Component<Props, State> {
             : <Icon name='send' size={20} color={sendIconColor} />
         ;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
+        const windowWidth = Dimensions.get('window').width;
+
         return (
             <FragmentSafeAreaViewWithoutTabBar>
                 <KeyboardAvoidingView
@@ -106,10 +109,9 @@ export class PostEditor extends React.Component<Props, State> {
                         title={this.props.name}
                     />
                     <ImagePreviewGrid
-                        columns={3}
                         images={this.state.post.images}
+                        imageSize={Math.floor((windowWidth - GRID_SPACING * 4) / 3)}
                         onRemoveImage={this.onRemoveImage}
-                        height={100}
                         modelHelper={this.modelHelper}
                     />
                     <SimpleTextInput
