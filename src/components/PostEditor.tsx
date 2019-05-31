@@ -113,6 +113,14 @@ export class PostEditor extends React.Component<Props, State> {
                         imageSize={Math.floor((windowWidth - GRID_SPACING * 4) / 3)}
                         onRemoveImage={this.onRemoveImage}
                         modelHelper={this.modelHelper}
+                        onReleaseRow={(_, order: number[]) => {
+                            this.setState({
+                                post: {
+                                    ...this.state.post,
+                                    images: order.map(i => this.state.post.images[i]),
+                                },
+                            });
+                        }}
                     />
                     <SimpleTextInput
                         style={styles.textInput}

@@ -22,6 +22,7 @@ export interface StateProps {
 
 export interface DispatchProps {
     onRemoveImage: (image: ImageData) => void;
+    onReleaseRow: (_: string, nextOrder: Array<number>) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -51,6 +52,8 @@ export class ImagePreviewGrid extends React.Component<Props> {
                         onRemoveImage={this.props.onRemoveImage}
                     />
                 )}
+                // @ts-ignore needs d.ts update
+                onReleaseRow={this.props.onReleaseRow}
             />
         );
     }
