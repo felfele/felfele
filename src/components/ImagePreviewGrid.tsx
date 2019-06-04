@@ -34,10 +34,11 @@ export class ImagePreviewGrid extends React.Component<Props> {
         if (this.props.images.length === 0) {
             return null;
         }
-
+        const doublePadding = 10;
         return (
             <SortableList
-                style={[styles.gridContainer, { height: this.props.imageSize }]}
+                style={[styles.gridContainer, { height: this.props.imageSize + doublePadding }]}
+                contentContainerStyle={{ padding: 5 }}
                 horizontal={true}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -60,7 +61,7 @@ export class ImagePreviewGrid extends React.Component<Props> {
 }
 
 interface ItemProps {
-    data: any;
+    data: ImageData;
     active: boolean;
     imageSize: number;
     modelHelper: ModelHelper;
@@ -144,7 +145,6 @@ const styles = StyleSheet.create({
     },
     gridContainer: {
         flexDirection: 'column',
-        padding: 5,
     },
     delete: {
         position: 'absolute',
