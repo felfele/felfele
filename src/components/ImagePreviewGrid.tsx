@@ -40,9 +40,9 @@ export class ImagePreviewGrid extends React.Component<Props> {
                 style={[styles.gridContainer, { height: this.props.imageSize + doublePadding }]}
                 contentContainerStyle={{ padding: 5 }}
                 horizontal={true}
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
-                    scrollEnabled={false}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                scrollEnabled={true}
                 data={this.props.images}
                 renderRow={(props: RowProps) => (
                     <Item
