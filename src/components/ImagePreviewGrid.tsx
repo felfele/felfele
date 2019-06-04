@@ -162,11 +162,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: Colors.WHITE,
         padding: 5,
-        ...Platform.select({
-            android: {
-                elevation: 0,
-                marginHorizontal: 30,
-            },
-        }),
     },
 });
