@@ -9,8 +9,6 @@ import {
     StyleSheet,
     ActivityIndicator,
     Dimensions,
-    ScrollView,
-    Keyboard,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
@@ -110,9 +108,6 @@ export class PostEditor extends React.Component<Props, State> {
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
                     style={styles.container}
-                    // keyboardShouldPersistTaps='always'
-                    // keyboardDismissMode='none'
-                    // scrollEnabled={false}
                 >
                     <ImagePreviewGrid
                         images={this.state.post.images}
