@@ -55,6 +55,7 @@ export class ImagePreviewGrid extends React.Component<Props> {
                 )}
                 // @ts-ignore needs d.ts update
                 onReleaseRow={this.props.onReleaseRow}
+                keyboardShouldPersistTaps='always'
             />
         );
     }
