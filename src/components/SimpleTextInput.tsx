@@ -23,6 +23,7 @@ interface SimpleTextInputProps {
     returnKeyType?: ReturnKeyTypeOptions;
     clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always';
     editable?: boolean;
+    blurOnSubmit?: boolean;
 
     onSubmitEditing?: (text: string) => void;
     onChangeText?: (text: string) => void;
@@ -35,6 +36,8 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
             ? this.props.defaultValue
             : '',
     };
+
+    private ref: TextInput | null = null;
 
     public render() {
         return (
@@ -66,8 +69,16 @@ export class SimpleTextInput extends React.Component<SimpleTextInputProps, { tex
                 onEndEditing={this.props.onEndEditing ? this.props.onEndEditing : this.onSubmitEditing}
                 clearButtonMode={this.props.clearButtonMode}
                 editable={this.props.editable}
+                blurOnSubmit={this.props.blurOnSubmit}
+                ref={ref => this.ref = ref}
             />
         );
+    }
+
+    public focus() {
+        if (this.ref != null) {
+            this.ref.focus();
+        }
     }
 
     private onSubmitEditing = () => {

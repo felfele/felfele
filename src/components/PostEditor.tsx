@@ -9,6 +9,8 @@ import {
     StyleSheet,
     ActivityIndicator,
     Dimensions,
+    ScrollView,
+    Keyboard,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
@@ -55,6 +57,7 @@ interface State {
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
     private modelHelper: ModelHelper;
+    private textInput: SimpleTextInput | null = null;
 
     constructor(props: Props) {
         super(props);
@@ -78,36 +81,39 @@ export class PostEditor extends React.Component<Props, State> {
 
         return (
             <FragmentSafeAreaViewWithoutTabBar>
+                <NavigationHeader
+                    leftButton={{
+                        onPress: this.onCancelConfirmation,
+                        label: <Icon
+                            name={'close'}
+                            size={20}
+                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                        />,
+                        testID: 'PostEditor/CloseButton',
+                    }}
+                    rightButton1={{
+                        onPress: sendButtonOnPress,
+                        label: sendIcon,
+                        testID: 'PostEditor/SendPostButton',
+                    }}
+                    titleImage={
+                        <Avatar
+                            size='medium'
+                            style={{ marginRight: 10 }}
+                            image={this.props.avatar}
+                            modelHelper={this.modelHelper}
+                        />
+                    }
+                    title={this.props.name}
+                />
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
                     style={styles.container}
+                    // keyboardShouldPersistTaps='always'
+                    // keyboardDismissMode='none'
+                    // scrollEnabled={false}
                 >
-                    <NavigationHeader
-                        leftButton={{
-                            onPress: this.onCancelConfirmation,
-                            label: <Icon
-                                name={'close'}
-                                size={20}
-                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                            />,
-                            testID: 'PostEditor/CloseButton',
-                        }}
-                        rightButton1={{
-                            onPress: sendButtonOnPress,
-                            label: sendIcon,
-                            testID: 'PostEditor/SendPostButton',
-                        }}
-                        titleImage={
-                            <Avatar
-                                size='medium'
-                                style={{ marginRight: 10 }}
-                                image={this.props.avatar}
-                                modelHelper={this.modelHelper}
-                            />
-                        }
-                        title={this.props.name}
-                    />
                     <ImagePreviewGrid
                         images={this.state.post.images}
                         imageSize={Math.floor((windowWidth - GRID_SPACING * 4) / 3)}
@@ -120,6 +126,7 @@ export class PostEditor extends React.Component<Props, State> {
                                     images: order.map(i => this.state.post.images[i]),
                                 },
                             });
+                            this.focusTextInput();
                         }}
                     />
                     <SimpleTextInput
@@ -132,7 +139,9 @@ export class PostEditor extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
+                        blurOnSubmit={false}
                         testID='PostEditor/TextInput'
+                        ref={ref => this.textInput = ref}
                     />
                     <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
@@ -153,6 +162,7 @@ export class PostEditor extends React.Component<Props, State> {
         this.setState({
             post,
         });
+        this.focusTextInput();
     }
 
     private onChangeText = (text: string) => {
@@ -243,6 +253,13 @@ export class PostEditor extends React.Component<Props, State> {
             this.setState({
                 post,
             });
+        }
+        this.focusTextInput();
+    }
+
+    private focusTextInput = () => {
+        if (this.textInput != null) {
+            this.textInput.focus();
         }
     }
 
