@@ -126,6 +126,12 @@ class Item extends React.Component<ItemProps> {
                     <TouchableView
                         style={styles.delete}
                         onPress={() => this.props.onRemoveImage(this.props.data)}
+                        hitSlop={{
+                            top: 5,
+                            left: 5,
+                            bottom: 5,
+                            right: 5,
+                        }}
                     >
                         <Icon name={'close-circle'} size={24}/>
                     </TouchableView>
