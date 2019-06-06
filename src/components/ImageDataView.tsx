@@ -1,21 +1,23 @@
 import * as React from 'react';
-import { Image, StyleSheet, StyleProp, ImageStyle, ImageProps } from 'react-native';
+import { Image, StyleSheet, StyleProp, ImageStyle, ImageProps, ImageBackground } from 'react-native';
 
 import { ImageData, BundledImage } from '../models/ImageData';
 import { ModelHelper } from '../models/ModelHelper';
 import { getImageSource } from '../helpers/imageDataHelpers';
+import { ChildrenProps } from '../ui/misc/ChildrenProps';
 
 export interface StateProps extends ImageProps {
     source: ImageData;
     defaultImage?: BundledImage;
     style?: StyleProp<ImageStyle>;
     modelHelper: ModelHelper;
+    background?: boolean;
 }
 
 export interface DispatchProps {
 }
 
-export type Props = StateProps & DispatchProps;
+export type Props = StateProps & DispatchProps & Partial<ChildrenProps>;
 
 export interface State {
 }
@@ -32,16 +34,32 @@ export const ImageDataView = (props: Props) => {
             ? StyleSheet.flatten(props.style).height
             : props.source.height
         : props.source.height;
-    return (
-        <Image
-            {...props}
-            source={source}
-            style={[props.style, {
-                width: width,
-                height: height,
-            }]}
-        />
-    );
+    if (props.background === true) {
+        return (
+            <ImageBackground
+                {...props}
+                source={source}
+                style={[props.style, {
+                    width: width,
+                    height: height,
+                }]}
+            >
+                {props.children}
+            </ImageBackground>
+        );
+    } else {
+        return (
+            <Image
+                {...props}
+                source={source}
+                style={[props.style, {
+                    width: width,
+                    height: height,
+                }]}
+            />
+        );
+    }
+
 };
 
 const styles = StyleSheet.create({
