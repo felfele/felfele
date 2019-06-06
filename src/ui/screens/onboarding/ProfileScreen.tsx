@@ -14,8 +14,6 @@ import { Colors, ComponentColors } from '../../../styles';
 import { DispatchProps as IdentitySettingsDispatchProps } from '../../../components/IdentitySettings';
 import { TouchableView } from '../../../components/TouchableView';
 import { defaultImages } from '../../../defaultImages';
-
-const defaultUserImage = defaultImages.defaultUser;
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';
@@ -53,7 +51,7 @@ export const ProfileScreen = (props: Props) => {
                 alignItems: 'flex-start',
             }}
             rightButton={{
-                label: 'NEXT',
+                label: 'DONE',
                 disabled: !isFormFilled,
                 onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser),
                 alignItems: 'flex-end',
