@@ -9,6 +9,7 @@ import {
     StyleSheet,
     ActivityIndicator,
     Dimensions,
+    Keyboard,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
@@ -30,6 +31,7 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
 import { getHttpLinkFromText } from '../helpers/urlUtils';
+import { Utils } from '../Utils';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -55,6 +57,7 @@ interface State {
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
     private modelHelper: ModelHelper;
+    private textInput: SimpleTextInput | null = null;
 
     constructor(props: Props) {
         super(props);
@@ -78,36 +81,36 @@ export class PostEditor extends React.Component<Props, State> {
 
         return (
             <FragmentSafeAreaViewWithoutTabBar>
+                <NavigationHeader
+                    leftButton={{
+                        onPress: this.onCancelConfirmation,
+                        label: <Icon
+                            name={'close'}
+                            size={20}
+                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                        />,
+                        testID: 'PostEditor/CloseButton',
+                    }}
+                    rightButton1={{
+                        onPress: sendButtonOnPress,
+                        label: sendIcon,
+                        testID: 'PostEditor/SendPostButton',
+                    }}
+                    titleImage={
+                        <Avatar
+                            size='medium'
+                            style={{ marginRight: 10 }}
+                            image={this.props.avatar}
+                            modelHelper={this.modelHelper}
+                        />
+                    }
+                    title={this.props.name}
+                />
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
                     style={styles.container}
                 >
-                    <NavigationHeader
-                        leftButton={{
-                            onPress: this.onCancelConfirmation,
-                            label: <Icon
-                                name={'close'}
-                                size={20}
-                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                            />,
-                            testID: 'PostEditor/CloseButton',
-                        }}
-                        rightButton1={{
-                            onPress: sendButtonOnPress,
-                            label: sendIcon,
-                            testID: 'PostEditor/SendPostButton',
-                        }}
-                        titleImage={
-                            <Avatar
-                                size='medium'
-                                style={{ marginRight: 10 }}
-                                image={this.props.avatar}
-                                modelHelper={this.modelHelper}
-                            />
-                        }
-                        title={this.props.name}
-                    />
                     <ImagePreviewGrid
                         images={this.state.post.images}
                         imageSize={Math.floor((windowWidth - GRID_SPACING * 4) / 3)}
@@ -120,6 +123,7 @@ export class PostEditor extends React.Component<Props, State> {
                                     images: order.map(i => this.state.post.images[i]),
                                 },
                             });
+                            this.focusTextInput();
                         }}
                     />
                     <SimpleTextInput
@@ -132,9 +136,14 @@ export class PostEditor extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
+                        blurOnSubmit={false}
                         testID='PostEditor/TextInput'
+                        ref={ref => this.textInput = ref}
                     />
-                    <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
+                    <PhotoWidget
+                        onPressCamera={this.openCamera}
+                        onPressInsert={this.openImagePicker}
+                    />
                 </KeyboardAvoidingView>
             </FragmentSafeAreaViewWithoutTabBar>
         );
@@ -153,6 +162,7 @@ export class PostEditor extends React.Component<Props, State> {
         this.setState({
             post,
         });
+        this.focusTextInput();
     }
 
     private onChangeText = (text: string) => {
@@ -191,11 +201,13 @@ export class PostEditor extends React.Component<Props, State> {
         this.props.navigation.goBack();
     }
 
-    private showCancelConfirmation = () => {
+    private showCancelConfirmation = async () => {
+        await this.waitUntilKeyboardDisappears();
+
         const options: any[] = [
             { text: 'Save', onPress: () => this.onSave() },
             { text: 'Discard', onPress: () => this.onDiscard() },
-            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => this.focusTextInput(), style: 'cancel' },
         ];
 
         if (Platform.OS === 'ios') {
@@ -212,6 +224,19 @@ export class PostEditor extends React.Component<Props, State> {
                 { cancelable: true },
             );
         }
+    }
+
+    private waitUntilKeyboardDisappears = async () => {
+        // This is a hack to avoid the keyboard to appear again before discarding the post
+        // It is necessary because on iOS the alert window remembers the state of the
+        // keyboard and restores it after the alert window is closed.
+        //
+        // In the case of 'Discard' this looked bad if the keyboard was visible when the
+        // alert was called, so we have to dismiss the keyboard. However it has an animation
+        // and if the keyboard is somewhat visible, alert will restore it anyhow. Hence the
+        // `waitMillisec` function to wait until it disappears completely.
+        Keyboard.dismiss();
+        await Utils.waitMillisec(50);
     }
 
     private onCancelConfirmation = () => {
@@ -243,6 +268,13 @@ export class PostEditor extends React.Component<Props, State> {
             this.setState({
                 post,
             });
+        }
+        this.focusTextInput();
+    }
+
+    private focusTextInput = () => {
+        if (this.textInput != null) {
+            this.textInput.focus();
         }
     }
 

@@ -17,7 +17,7 @@ export interface StateProps extends ImageProps {
 export interface DispatchProps {
 }
 
-export type Props = StateProps & DispatchProps & ChildrenProps;
+export type Props = StateProps & DispatchProps & Partial<ChildrenProps>;
 
 export interface State {
 }
