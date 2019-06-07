@@ -16,6 +16,10 @@ const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     return [];
 };
 
+const sortFeeds = (feeds: Feed[]): Feed[] => {
+    return feeds.sort((a, b) => a.name.localeCompare(b.name));
+};
+
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
     const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
@@ -23,10 +27,10 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : state.ownFeeds
     ;
-    const followedFeeds = navParamFeeds
+    const followedFeeds = sortFeeds(navParamFeeds
         ? navParamFeeds
         : getFollowedFeeds(state)
-    ;
+    );
     const knownFeeds = navParamFeeds
         ? []
         : getKnownFeeds(state)
