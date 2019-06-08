@@ -1,5 +1,5 @@
 import { ImageData } from './models/ImageData';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { Debug } from './Debug';
 import ImagePicker from 'react-native-image-picker';
 
@@ -99,7 +99,12 @@ export class AsyncImagePicker {
     private static async launchPicker(pickerFunction: (options: Options) => Promise<Response>): Promise<ImageData | null> {
         const response = await pickerFunction(defaultImagePickerOtions);
         if (response.error) {
-            console.error(response.error);
+            Debug.log('AsyncImagePicker.launchPicker', response.error);
+            if (Platform.OS === 'ios') {
+                Alert.alert('Allow permissions',
+                    '\nPlease go to Settings app, find Felfele and enable access to photos',
+                );
+            }
             return null;
         }
         if (response.didCancel) {
