@@ -4,12 +4,13 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { TypedNavigation } from '../helpers/navigation';
+import { sortFeedsByName } from '../helpers/feedHelpers';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     const navParamFeeds = ownProps.navigation.getParam<'FavoriteListViewerContainer', 'feeds'>('feeds');
 
     const sections: FeedSection[] = [{
-        data: navParamFeeds,
+        data: sortFeedsByName(navParamFeeds),
     }];
 
     return {
