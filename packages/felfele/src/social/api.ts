@@ -3,9 +3,9 @@ import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
-import TEST from '@felfele/felfele-core';
+import { LERNA_MAGIC } from '@felfele/felfele-core';
 
-Debug.log(TEST);
+Debug.log(LERNA_MAGIC);
 type PostCommandType = 'update' | 'remove';
 
 export const PostCommandProtocolVersion = 1;
