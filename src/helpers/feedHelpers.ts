@@ -15,3 +15,7 @@ export const getFeedImage = (feed: Feed): ImageData => {
     ;
     return image;
 };
+
+export const sortFeedsByName = (feeds: Feed[]): Feed[] => {
+    return feeds.sort((a, b) => a.name.localeCompare(b.name));
+};
