@@ -46,7 +46,7 @@
     "watchTest": "node node_modules/jest/bin/jest.js --watch",
     "check": "npm run tsc && npm run lint && npm run test",
     "extended-check": "npm run tsc && npm run lint && npm run test && cd android && ./gradlew assembleRelease",
-    "tsc": "tsc",
+    "tsc": "tsc -p tsconfig.build.json",
     "help": "tsc --help",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
@@ -112,7 +112,7 @@
     "utf8-encoder": "=1.0.1",
     "util": "=0.10.4",
     "vm-browserify": "=1.1.0",
-    "@felfele/felfele-core": "^0.0.0"
+    "@felfele/felfele-core": "^1.0.3"
   },
   "files": [
     "build/dist"

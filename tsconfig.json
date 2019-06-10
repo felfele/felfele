@@ -5,6 +5,5 @@
     "paths": {
       "@felfele/*": ["packages/*/src"]
     },
-    "skipLibCheck": true,
   }
 }
