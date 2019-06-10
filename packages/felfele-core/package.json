@@ -1,0 +1,29 @@
+{
+  "name": "@felfele/felfele-core",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Mark Vujevits <mark.vujevits@felfele.org>",
+  "homepage": "https://github.com/felfele/felfele#readme",
+  "license": "ISC",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felfele/felfele.git"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "=3.4.3"
+  },
+  "bugs": {
+    "url": "https://github.com/felfele/felfele/issues"
+  }
+}

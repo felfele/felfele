@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@felfele/*": ["packages/*/src"]
+    },
+    "skipLibCheck": true,
+  }
+}

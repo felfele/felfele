@@ -1,5 +1,5 @@
 {
-  "name": "felfele",
+  "name": "@felfele/felfele",
   "version": "1.0.3",
   "private": true,
   "devDependencies": {
@@ -47,6 +47,7 @@
     "check": "npm run tsc && npm run lint && npm run test",
     "extended-check": "npm run tsc && npm run lint && npm run test && cd android && ./gradlew assembleRelease",
     "tsc": "tsc",
+    "help": "tsc --help",
     "lint": "tslint src/**/*.ts",
     "build": "npm run clean && npm run tsc --",
     "clean": "rm -rf build",
@@ -110,8 +111,13 @@
     "url": "=0.11.0",
     "utf8-encoder": "=1.0.1",
     "util": "=0.10.4",
-    "vm-browserify": "=1.1.0"
+    "vm-browserify": "=1.1.0",
+    "@felfele/felfele-core": "^0.0.0"
   },
+  "files": [
+    "build/dist"
+  ],
+  "main": "build/dist/index",
   "rnpm": {
     "assets": [
       "fonts",

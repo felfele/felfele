@@ -3,7 +3,9 @@ import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../Debug';
+import TEST from '@felfele/felfele-core';
 
+Debug.log(TEST);
 type PostCommandType = 'update' | 'remove';
 
 export const PostCommandProtocolVersion = 1;

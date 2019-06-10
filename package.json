@@ -1,7 +1,14 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "pub": "lerna publish"
+  },
   "devDependencies": {
-    "lerna": "^3.14.1"
+    "lerna": "=3.14.1",
+    "typescript": "=3.4.3"
   }
 }
