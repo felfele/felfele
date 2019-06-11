@@ -58,9 +58,11 @@
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
   },
   "dependencies": {
+    "@felfele/felfele-core": "^1.0.3",
     "base-64": "^0.1.0",
     "base64-arraybuffer": "=0.1.5",
     "ecma-nacl": "=2.4.2",
+    "get-dev-paths": "=0.1.1",
     "he": "=1.2.0",
     "js-sha3": "=0.8.0",
     "node-libs-browser": "=2.1.0",
@@ -107,9 +109,7 @@
     "tslint": "=5.11.0",
     "url": "=0.11.0",
     "utf8-encoder": "=1.0.1",
-    "util": "=0.10.4",
-    "vm-browserify": "=1.1.0",
-    "@felfele/felfele-core": "^1.0.3"
+    "vm-browserify": "=1.1.0"
   },
   "files": [
     "build/dist"
