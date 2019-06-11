@@ -3,6 +3,8 @@ Felfele [![Build Status](https://travis-ci.org/felfele/felfele.svg?branch=master
 [![Slack](https://img.shields.io/badge/chat-on%20slack-blueviolet.svg)](https://join.slack.com/t/felfele/shared_invite/enQtNTM1MjUwNTI1NzI5LTY5Yjg0YmVjN2MyN2MzMzc0Y2RkMGRiYzE0N2U0ZjgwNmYxMTQ3YjUwMDg1MGFiZTZlMWViZjU2MWJjY2Y0OTY)
 =======
 
+[<img src="screenshot-mobile.png" width=300>](screenshot-mobile.png)
+
 Felfele is a social app that lets you share and receive information easily, offers strong privacy and is affordable for everyone.
 
 The project is developed by a core team funded by a non-profit organization and volunteers from all over the world.
