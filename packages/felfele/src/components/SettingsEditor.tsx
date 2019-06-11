@@ -2,21 +2,20 @@ import * as React from 'react';
 import { StyleSheet, ScrollView, Vibration } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { Settings } from '../models/Settings';
+import { Settings, RecentPostFeed } from '@felfele/felfele-core';
 import { Version } from '../Version';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/buttons/RowButton';
 import { SuperGridSectionList } from 'react-native-super-grid';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
 import { RegularText, MediumText } from '../ui/misc/text';
-import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TouchableView } from './TouchableView';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface StateProps {
     navigation: TypedNavigation;

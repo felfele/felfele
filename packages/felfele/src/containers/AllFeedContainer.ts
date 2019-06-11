@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { AsyncActions, Actions } from '../actions/Actions';
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { StateProps, DispatchProps, AllFeedScreen } from '../components/AllFeedScreen';
 import { getAllFeeds, getAllPostsSorted } from '../selectors/selectors';
-import { Post } from '../models/Post';
+import { Post } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {

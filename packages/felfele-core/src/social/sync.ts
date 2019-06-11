@@ -6,7 +6,7 @@ import {
     getLatestPostCommandEpochFromLog,
     mergePostCommandLogs,
 } from './api';
-import { Debug } from '../Debug';
+import { Debug } from '../helpers/Debug';
 
 export const uploadUnsyncedPostCommandsToStorage = async (postCommandLog: PostCommandLog, storage: PostCommandLogStorage): Promise<PostCommandLog> => {
     const unsyncedCommandLog = getUnsyncedPostCommandLog(postCommandLog);

@@ -1,5 +1,15 @@
 import * as React from 'react';
-import { Post } from '../models/Post';
+import {
+    Post,
+    isSwarmLink,
+    ImageData,
+    Debug,
+    Rectangle,
+    Author,
+    Feed,
+    calculateImageDimensions,
+    ModelHelper,
+} from '@felfele/felfele-core';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 import {
@@ -13,20 +23,13 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableView, TouchableViewProps, TouchableViewDefaultHitSlop } from './TouchableView';
-import { DateUtils } from '../DateUtils';
+import { DateUtils } from '@felfele/felfele-core';
 import * as urlUtils from '../helpers/urlUtils';
 import { ImageDataView } from './ImageDataView';
-import { isSwarmLink } from '../swarm/Swarm';
-import { ImageData } from '../models/ImageData';
-import { Debug } from '../Debug';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { Avatar } from '../ui/misc/Avatar';
 import { Carousel } from '../ui/misc/Carousel';
-import { Rectangle } from '../models/ModelHelper';
 import { CardMarkdown } from './CardMarkdown';
-import { calculateImageDimensions, ModelHelper } from '../models/ModelHelper';
-import { Author } from '../models/Author';
-import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {

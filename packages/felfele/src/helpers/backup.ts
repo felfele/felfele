@@ -5,12 +5,11 @@ import { generateSecureRandom } from 'react-native-securerandom';
 // @ts-ignore
 import * as utf8 from 'utf8-encoder';
 
-import { hexToByteArray, stringToByteArray, byteArrayToHex, isHexString } from '../helpers/conversion';
+import { hexToByteArray, stringToByteArray, byteArrayToHex, isHexString } from '@felfele/felfele-core/src/helpers/conversion';
 import { Version } from '../Version';
 import { encrypt, decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../helpers/crypto';
-import * as Swarm from '../swarm/Swarm';
-import { Debug } from '../Debug';
-import { HexString } from './opaqueTypes';
+import { Debug, BzzApi } from '@felfele/felfele-core';
+import { HexString } from '@felfele/felfele-core';
 
 const CONTENT_HASH_OFFSET = 0;
 const CONTENT_HASH_LENGTH = 64;
@@ -77,7 +76,7 @@ export const restoreTextBackupToString = (backupText: string, secretHex: string)
     return originalText;
 };
 
-export const backupToSwarm = async (bzz: Swarm.BzzApi, data: string, secretHex: HexString): Promise<HexString> => {
+export const backupToSwarm = async (bzz: BzzApi, data: string, secretHex: HexString): Promise<HexString> => {
     Debug.log('backupToSwarm', 'secretHex', secretHex);
     const encryptedBackup = await createBinaryBackupFromString(data, secretHex);
     const contentHash = await bzz.uploadUint8Array(encryptedBackup) as HexString;
@@ -109,7 +108,7 @@ export const isValidBackupLinkData = (s: string): boolean => {
     return isHexString(s);
 };
 
-export const downloadBackupFromSwarm = async (bzz: Swarm.BzzApi, backupLinkData: HexString, backupPassword: string): Promise<string> => {
+export const downloadBackupFromSwarm = async (bzz: BzzApi, backupLinkData: HexString, backupPassword: string): Promise<string> => {
     const backupPasswordByteArray = stringToByteArray(backupPassword);
     const backupDataUint8Array = new Uint8Array(hexToByteArray(backupLinkData));
     const decryptedBackupData = decrypt(backupDataUint8Array, backupPasswordByteArray);

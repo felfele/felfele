@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
 

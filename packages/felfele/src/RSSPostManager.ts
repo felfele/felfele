@@ -1,12 +1,15 @@
-import { Post, PublicPost } from './models/Post';
-import { ImageData } from './models/ImageData';
-import { Feed } from './models/Feed';
+import {
+    Post,
+    PublicPost,
+    ImageData,
+    Feed,
+    ContentFilter,
+} from '@felfele/felfele-core';
 import { FaviconCache } from './FaviconCache';
 import { Utils } from './Utils';
 import * as urlUtils from './helpers/urlUtils';
 import { HtmlUtils } from './HtmlUtils';
-import { ContentFilter } from './models/ContentFilter';
-import { Debug } from './Debug';
+import { Debug } from '../../felfele-core/src/helpers/Debug';
 import {
     HEADERS_WITH_FELFELE,
     HEADERS_WITH_CURL,
@@ -33,6 +36,8 @@ const RSSMimeTypes = [
     'application/xml',
     'text/xml',
 ];
+
+declare var global: any;
 
 export class RSSFeedManager {
     public static getFeedUrlFromHtmlLink(link: Node): string {
@@ -305,7 +310,7 @@ class _RSSPostManager {
             return [];
         }
 
-        if (__DEV__) {
+        if (global.__DEV__) {
             const stats = metrics
                 .map(metric => `${urlUtils.getHumanHostname(metric.feed.url)}: s${metric.size} d${metric.downloadTime} x${metric.xmlTime} p${metric.parseTime}`)
                 .join('\n');

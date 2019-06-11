@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet, Clipboard } from 'react-native';
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Debug } from '../Debug';
+import { Debug, makeBzzApi } from '@felfele/felfele-core';
 import { Colors, ComponentColors, DefaultNavigationBarHeight, defaultMediumFont } from '../styles';
 import {
     isValidBackupLinkData,
@@ -10,9 +10,8 @@ import {
 } from '../helpers/backup';
 import { getAppStateFromSerialized } from '../reducers';
 import { TypedNavigation } from '../helpers/navigation';
-import * as Swarm from '../swarm/Swarm';
 import { AppState } from '../reducers/AppState';
-import { HexString } from '../helpers/opaqueTypes';
+import { HexString } from '@felfele/felfele-core';
 import { TouchableView } from './TouchableView';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { MediumText } from '../ui/misc/text';
@@ -114,7 +113,7 @@ export class Restore extends React.PureComponent<Props, State> {
 
     private onChangePassword = async (password: string) => {
         try {
-            const bzz = Swarm.makeBzzApi(this.props.swarmGatewayAddress);
+            const bzz = makeBzzApi(this.props.swarmGatewayAddress);
             const serializedAppState = await downloadBackupFromSwarm(bzz, this.state.backupLinkData, password);
             const appState = await getAppStateFromSerialized(serializedAppState);
             Debug.log('Restore.onChangePassword', 'success');

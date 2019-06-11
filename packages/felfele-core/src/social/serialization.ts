@@ -1,4 +1,4 @@
-import { Debug } from '../Debug';
+import { Debug } from '../helpers/Debug';
 
 const keyBlacklist = new Set<string>()
     .add('localPath')

@@ -7,11 +7,13 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
-import { Post } from '../models/Post';
+import {
+    Post,
+    ImageData,
+} from '@felfele/felfele-core';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
-import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';

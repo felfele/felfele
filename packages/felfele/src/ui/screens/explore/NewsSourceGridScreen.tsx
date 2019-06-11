@@ -4,7 +4,7 @@ import { GridCard, getGridCardSize } from '../../misc/GridCard';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { Feed } from '../../../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';

@@ -13,12 +13,16 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
-import { Feed } from '../models/Feed';
+import {
+    Feed,
+    downloadRecentPostFeed,
+    defaultFeedPrefix,
+    makeFeedAddressFromBzzFeedUrl,
+    makeReadableApi,
+} from '@felfele/felfele-core';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 import { ComponentColors, Colors, defaultMediumFont } from '../styles';
-import * as Swarm from '../swarm/Swarm';
-import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -226,9 +230,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
         try {
-            if (url.startsWith(Swarm.defaultFeedPrefix)) {
-                const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-                const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
+            if (url.startsWith(defaultFeedPrefix)) {
+                const feedAddress = makeFeedAddressFromBzzFeedUrl(url);
+                const swarm = makeReadableApi(feedAddress, this.props.swarmGateway);
                 const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
                 return feed;
             } else {

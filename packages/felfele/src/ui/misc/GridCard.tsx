@@ -10,8 +10,8 @@ import {
 import { Colors } from '../../styles';
 import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
-import { ModelHelper } from '../../models/ModelHelper';
-import { ImageData, BundledImage } from '../../models/ImageData';
+import { ModelHelper } from '@felfele/felfele-core';
+import { ImageData, BundledImage } from '@felfele/felfele-core';
 
 interface Props {
     title: string;

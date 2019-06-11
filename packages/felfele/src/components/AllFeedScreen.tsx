@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import {
+    Feed,
+    Post,
+    ImageData,
+} from '@felfele/felfele-core';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ComponentColors } from '../styles';
-import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import SplashScreen from 'react-native-splash-screen';

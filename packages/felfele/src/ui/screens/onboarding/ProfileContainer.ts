@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/Actions';
 import { StateProps, DispatchProps, ProfileScreen } from './ProfileScreen';
-import { ImageData } from '../../../models/ImageData';
+import { ImageData } from '@felfele/felfele-core';
 import { TypedNavigation } from '../../../helpers/navigation';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {

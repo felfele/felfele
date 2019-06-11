@@ -1,27 +1,39 @@
 import { ActionsUnion } from './types';
 import { createAction } from './actionHelpers';
-import { Feed } from '../models/Feed';
-import { ContentFilter } from '../models/ContentFilter';
-import { migrateAppStateToCurrentVersion } from '../reducers';
-import { AppState } from '../reducers/AppState';
-import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
-import { Author } from '../models/Author';
-import { ImageData } from '../models/ImageData';
-import { Debug } from '../Debug';
-import { Utils } from '../Utils';
 import {
+    Feed,
+    ContentFilter,
+    Post,
+    PublicPost,
+    PrivateIdentity,
+    ImageData,
     LocalFeed,
     shareNewPost,
     removePost,
     mergePostCommandLogs,
     getPreviousCommandEpochFromLog,
-} from '../social/api';
-import * as Swarm from '../swarm/Swarm';
-import { PrivateIdentity } from '../models/Identity';
+    isPostFeedUrl,
+    loadRecentPosts,
+    makeSwarmStorage,
+    makeSwarmStorageSyncer,
+    SwarmHelpers,
+    makeReadableApi,
+    makeFeedAddressFromPublicIdentity,
+    makeBzzFeedUrl,
+    signDigest,
+    generateSecureIdentity,
+    makeFeedAddressFromBzzFeedUrl,
+    ReadableApi,
+    FeedDigestSigner,
+    makeApi,
+} from '@felfele/felfele-core';
+import { migrateAppStateToCurrentVersion } from '../reducers';
+import { AppState } from '../reducers/AppState';
+import { RSSPostManager } from '../RSSPostManager';
+import { Debug } from '@felfele/felfele-core';
+import { Utils } from '../Utils';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
-import { isPostFeedUrl, loadRecentPosts, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defaultData';
@@ -173,7 +185,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
-            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
+            const swarm = makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const posts = mergeUpdatedPosts(downloadedPosts, previousPosts);
             dispatch(Actions.updateRssPosts(posts));
@@ -266,8 +278,8 @@ export const AsyncActions = {
     createOwnFeed: (): Thunk => {
         return async (dispatch, getState) => {
             const identity = getState().author.identity!;
-            const address = Swarm.makeFeedAddressFromPublicIdentity(identity);
-            const feedUrl = Swarm.makeBzzFeedUrl(address);
+            const address = makeFeedAddressFromPublicIdentity(identity);
+            const feedUrl = makeBzzFeedUrl(address);
             const author = getState().author;
             const ownFeed: LocalFeed = {
                 posts: [],
@@ -324,7 +336,7 @@ export const AsyncActions = {
             }));
 
             const identity = getState().author.identity!;
-            const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+            const signFeedDigest = (digest: number[]) => signDigest(digest, identity);
             const swarmGateway = getState().settings.swarmGatewayAddress;
             const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeedToSync.feedUrl, swarmGateway);
 
@@ -419,7 +431,7 @@ export const AsyncActions = {
     },
     createUserIdentity: (): Thunk => {
         return async (dispatch, getState) => {
-            const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+            const privateIdentity = await generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
@@ -469,8 +481,8 @@ export const AsyncActions = {
                 registerBackgroundTask(backgroundTaskIntervalMinutes, async () => {
                     const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
                     const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
-                    const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
-                    const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
+                    const address = makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
+                    const swarm = makeReadableApi(address, getState().settings.swarmGatewayAddress);
                     const recentPosts = await loadRecentPosts(swarm, foundationFeeds);
                     if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
                         const posts = mergeUpdatedPosts(recentPosts, previousPosts);
@@ -504,7 +516,7 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
+const loadPostsFromFeeds = async (swarm: ReadableApi, feeds: Feed[]): Promise<Post[]> => {
     const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
     const rssFeeds = feedsWithoutOnboarding.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feedsWithoutOnboarding.filter(feed => isPostFeedUrl(feed.url));
@@ -517,9 +529,9 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
     return allPosts;
 };
 
-const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feedUrl: string, swarmGateway: string) => {
-    const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feedUrl);
-    const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
+const getSwarmStorageSyncer = (signFeedDigest: FeedDigestSigner, feedUrl: string, swarmGateway: string) => {
+    const feedAddress = makeFeedAddressFromBzzFeedUrl(feedUrl);
+    const swarm = makeApi(feedAddress, signFeedDigest, swarmGateway);
     const modelHelper = new ReactNativeModelHelper(swarmGateway);
     const swarmHelpers: SwarmHelpers = {
         imageResizer: {

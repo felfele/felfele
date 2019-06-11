@@ -2,10 +2,8 @@ import { PublicPost, Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { ImageData } from '../models/ImageData';
 import * as Swarm from '../swarm/Swarm';
-import { Debug } from '../Debug';
-import { LERNA_MAGIC } from '@felfele/felfele-core';
+import { Debug } from '../helpers/Debug';
 
-Debug.log(LERNA_MAGIC);
 type PostCommandType = 'update' | 'remove';
 
 export const PostCommandProtocolVersion = 1;

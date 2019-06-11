@@ -1,16 +1,18 @@
 import { AppState } from './AppState';
-import { Settings } from '../models/Settings';
-import * as Swarm from '../swarm/Swarm';
-import { Author } from '../models/Author';
-import { Post } from '../models/Post';
-import { Feed } from '../models/Feed';
+import {
+    Settings,
+    Author,
+    defaultGateway,
+    Post,
+    Feed,
+} from '@felfele/felfele-core';
 import { defaultImages } from '../defaultImages';
 
 export const defaultSettings: Settings = {
     saveToCameraRoll: true,
     showSquareImages: false,
     showDebugMenu: false,
-    swarmGatewayAddress: Swarm.defaultGateway,
+    swarmGatewayAddress: defaultGateway,
 };
 
 export const DEFAULT_AUTHOR_NAME = '';

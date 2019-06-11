@@ -1,7 +1,9 @@
 import * as util from 'util';
-import { Utils } from './Utils';
+import { Utils } from '../../../felfele/src/Utils';
 
 type Logger = (s: string) => void;
+
+declare var global: any;
 
 export class Debug {
     public static isDebugMode = false;
@@ -16,7 +18,7 @@ export class Debug {
     }
 
     public static log(...args: any[]) {
-        if (__DEV__ && Debug.isDebugMode) {
+        if (global.__DEV__ && Debug.isDebugMode) {
             if (Utils.isNodeJS() &&
                 args.length === 2 &&
                 typeof args[0] === 'string' &&

@@ -1,8 +1,7 @@
 // @ts-ignore
 import * as RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
-
-import { ImageData } from './models/ImageData';
+import { ImageData } from '@felfele/felfele-core/src';
 
 const USER_IMAGE_ASSET_DIR = 'custom';
 const USER_IMAGE_NAME = 'defaultuser.png';

@@ -11,19 +11,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { NavigationHeader } from './NavigationHeader';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Debug } from '../Debug';
+import {
+    Debug,
+    HexString,
+ } from '@felfele/felfele-core';
 import { Colors, ComponentColors, DefaultNavigationBarHeight, defaultMediumFont } from '../styles';
 import {
     backupToSwarm,
     encryptBackupLinkData,
     generateBackupRandomSecret,
 } from '../helpers/backup';
-import { DateUtils } from '../DateUtils';
+import { DateUtils, makeBzzApi } from '@felfele/felfele-core';
 import { getSerializedAppState } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { TypedNavigation } from '../helpers/navigation';
-import * as Swarm from '../swarm/Swarm';
-import { HexString } from '../helpers/opaqueTypes';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TouchableView } from './TouchableView';
 import { MediumText } from '../ui/misc/text';
@@ -163,7 +164,7 @@ Backup link: ${this.state.backupData}
 
     private onBackupData = async () => {
         try {
-            const bzz = Swarm.makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
+            const bzz = makeBzzApi(this.props.appState.settings.swarmGatewayAddress);
             const serializedAppState = await this.getOrLoadSerializedAppState();
             const contentHash = await backupToSwarm(bzz, serializedAppState, this.state.randomSecret);
             const backupData = await encryptBackupLinkData(contentHash, this.state.randomSecret, this.state.backupPassword);

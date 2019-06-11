@@ -1,5 +1,5 @@
 import { HtmlUtils } from './HtmlUtils';
-import { Debug } from './Debug';
+import { Debug } from '../../felfele-core/src/helpers/Debug';
 import { safeFetch } from './Network';
 import * as urlUtils from './helpers/urlUtils';
 

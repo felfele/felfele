@@ -2,7 +2,7 @@ import { OpenGraphData, getHtmlOpenGraphData } from './openGraph';
 import { RSSFeedManager } from '../RSSPostManager';
 import { FaviconCache } from '../FaviconCache';
 import { HtmlUtils } from '../HtmlUtils';
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 
 export interface HtmlMetaData extends OpenGraphData {
     icon: string;

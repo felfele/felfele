@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Image, StyleSheet, StyleProp, ImageStyle, ImageProps, ImageBackground } from 'react-native';
 
-import { ImageData, BundledImage } from '../models/ImageData';
-import { ModelHelper } from '../models/ModelHelper';
-import { getImageSource } from '../helpers/imageDataHelpers';
+import { ImageData, BundledImage } from '@felfele/felfele-core';
+import { ModelHelper } from '@felfele/felfele-core';
+import { getImageSource } from '@felfele/felfele-core';
 import { ChildrenProps } from '../ui/misc/ChildrenProps';
 
 export interface StateProps extends ImageProps {

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { ContentFilter } from '../models/ContentFilter';
-import { DateUtils } from '../DateUtils';
+import { ContentFilter } from '@felfele/felfele-core';
+import { DateUtils } from '@felfele/felfele-core';
 import { NavigationHeader } from './NavigationHeader';
 import { ComponentColors } from '../styles';
 import { RowItem } from '../ui/buttons/RowButton';

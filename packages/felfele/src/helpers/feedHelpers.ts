@@ -1,7 +1,9 @@
-import { Feed } from '../models/Feed';
-import { LocalFeed } from '../social/api';
-import { ImageData } from '../models/ImageData';
-import { isBundledImage } from './imageDataHelpers';
+import {
+    Feed,
+    LocalFeed,
+    ImageData,
+    isBundledImage,
+} from '@felfele/felfele-core';
 
 export const getFeedImage = (feed: Feed): ImageData => {
     if (isBundledImage(feed.favicon)) {

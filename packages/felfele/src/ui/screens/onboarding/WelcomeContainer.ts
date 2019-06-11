@@ -6,7 +6,7 @@ import {
 } from './WelcomeScreen';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/Actions';
-import { ImageData } from '../../../models/ImageData';
+import { ImageData } from '@felfele/felfele-core';
 import { TypedNavigation } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {

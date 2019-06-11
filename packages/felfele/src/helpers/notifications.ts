@@ -1,7 +1,7 @@
 // @ts-ignore
 import PushNotification from 'react-native-push-notification';
 import { PushNotificationIOS, Platform, Alert } from 'react-native';
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 
 export const initializeNotifications = () => {
     PushNotification.configure({

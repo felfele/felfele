@@ -1,7 +1,9 @@
-import { ContentFilter } from '../models/ContentFilter';
-import { Feed } from '../models/Feed';
+import {
+    ContentFilter,
+    LocalFeed,
+    Feed,
+} from '@felfele/felfele-core';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
-import { LocalFeed } from '../social/api';
 
 export interface Routes {
     App: {};

@@ -6,10 +6,10 @@ import {
     Easing,
 } from 'react-native';
 
-import { ImageData } from '../models/ImageData';
+import { ImageData } from '@felfele/felfele-core';
 import { TouchableView } from './TouchableView';
 import { ImageDataView } from './ImageDataView';
-import { ModelHelper } from '../models/ModelHelper';
+import { ModelHelper } from '@felfele/felfele-core';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../styles';
 import SortableList, { RowProps } from 'react-native-sortable-list';

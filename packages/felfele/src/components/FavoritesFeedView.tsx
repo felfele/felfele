@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import {
+    Feed,
+    Post,
+} from '@felfele/felfele-core';
 import { NavigationHeader } from './NavigationHeader';
 import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
 
-// @ts-ignore
-import SnorkelingIcon from '../../images/snorkeling.svg';
 import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {

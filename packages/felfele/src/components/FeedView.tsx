@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import {
+    Feed,
+    Post,
+    LocalFeed,
+} from '@felfele/felfele-core';
 import { NavigationHeader, HeaderDefaultLeftButtonIcon } from './NavigationHeader';
 import { ComponentColors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
-import { LocalFeed } from '../social/api';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;

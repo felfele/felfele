@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';

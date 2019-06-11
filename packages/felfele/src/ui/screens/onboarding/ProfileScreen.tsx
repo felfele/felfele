@@ -7,14 +7,13 @@ import {
     ImageBackground,
     KeyboardAvoidingView,
 } from 'react-native';
-import { Author } from '../../../models/Author';
-import { ImageData } from '../../../models/ImageData';
+import { Author } from '@felfele/felfele-core';
+import { ImageData } from '@felfele/felfele-core';
 import { AsyncImagePicker } from '../../../AsyncImagePicker';
 import { Colors, ComponentColors } from '../../../styles';
 import { DispatchProps as IdentitySettingsDispatchProps } from '../../../components/IdentitySettings';
 import { TouchableView } from '../../../components/TouchableView';
 import { defaultImages } from '../../../defaultImages';
-import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RegularText } from '../../misc/text';
@@ -22,7 +21,8 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { defaultAuthor } from '../../../reducers/defaultData';
 import { getDefaultUserImage } from '../../../defaultUserImage';
-import { getImageSource } from '../../../helpers/imageDataHelpers';
+import { getImageSource } from '@felfele/felfele-core';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 
 export type CreateUserCallback = (name: string, image: ImageData, navigation: TypedNavigation) => void;
 

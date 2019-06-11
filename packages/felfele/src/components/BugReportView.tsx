@@ -17,7 +17,7 @@ import { BoldText, RegularText } from '../ui/misc/text';
 import { filteredLog, LogItem } from '../log';
 import { Version } from '../Version';
 
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 import { SimpleTextInput } from './SimpleTextInput';
 import { WideButton } from '../ui/buttons/WideButton';

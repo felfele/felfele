@@ -1,12 +1,17 @@
 import { keccak256 } from 'js-sha3';
 
 import { Version } from '../Version';
-import { apiTests } from '../social/apiTest';
-import { syncTests } from '../social/syncTest';
-import * as Swarm from '../swarm/Swarm';
 import { generateUnsecureRandom } from '../helpers/unsecureRandom';
-import { stringToByteArray } from '../helpers/conversion';
-import { Debug } from '../Debug';
+import { stringToByteArray } from '@felfele/felfele-core/src/helpers/conversion';
+import {
+    Debug,
+    makeBzzApi,
+    generateSecureIdentity,
+    File,
+    imageMimeTypeFromFilenameExtension,
+    apiTests,
+    syncTests,
+} from '@felfele/felfele-core';
 import { parseArguments, addOption } from './cliParser';
 import { feedCommandDefinition } from './feedCommands';
 import { output, setOutput, jsonPrettyPrint } from './cliHelpers';
@@ -75,7 +80,7 @@ const definitions =
         addOption('--gateway <address>', 'Swarm gateway address', (gatewayAddress) => swarmConfig.gatewayAddress = gatewayAddress)
         .
         addCommand('get <hash>', 'Download the data by hash', async (hash: string) => {
-            const bzz = Swarm.makeBzzApi(swarmConfig.gatewayAddress);
+            const bzz = makeBzzApi(swarmConfig.gatewayAddress);
             const data = await bzz.downloadString(hash, 0);
             output(data);
         })
@@ -89,18 +94,18 @@ const definitions =
         })
         .
         addCommand('testId', 'Generate a test identity', async () => {
-            const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
+            const identity = await generateSecureIdentity(generateUnsecureRandom);
             output('Generated identity:', jsonPrettyPrint(identity));
             output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
         })
         .
         addCommand('uploadImage <path-to-image>', 'Upload an image to Swarm', async (localPath) => {
-            const bzz = Swarm.makeBzzApi(swarmConfig.gatewayAddress);
-            const files: Swarm.File[] = [
+            const bzz = makeBzzApi(swarmConfig.gatewayAddress);
+            const files: File[] = [
                 {
                     name: 'image',
                     localPath,
-                    mimeType: Swarm.imageMimeTypeFromFilenameExtension(localPath),
+                    mimeType: imageMimeTypeFromFilenameExtension(localPath),
                 },
             ];
             const hash = await bzz.uploadFiles(files);

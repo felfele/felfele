@@ -19,7 +19,7 @@ import {
     assertPostCommandLogsAreEqual,
     assertEquals,
 } from './apiTest';
-import { Debug } from '../Debug';
+import { Debug } from '../helpers/Debug';
 import {
     syncPostCommandLogWithStorage,
     uploadUnsyncedPostCommandsToStorage,

@@ -3,7 +3,7 @@ import { StateProps, DispatchProps, FeedSettingsScreen } from './FeedSettingsScr
 import { AppState } from '../../../reducers/AppState';
 import { Actions } from '../../../actions/Actions';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { Feed } from '../../../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const paramFeed = ownProps.navigation.getParam<'FeedSettings', 'feed'>('feed');

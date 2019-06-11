@@ -1,6 +1,6 @@
-// tslint:disable:no-bitwise
-import { HexString } from '../helpers/opaqueTypes';
+import { HexString } from './opaqueTypes';
 
+// tslint:disable:no-bitwise
 export const hexToString = (hex: string): string => {
     const byteArray = hexToByteArray(hex);
     return byteArrayToString(byteArray);

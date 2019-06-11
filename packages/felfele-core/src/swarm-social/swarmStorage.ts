@@ -14,8 +14,8 @@ import {
 } from '../social/api';
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
-import { Debug } from '../Debug';
-import { Utils } from '../Utils';
+import { Debug } from '../helpers/Debug';
+import { Utils } from '../../../felfele/src/Utils';
 import { PublicPost, Post } from '../models/Post';
 import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
@@ -50,7 +50,7 @@ const defaultSwarmHelpers: SwarmHelpers = {
     getLocalPath: (localPath) => localPath,
 };
 
-interface SwarmStorage extends Storage {
+export interface SwarmStorage extends Storage {
     readonly swarmApi: Swarm.Api;
     readonly swarmHelpers: SwarmHelpers;
 }

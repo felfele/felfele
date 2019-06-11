@@ -1,7 +1,7 @@
 import * as urlUtils from './urlUtils';
 import { Utils } from '../Utils';
 import { Version } from '../Version';
-import { DateUtils } from '../DateUtils';
+import { DateUtils } from '@felfele/felfele-core';
 import { loadRedditFeed, redditFeedUrl } from './redditFeedHelpers';
 
 // tslint:disable-next-line:no-var-requires

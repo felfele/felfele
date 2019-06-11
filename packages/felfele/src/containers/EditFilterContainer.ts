@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, EditFilter } from '../components/EditFilter';
-import { ContentFilter } from '../models/ContentFilter';
+import { ContentFilter } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {

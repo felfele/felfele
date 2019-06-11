@@ -5,13 +5,13 @@ import {
     RefreshControl,
     LayoutAnimation,
 } from 'react-native';
-import { Post } from '../models/Post';
+import { Post } from '@felfele/felfele-core';
 import { ComponentColors, Colors } from '../styles';
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { CardContainer } from '../containers/CardContainer';
 import { Props as NavHeaderProps } from './NavigationHeader';
 import { Props as FeedHeaderProps } from './FeedHeader';
-import { ModelHelper } from '../models/ModelHelper';
+import { ModelHelper } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 

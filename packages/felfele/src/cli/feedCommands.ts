@@ -1,11 +1,8 @@
 import { addOption } from './cliParser';
-import * as Swarm from '../swarm/Swarm';
-import { makeSwarmStorage, makeSwarmStorageSyncer } from '../swarm-social/swarmStorage';
 import { output, jsonPrettyPrint } from './cliHelpers';
 import { swarmConfig } from './swarmConfig';
-import { PrivateIdentity } from '../models/Identity';
-import { shareNewPost, emptyPostCommandLog, RecentPostFeed } from '../social/api';
-import { Post } from '../models/Post';
+import { PrivateIdentity, makeSwarmStorage, FeedAddress, makeApi, signDigest, makeFeedAddressFromPublicIdentity, makeBzzFeedUrl, RecentPostFeed, emptyPostCommandLog, makeSwarmStorageSyncer, shareNewPost } from '@felfele/felfele-core';
+import { Post } from '@felfele/felfele-core';
 
 import fs from 'fs';
 import { generateUnsecureRandomHexString } from '../helpers/unsecureRandom';
@@ -32,12 +29,12 @@ export const feedCommandDefinition =
                 ? privateIdentity.address
                 : throwError('user is not provided')
         ;
-        const feedAddress: Swarm.FeedAddress = {
+        const feedAddress: FeedAddress = {
             topic: '',
             user,
         };
         const dummySigner = (digest: number[]) => '';
-        const swarmApi = Swarm.makeApi(feedAddress, dummySigner, swarmConfig.gatewayAddress);
+        const swarmApi = makeApi(feedAddress, dummySigner, swarmConfig.gatewayAddress);
         const storageApi = makeSwarmStorage(swarmApi);
         const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
         output('Recent post feed', jsonPrettyPrint(recentPostFeed));
@@ -49,15 +46,15 @@ export const feedCommandDefinition =
     .
     addCommand('create <name> [image]', 'Create new feed', async (name, localPath) => {
         const privateIdentity = getPrivateIdentity() || throwError('missing identity file, please provide one with the -i option');
-        const feedAddress: Swarm.FeedAddress = {
+        const feedAddress: FeedAddress = {
             topic: '',
             user: privateIdentity.address,
         };
-        const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
-        const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
+        const signer = (digest: number[]) => signDigest(digest, privateIdentity);
+        const swarmApi = makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
         const storageApi = makeSwarmStorage(swarmApi);
-        const address = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
-        const feedUrl = Swarm.makeBzzFeedUrl(address);
+        const address = makeFeedAddressFromPublicIdentity(privateIdentity);
+        const feedUrl = makeBzzFeedUrl(address);
         const recentPostFeed: RecentPostFeed = {
             posts: [],
             authorImage: {
@@ -73,13 +70,13 @@ export const feedCommandDefinition =
     .
     addCommand('post <markdown> [image-files...]', 'Share a new post in an existing feed', async (markdownText, image) => {
         const privateIdentity = getPrivateIdentity() || throwError('missing identity file, please provide one with the -i option');
-        const feedAddress: Swarm.FeedAddress = {
+        const feedAddress: FeedAddress = {
             topic: '',
             user: privateIdentity.address,
         };
         const source = generateUnsecureRandomHexString(32);
-        const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
-        const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
+        const signer = (digest: number[]) => signDigest(digest, privateIdentity);
+        const swarmApi = makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
         const storageApi = makeSwarmStorage(swarmApi);
         const storageSyncApi = makeSwarmStorageSyncer(storageApi);
         const recentPostFeed = await storageApi.downloadRecentPostFeed(0);

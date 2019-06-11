@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
     View,
 } from 'react-native';
-import { Author } from '../models/Author';
+import { Author } from '@felfele/felfele-core';
 import { TypedNavigation, Routes } from '../helpers/navigation';
 
 export interface DispatchProps { }

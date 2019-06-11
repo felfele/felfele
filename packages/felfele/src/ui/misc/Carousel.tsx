@@ -4,9 +4,9 @@ import SwipeableViews from 'react-swipeable-views-native';
 // @ts-ignore
 import { autoPlay } from 'react-swipeable-views-utils';
 import { View, Dimensions, StyleSheet } from 'react-native';
-import { Post } from '../../models/Post';
-import { Rectangle, ModelHelper } from '../../models/ModelHelper';
-import { ImageData } from '../../models/ImageData';
+import { Post } from '@felfele/felfele-core';
+import { Rectangle, ModelHelper } from '@felfele/felfele-core';
+import { ImageData } from '@felfele/felfele-core';
 import { Colors } from '../../styles';
 import { ImageDataView } from '../../components/ImageDataView';
 

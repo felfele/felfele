@@ -13,7 +13,7 @@ import {
     emptyPostCommandLog,
 } from './api';
 import { Post} from '../models/Post';
-import { Debug } from '../Debug';
+import { Debug } from '../helpers/Debug';
 
 const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => {
     const sortedCommands = sortAndFilterPostCommands(commands);

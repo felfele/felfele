@@ -1,18 +1,17 @@
 import { PersistedState } from 'redux-persist';
-import { Debug } from '../Debug';
+import { Debug, defaultGateway } from '@felfele/felfele-core';
 import {
     RecentPostFeed,
     PostCommandLog,
     shareNewPost,
     emptyPostCommandLog,
-} from '../social/api';
-import { ContentFilter } from '../models/ContentFilter';
-import { Feed } from '../models/Feed';
-import { Post, PublicPost } from '../models/Post';
-import { Author } from '../models/Author';
-import { Metadata } from '../models/Metadata';
-import { Settings } from '../models/Settings';
-import * as Swarm from '../swarm/Swarm';
+} from '@felfele/felfele-core';
+import { ContentFilter } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
+import { Post, PublicPost } from '@felfele/felfele-core';
+import { Author } from '@felfele/felfele-core';
+import { Metadata } from '@felfele/felfele-core';
+import { Settings } from '@felfele/felfele-core';
 import { AppStateV0 } from './version0';
 
 const makePostCommandLogFromPosts = (posts: PublicPost[]): PostCommandLog => {
@@ -52,7 +51,7 @@ export const migrateVersion0ToVersion1 = (state: PersistedState): AppStateV1 => 
         })),
         settings: {
             ...appStateV0.settings,
-            swarmGatewayAddress: Swarm.defaultGateway,
+            swarmGatewayAddress: defaultGateway,
         },
         postUploadQueue: undefined,
     };

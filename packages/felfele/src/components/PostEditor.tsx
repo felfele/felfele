@@ -14,17 +14,16 @@ import {
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
 import { ImagePreviewGrid, GRID_SPACING } from './ImagePreviewGrid';
-import { Post } from '../models/Post';
-import { ImageData } from '../models/ImageData';
+import { Post } from '@felfele/felfele-core';
+import { ImageData } from '@felfele/felfele-core';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 import { markdownEscape, markdownUnescape } from '../markdown';
 import { ComponentColors, Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { ModelHelper } from '../models/ModelHelper';
+import { ModelHelper } from '@felfele/felfele-core';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
@@ -32,6 +31,7 @@ import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
 import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface StateProps {
     navigation: TypedNavigation;

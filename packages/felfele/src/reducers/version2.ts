@@ -1,14 +1,13 @@
 import { PersistedState } from 'redux-persist';
-import { Debug } from '../Debug';
-import { ContentFilter } from '../models/ContentFilter';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
-import { Author } from '../models/Author';
-import { Metadata } from '../models/Metadata';
-import { Settings } from '../models/Settings';
-import { LocalFeed } from '../social/api';
+import { Debug, defaultGateway } from '@felfele/felfele-core';
+import { ContentFilter } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
+import { Post } from '@felfele/felfele-core';
+import { Author } from '@felfele/felfele-core';
+import { Metadata } from '@felfele/felfele-core';
+import { Settings } from '@felfele/felfele-core';
+import { LocalFeed } from '@felfele/felfele-core';
 import { AppStateV1 } from './version1';
-import * as Swarm from '../swarm/Swarm';
 
 export interface AppStateV2 extends PersistedState {
     contentFilters: ContentFilter[];
@@ -34,7 +33,7 @@ export const migrateVersion1ToVersion2 = (state: PersistedState): AppStateV2 => 
         })),
         settings: {
             ...appStateV1.settings,
-            swarmGatewayAddress: Swarm.defaultGateway,
+            swarmGatewayAddress: defaultGateway,
         },
     };
     return appStateV2;

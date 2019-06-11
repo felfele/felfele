@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 import { BugReportViewWithoutTabBar } from './BugReportView';
 
 export class TopLevelErrorBoundary extends React.Component<{}, { hasError: boolean }> {

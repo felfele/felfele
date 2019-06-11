@@ -7,17 +7,15 @@ import { generateSecureRandom } from 'react-native-securerandom';
 
 import { getSerializedAppState, getAppStateFromSerialized } from '../reducers';
 import { AppState } from '../reducers/AppState';
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
 import { ComponentColors, Colors } from '../styles';
 import { RowItem } from '../ui/buttons/RowButton';
-import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
-import { localScheduledNotification, localNotification } from '../helpers/notifications';
-import { SECOND } from '../DateUtils';
+import { generateSecureIdentity } from '@felfele/felfele-core';
 
 export interface StateProps {
     appState: AppState;
@@ -160,7 +158,7 @@ const onCreateIdentity = async (props: Props) => {
 };
 
 const onGenerateNewIdentity = async (props: Props) => {
-    const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+    const privateIdentity = await generateSecureIdentity(generateSecureRandom);
     // tslint:disable-next-line:no-console
     console.log(privateIdentity);
 };

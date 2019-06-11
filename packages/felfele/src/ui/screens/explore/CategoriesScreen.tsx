@@ -8,7 +8,7 @@ import { RowItem } from '../../buttons/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
-import { Feed } from '../../../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 

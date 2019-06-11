@@ -2,11 +2,11 @@ import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
 
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
-import { Debug } from '../Debug';
-import { safeFetch, safeFetchWithTimeout } from '../Network';
+import { Debug } from '../helpers/Debug';
+import { safeFetch, safeFetchWithTimeout } from '../../../felfele/src/Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
-import { Utils } from '../Utils';
+import { Utils } from '../../../felfele/src/Utils';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';

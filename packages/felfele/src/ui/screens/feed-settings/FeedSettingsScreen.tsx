@@ -3,19 +3,17 @@ import {
     Text,
     StyleSheet,
     ScrollView,
-    Image,
     SafeAreaView,
  } from 'react-native';
 
-import { Settings } from '../../../models/Settings';
+import { Settings, LocalFeed } from '@felfele/felfele-core';
 import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RowItem } from '../../../ui/buttons/RowButton';
-import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';
-import { LocalFeed } from '../../../social/api';
 import { ImageDataView } from '../../../components/ImageDataView';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 
 export interface StateProps {
     navigation: any;

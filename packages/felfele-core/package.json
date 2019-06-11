@@ -20,7 +20,14 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@types/elliptic": "=6.4.5",
     "typescript": "=3.4.3"
+  },
+  "dependencies": {
+    "buffer": "=5.2.1",
+    "js-sha3": "=0.8.0",
+    "elliptic": "=6.4.1",
+    "tslib": "=1.9.3"
   },
   "bugs": {
     "url": "https://github.com/felfele/felfele/issues"

@@ -1,8 +1,8 @@
 import ImageResizer from 'react-native-image-resizer';
 
-import { ImageData } from './models/ImageData';
-import { Debug } from './Debug';
-import { calculateImageDimensions } from './models/ModelHelper';
+import { ImageData } from '../../felfele-core/src/helpers/models/ImageData';
+import { Debug } from '../../felfele-core/src/helpers/Debug';
+import { calculateImageDimensions } from '../../felfele-core/src/helpers/models/ModelHelper';
 
 const MAX_UPLOADED_IMAGE_DIMENSION = 400;
 const MAX_UPLOADED_IMAGE_SIZE = 500 * 1024;

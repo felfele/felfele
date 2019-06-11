@@ -16,14 +16,13 @@ import {
 } from 'redux-persist';
 
 import { Actions, AsyncActions } from '../actions/Actions';
-import { ContentFilter } from '../models/ContentFilter';
-import { Feed } from '../models/Feed';
-import { Settings } from '../models/Settings';
-import { Post } from '../models/Post';
-import { Author } from '../models/Author';
-import { Metadata } from '../models/Metadata';
-import { Debug } from '../Debug';
-import { LocalFeed } from '../social/api';
+import { ContentFilter, LocalFeed } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
+import { Settings } from '@felfele/felfele-core';
+import { Post } from '@felfele/felfele-core';
+import { Author } from '@felfele/felfele-core';
+import { Metadata } from '@felfele/felfele-core';
+import { Debug } from '@felfele/felfele-core';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray, containsItem } from '../helpers/immutable';

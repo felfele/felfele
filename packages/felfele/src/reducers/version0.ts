@@ -1,11 +1,11 @@
 import { PersistedState } from 'redux-persist';
-import { Debug } from '../Debug';
-import { RecentPostFeed } from '../social/api';
-import { ContentFilter } from '../models/ContentFilter';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
-import { Author } from '../models/Author';
-import { Metadata } from '../models/Metadata';
+import { Debug } from '@felfele/felfele-core';
+import { RecentPostFeed } from '@felfele/felfele-core';
+import { ContentFilter } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
+import { Post } from '@felfele/felfele-core';
+import { Author } from '@felfele/felfele-core';
+import { Metadata } from '@felfele/felfele-core';
 
 interface SettingsV0 {
     saveToCameraRoll: boolean;

@@ -1,6 +1,6 @@
 import BackgroundFetch from 'react-native-background-fetch';
 
-import { Debug } from '../Debug';
+import { Debug } from '@felfele/felfele-core';
 
 type Task = () => void;
 type AsyncTask = () => Promise<void>;

@@ -1,7 +1,7 @@
-import { Post } from '../models/Post';
-import { Author } from '../models/Author';
+import { Post } from '@felfele/felfele-core';
+import { Author } from '@felfele/felfele-core';
 import { HtmlMetaData } from './htmlMetaData';
-import { ImageData } from '../models/ImageData';
+import { ImageData } from '@felfele/felfele-core';
 
 export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[] => {
     const uniqueAuthors = new Map<string, Author>();

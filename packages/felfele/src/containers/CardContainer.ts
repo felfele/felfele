@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, MemoizedCard, AuthorFeed } from '../components/Card';
-import { Post } from '../models/Post';
-import { Feed } from '../models/Feed';
+import { Post } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
 import { AsyncActions } from '../actions/Actions';
-import { ModelHelper } from '../models/ModelHelper';
+import { ModelHelper } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 import { getAllFeeds } from '../selectors/selectors';
 

@@ -6,7 +6,7 @@ import {
 // @ts-ignore
 import * as base64 from 'base-64';
 
-import { Feed } from '../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 
 export const showShareFeedDialog = async (feed?: Feed) => {
     const title = 'Share your channel';

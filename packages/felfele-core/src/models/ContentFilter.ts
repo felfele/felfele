@@ -1,5 +1,5 @@
 import { Model } from './Model';
-import { DateUtils } from '../DateUtils';
+import { DateUtils } from '../helpers/DateUtils';
 
 export interface ContentFilter extends Model {
     text: string;

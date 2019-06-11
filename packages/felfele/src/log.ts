@@ -1,4 +1,4 @@
-import { DateUtils } from './DateUtils';
+import { DateUtils } from '../../felfele-core/src/helpers/DateUtils';
 
 export type LogItem = [string, string];
 

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { StateProps, NewsSourceGridScreen, DispatchProps } from './NewsSourceGridScreen';
 import { AppState } from '../../../reducers/AppState';
-import { Feed } from '../../../models/Feed';
+import { Feed } from '@felfele/felfele-core';
 import { AsyncActions } from '../../../actions/Actions';
 import { TypedNavigation } from '../../../helpers/navigation';
 

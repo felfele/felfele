@@ -4,7 +4,6 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    Image,
     TouchableOpacity,
     Dimensions,
     ScrollView,
@@ -13,24 +12,22 @@ import {
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { SimpleTextInput } from './SimpleTextInput';
-import { Author } from '../models/Author';
-import { ImageData } from '../models/ImageData';
-import { Feed } from '../models/Feed';
+import { Author, LocalFeed } from '@felfele/felfele-core';
+import { ImageData } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { ComponentColors, Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Debug } from '../Debug';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/buttons/RowButton';
 import { RegularText } from '../ui/misc/text';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
-import { LocalFeed } from '../social/api';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { TwoButton } from '../ui/buttons/TwoButton';
 import { ImageDataView } from '../components/ImageDataView';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const defaultUserImage = defaultImages.defaultUser;
 

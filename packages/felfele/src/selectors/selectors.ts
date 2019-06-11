@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../reducers/AppState';
-import { Post } from '../models/Post';
-import { Feed } from '../models/Feed';
+import { Post } from '@felfele/felfele-core';
+import { Feed } from '@felfele/felfele-core';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { RefreshableFeed } from './RefreshableFeed';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import { Feed } from '@felfele/felfele-core';
+import { Post } from '@felfele/felfele-core';
 import { FeedHeader } from './FeedHeader';
 import { NavigationHeader } from './NavigationHeader';
-import { ImageData } from '../models/ImageData';
+import { ImageData } from '@felfele/felfele-core';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
 

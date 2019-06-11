@@ -7,12 +7,19 @@ import {
     Slider,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-import { ContentFilter, filterValidUntilToText } from '../models/ContentFilter';
+import {
+    ContentFilter,
+    filterValidUntilToText,
+} from '@felfele/felfele-core';
 import { ComponentColors } from '../styles';
-import { DAY, MONTH31, WEEK, YEAR } from '../DateUtils';
+import {
+    DAY,
+    MONTH31,
+    WEEK,
+    YEAR,
+    Debug,
+} from '@felfele/felfele-core';
 import { SimpleTextInput } from './SimpleTextInput';
-import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
