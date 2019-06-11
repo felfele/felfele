@@ -30,7 +30,7 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
 import { getHttpLinkFromText } from '../helpers/urlUtils';
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 export interface StateProps {

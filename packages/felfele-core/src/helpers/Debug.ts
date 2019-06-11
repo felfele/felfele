@@ -1,5 +1,5 @@
 import * as util from 'util';
-import { Utils } from '../../../felfele/src/Utils';
+import { Utils } from './Utils';
 
 type Logger = (s: string) => void;
 

@@ -1,5 +1,5 @@
 import * as urlUtils from './urlUtils';
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 import { Version } from '../Version';
 import { DateUtils } from '@felfele/felfele-core';
 import { loadRedditFeed, redditFeedUrl } from './redditFeedHelpers';

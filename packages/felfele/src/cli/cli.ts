@@ -2,7 +2,7 @@ import { keccak256 } from 'js-sha3';
 
 import { Version } from '../Version';
 import { generateUnsecureRandom } from '../helpers/unsecureRandom';
-import { stringToByteArray } from '@felfele/felfele-core/src/helpers/conversion';
+import { stringToByteArray } from '@felfele/felfele-core';
 import {
     Debug,
     makeBzzApi,

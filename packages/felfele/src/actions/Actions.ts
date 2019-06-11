@@ -31,7 +31,7 @@ import { migrateAppStateToCurrentVersion } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Debug } from '@felfele/felfele-core';
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';

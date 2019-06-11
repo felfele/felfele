@@ -1,10 +1,13 @@
 // @ts-ignore
 import * as RNFS from 'react-native-fs';
 
-import { ModelHelper } from './ModelHelper';
-import { ImageData, BundledImage } from './ImageData';
-import { getSwarmGatewayUrl } from '../swarm/Swarm';
-import { isBundledImage } from '../helpers/imageDataHelpers';
+import {
+    ModelHelper,
+    BundledImage,
+    isBundledImage,
+    getSwarmGatewayUrl,
+    ImageData,
+} from '@felfele/felfele-core';
 
 const FILE_PROTOCOL = 'file://';
 

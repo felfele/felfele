@@ -1,9 +1,9 @@
-import * as Swarm from '../swarm/Swarm';
+import { defaultGateway } from '@felfele/felfele-core';
 
 interface SwarmConfig {
     gatewayAddress: string;
 }
 
 export const swarmConfig: SwarmConfig = {
-    gatewayAddress: process.env.SWARM_GATEWAY || Swarm.defaultGateway,
+    gatewayAddress: process.env.SWARM_GATEWAY || defaultGateway,
 };

@@ -13,7 +13,7 @@ import * as AreYouSureDialog from './AreYouSureDialog';
 import { ComponentColors, Colors } from '../styles';
 import { RowItem } from '../ui/buttons/RowButton';
 import { restartApp } from '../helpers/restart';
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 import { TypedNavigation } from '../helpers/navigation';
 import { generateSecureIdentity } from '@felfele/felfele-core';
 

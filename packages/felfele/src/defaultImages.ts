@@ -1,4 +1,4 @@
-import { BundledImage } from '@felfele/felfele-core/src';
+import { BundledImage } from '@felfele/felfele-core';
 
 declare var require: (id: string) => BundledImage;
 

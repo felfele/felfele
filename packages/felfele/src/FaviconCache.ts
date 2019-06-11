@@ -1,6 +1,5 @@
 import { HtmlUtils } from './HtmlUtils';
-import { Debug } from '../../felfele-core/src/helpers/Debug';
-import { safeFetch } from './Network';
+import { safeFetch, Debug } from '@felfele/felfele-core';
 import * as urlUtils from './helpers/urlUtils';
 
 interface Icon {

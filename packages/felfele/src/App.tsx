@@ -15,7 +15,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { setCustomText } from 'react-native-global-props';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
-import { Debug } from '../../felfele-core/src/helpers/Debug';
+import { Debug } from '@felfele/felfele-core';
 import { store, persistor } from './reducers';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { AllFeedContainer } from './containers/AllFeedContainer';

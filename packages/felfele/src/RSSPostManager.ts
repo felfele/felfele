@@ -4,12 +4,12 @@ import {
     ImageData,
     Feed,
     ContentFilter,
+    Debug,
 } from '@felfele/felfele-core';
 import { FaviconCache } from './FaviconCache';
-import { Utils } from './Utils';
+import { Utils } from '@felfele/felfele-core';
 import * as urlUtils from './helpers/urlUtils';
 import { HtmlUtils } from './HtmlUtils';
-import { Debug } from '../../felfele-core/src/helpers/Debug';
 import {
     HEADERS_WITH_FELFELE,
     HEADERS_WITH_CURL,

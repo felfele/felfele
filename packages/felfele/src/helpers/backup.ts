@@ -5,7 +5,7 @@ import { generateSecureRandom } from 'react-native-securerandom';
 // @ts-ignore
 import * as utf8 from 'utf8-encoder';
 
-import { hexToByteArray, stringToByteArray, byteArrayToHex, isHexString } from '@felfele/felfele-core/src/helpers/conversion';
+import { hexToByteArray, stringToByteArray, byteArrayToHex, isHexString } from '@felfele/felfele-core';
 import { Version } from '../Version';
 import { encrypt, decrypt, ENCRYPTED_HEX_HEADER_LENGTH } from '../helpers/crypto';
 import { Debug, BzzApi } from '@felfele/felfele-core';

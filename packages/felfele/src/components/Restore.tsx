@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { MediumText } from '../ui/misc/text';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 import { restartApp } from '../helpers/restart';
 
 export interface StateProps {

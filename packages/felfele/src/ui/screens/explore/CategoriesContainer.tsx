@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { StateProps, CategoriesScreen } from './CategoriesScreen';
 import { AppState } from '../../../reducers/AppState';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { exploreData } from 'packages/felfele/src/models/recommendation/NewsSource';
+import { exploreData } from '../../../models/recommendation/NewsSource';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {

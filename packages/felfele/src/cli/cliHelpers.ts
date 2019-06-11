@@ -1,5 +1,3 @@
-import * as Swarm from '../swarm/Swarm';
-
 export const jsonPrettyPrint = (obj: any) => JSON.stringify(obj, null, 4);
 type OutputFunction = (...args: any[]) => void;
 // tslint:disable-next-line:no-console

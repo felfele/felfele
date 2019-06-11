@@ -3,10 +3,10 @@ import { ec } from 'elliptic';
 
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { Debug } from '../helpers/Debug';
-import { safeFetch, safeFetchWithTimeout } from '../../../felfele/src/Network';
+import { safeFetch, safeFetchWithTimeout } from '../helpers/Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
-import { Utils } from '../../../felfele/src/Utils';
+import { Utils } from '../helpers/Utils';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';

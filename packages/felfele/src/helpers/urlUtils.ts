@@ -1,6 +1,6 @@
 // tslint:disable-next-line:no-var-requires
 const Url = require('url');
-import { Utils } from '../Utils';
+import { Utils } from '@felfele/felfele-core';
 
 export const REDDIT_COM = 'reddit.com';
 

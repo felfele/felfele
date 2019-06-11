@@ -1,6 +1,5 @@
-import { ImageData } from '@felfele/felfele-core';
+import { ImageData, Debug } from '@felfele/felfele-core';
 import { Platform, Alert } from 'react-native';
-import { Debug } from '../../felfele-core/src/helpers/Debug';
 import ImagePicker from 'react-native-image-picker';
 
 // tslint:disable-next-line:no-var-requires

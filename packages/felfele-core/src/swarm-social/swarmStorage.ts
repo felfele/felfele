@@ -15,7 +15,7 @@ import {
 import { serialize, deserialize } from '../social/serialization';
 import * as Swarm from '../swarm/Swarm';
 import { Debug } from '../helpers/Debug';
-import { Utils } from '../../../felfele/src/Utils';
+import { Utils } from '../helpers/Utils';
 import { PublicPost, Post } from '../models/Post';
 import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
