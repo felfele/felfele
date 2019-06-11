@@ -53,6 +53,7 @@ import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownC
 // @ts-ignore
 import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoDeepLinkContainer } from './containers/FeedInfoDeepLinkContainer';
+import { BASE_URL } from './helpers/deepLinking';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -360,11 +361,9 @@ const OnboardingNavigator = createStackNavigator({
     initialRouteName: 'Welcome',
 });
 
-const incomingUriPrefix = 'https://app.felfele.org/';
-
 const InitialNavigator = createSwitchNavigator({
     Loading: LoadingScreenContainer,
-    App: () => <AppNavigator uriPrefix={incomingUriPrefix}/>,
+    App: () => <AppNavigator uriPrefix={BASE_URL}/>,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
