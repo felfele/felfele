@@ -198,6 +198,7 @@ export class RSSFeedManager {
                 '/feed',
                 '/social-media/feed/',
                 '/feed/',
+                '/feed/rss/',
             ];
             if (baseUrl !== url) {
                 altFeedLocations.unshift('/');

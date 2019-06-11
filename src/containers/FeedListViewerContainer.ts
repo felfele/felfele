@@ -5,6 +5,7 @@ import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../compo
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
+import { sortFeedsByName } from '../helpers/feedHelpers';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
@@ -23,14 +24,14 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : state.ownFeeds
     ;
-    const followedFeeds = navParamFeeds
+    const followedFeeds = sortFeedsByName(navParamFeeds
         ? navParamFeeds
         : getFollowedFeeds(state)
-    ;
-    const knownFeeds = navParamFeeds
+    );
+    const knownFeeds = sortFeedsByName(navParamFeeds
         ? []
         : getKnownFeeds(state)
-    ;
+    );
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
         addSection('Channels you follow', followedFeeds),

@@ -158,7 +158,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
 };
 
 const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
-    const imageData = await AsyncImagePicker.launchImageLibrary();
+    const imageData = await AsyncImagePicker.showImagePicker();
     if (imageData != null) {
         onUpdatePicture(imageData);
     }

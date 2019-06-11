@@ -153,6 +153,7 @@ const CardBody = (props: {
                             originalAuthorFeed={undefined}
                             togglePostSelection={undefined}
                             post={originalPost}
+                            currentTimestamp={originalPost.createdAt}
                             width={props.width - 22}
                         />
                     </View>

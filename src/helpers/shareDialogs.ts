@@ -3,16 +3,16 @@ import {
     ShareContent,
     ShareOptions,
 } from 'react-native';
-// @ts-ignore
-import * as base64 from 'base-64';
 
 import { Feed } from '../models/Feed';
+import { getFollowLink } from './deepLinking';
 
 export const showShareFeedDialog = async (feed?: Feed) => {
     const title = 'Share your channel';
     const url = feed != null ? feed.feedUrl : '';
+    const followLink = getFollowLink(url);
     const message = `Follow my channel on Felfele by opening this link:
-https://app.felfele.org/follow/${base64.encode(url)}`;
+${followLink}`;
 
     const content: ShareContent = {
         title,

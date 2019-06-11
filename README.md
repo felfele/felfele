@@ -7,7 +7,7 @@ Felfele is a social app that lets you share and receive information easily, offe
 
 The project is developed by a core team funded by a non-profit organization and volunteers from all over the world.
 
-[Homepage](https://felfele.com/)
+[Homepage](https://felfele.org/)
 
 Contribute
 --------------------

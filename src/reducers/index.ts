@@ -26,7 +26,7 @@ import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { removeFromArray, updateArrayItem, insertInArray } from '../helpers/immutable';
+import { removeFromArray, updateArrayItem, insertInArray, containsItem } from '../helpers/immutable';
 import {
     defaultFeeds,
     defaultSettings,
@@ -124,6 +124,11 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 ...feed,
                 favorite: !feed.favorite,
             }));
+        }
+        case 'CLEAN-FEEDS-FROM-OWN-FEEDS': {
+            const feedsWithoutOwnFeeds = feeds
+                .filter((feed: Feed) => !containsItem(action.payload.feedUrls, (feedUrl: string) => feedUrl === feed.feedUrl));
+            return feedsWithoutOwnFeeds;
         }
         default: {
             return feeds;
@@ -358,6 +363,7 @@ const initStore = () => {
 
     // @ts-ignore
     store.dispatch(AsyncActions.cleanupContentFilters());
+    store.dispatch(Actions.cleanFeedsFromOwnFeeds(store.getState().ownFeeds.map(feed => feed.feedUrl)));
     for (const ownFeed of store.getState().ownFeeds) {
         store.dispatch(Actions.updateOwnFeed({
             ...ownFeed,
