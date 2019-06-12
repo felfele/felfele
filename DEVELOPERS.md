@@ -8,7 +8,7 @@ We are using Lerna to manage packages. One of the projects (packages/felfele) us
 
 ## Install dependencies
 
-`npm install`
+`npm install`  
 `npm run bootstrap`
 
 ## Build all packages
