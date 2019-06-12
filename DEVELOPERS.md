@@ -16,7 +16,7 @@ We are using Lerna to manage packages. One of the projects (packages/felfele) us
 
 ## Development
 
-If you are doing development in one of the modules which depend on another one, you should also run
+If you are doing development in one of the modules which depend on another one, you should also run  
 `npm run build:watch`
 
 For more details developing the mobile app, check out the [readme](packages/felfele/README.md)
