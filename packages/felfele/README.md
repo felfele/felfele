@@ -7,7 +7,7 @@ Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://
 This project uses React Native. You will need Android SDK, XCode, Node.js and NPM to be installed.
 
 ## Install dependencies
-If you have set up the project from the root using `npm run bootstrap`, you can skip this step.
+If you have set up the project from the root using `npm run bootstrap`, you can skip this step.  
 `npm install && npm run link`
 
 ## Link assets
