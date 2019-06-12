@@ -5,6 +5,7 @@ import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../compo
 import { Feed } from '@felfele/felfele-core';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
+import { sortFeedsByName } from '../helpers/feedHelpers';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
@@ -16,10 +17,6 @@ const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     return [];
 };
 
-const sortFeeds = (feeds: Feed[]): Feed[] => {
-    return feeds.sort((a, b) => a.name.localeCompare(b.name));
-};
-
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
     const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
@@ -27,14 +24,14 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : state.ownFeeds
     ;
-    const followedFeeds = sortFeeds(navParamFeeds
+    const followedFeeds = sortFeedsByName(navParamFeeds
         ? navParamFeeds
         : getFollowedFeeds(state)
     );
-    const knownFeeds = navParamFeeds
+    const knownFeeds = sortFeedsByName(navParamFeeds
         ? []
         : getKnownFeeds(state)
-    ;
+    );
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
         addSection('Channels you follow', followedFeeds),

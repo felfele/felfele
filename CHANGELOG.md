@@ -1,4 +1,13 @@
-## v1.0.3 (2019-05-13) First Alpha update
+## v1.0.4 (2019-06-11) Alpha update
+
+This release adds the following new features and fixes:
+
+- Feature: Improved post editor, image reordering added (https://github.com/felfele/felfele/pull/400)
+- Bugfix: It was possible to follow yourself (https://github.com/felfele/felfele/pull/397)
+- Bugfix: reshared posts now has correct timestamp (https://github.com/felfele/felfele/pull/399)
+- Some crashes and permission issues fixed
+
+## v1.0.3 (2019-05-23) First Alpha update
 
 This release adds the following new features and fixes:
 

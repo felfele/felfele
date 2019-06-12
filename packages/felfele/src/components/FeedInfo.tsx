@@ -31,6 +31,7 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
+import { getFeedUrlFromFollowLink } from '../helpers/deepLinking';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -94,7 +95,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             activityText: 'Loading channel...',
         });
 
-        const url = feedUrl != null ? feedUrl : this.state.url;
+        const url = this.tryGetFeedUrlFromFollowLink(feedUrl != null ? feedUrl : this.state.url);
         const feed = await this.fetchFeedFromUrl(url);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
@@ -226,6 +227,14 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 await this.fetchFeed(link);
             }
         }
+    }
+
+    private tryGetFeedUrlFromFollowLink = (followLink: string): string => {
+        const feedUrlFromFollowLink = getFeedUrlFromFollowLink(followLink);
+        return feedUrlFromFollowLink != null
+            ? feedUrlFromFollowLink
+            : followLink
+        ;
     }
 
     private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
