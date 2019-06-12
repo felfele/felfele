@@ -6,7 +6,8 @@
     "bootstrap": "lerna bootstrap",
     "clean": "lerna run clean",
     "build": "lerna run build",
-    "pub": "lerna publish"
+    "pub": "lerna publish",
+    "watch": "lerna run --parallel build:watch"
   },
   "devDependencies": {
     "lerna": "=3.14.1",

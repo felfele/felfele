@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "npm run clean && npm run compile",
+    "build:watch": "npm run clean && tsc -w -p tsconfig.build.json",
     "clean": "rm -rf ./dist",
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build"
