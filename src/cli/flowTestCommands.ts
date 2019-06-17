@@ -81,7 +81,6 @@ interface User {
 }
 
 interface Alice extends User {
-    originalSeed: string;
     randomSeed: string;
     contactKeyPair: ec.KeyPair;
     bobContactPublicKey?: string | undefined;
@@ -90,11 +89,9 @@ interface Alice extends User {
 
 const createAlice = (nextRandom: () => string): Alice => {
     const ownRandom = nextRandom();
-    const originalSeed  = nextRandom();
-    const randomSeed = byteArrayToHex(keccak256.array(hexToByteArray(originalSeed)), false);
+    const randomSeed = nextRandom();
     const contactRandom = nextRandom();
     return {
-        originalSeed,
         randomSeed,
         ownKeyPair: genKeyPair(ownRandom),
         contactKeyPair: genKeyPair(contactRandom),
