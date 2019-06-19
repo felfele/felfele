@@ -1,4 +1,4 @@
-import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact, IncomingContact } from '../models/Contact';
+import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact } from '../models/Contact';
 import { SECOND } from '../DateUtils';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { HexString } from './opaqueTypes';
@@ -6,6 +6,7 @@ import { byteArrayToHex } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
 import { Utils } from '../Utils';
+import { Debug } from '../Debug';
 
 const stripHexPrefix = (hex: string) => hex.startsWith('0x')
     ? hex.slice(2)
@@ -64,7 +65,6 @@ export const createCodeReceivedContact = async (
         remoteRandomSeed: randomSeed,
         remoteContactIdentity,
         contactIdentity,
-        isContactPublicKeySent: false,
     };
 };
 
@@ -76,7 +76,6 @@ export const advanceContactState = async (
     switch (contact.type) {
         case 'invited-contact': return advanceInvitedContactState(contact, helper, timeout);
         case 'code-received-contact': return advanceCodeReceivedContactState(contact, helper, timeout);
-        case 'incoming-contact': return advanceIncomingContactState(contact, helper, timeout);
         case 'accepted-contact': return advanceAcceptedContactState(contact, helper, timeout);
         case 'mutual-contact': return contact;
     }
@@ -84,7 +83,7 @@ export const advanceContactState = async (
 
 const pollFeed = async (publicIdentity: PublicIdentity, helper: ContactHelper, timeout: number): Promise<string | undefined> => {
     const startTime = helper.now();
-    const pollTimeout = 3 * SECOND;
+    const pollTimeout = 1 * SECOND;
     const maxTries = (timeout / pollTimeout) + 1;
     let numErrors = 0;
     while (helper.now() <= startTime + timeout && numErrors < maxTries) {
@@ -94,7 +93,8 @@ const pollFeed = async (publicIdentity: PublicIdentity, helper: ContactHelper, t
             return data;
         } catch (e) {
             numErrors += 1;
-            await Utils.waitUntil(beforeRead + pollTimeout);
+            const waited = await Utils.waitUntil(beforeRead + pollTimeout);
+            Debug.log('pollFeed', {address: publicIdentity.address, waited, numErrors});
         }
     }
     return undefined;
@@ -114,6 +114,7 @@ const advanceInvitedContactState = async (
     timeout: number
 ): Promise<InvitedContact | AcceptedContact | MutualContact> => {
     const randomFeedIdentity = await helper.generateSecureIdentity(contact.randomSeed);
+    Debug.log('advanceInvitedContactState', 'read', randomFeedIdentity.address);
     const pollData = await pollFeed(randomFeedIdentity, helper, timeout);
     if (pollData == null) {
         return contact;
@@ -137,59 +138,27 @@ const advanceCodeReceivedContactState = async (
     contact: CodeReceivedContact,
     helper: ContactHelper,
     timeout: number
-): Promise<CodeReceivedContact | IncomingContact | MutualContact> => {
-    if (!contact.isContactPublicKeySent) {
-        const randomFeedIdentity = await helper.generateSecureIdentity(contact.remoteRandomSeed);
-        const encryptedContactPublicKey = await helper.encrypt(contact.contactIdentity.publicKey as HexString, contact.remoteRandomSeed);
+): Promise<CodeReceivedContact | AcceptedContact | MutualContact> => {
+    const randomFeedIdentity = await helper.generateSecureIdentity(contact.remoteRandomSeed);
+    const encryptedContactPublicKey = await helper.encrypt(contact.contactIdentity.publicKey as HexString, contact.remoteRandomSeed);
 
-        try {
-            await helper.write(randomFeedIdentity, encryptedContactPublicKey, timeout);
-        } catch (e) {
-            return contact;
-        }
-    }
-
-    const pollData = await pollFeed(contact.remoteContactIdentity, helper, timeout);
-    if (pollData == null) {
-        return {
-            ...contact,
-            isContactPublicKeySent: true,
-        };
+    try {
+        Debug.log('advanceCodeReceivedContactState', 'write', randomFeedIdentity.address);
+        await helper.write(randomFeedIdentity, encryptedContactPublicKey, timeout);
+    } catch (e) {
+        return contact;
     }
 
     const sharedKey = deriveSharedKey(contact.contactIdentity, contact.remoteContactIdentity);
-    const contactPublicKey = helper.decrypt(pollData as HexString, sharedKey);
-    const remoteIdentity = publicKeyToIdentity(contactPublicKey);
-    const incomingContact: IncomingContact = {
-        type: 'incoming-contact',
+    const acceptedContact: AcceptedContact = {
+        type: 'accepted-contact',
         contactIdentity: contact.contactIdentity,
-        remoteIdentity,
+        remoteContactIdentity: contact.remoteContactIdentity,
         sharedKey,
+        isPublicKeySent: false,
     };
 
-    return advanceIncomingContactState(incomingContact, helper, timeout);
-};
-
-const advanceIncomingContactState = async (
-    incomingContact: IncomingContact,
-    helper: ContactHelper,
-    timeout: number
-): Promise<IncomingContact | MutualContact> => {
-    const encryptedPublicKey = await helper.encrypt(helper.ownIdentity.publicKey as HexString, incomingContact.sharedKey);
-    try {
-        await helper.write(incomingContact.contactIdentity, encryptedPublicKey, timeout);
-    } catch (e) {
-        return incomingContact;
-    }
-
-    const mutualContact: MutualContact = {
-        type: 'mutual-contact',
-        name: '',
-        image: {},
-        identity: incomingContact.remoteIdentity,
-        confirmed: false,
-    };
-    return mutualContact;
+    return advanceAcceptedContactState(acceptedContact, helper, timeout);
 };
 
 const advanceAcceptedContactState = async (
@@ -200,12 +169,14 @@ const advanceAcceptedContactState = async (
     if (!acceptedContact.isPublicKeySent) {
         const encryptedPublicKey = await helper.encrypt(helper.ownIdentity.publicKey as HexString, acceptedContact.sharedKey);
         try {
+            Debug.log('advanceAcceptedContactState', 'write', acceptedContact.contactIdentity.address);
             await helper.write(acceptedContact.contactIdentity, encryptedPublicKey, timeout);
         } catch (e) {
             return acceptedContact;
         }
     }
 
+    Debug.log('advanceInvitedContactState', 'read', acceptedContact.remoteContactIdentity.address);
     const pollData = await pollFeed(acceptedContact.remoteContactIdentity, helper, timeout);
     if (pollData == null) {
         return {

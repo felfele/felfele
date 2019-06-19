@@ -2,7 +2,7 @@ import { ContactHelper, createInvitedContact, advanceContactState } from '../../
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { PrivateIdentity, PublicIdentity } from '../../src/models/Identity';
 import { Debug } from '../../src/Debug';
-import { IncomingContact, AcceptedContact, CodeReceivedContact } from '../../src/models/Contact';
+import { AcceptedContact, CodeReceivedContact } from '../../src/models/Contact';
 
 Debug.setDebugMode(true);
 
@@ -106,48 +106,6 @@ test('successful invited contact to mutual contact', async () => {
     expect(contact.type).toEqual('mutual-contact');
 });
 
-test('successful incoming contact to mutual contact', async () => {
-    const mockRead = jest.fn(x => throwError());
-    const mockWrite = jest.fn(x => Promise.resolve({}));
-    const helper: ContactHelper = {
-        ...testContactHelper,
-        read: (publicIdentity, timeout) => mockRead(),
-        write: (privateIdentity, data, timeout) => mockWrite(),
-    };
-    const incomingContact: IncomingContact = {
-        type: 'incoming-contact',
-        contactIdentity: testContactIdentity,
-        remoteIdentity: testRemoteIdentity,
-        sharedKey: '' as HexString,
-    };
-    const mutualContact = await advanceContactState(incomingContact, helper, 0);
-
-    expect(mutualContact.type).toEqual('mutual-contact');
-    if (mutualContact.type === 'mutual-contact') {
-        expect(mutualContact.identity).toEqual(testRemoteIdentity);
-        expect(mutualContact.confirmed).toBeFalsy();
-    }
-});
-
-test('incoming contact failed to write public key', async () => {
-    const mockRead = jest.fn(x => throwError());
-    const mockWrite = jest.fn(x => throwError());
-    const helper: ContactHelper = {
-        ...testContactHelper,
-        read: (publicIdentity, timeout) => mockRead(),
-        write: (privateIdentity, data, timeout) => mockWrite(),
-    };
-    const incomingContact: IncomingContact = {
-        type: 'incoming-contact',
-        contactIdentity: testContactIdentity,
-        remoteIdentity: testRemoteIdentity,
-        sharedKey: '' as HexString,
-    };
-    const contact = await advanceContactState(incomingContact, helper, 0);
-
-    expect(contact).toEqual(incomingContact);
-});
-
 test('code receive contact failed to write contact key', async () => {
     const mockRead = jest.fn(x => throwError());
     const mockWrite = jest.fn(x => throwError());
@@ -161,16 +119,16 @@ test('code receive contact failed to write contact key', async () => {
         contactIdentity: testContactIdentity,
         remoteRandomSeed: testRandomSeed,
         remoteContactIdentity: testRemoteContactIdentity,
-        isContactPublicKeySent: false,
     };
     const contact = await advanceContactState(codeReceivedContact, helper, 0);
 
     expect(contact).toEqual(codeReceivedContact);
+    expect(mockRead.mock.calls.length).toBe(0);
     expect(mockWrite.mock.calls.length).toBe(1);
 });
 
-test('code receive contact succeded to read contact key but failed to write', async () => {
-    const mockRead = jest.fn(x => throwError());
+test('code receive contact succeded', async () => {
+    const mockRead = jest.fn(x => Promise.resolve(testRemoteIdentity.publicKey));
     const mockWrite = jest.fn(x => Promise.resolve({}));
     const helper: ContactHelper = {
         ...testContactHelper,
@@ -182,38 +140,12 @@ test('code receive contact succeded to read contact key but failed to write', as
         contactIdentity: testContactIdentity,
         remoteRandomSeed: testRandomSeed,
         remoteContactIdentity: testRemoteContactIdentity,
-        isContactPublicKeySent: false,
     };
     const contact = await advanceContactState(codeReceivedContact, helper, 0);
 
-    expect(contact).toEqual({
-        ...codeReceivedContact,
-        isContactPublicKeySent: true,
-    });
+    expect(contact.type).toEqual('mutual-contact');
     expect(mockRead.mock.calls.length).toBe(1);
-    expect(mockWrite.mock.calls.length).toBe(1);
-});
-
-test('code receive contact failed to read contact key', async () => {
-    const mockRead = jest.fn(x => throwError());
-    const mockWrite = jest.fn(x => throwError());
-    const helper: ContactHelper = {
-        ...testContactHelper,
-        read: (publicIdentity, timeout) => mockRead(),
-        write: (privateIdentity, data, timeout) => mockWrite(),
-    };
-    const codeReceivedContact: CodeReceivedContact = {
-        type: 'code-received-contact',
-        contactIdentity: testContactIdentity,
-        remoteRandomSeed: testRandomSeed,
-        remoteContactIdentity: testRemoteContactIdentity,
-        isContactPublicKeySent: true,
-    };
-    const contact = await advanceContactState(codeReceivedContact, helper, 0);
-
-    expect(contact).toEqual(codeReceivedContact);
-    expect(mockRead.mock.calls.length).toBe(1);
-    expect(mockWrite.mock.calls.length).toBe(0);
+    expect(mockWrite.mock.calls.length).toBe(2);
 });
 
 test('successful accepted contact to mutual contact', async () => {

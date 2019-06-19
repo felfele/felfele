@@ -4,7 +4,7 @@ import { HexString } from '../helpers/opaqueTypes';
 
 // Alice invites Bob with a QR code:
 // Alice: InvitedContact -> AcceptedContact -> MutualContact
-// Bob: CodeReceivedContact -> IncomingContact -> MutualContact
+// Bob: CodeReceivedContact -> AcceptedContact -> MutualContact
 
 export interface InvitedContact {
     type: 'invited-contact';
@@ -18,7 +18,6 @@ export interface CodeReceivedContact {
     contactIdentity: PrivateIdentity;
     remoteRandomSeed: HexString;
     remoteContactIdentity: PublicIdentity;
-    isContactPublicKeySent: boolean;
 }
 
 export interface AcceptedContact {
@@ -29,13 +28,6 @@ export interface AcceptedContact {
     isPublicKeySent: boolean;
 }
 
-export interface IncomingContact {
-    type: 'incoming-contact';
-    contactIdentity: PrivateIdentity;
-    remoteIdentity: PublicIdentity;
-    sharedKey: HexString;
-}
-
 export interface MutualContact {
     type: 'mutual-contact';
     name: string;
@@ -44,4 +36,4 @@ export interface MutualContact {
     confirmed: boolean;
 }
 
-export type Contact = InvitedContact | AcceptedContact | CodeReceivedContact | IncomingContact | MutualContact;
+export type Contact = InvitedContact | AcceptedContact | CodeReceivedContact | MutualContact;
