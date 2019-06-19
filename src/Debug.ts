@@ -1,11 +1,13 @@
 import * as util from 'util';
 import { Utils } from './Utils';
+import { DateUtils } from './DateUtils';
 
 type Logger = (s: string) => void;
 
 export class Debug {
     public static isDebugMode = false;
     public static useColors = true;
+    public static showTimestamp = false;
 
     public static setDebugMode(isDebug: boolean) {
         Debug.isDebugMode = isDebug;
@@ -17,6 +19,10 @@ export class Debug {
 
     public static log(...args: any[]) {
         if (__DEV__ && Debug.isDebugMode) {
+            const timestamp = Debug.showTimestamp
+                ? DateUtils.timestampToDateString(Date.now(), false)
+                : ''
+            ;
             if (Utils.isNodeJS() &&
                 args.length === 2 &&
                 typeof args[0] === 'string' &&
@@ -25,10 +31,10 @@ export class Debug {
                 const name = args[0];
                 const obj = args[1];
                 // tslint:disable-next-line:no-console
-                console.log(name, util.inspect(obj, false, null, Debug.useColors));
+                console.log(timestamp, name, util.inspect(obj, false, null, Debug.useColors));
             } else {
                 // tslint:disable-next-line:no-console
-                console.log.call(console, ...args);
+                console.log.call(console, [timestamp, ...args]);
             }
         }
         const maxLengthArgs = args.map((value) => {
