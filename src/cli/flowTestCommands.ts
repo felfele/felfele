@@ -134,6 +134,8 @@ const bobSharesContactPublicKeyAndContactFeed = (
     qrCode: RandomWithContactPublicKey,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nBob shares contactPublicKey');
+
     bob.aliceContactPublicKey = qrCode.contactPublicKey;
     const contactFeedKeyPair = genKeyPair(qrCode.randomSeed);
     const contactPublicKey: ContactPublicKey = {
@@ -146,6 +148,8 @@ const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = (
     alice: Alice,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nAlice reads Bob\'s contactPublicKey and shares encrypted publicKey');
+
     const contactFeedKeyPair = genKeyPair(alice.randomSeed);
     const encryptedContactFeedData = swarmFeeds.read(contactFeedKeyPair, contactTopic) || throwError('contact feed is empty!');
     const contactFeedData = decrypt(encryptedContactFeedData, alice.randomSeed);
@@ -163,6 +167,8 @@ const bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey = (
     bob: Bob,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nBob reads Alice\'s contactPublicKey and shares encrypted publicKey');
+
     const curve = new ec('secp256k1');
     const aliceContactPublicKeyPair = curve.keyFromPublic(bob.aliceContactPublicKey!, 'hex');
     const sharedKey = deriveSharedKey(bob.contactKeyPair, aliceContactPublicKeyPair);
@@ -178,6 +184,8 @@ const aliceReadsBobsEncryptedPublicKey = (
     alice: Alice,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nAlice reads Bob\'s encrypted publicKey');
+
     const curve = new ec('secp256k1');
     const bobContactPublicKeyPair = curve.keyFromPublic(alice.bobContactPublicKey!, 'hex');
     const sharedKey = deriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
