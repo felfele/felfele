@@ -28,13 +28,13 @@ export class Debug {
                 typeof args[0] === 'string' &&
                 typeof args[1] === 'object'
             ) {
-                const name = args[0];
+                const name = Debug.showTimestamp ? timestamp + ' ' + args[0] : args[0];
                 const obj = args[1];
                 // tslint:disable-next-line:no-console
-                console.log(timestamp, name, util.inspect(obj, false, null, Debug.useColors));
+                console.log(name, util.inspect(obj, false, null, Debug.useColors));
             } else {
                 // tslint:disable-next-line:no-console
-                console.log.call(console, [timestamp, ...args]);
+                console.log.call(console, timestamp, ...args);
             }
         }
         const maxLengthArgs = args.map((value) => {
