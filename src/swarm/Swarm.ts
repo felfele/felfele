@@ -388,7 +388,6 @@ const updateMinLength = topicLength + userLength + timeLength + levelLength + he
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
-    Debug.log('feedUpdateDigest', {digest: byteArrayToHex(digestData)});
     return keccak256.array(digestData);
 }
 
