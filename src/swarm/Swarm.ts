@@ -226,7 +226,7 @@ const downloadUserFeedTemplate = async (swarmGateway: string, address: FeedAddre
     return feedUpdateResponse;
 };
 
-const downloadUserFeed = async (swarmGateway: string, address: FeedAddress): Promise<string> => {
+const downloadUserFeed = async (swarmGateway: string, address: FeedAddress, timeout: number = 0): Promise<string> => {
     const addressPart = calculateFeedAddressQueryString(address);
     return await downloadFeed(swarmGateway, `bzz-feed:/?${addressPart}`);
 };
@@ -265,7 +265,7 @@ const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate
 };
 
 export interface ReadableFeedApi {
-    download: () => Promise<string>;
+    download: (timeout: number) => Promise<string>;
     downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
     downloadFeedTemplate: () => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string, timeout: number) => Promise<string>;
@@ -300,7 +300,7 @@ export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity
 };
 
 export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string = defaultGateway): ReadableFeedApi => ({
-    download: async (): Promise<string> => downloadUserFeed(swarmGateway, address),
+    download: async (timeout: number = 0): Promise<string> => downloadUserFeed(swarmGateway, address, timeout),
     downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(swarmGateway, address, epoch),
     downloadFeedTemplate: async () => downloadUserFeedTemplate(swarmGateway, address),
     downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(swarmGateway, feedUri, timeout),
@@ -310,13 +310,13 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
 
 export type FeedDigestSigner = (digest: number[]) => string | Promise<string>;
 
-export interface WriteableFeedApi extends ReadableFeedApi {
+export interface FeedApi extends ReadableFeedApi {
     updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
     update: (data: string) => Promise<FeedTemplate>;
     signFeedDigest: FeedDigestSigner;
 }
 
-export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): WriteableFeedApi => {
+export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): FeedApi => {
     return {
         ...makeReadableFeedApi(address, swarmGateway),
 
@@ -355,7 +355,7 @@ export interface BaseApi {
 
 export interface WriteableApi extends BaseApi {
     readonly bzz: BzzApi;
-    readonly feed: WriteableFeedApi;
+    readonly feed: FeedApi;
 }
 
 export type Api = WriteableApi;
@@ -479,7 +479,7 @@ export const generateSecureIdentity = async (generateRandom: (length: number) =>
     const secureRandomUint8Array = await generateRandom(32);
     const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
     const curve = new ec('secp256k1');
-    const keyPair = await curve.genKeyPair({
+    const keyPair = curve.genKeyPair({
         entropy: secureRandom,
         entropyEnc: 'hex',
         pers: undefined,
