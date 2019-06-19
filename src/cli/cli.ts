@@ -33,6 +33,7 @@ global.fetch = fetch;
 global.FormData = FormData;
 
 Debug.setDebugMode(false);
+Debug.showTimestamp = true;
 
 const definitions =
     addOption('-q, --quiet', 'quiet mode', () => setOutput(() => {}))

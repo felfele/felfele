@@ -263,7 +263,6 @@ export const flowTestCommandDefinition =
     })
     .
     addCommand('swarmInvite [randomSeed]', 'Test invite flow on Swarm', async (randomSeed?: string) => {
-        Debug.showTimestamp = false;
         randomSeed = randomSeed ? randomSeed : randomNumbers[0];
         const nextRandom = createDeterministicRandomGenerator(randomSeed);
         const generateDeterministicRandom = async (length: number) => {
