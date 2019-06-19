@@ -5,19 +5,25 @@ import { HexString } from './opaqueTypes';
 import { byteArrayToHex } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
+import { Utils } from '../Utils';
 
 const stripHexPrefix = (hex: string) => hex.startsWith('0x')
     ? hex.slice(2)
     : hex
 ;
 
-const publicKeyToAddress = (contactPublicKey: HexString): HexString => {
+const publicKeyToAddress = (publicKey: HexString): HexString => {
     const curve = new ec('secp256k1');
-    const contactPublicKeyWithoutPrefix = stripHexPrefix(contactPublicKey);
-    const publicKeyPair = curve.keyFromPublic(contactPublicKeyWithoutPrefix, 'hex');
+    const publicKeyWithoutPrefix = stripHexPrefix(publicKey);
+    const publicKeyPair = curve.keyFromPublic(publicKeyWithoutPrefix, 'hex');
     const publicKeyBytes = publicKeyPair.getPublic().encode();
     return byteArrayToHex(keccak256.array(publicKeyBytes.slice(1)).slice(12));
 };
+
+export const publicKeyToIdentity = (publicKey: string): PublicIdentity => ({
+    publicKey,
+    address: publicKeyToAddress(publicKey as HexString),
+});
 
 export interface ContactHelper {
     read: (publicIdentity: PublicIdentity, timeout: number) => Promise<string | undefined>;
@@ -25,8 +31,8 @@ export interface ContactHelper {
     now: () => number;
     generateSecureIdentity: (randomSeed: HexString) => Promise<PrivateIdentity>;
     generateSecureRandom: () => Promise<HexString>;
+    encrypt: (data: HexString, key: HexString) => Promise<HexString>;
     decrypt: (data: HexString, key: HexString) => HexString;
-    encrypt: (data: HexString, key: HexString) => HexString;
     ownIdentity: PublicIdentity;
 }
 
@@ -50,11 +56,7 @@ export const createCodeReceivedContact = async (
     contactPublicKey: HexString,
     helper: ContactHelper,
 ): Promise<CodeReceivedContact> => {
-    const contactAddress = publicKeyToAddress(contactPublicKey);
-    const remoteContactIdentity = {
-        publicKey: contactPublicKey,
-        address: contactAddress,
-    };
+    const remoteContactIdentity = publicKeyToIdentity(contactPublicKey);
     const contactIdentityRandomSeed = await helper.generateSecureRandom();
     const contactIdentity = await helper.generateSecureIdentity(contactIdentityRandomSeed);
     return {
@@ -83,14 +85,16 @@ export const advanceContactState = async (
 const pollFeed = async (publicIdentity: PublicIdentity, helper: ContactHelper, timeout: number): Promise<string | undefined> => {
     const startTime = helper.now();
     const pollTimeout = 3 * SECOND;
-    const maxTries = timeout / pollTimeout + 1;
+    const maxTries = (timeout / pollTimeout) + 1;
     let numErrors = 0;
     while (helper.now() <= startTime + timeout && numErrors < maxTries) {
+        const beforeRead = helper.now();
         try {
             const data = await helper.read(publicIdentity, pollTimeout);
             return data;
         } catch (e) {
             numErrors += 1;
+            await Utils.waitUntil(beforeRead + pollTimeout);
         }
     }
     return undefined;
@@ -116,11 +120,7 @@ const advanceInvitedContactState = async (
     }
 
     const contactPublicKey = helper.decrypt(pollData as HexString, contact.randomSeed);
-    const contactAddress = publicKeyToAddress(contactPublicKey);
-    const remoteContactIdentity = {
-        publicKey: contactPublicKey,
-        address: contactAddress,
-    };
+    const remoteContactIdentity = publicKeyToIdentity(contactPublicKey);
     const sharedKey = deriveSharedKey(contact.contactIdentity, remoteContactIdentity);
     const acceptedContact: AcceptedContact = {
         type: 'accepted-contact',
@@ -140,7 +140,7 @@ const advanceCodeReceivedContactState = async (
 ): Promise<CodeReceivedContact | IncomingContact | MutualContact> => {
     if (!contact.isContactPublicKeySent) {
         const randomFeedIdentity = await helper.generateSecureIdentity(contact.remoteRandomSeed);
-        const encryptedContactPublicKey = helper.encrypt(contact.contactIdentity.publicKey as HexString, contact.remoteRandomSeed);
+        const encryptedContactPublicKey = await helper.encrypt(contact.contactIdentity.publicKey as HexString, contact.remoteRandomSeed);
 
         try {
             await helper.write(randomFeedIdentity, encryptedContactPublicKey, timeout);
@@ -159,11 +159,7 @@ const advanceCodeReceivedContactState = async (
 
     const sharedKey = deriveSharedKey(contact.contactIdentity, contact.remoteContactIdentity);
     const contactPublicKey = helper.decrypt(pollData as HexString, sharedKey);
-    const contactAddress = publicKeyToAddress(contactPublicKey);
-    const remoteIdentity = {
-        publicKey: contactPublicKey as string,
-        address: contactAddress as string,
-    };
+    const remoteIdentity = publicKeyToIdentity(contactPublicKey);
     const incomingContact: IncomingContact = {
         type: 'incoming-contact',
         contactIdentity: contact.contactIdentity,
@@ -179,7 +175,7 @@ const advanceIncomingContactState = async (
     helper: ContactHelper,
     timeout: number
 ): Promise<IncomingContact | MutualContact> => {
-    const encryptedPublicKey = helper.encrypt(helper.ownIdentity.publicKey as HexString, incomingContact.sharedKey);
+    const encryptedPublicKey = await helper.encrypt(helper.ownIdentity.publicKey as HexString, incomingContact.sharedKey);
     try {
         await helper.write(incomingContact.contactIdentity, encryptedPublicKey, timeout);
     } catch (e) {
@@ -202,7 +198,7 @@ const advanceAcceptedContactState = async (
     timeout: number
 ): Promise<AcceptedContact | MutualContact> => {
     if (!acceptedContact.isPublicKeySent) {
-        const encryptedPublicKey = helper.encrypt(helper.ownIdentity.publicKey as HexString, acceptedContact.sharedKey);
+        const encryptedPublicKey = await helper.encrypt(helper.ownIdentity.publicKey as HexString, acceptedContact.sharedKey);
         try {
             await helper.write(acceptedContact.contactIdentity, encryptedPublicKey, timeout);
         } catch (e) {
@@ -219,12 +215,7 @@ const advanceAcceptedContactState = async (
     }
 
     const remotePublicKey = helper.decrypt(pollData as HexString, acceptedContact.sharedKey);
-    const remoteAddress = publicKeyToAddress(remotePublicKey);
-    const remoteIdentity: PublicIdentity = {
-        publicKey: remotePublicKey,
-        address: remoteAddress,
-    };
-
+    const remoteIdentity = publicKeyToIdentity(remotePublicKey);
     const mutualContact: MutualContact = {
         type: 'mutual-contact',
         name: '',

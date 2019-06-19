@@ -5,6 +5,12 @@ import { generateUnsecureRandom } from '../helpers/unsecureRandom';
 import { output } from './cliHelpers';
 import { stringToByteArray, byteArrayToHex, hexToByteArray } from '../helpers/conversion';
 import { Debug } from '../Debug';
+import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
+import * as Swarm from '../swarm/Swarm';
+import { swarmConfig } from './swarmConfig';
+import { createInvitedContact, createCodeReceivedContact, advanceContactState } from '../helpers/contactHelpers';
+import { HexString } from '../helpers/opaqueTypes';
+import { SECOND } from '../DateUtils';
 
 const stringToUint8Array = (s: string): Uint8Array => new Uint8Array(stringToByteArray(s));
 
@@ -51,6 +57,14 @@ const createRandomGenerator = (randomArray: string[]) => {
         return random;
     };
     return nextRandom;
+};
+
+const createDeterministicRandomGenerator = (randomSeed: string): () => string => {
+    return () => {
+        const randomSeedBytes = hexToByteArray(randomSeed);
+        randomSeed = byteArrayToHex(keccak256.array(randomSeedBytes), false);
+        return randomSeed;
+    };
 };
 
 const throwError = (msg: string): never => {
@@ -246,5 +260,37 @@ export const flowTestCommandDefinition =
             const random = await generateUnsecureRandom(32);
             output(byteArrayToHex(random, false));
         }
+    })
+    .
+    addCommand('swarmInvite [randomSeed]', 'Test invite flow on Swarm', async (randomSeed?: string) => {
+        Debug.showTimestamp = false;
+        randomSeed = randomSeed ? randomSeed : randomNumbers[0];
+        const nextRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = async (length: number) => {
+            const randomString = nextRandom();
+            Debug.log('generateDeterministicRandom', {randomString});
+            const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
+            return randomBytes;
+        };
+        const aliceIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const aliceContactHelper = await createSwarmContactHelper(aliceIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const bobIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const bobContactHelper = await createSwarmContactHelper(bobIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const aliceInvitedContact = await createInvitedContact(aliceContactHelper);
+        const bobCodeReceivedContact = await createCodeReceivedContact(
+            aliceInvitedContact.randomSeed,
+            aliceInvitedContact.contactIdentity.publicKey as HexString,
+            bobContactHelper
+        );
+
+        output({aliceInvitedContact, bobCodeReceivedContact});
+
+        const timeout = 30 * SECOND;
+        const [aliceContact, bobContact] = await Promise.all([
+            advanceContactState(aliceInvitedContact, aliceContactHelper, timeout),
+            advanceContactState(bobCodeReceivedContact, bobContactHelper, timeout),
+        ]);
+
+        output({aliceContact, bobContact});
     })
 ;

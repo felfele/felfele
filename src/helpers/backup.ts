@@ -89,7 +89,7 @@ export const encryptBackupLinkData = async (contentHash: HexString, randomSecret
     const backupData = `${contentHash}${randomSecret}` as HexString;
     const plainData = new Uint8Array(hexToByteArray(backupData));
     const backupPasswordByteArray = stringToByteArray(backupPassword);
-    const encryptedBackupData = await encrypt(plainData, backupPasswordByteArray);
+    const encryptedBackupData = await encrypt(plainData, backupPasswordByteArray, generateSecureRandom);
     const encryptedHexBackup = byteArrayToHex(encryptedBackupData, false);
     return encryptedHexBackup;
 };

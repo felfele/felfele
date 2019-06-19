@@ -31,7 +31,7 @@ const testRemoteIdentity: PublicIdentity = {
     address: '0x402a3387abceef20ea3e384b62504a7d07541f1b',
 };
 
-const encrypt = (data: HexString, secret: HexString): HexString => data;
+const encrypt = (data: HexString, secret: HexString): Promise<HexString> => Promise.resolve(data);
 const decrypt = (data: HexString, secret: HexString): HexString => data;
 
 const testContactHelper: ContactHelper = {
