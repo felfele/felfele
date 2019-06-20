@@ -34,7 +34,7 @@
     "react-native-typescript-transformer": "=1.2.10",
     "react-native-version": "=3.1.0",
     "react-test-renderer": "16.6.1",
-    "typescript": "=3.4.3"
+    "typescript": "=3.5.1"
   },
   "scripts": {
     "start": "react-native start",
@@ -58,7 +58,7 @@
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
   },
   "dependencies": {
-    "base-64": "^0.1.0",
+    "base-64": "=0.1.0",
     "base64-arraybuffer": "=0.1.5",
     "buffer": "=5.2.1",
     "ecma-nacl": "=2.4.2",
