@@ -93,7 +93,7 @@ const pollFeed = async (publicIdentity: PublicIdentity, helper: ContactHelper, t
             return data;
         } catch (e) {
             numErrors += 1;
-            const waited = await Utils.waitUntil(beforeRead + pollTimeout);
+            const waited = await Utils.waitUntil(beforeRead + pollTimeout, helper.now());
             Debug.log('pollFeed', {address: publicIdentity.address, waited, numErrors});
         }
     }
