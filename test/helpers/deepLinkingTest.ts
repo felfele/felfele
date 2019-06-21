@@ -16,7 +16,7 @@ test('invite link encoding and decoding', () => {
         privateKey: 'privateKey',
         publicKey: 'publicKey',
         address: 'address',
-    }
+    };
     const invitedContact: InvitedContact = {
         type: 'invited-contact',
         randomSeed,
