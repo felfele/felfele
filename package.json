@@ -58,6 +58,10 @@
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
   },
   "dependencies": {
+    "@erebos/api-bzz-browser": "=0.8.0",
+    "@erebos/'@erebos/api-bzz-base": "=0.8.0",
+    "@erebos/keccak256": "^0.7.0",
+    "@erebos/secp256k1": "^0.7.0",
     "base-64": "^0.1.0",
     "base64-arraybuffer": "=0.1.5",
     "buffer": "=5.2.1",

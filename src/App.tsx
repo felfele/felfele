@@ -1,3 +1,4 @@
+import 'node-libs-react-native/globals';
 import * as React from 'react';
 import {
     NavigationRouteConfigMap,
@@ -63,6 +64,48 @@ Debug.setDebugMode(true);
 Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
 initializeNotifications();
+
+/*
+import Bzz from '@erebos/api-bzz-browser';
+import { defaultGateway } from './swarm/Swarm';
+import SplashScreen from 'react-native-splash-screen';
+import { pubKeyToAddress } from '@erebos/keccak256';
+import { createKeyPair, sign } from '@erebos/secp256k1';
+
+SplashScreen.hide();
+
+                        const bzz = new BzzAPI({ url: `${defaultGateway}/` });
+bzz.upload('szep 🤫 🤭 🧐 🤓 😈 👿 👹', { contentType: 'text/plain' })
+    .then(value => {
+        Debug.log(value);
+        bzz.download(value).then(origValue => Debug.log(origValue));
+    }
+)
+    .catch(reason => {
+            Debug.log(reason);
+        }
+    )
+;
+
+const keyPair = createKeyPair();
+const user = pubKeyToAddress(keyPair.getPublic().encode());
+const signBytes = async (bytes: any) => sign(bytes, keyPair.getPrivate());
+const bzz = new Bzz({ url: `${defaultGateway}/`, signBytes });
+bzz.createFeedManifest({
+    user,
+    name: 'my-awesome-website',
+}).then((manifestHash: any) => {
+    Debug.log('feedHash', manifestHash);
+    bzz.setFeedContent(manifestHash, 'the big test', {
+            contentType: 'text/plain',
+        })
+        .then((feedUpdate: any) => {
+            Debug.log('feedUpdate', feedUpdate);
+            bzz.download(manifestHash).then((val: any) => {
+                Debug.log('val', val);
+            });
+        });
+});*/
 
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {

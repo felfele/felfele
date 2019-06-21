@@ -28,6 +28,10 @@ import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defau
 import { registerBackgroundTask } from '../helpers/backgroundTask';
 import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
+import { ec } from 'elliptic';
+import { createKeyPair, sign } from '@erebos/secp256k1';
+import { ErebosSwarm } from '../swarm/erebos';
+import { SignBytesFunc } from '@erebos/api-bzz-browser/node_modules/@erebos/api-bzz-base';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -173,7 +177,8 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
-            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
+            const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, getState().author.identity!);
+            const swarm = new ErebosSwarm(signFeedDigest, {user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const downloadedPosts = await loadPostsFromFeeds(swarm, feeds);
             const posts = mergeUpdatedPosts(downloadedPosts, previousPosts);
             dispatch(Actions.updateRssPosts(posts));
@@ -470,7 +475,8 @@ export const AsyncActions = {
                     const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
                     const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
                     const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
-                    const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
+                    const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, getState().author.identity!);
+                    const swarm = new ErebosSwarm(signFeedDigest, address, getState().settings.swarmGatewayAddress);
                     const recentPosts = await loadRecentPosts(swarm, foundationFeeds);
                     if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
                         const posts = mergeUpdatedPosts(recentPosts, previousPosts);
@@ -504,7 +510,7 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Promise<Post[]> => {
+const loadPostsFromFeeds = async (swarm: ErebosSwarm, feeds: Feed[]): Promise<Post[]> => {
     const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
     const rssFeeds = feedsWithoutOnboarding.filter(feed => !isPostFeedUrl(feed.url));
     const postFeeds = feedsWithoutOnboarding.filter(feed => isPostFeedUrl(feed.url));
@@ -517,9 +523,9 @@ const loadPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[]): Prom
     return allPosts;
 };
 
-const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feedUrl: string, swarmGateway: string) => {
+const getSwarmStorageSyncer = (signFeedDigest: SignBytesFunc, feedUrl: string, swarmGateway: string) => {
     const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feedUrl);
-    const swarm = Swarm.makeApi(feedAddress, signFeedDigest, swarmGateway);
+    const erebosSwarm = new ErebosSwarm(signFeedDigest, feedAddress, swarmGateway);
     const modelHelper = new ReactNativeModelHelper(swarmGateway);
     const swarmHelpers: SwarmHelpers = {
         imageResizer: {
@@ -528,7 +534,7 @@ const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feedUrl: 
         },
         getLocalPath: modelHelper.getLocalPath,
     };
-    const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);
+    const swarmStorage = makeSwarmStorage(erebosSwarm, swarmHelpers);
     const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
     return swarmStorageSyncer;
 };

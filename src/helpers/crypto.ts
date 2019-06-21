@@ -2,6 +2,7 @@ import nacl from 'ecma-nacl';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { keccak256 } from 'js-sha3';
+import { ec } from 'elliptic';
 
 export const ENCRYPTED_HEADER_LENGTH_IN_BYTES = 40;
 export const ENCRYPTED_HEX_HEADER_LENGTH = 2 * ENCRYPTED_HEADER_LENGTH_IN_BYTES;

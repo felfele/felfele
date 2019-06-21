@@ -28,6 +28,7 @@ import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { getFeedUrlFromFollowLink } from '../helpers/deepLinking';
+import { ErebosSwarm } from '../swarm/erebos';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -237,8 +238,9 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         try {
             if (url.startsWith(Swarm.defaultFeedPrefix)) {
                 const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-                const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
-                const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
+                const erebosSwarm = new ErebosSwarm(null as any, feedAddress, this.props.swarmGateway);
+
+                const feed: Feed = await downloadRecentPostFeed(erebosSwarm, url, 60 * 1000);
                 return feed;
             } else {
                 Debug.log('fetchFeedFromUrl', 'url', url);

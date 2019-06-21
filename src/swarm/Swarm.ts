@@ -7,6 +7,8 @@ import { safeFetch, safeFetchWithTimeout } from '../Network';
 import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
 import { Utils } from '../Utils';
+import { createKeyPair, sign } from '@erebos/secp256k1';
+import { DirectoryData } from '@erebos/api-bzz-browser/node_modules/@erebos/api-bzz-base';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
@@ -463,17 +465,20 @@ function publicKeyToAddress(pubKey: any) {
     return keccak256.array(pubBytes.slice(1)).slice(12);
 }
 
-export const signDigest = (digest: number[], identity: PrivateIdentity) => {
-    const curve = new ec('secp256k1');
-    const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
-    const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
-    const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
-    if (sigRaw.recoveryParam != null) {
-        const signature = partialSignature.concat(sigRaw.recoveryParam);
-        return byteArrayToHex(signature);
-    }
-    throw new Error('signDigest recovery param was null');
+export const signDigest = async (digest: number[], identity: PrivateIdentity) => {
+    return await sign(digest, Buffer.from(identity.privateKey.substring(2), 'hex'));
+   // return byteArrayToHex(signature);
 };
+
+// export const signDigest = (digest: number[], identity: PrivateIdentity) => {
+//     const curve = new ec('secp256k1');
+//     const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
+//     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
+//     const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
+//     if (sigRaw.recoveryParam != null) {
+//         const signature = partialSignature.concat(sigRaw.recoveryParam);
+//         return byteArrayToHex(signature);
+// };
 
 export const generateSecureIdentity = async (generateRandom: (length: number) => Promise<Uint8Array>): Promise<PrivateIdentity> => {
     const secureRandomUint8Array = await generateRandom(32);
