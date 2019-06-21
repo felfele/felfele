@@ -10,15 +10,15 @@ import {
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+// @ts-ignore
+import { generateSecureRandom } from 'react-native-securerandom';
 
-import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { ComponentColors, Colors, defaultMediumFont } from '../styles';
 import * as Swarm from '../swarm/Swarm';
-import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -27,7 +27,12 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
-import { getFeedUrlFromFollowLink } from '../helpers/deepLinking';
+import { getFeedUrlFromFollowLink, getInviteCodeFromInviteLink } from '../helpers/deepLinking';
+import { advanceContactState, createCodeReceivedContact } from '../helpers/contactHelpers';
+import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
+import { PublicIdentity } from '../models/Identity';
+import { SECOND } from '../DateUtils';
+import { fetchFeedFromUrl } from '../helpers/feedHelpers';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -52,6 +57,7 @@ export interface StateProps {
     feed: Feed;
     navigation: TypedNavigation;
     isKnownFeed: boolean;
+    identity: PublicIdentity;
 }
 
 type Props = DispatchProps & StateProps;
@@ -91,8 +97,8 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             activityText: 'Loading channel...',
         });
 
-        const url = this.tryGetFeedUrlFromFollowLink(feedUrl != null ? feedUrl : this.state.url);
-        const feed = await this.fetchFeedFromUrl(url);
+        const url = await this.tryGetFeedUrlFromFollowLink(feedUrl != null ? feedUrl : this.state.url);
+        const feed = await fetchFeedFromUrl(url, this.props.swarmGateway);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
                 loading: false,
@@ -225,33 +231,23 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         }
     }
 
-    private tryGetFeedUrlFromFollowLink = (followLink: string): string => {
+    private tryGetFeedUrlFromFollowLink = async (followLink: string): Promise<string> => {
         const feedUrlFromFollowLink = getFeedUrlFromFollowLink(followLink);
-        return feedUrlFromFollowLink != null
-            ? feedUrlFromFollowLink
-            : followLink
-        ;
-    }
-
-    private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        try {
-            if (url.startsWith(Swarm.defaultFeedPrefix)) {
-                const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-                const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
-                const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
-                return feed;
-            } else {
-                Debug.log('fetchFeedFromUrl', 'url', url);
-                const canonicalUrl = urlUtils.getCanonicalUrl(url);
-                Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-                const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-                Debug.log('fetchFeedFromUrl', 'feed', feed);
-                return feed;
-            }
-        } catch (e) {
-            Debug.log(e);
-            return null;
+        if (feedUrlFromFollowLink != null) {
+            return feedUrlFromFollowLink;
         }
+        const inviteCode = getInviteCodeFromInviteLink(followLink);
+        if (inviteCode != null) {
+            const swarmContactHelper = createSwarmContactHelper(this.props.identity, this.props.swarmGateway, generateSecureRandom);
+            const invitedContact = await createCodeReceivedContact(inviteCode.randomSeed, inviteCode.contactPublicKey, swarmContactHelper);
+            const contact = await advanceContactState(invitedContact, swarmContactHelper, 300 * SECOND);
+            Debug.log('tryGetFeedUrlFromFollowLink', contact);
+            if (contact.type === 'mutual-contact') {
+                const feedUrlFromInviteCode = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(contact.identity));
+                return feedUrlFromInviteCode;
+            }
+        }
+        return followLink;
     }
 
     private onUnfollowFeed = () => {

@@ -37,6 +37,7 @@ import {
     defaultState,
 } from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
+import { Contact } from '../models/Contact';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -295,6 +296,15 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
+const contactsReducer = (contacts: Contact[] = [], action: Actions): Contact[] => {
+    switch (action.type) {
+        case 'ADD-CONTACT': {
+            return [action.payload.contact, ...contacts];
+        }
+    }
+    return contacts;
+};
+
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     switch (action.type) {
         case 'APP-STATE-RESET': {
@@ -345,6 +355,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    contacts: contactsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);

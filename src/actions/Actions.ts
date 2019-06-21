@@ -6,7 +6,6 @@ import { migrateAppStateToCurrentVersion } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
-import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -28,6 +27,9 @@ import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defau
 import { registerBackgroundTask } from '../helpers/backgroundTask';
 import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
+import { createInvitedContact } from '../helpers/contactHelpers';
+import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
+import { Contact } from '../models/Contact';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -62,6 +64,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
     CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
     CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
+    ADD_CONTACT = 'ADD-CONTACT',
 }
 
 const InternalActions = {
@@ -128,6 +131,8 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
     cleanFeedsFromOwnFeeds: (feedUrls: string[]) =>
         createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
+    addContact: (contact: Contact) =>
+        createAction(ActionTypes.ADD_CONTACT, { contact }),
 };
 
 export const AsyncActions = {
@@ -479,6 +484,14 @@ export const AsyncActions = {
                     }
                 });
             }
+        };
+    },
+    generateInvitedContact: (): Thunk => {
+        return async (dispatch, getState) => {
+            const contactRandomHelper = createSwarmContactRandomHelper(generateSecureRandom);
+            const createdAt = Date.now();
+            const invitedContact = await createInvitedContact(contactRandomHelper, createdAt);
+            dispatch(Actions.addContact(invitedContact));
         };
     },
 };

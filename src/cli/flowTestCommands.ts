@@ -275,7 +275,8 @@ export const flowTestCommandDefinition =
         const aliceContactHelper = await createSwarmContactHelper(aliceIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
         const bobIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
         const bobContactHelper = await createSwarmContactHelper(bobIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
-        const aliceInvitedContact = await createInvitedContact(aliceContactHelper);
+        const createdAt = Date.now();
+        const aliceInvitedContact = await createInvitedContact(aliceContactHelper, createdAt);
         const bobCodeReceivedContact = await createCodeReceivedContact(
             aliceInvitedContact.randomSeed,
             aliceInvitedContact.contactIdentity.publicKey as HexString,

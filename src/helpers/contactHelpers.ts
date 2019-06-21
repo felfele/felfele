@@ -1,11 +1,9 @@
 import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact } from '../models/Contact';
-import { SECOND } from '../DateUtils';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { HexString } from './opaqueTypes';
 import { byteArrayToHex } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
-import { Utils } from '../Utils';
 import { Debug } from '../Debug';
 
 const stripHexPrefix = (hex: string) => hex.startsWith('0x')
@@ -26,24 +24,35 @@ export const publicKeyToIdentity = (publicKey: string): PublicIdentity => ({
     address: publicKeyToAddress(publicKey as HexString),
 });
 
-export interface ContactHelper {
-    read: (publicIdentity: PublicIdentity, timeout: number) => Promise<string | undefined>;
-    write: (privateIdentity: PrivateIdentity, data: string, timeout: number) => Promise<void | never>;
-    now: () => number;
+export interface ContactRandomHelper {
     generateSecureIdentity: (randomSeed: HexString) => Promise<PrivateIdentity>;
     generateSecureRandom: () => Promise<HexString>;
+}
+
+export interface ContactHelper extends ContactRandomHelper {
+    read: (publicIdentity: PublicIdentity, timeout: number) => Promise<string | never>;
+    write: (privateIdentity: PrivateIdentity, data: string, timeout: number) => Promise<void | never>;
     encrypt: (data: HexString, key: HexString) => Promise<HexString>;
     decrypt: (data: HexString, key: HexString) => HexString;
     ownIdentity: PublicIdentity;
 }
 
+const tryRead = (helper: ContactHelper, publicIdentity: PublicIdentity, timeout: number) => {
+    try {
+        const data = helper.read(publicIdentity, timeout);
+        return data;
+    } catch (e) {
+        return undefined;
+    }
+};
+
 export const createInvitedContact = async (
-    helper: ContactHelper,
+    helper: ContactRandomHelper,
+    createdAt: number,
 ): Promise<InvitedContact> => {
     const randomSeed = await helper.generateSecureRandom();
     const contactIdentityRandomSeed = await helper.generateSecureRandom();
     const contactIdentity = await helper.generateSecureIdentity(contactIdentityRandomSeed);
-    const createdAt = helper.now();
     return {
         type: 'invited-contact',
         randomSeed,
@@ -55,7 +64,7 @@ export const createInvitedContact = async (
 export const createCodeReceivedContact = async (
     randomSeed: HexString,
     contactPublicKey: HexString,
-    helper: ContactHelper,
+    helper: ContactRandomHelper,
 ): Promise<CodeReceivedContact> => {
     const remoteContactIdentity = publicKeyToIdentity(contactPublicKey);
     const contactIdentityRandomSeed = await helper.generateSecureRandom();
@@ -81,25 +90,6 @@ export const advanceContactState = async (
     }
 };
 
-const pollFeed = async (publicIdentity: PublicIdentity, helper: ContactHelper, timeout: number): Promise<string | undefined> => {
-    const startTime = helper.now();
-    const pollTimeout = 1 * SECOND;
-    const maxTries = (timeout / pollTimeout) + 1;
-    let numErrors = 0;
-    while (helper.now() <= startTime + timeout && numErrors < maxTries) {
-        const beforeRead = helper.now();
-        try {
-            const data = await helper.read(publicIdentity, pollTimeout);
-            return data;
-        } catch (e) {
-            numErrors += 1;
-            const waited = await Utils.waitUntil(beforeRead + pollTimeout, helper.now());
-            Debug.log('pollFeed', {address: publicIdentity.address, waited, numErrors});
-        }
-    }
-    return undefined;
-};
-
 const deriveSharedKey = (privateIdentity: PrivateIdentity, publicIdentity: PublicIdentity): HexString => {
     const curve = new ec('secp256k1');
     const publicKeyPair = curve.keyFromPublic(stripHexPrefix(publicIdentity.publicKey), 'hex');
@@ -115,7 +105,7 @@ const advanceInvitedContactState = async (
 ): Promise<InvitedContact | AcceptedContact | MutualContact> => {
     const randomFeedIdentity = await helper.generateSecureIdentity(contact.randomSeed);
     Debug.log('advanceInvitedContactState', 'read', randomFeedIdentity.address);
-    const pollData = await pollFeed(randomFeedIdentity, helper, timeout);
+    const pollData = await tryRead(helper, randomFeedIdentity, timeout);
     if (pollData == null) {
         return contact;
     }
@@ -177,7 +167,7 @@ const advanceAcceptedContactState = async (
     }
 
     Debug.log('advanceInvitedContactState', 'read', acceptedContact.remoteContactIdentity.address);
-    const pollData = await pollFeed(acceptedContact.remoteContactIdentity, helper, timeout);
+    const pollData = await tryRead(helper, acceptedContact.remoteContactIdentity, timeout);
     if (pollData == null) {
         return {
             ...acceptedContact,

@@ -4,8 +4,6 @@ import { PrivateIdentity, PublicIdentity } from '../../src/models/Identity';
 import { Debug } from '../../src/Debug';
 import { AcceptedContact, CodeReceivedContact } from '../../src/models/Contact';
 
-Debug.setDebugMode(true);
-
 const testRandomSeed = '9932c9eb82bfc80dace2d511b03ec391a1ea0d984f91a78ea3be13a0493d1803' as HexString;
 const testGenerateRandom = async (): Promise<HexString> => testRandomSeed;
 
@@ -51,7 +49,7 @@ const throwError = (message: string = ''): never => {
 
 test('create invited contact', async () => {
     const helper = testContactHelper;
-    const contact = await createInvitedContact(helper);
+    const contact = await createInvitedContact(helper, 0);
 
     expect(contact.randomSeed).toEqual(testRandomSeed);
     expect(contact.contactIdentity).toEqual(testContactIdentity);
@@ -65,7 +63,7 @@ test('invited contact failed to read contact public key', async () => {
         read: (publicIdentity, timeout) => mockRead(),
         write: (privateIdentity, data, timeout) => mockWrite(),
     };
-    const invitedContact = await createInvitedContact(helper);
+    const invitedContact = await createInvitedContact(helper, 0);
     const acceptedContact = await advanceContactState(invitedContact, helper, 0);
 
     expect(acceptedContact).toEqual(invitedContact);
@@ -81,7 +79,7 @@ test('invited contact failed to write public key', async () => {
         read: (publicIdentity, timeout) => mockRead(),
         write: (privateIdentity, data, timeout) => mockWrite(),
     };
-    const invitedContact = await createInvitedContact(helper);
+    const invitedContact = await createInvitedContact(helper, 0);
     const acceptedContact = await advanceContactState(invitedContact, helper, 0);
 
     expect(acceptedContact.type).toEqual('accepted-contact');
@@ -100,7 +98,7 @@ test('successful invited contact to mutual contact', async () => {
         read: (publicIdentity, timeout) => mockRead(),
         write: (privateIdentity, data, timeout) => mockWrite(),
     };
-    const invitedContact = await createInvitedContact(helper);
+    const invitedContact = await createInvitedContact(helper, 0);
     const contact = await advanceContactState(invitedContact, helper, 0);
 
     expect(contact.type).toEqual('mutual-contact');

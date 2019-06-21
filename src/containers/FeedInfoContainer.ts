@@ -16,6 +16,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
         isKnownFeed: isKnownFeed,
+        identity: state.author.identity!,
     };
 };
 
