@@ -42,6 +42,7 @@ import { advanceContactState } from '../helpers/contactHelpers';
 import { SECOND } from '../DateUtils';
 import * as Swarm from '../swarm/Swarm';
 import { fetchFeedFromUrl } from '../helpers/feedHelpers';
+import { getInviteLink } from '../helpers/deepLinking';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -85,11 +86,7 @@ const generateQRCodeValue = (invitedContact?: InvitedContact): string | undefine
     if (invitedContact == null) {
         return undefined;
     }
-    const code: InviteQRCode = {
-        r: invitedContact.randomSeed,
-        c: invitedContact.contactIdentity.publicKey,
-    };
-    return JSON.stringify(code);
+    return getInviteLink(invitedContact);
 };
 
 interface ContactStateChangeListenerProps {

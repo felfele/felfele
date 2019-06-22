@@ -49,6 +49,10 @@ export const hexToByteArray = (hex: string): number[] => {
     return subStrings.map(s => parseInt(s, 16));
 };
 
+export const hexToUint8Array = (hex: string): Uint8Array => {
+    return new Uint8Array(hexToByteArray(hex));
+};
+
 export const isHexString = (s: string, strict: boolean = false): boolean => {
     const hasPrefix = s.startsWith('0x');
     if (strict && !hasPrefix) {

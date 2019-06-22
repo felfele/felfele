@@ -97,7 +97,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             activityText: 'Loading channel...',
         });
 
-        const url = await this.tryGetFeedUrlFromFollowLink(feedUrl != null ? feedUrl : this.state.url);
+        const url = await this.tryGetFeedUrlFromLink(feedUrl != null ? feedUrl : this.state.url);
         const feed = await fetchFeedFromUrl(url, this.props.swarmGateway);
         if (feed != null && feed.feedUrl !== '') {
             this.setState({
@@ -231,12 +231,12 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         }
     }
 
-    private tryGetFeedUrlFromFollowLink = async (followLink: string): Promise<string> => {
-        const feedUrlFromFollowLink = getFeedUrlFromFollowLink(followLink);
+    private tryGetFeedUrlFromLink = async (link: string): Promise<string> => {
+        const feedUrlFromFollowLink = getFeedUrlFromFollowLink(link);
         if (feedUrlFromFollowLink != null) {
             return feedUrlFromFollowLink;
         }
-        const inviteCode = getInviteCodeFromInviteLink(followLink);
+        const inviteCode = getInviteCodeFromInviteLink(link);
         if (inviteCode != null) {
             const swarmContactHelper = createSwarmContactHelper(this.props.identity, this.props.swarmGateway, generateSecureRandom);
             const invitedContact = await createCodeReceivedContact(inviteCode.randomSeed, inviteCode.contactPublicKey, swarmContactHelper);
@@ -247,7 +247,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                 return feedUrlFromInviteCode;
             }
         }
-        return followLink;
+        return link;
     }
 
     private onUnfollowFeed = () => {
@@ -286,7 +286,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     private onScanSuccess = async (data: any) => {
         try {
             Debug.log('FeedInfo.onScanSuccess', 'data', data);
-            const feedUrl = data;
+            const inviteLink = getInviteCodeFromInviteLink(data);
+            const feedUrl = inviteLink != null
+                ? inviteLink
+                : data;
             this.setState({
                 url: feedUrl,
             });
