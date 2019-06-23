@@ -35,7 +35,6 @@ const decrypt = (data: HexString, secret: HexString): HexString => data;
 const testContactHelper: ContactHelper = {
     read: (publicIdentity, timeout) => Promise.resolve(''),
     write: (privateIdentity, data, timeout) => Promise.resolve(),
-    now: () => 0,
     generateSecureRandom: testGenerateRandom,
     generateSecureIdentity: testGenerateIdentity,
     encrypt,
