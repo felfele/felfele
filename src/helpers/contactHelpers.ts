@@ -15,7 +15,7 @@ const publicKeyToAddress = (publicKey: HexString): HexString => {
     const curve = new ec('secp256k1');
     const publicKeyWithoutPrefix = stripHexPrefix(publicKey);
     const publicKeyPair = curve.keyFromPublic(publicKeyWithoutPrefix, 'hex');
-    const publicKeyBytes = publicKeyPair.getPublic().encode();
+    const publicKeyBytes = publicKeyPair.getPublic(true).encode();
     return byteArrayToHex(keccak256.array(publicKeyBytes.slice(1)).slice(12));
 };
 

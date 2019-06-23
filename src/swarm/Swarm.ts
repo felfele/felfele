@@ -484,7 +484,7 @@ export const generateSecureIdentity = async (generateRandom: (length: number) =>
         pers: undefined,
     });
     const privateKey = '0x' + keyPair.getPrivate('hex');
-    const publicKey = '0x' + keyPair.getPublic('hex');
+    const publicKey = '0x' + keyPair.getPublic(true, 'hex');
     const address = byteArrayToHex(publicKeyToAddress(keyPair.getPublic()));
     return {
         privateKey,
