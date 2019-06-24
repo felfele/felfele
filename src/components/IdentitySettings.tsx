@@ -14,6 +14,7 @@ import {
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
+import { withNavigationFocus, NavigationEvents } from 'react-navigation';
 
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author } from '../models/Author';
@@ -111,7 +112,6 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
         );
         const contact = await advanceContactState(this.props.contact, swarmContactHelper, 300 * SECOND);
         Debug.log('ContactStateChangeListener.componentDidMount', contact);
-        Alert.alert('Contact', `Type: ${contact.type}`);
         this.props.onContactStateChanged(this.props.contact, contact);
         if (contact.type === 'mutual-contact') {
             const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(contact.identity));
@@ -126,14 +126,12 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
         }
     }
 
-    public componentWillUnmount() {
-        Debug.log('ContactStateChangeListener.componentWillUnmount');
-        this.isCanceled = true;
-    }
-
-    public render() {
-        return null;
-    }
+    public render = () => (
+        <NavigationEvents
+            onDidFocus={payload => this.isCanceled = false}
+            onDidBlur={payload => this.isCanceled = true}
+        />
+    )
 }
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
@@ -150,9 +148,9 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     contact={props.invitedContact}
                     identity={props.author.identity!}
                     swarmGateway={props.gatewayAddress}
-                    navigation={props.navigation}
                     onContactStateChanged={() => {}}
                     onAddFeed={props.onAddFeed}
+                    navigation={props.navigation}
                 />
             }
             <KeyboardAvoidingView style={styles.mainContainer}>

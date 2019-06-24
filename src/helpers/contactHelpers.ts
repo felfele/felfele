@@ -37,9 +37,9 @@ export interface ContactHelper extends ContactRandomHelper {
     ownIdentity: PublicIdentity;
 }
 
-const tryRead = (helper: ContactHelper, publicIdentity: PublicIdentity, timeout: number) => {
+const tryRead = async (helper: ContactHelper, publicIdentity: PublicIdentity, timeout: number) => {
     try {
-        const data = helper.read(publicIdentity, timeout);
+        const data = await helper.read(publicIdentity, timeout);
         return data;
     } catch (e) {
         return undefined;
