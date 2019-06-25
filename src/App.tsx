@@ -361,9 +361,13 @@ const OnboardingNavigator = createStackNavigator({
     initialRouteName: 'Welcome',
 });
 
-const InitialNavigator = createSwitchNavigator({
+const LoadingNavigator = createStackNavigator({
     Loading: LoadingScreenContainer,
-    App: () => <AppNavigator uriPrefix={BASE_URL}/>,
+});
+
+const InitialNavigator = createSwitchNavigator({
+    Loading: LoadingNavigator,
+    App: AppNavigator,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
@@ -376,7 +380,7 @@ export default class App extends React.Component {
             <TopLevelErrorBoundary>
                 <Provider store={store}>
                     <PersistGate loading={null} persistor={persistor}>
-                        <InitialNavigator/>
+                        <InitialNavigator uriPrefix={BASE_URL}/>
                     </PersistGate>
                 </Provider>
             </TopLevelErrorBoundary>
