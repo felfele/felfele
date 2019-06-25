@@ -72,18 +72,6 @@ const VIEW_POSTS_LABEL = 'View all your posts';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
-const generateQRCodeValueFromFeed = (feed?: Feed): string => {
-    if (feed == null) {
-        return '';
-    }
-    return feed.url;
-};
-
-interface InviteQRCode {
-    r: string;
-    c: string;
-}
-
 const generateQRCodeValue = (invitedContact?: InvitedContact): string | undefined => {
     if (invitedContact == null) {
         return undefined;
@@ -104,7 +92,15 @@ interface ContactStateChangeListenerProps {
 class ContactStateChangeListener extends React.PureComponent<ContactStateChangeListenerProps> {
     private isCanceled = false;
 
-    public async componentDidMount() {
+    public render = () => (
+        <NavigationEvents
+            onDidFocus={payload => this.tryAdvanceContactState()}
+            onDidBlur={payload => this.isCanceled = true}
+        />
+    )
+
+    private async tryAdvanceContactState() {
+        this.isCanceled = false;
         const swarmContactHelper = createSwarmContactHelper(
             this.props.identity,
             this.props.swarmGateway,
@@ -126,13 +122,6 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
             }
         }
     }
-
-    public render = () => (
-        <NavigationEvents
-            onDidFocus={payload => this.isCanceled = false}
-            onDidBlur={payload => this.isCanceled = true}
-        />
-    )
 }
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
