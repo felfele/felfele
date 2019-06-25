@@ -166,7 +166,7 @@ const advanceAcceptedContactState = async (
         }
     }
 
-    Debug.log('advanceInvitedContactState', 'read', acceptedContact.remoteContactIdentity.address);
+    Debug.log('advanceAcceptedContactState', 'read', acceptedContact.remoteContactIdentity.address);
     const pollData = await tryRead(helper, acceptedContact.remoteContactIdentity, timeout);
     if (pollData == null) {
         return {
