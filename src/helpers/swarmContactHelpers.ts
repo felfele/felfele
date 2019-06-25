@@ -59,7 +59,17 @@ export const createSwarmContactHelper = (
             const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
             const signDigest = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
             const feed = Swarm.makeFeedApi(feedAddress, signDigest, swarmGateway);
-            await feed.update(data);
+            const feedTemplate: Swarm.FeedTemplate = {
+                feed: feedAddress,
+                epoch: {
+                    time: Math.floor(Date.now() / 1000),
+                    level: 25,
+                },
+                protocolVersion: 0,
+            };
+            Debug.log('swarmContactHelpers.write', feedTemplate);
+            await feed.updateWithFeedTemplate(feedTemplate, data);
+            // await feed.update(data);
         },
         encrypt: async (data: HexString, key: HexString) => {
             const dataBytes = new Uint8Array(hexToByteArray(data));
