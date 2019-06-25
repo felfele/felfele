@@ -2,6 +2,7 @@ import { FeedAddress, defaultGateway, Epoch } from './Swarm';
 import { DirectoryData, UploadOptions, SignBytesFunc } from '@erebos/api-bzz-browser/node_modules/@erebos/api-bzz-base';
 import Bzz from '@erebos/api-bzz-browser';
 import { Debug } from '../Debug';
+import { SwarmHelpers } from '../swarm-social/swarmStorage';
 
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz:/';
@@ -40,7 +41,7 @@ export class ErebosSwarm {
         return response.text();
     }
 
-    public downloadFeed = async (url: string, timeout: number): Promise<string> => {
+    public downloadFeedFromUrl = async (url: string, timeout: number): Promise<string> => {
         Debug.log('DOWNLOAD FEED 1', url);
         const user = url.split('=')[1];
         const response = await this.bzz.getFeedChunk({ user }, { timeout });
@@ -48,6 +49,17 @@ export class ErebosSwarm {
         return response.text();
     }
 
+    public downloadPreviousVersion = async (epoch: Epoch, timeout: number): Promise<string> => {
+        const response = await this.bzz.getFeedChunk({ ...this.address, time: epoch.time }, { timeout });
+        Debug.log('DOWNLOAD FEED 4', response);
+        return response.text();
+    }
+
+    public downloadFeedFromAddress = async (address: FeedAddress, timeout: number): Promise<string> => {
+        const response = await this.bzz.getFeedChunk({ ...address }, { timeout });
+        Debug.log('DOWNLOAD FEED 4', response);
+        return response.text();
+    }
     public setFeedContent = async (data: string): Promise<string> => {
         return await this.bzz.setFeedContent({
             ...this.address,

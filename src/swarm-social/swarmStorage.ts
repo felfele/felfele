@@ -72,9 +72,9 @@ export const makeSwarmStorage = (swarmApi: ErebosSwarm, swarmHelpers: SwarmHelpe
             ...swarmApi.address,
             topic: Swarm.calculateTopic(DEFAULT_POST_COMMAND_LOG_TOPIC),
         };
-        const feedApi = Swarm.makeReadableFeedApi(postCommandLogFeedAddress, swarmApi.swarmGateway);
+        const erebosSwarm = new ErebosSwarm(null as any, postCommandLogFeedAddress);
         try {
-            return await fetchSwarmPostCommandLog(feedApi, until);
+            return await fetchSwarmPostCommandLog(erebosSwarm, until);
         } catch (e) {
             return emptyPostCommandLog;
         }
@@ -107,12 +107,12 @@ export const isPostFeedUrl = (url: string): boolean => {
     return url.startsWith(Swarm.defaultFeedPrefix);
 };
 
-const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, until?: Swarm.Epoch): Promise<PostCommandLog> => {
+const fetchSwarmPostCommandLog = async (swarmFeedApi: ErebosSwarm, until?: Swarm.Epoch): Promise<PostCommandLog> => {
     const postCommandLog: PostCommandLog = {
         commands: [],
     };
     try {
-        let postCommandJSON = await swarmFeedApi.download();
+        let postCommandJSON = await swarmFeedApi.downloadFeedFromAddress(swarmFeedApi.address, 5000);
         while (true) {
             Debug.log('fetchSwarmPostCommandLog', {postCommandJSON});
             const postCommand = deserialize(postCommandJSON) as PostCommand;
@@ -126,7 +126,7 @@ const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, unt
                 Debug.log('fetchSwarmPostCommandLog', 'finished until');
                 break;
             }
-            postCommandJSON = await swarmFeedApi.downloadPreviousVersion(previousEpoch);
+            postCommandJSON = await swarmFeedApi.downloadPreviousVersion(previousEpoch, 5000);
         }
         return postCommandLog;
     } catch (e) {
@@ -352,7 +352,7 @@ const updateRecentPostFeed = async (swarm: ErebosSwarm, postFeed: RecentPostFeed
 
 export const downloadRecentPostFeed = async (swarm: ErebosSwarm, url: string, timeout: number = 5000): Promise<RecentPostFeed> => {
     try {
-        const contentHash = await swarm.downloadFeed(url, timeout);
+        const contentHash = await swarm.downloadFeedFromUrl(url, timeout);
         Debug.log('downloadPostFeed', {contentHash});
 
         const content = await swarm.download(contentHash, timeout);
