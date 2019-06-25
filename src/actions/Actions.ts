@@ -29,7 +29,7 @@ import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
 import { createInvitedContact } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
-import { Contact } from '../models/Contact';
+import { Contact, NonMutualContact } from '../models/Contact';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -65,6 +65,7 @@ export enum ActionTypes {
     CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
     CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
     ADD_CONTACT = 'ADD-CONTACT',
+    UPDATE_CONTACT_STATE = 'UPDATE-CONTACT-STATE',
 }
 
 const InternalActions = {
@@ -133,6 +134,8 @@ export const Actions = {
         createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
     addContact: (contact: Contact) =>
         createAction(ActionTypes.ADD_CONTACT, { contact }),
+    updateContactState: (contact: NonMutualContact, updatedContact: Contact) =>
+        createAction(ActionTypes.UPDATE_CONTACT_STATE, { contact, updatedContact }),
 };
 
 export const AsyncActions = {

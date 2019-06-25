@@ -53,6 +53,7 @@ export interface DispatchProps {
     onChangeText?: (text: string) => void;
     onChangeQRCode: () => void;
     onAddFeed: (feed: Feed) => void;
+    onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => void;
 }
 
 export interface StateProps {
@@ -148,7 +149,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     contact={props.invitedContact}
                     identity={props.author.identity!}
                     swarmGateway={props.gatewayAddress}
-                    onContactStateChanged={() => {}}
+                    onContactStateChanged={props.onContactStateChange}
                     onAddFeed={props.onAddFeed}
                     navigation={props.navigation}
                 />

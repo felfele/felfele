@@ -26,7 +26,7 @@ import { Debug } from '../Debug';
 import { LocalFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { removeFromArray, updateArrayItem, insertInArray, containsItem } from '../helpers/immutable';
+import { removeFromArray, updateArrayItem, insertInArray, containsItem, replaceItemInArray } from '../helpers/immutable';
 import {
     defaultFeeds,
     defaultSettings,
@@ -300,6 +300,16 @@ const contactsReducer = (contacts: Contact[] = [], action: Actions): Contact[] =
     switch (action.type) {
         case 'ADD-CONTACT': {
             return [action.payload.contact, ...contacts];
+        }
+        case 'UPDATE-CONTACT-STATE': {
+            const index = contacts.findIndex(contact =>
+                contact.type === action.payload.contact.type &&
+                contact.contactIdentity.publicKey === action.payload.contact.contactIdentity.publicKey
+            );
+            return index !== -1
+                ? replaceItemInArray(contacts, action.payload.updatedContact, index)
+                : contacts
+            ;
         }
     }
     return contacts;

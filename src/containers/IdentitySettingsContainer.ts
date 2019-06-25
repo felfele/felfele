@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { AsyncActions } from '../actions/Actions';
+import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, IdentitySettings } from '../components/IdentitySettings';
 import { ImageData} from '../models/ImageData';
 import { TypedNavigation } from '../helpers/navigation';
-import { InvitedContact } from '../models/Contact';
+import { InvitedContact, Contact } from '../models/Contact';
 import { Feed } from '../models/Feed';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
@@ -34,6 +34,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onAddFeed: (feed: Feed) => {
             dispatch(AsyncActions.addFeed(feed));
+        },
+        onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => {
+            dispatch(Actions.updateContactState(contact, updatedContact));
         },
     };
 };

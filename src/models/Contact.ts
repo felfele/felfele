@@ -36,4 +36,5 @@ export interface MutualContact {
     confirmed: boolean;
 }
 
-export type Contact = InvitedContact | AcceptedContact | CodeReceivedContact | MutualContact;
+export type NonMutualContact = InvitedContact | AcceptedContact | CodeReceivedContact;
+export type Contact = NonMutualContact | MutualContact;
