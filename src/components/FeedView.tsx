@@ -54,11 +54,11 @@ export const FeedView = (props: Props) => {
             feed: props.feed,
         }
     );
-    const onLinkPressed = async () => onFollowPressed(props.feed.feedUrl,
+    const onLinkPressed = async () => onFollowPressed(
         props.feed,
         props.onUnfollowFeed,
         props.onFollowFeed
-);
+    );
 
     const rightButton1 = props.feed.isOwnFeed
         ? props.feed.name.length > 0
@@ -99,7 +99,7 @@ export const FeedView = (props: Props) => {
     );
 };
 
-const onFollowPressed = async (uri: string, feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
+const onFollowPressed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
     if (feed.followed === true) {
         await unfollowFeed(feed, onUnfollowFeed);
     } else {

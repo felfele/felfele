@@ -68,7 +68,7 @@ export interface Routes {
     YourTab: {};
     ContactView: {
         publicKey: string;
-        feed: RecentPostFeed;
+        feed: Feed;
     };
 }
 

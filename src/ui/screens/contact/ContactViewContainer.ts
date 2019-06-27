@@ -6,6 +6,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { Feed } from '../../../models/Feed';
 import { Contact, MutualContact } from '../../../models/Contact';
 import { Debug } from '../../../Debug';
+import { getFeedPosts } from '../../../selectors/selectors';
 
 const findContactByPublicKey = (publicKey: string, contacts: Contact[]): Contact | UnknownContact => {
     return contacts.find(
@@ -24,7 +25,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     const contact = findContactByPublicKey(publicKey, state.contacts);
     const posts = contact.type !== 'mutual-contact'
         ? []
-        : feed.posts
+        : getFeedPosts(state, feed.feedUrl)
     ;
     Debug.log('ContactViewContainer.mapStateToProps', {feed, contact, posts});
     return {

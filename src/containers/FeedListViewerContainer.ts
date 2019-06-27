@@ -7,6 +7,7 @@ import { getFollowedFeeds, getKnownFeeds, getContactFeeds } from '../selectors/s
 import { TypedNavigation } from '../helpers/navigation';
 import { sortFeedsByName } from '../helpers/feedHelpers';
 import { Debug } from '../Debug';
+import { ContactFeed } from '../models/ContactFeed';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
@@ -61,11 +62,17 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         openExplore: () => {
             ownProps.navigation.navigate('CategoriesContainer', {});
         },
-        onPressFeed: (feed: Feed) => {
-            ownProps.navigation.navigate('FeedFromList', {
-                feedUrl: feed.feedUrl,
-                name: feed.name,
-            });
+        onPressFeed: (feed: ContactFeed) => {
+            feed.contact != null
+                ? ownProps.navigation.navigate('ContactView', {
+                    publicKey: feed.contact.identity.publicKey,
+                    feed: feed,
+                })
+                : ownProps.navigation.navigate('FeedFromList', {
+                    feedUrl: feed.feedUrl,
+                    name: feed.name,
+                })
+            ;
         },
     };
 };

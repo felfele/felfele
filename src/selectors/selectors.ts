@@ -4,6 +4,7 @@ import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { MutualContact } from '../models/Contact';
 import { makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
+import { ContactFeed } from '../models/ContactFeed';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -42,7 +43,8 @@ export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
         feedUrl: makeBzzFeedUrlFromIdentity(contact.identity),
         favicon: '',
         followed: true,
-    } as Feed));
+        contact,
+    } as ContactFeed));
 });
 
 export const getFollowedFeeds = createSelector([ getFeeds, getContactFeeds ], (feeds, contactFeeds) => {
