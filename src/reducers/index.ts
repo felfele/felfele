@@ -311,6 +311,9 @@ const contactsReducer = (contacts: Contact[] = [], action: Actions): Contact[] =
                 : contacts
             ;
         }
+        case 'DELETE-CONTACTS': {
+            return [];
+        }
     }
     return contacts;
 };

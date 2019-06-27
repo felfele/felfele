@@ -1,7 +1,7 @@
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
-import { LocalFeed } from '../social/api';
+import { LocalFeed, RecentPostFeed } from '../social/api';
 
 export interface Routes {
     App: {};
@@ -66,6 +66,10 @@ export interface Routes {
         subCategoryName: string,
     };
     YourTab: {};
+    ContactView: {
+        publicKey: string;
+        feed: RecentPostFeed;
+    };
 }
 
 export interface TypedNavigation {

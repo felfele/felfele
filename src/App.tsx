@@ -50,6 +50,7 @@ import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
+import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
 // @ts-ignore
 import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoDeepLinkContainer } from './containers/FeedInfoDeepLinkContainer';
@@ -334,6 +335,9 @@ const Scenes: NavigationRouteConfigMap = {
     FeedInfoDeepLink: {
         screen: FeedInfoDeepLinkContainer,
         path: 'follow/:feedUrl',
+    },
+    ContactView: {
+        screen: ContactViewContainer,
     },
 };
 

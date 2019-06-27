@@ -4,6 +4,7 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 import { TypedNavigation, Routes } from '../helpers/navigation';
+import { Contact } from '../models/Contact';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     // this fixes rerendering after unfollow
@@ -43,6 +44,9 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         },
         onUnfollowFeed: (feed: Feed) => {
             dispatch(Actions.unfollowFeed(feed));
+        },
+        onAddContact: (contact: Contact) => {
+            dispatch(Actions.addContact(contact));
         },
     };
 };

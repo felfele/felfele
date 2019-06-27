@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
-import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
+import { getFollowedFeeds, getKnownFeeds, getContactFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
 import { sortFeedsByName } from '../helpers/feedHelpers';
+import { Debug } from '../Debug';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
@@ -32,8 +33,15 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : getKnownFeeds(state)
     );
+    const contactFeeds = sortFeedsByName(navParamFeeds
+        ? []
+        : getContactFeeds(state)
+    );
+
+    Debug.log('FeedListViewerContainer.mapStateToProps', contactFeeds);
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
+        addSection('Your contacts', contactFeeds),
         addSection('Channels you follow', followedFeeds),
         addSection('Your channels', ownFeeds),
         addSection('Other channels', knownFeeds),

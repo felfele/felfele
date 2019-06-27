@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/Actions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { getAllFeeds } from '../selectors/selectors';
+import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
 
 interface OwnProps {
     isSelected: boolean;
@@ -44,6 +44,7 @@ const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
     const postAuthor = post.author;
     const knownFeed = state.feeds.find(feed => feed.feedUrl === postAuthor.uri)
         || state.ownFeeds.find(feed => feed.name === postAuthor.name)
+        || getContactFeeds(state).find(feed => feed.feedUrl === postAuthor.uri)
     ;
     return knownFeed != null
         ? {

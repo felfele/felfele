@@ -66,6 +66,7 @@ export enum ActionTypes {
     CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
     ADD_CONTACT = 'ADD-CONTACT',
     UPDATE_CONTACT_STATE = 'UPDATE-CONTACT-STATE',
+    DELETE_CONTACTS = 'DELETE-CONTACTS',
 }
 
 const InternalActions = {
@@ -136,6 +137,8 @@ export const Actions = {
         createAction(ActionTypes.ADD_CONTACT, { contact }),
     updateContactState: (contact: NonMutualContact, updatedContact: Contact) =>
         createAction(ActionTypes.UPDATE_CONTACT_STATE, { contact, updatedContact }),
+    deleteContacts: () =>
+        createAction(ActionTypes.DELETE_CONTACTS, {}),
 };
 
 export const AsyncActions = {
@@ -179,6 +182,7 @@ export const AsyncActions = {
     },
     downloadPostsFromFeeds: (feeds: Feed[]): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('downloadPostsFromFeeds', feeds);
             const previousPosts = getState().rssPosts;
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);

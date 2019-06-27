@@ -42,7 +42,7 @@ import { PublicIdentity } from '../models/Identity';
 import { advanceContactState } from '../helpers/contactHelpers';
 import { SECOND } from '../DateUtils';
 import * as Swarm from '../swarm/Swarm';
-import { fetchFeedFromUrl } from '../helpers/feedHelpers';
+import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
 import { getInviteLink } from '../helpers/deepLinking';
 
 const defaultUserImage = defaultImages.defaultUser;
@@ -94,8 +94,14 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
 
     public render = () => (
         <NavigationEvents
-            onDidFocus={payload => this.tryAdvanceContactState()}
-            onDidBlur={payload => this.isCanceled = true}
+            onDidFocus={payload => {
+                Debug.log('ContactStateChangeListener.render', 'onDidFocus', this.props);
+                this.tryAdvanceContactState();
+            }}
+            onDidBlur={payload => {
+                Debug.log('ContactStateChangeListener.render', 'onDidBlur', this.props);
+                this.isCanceled = true;
+            }}
         />
     )
 
@@ -111,13 +117,12 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
         Debug.log('ContactStateChangeListener.componentDidMount', contact);
         this.props.onContactStateChanged(this.props.contact, contact);
         if (contact.type === 'mutual-contact') {
-            const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(contact.identity));
-            const feed = await fetchFeedFromUrl(feedUrl, this.props.swarmGateway);
+            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
+            const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
             if (feed != null && feed.feedUrl !== '') {
-                this.props.onAddFeed(feed);
-                this.props.navigation.navigate('Feed', {
-                    feedUrl: feed.feedUrl,
-                    name: feed.name,
+                this.props.navigation.navigate('ContactView', {
+                    publicKey: contact.identity.publicKey,
+                    feed,
                 });
             }
         }
@@ -129,7 +134,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
     if (qrCodeValue == null) {
         props.onChangeQRCode();
     }
-    Debug.log('IdentitySettings', qrCodeValue);
+    Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
