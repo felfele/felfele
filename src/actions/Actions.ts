@@ -16,6 +16,7 @@ import {
     removePost,
     mergePostCommandLogs,
     getPreviousCommandEpochFromLog,
+    RecentPostFeed,
 } from '../social/api';
 import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
@@ -78,7 +79,7 @@ const InternalActions = {
         createAction(ActionTypes.UPDATE_AUTHOR_IDENTITY, { privateIdentity }),
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
-    updateFeedsData: (feeds: Feed[]) =>
+    updateFeedsData: (feeds: RecentPostFeed[]) =>
         createAction(ActionTypes.UPDATE_FEEDS_DATA, { feeds }),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
@@ -178,9 +179,11 @@ export const AsyncActions = {
             const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
-            const socialPosts = await loadSocialPostsFromFeeds(swarm, feedsWithoutOnboarding, dispatch);
-            const rssPosts = await loadRSSPostsFromFeeds(feedsWithoutOnboarding);
-            const posts = mergeUpdatedPosts(socialPosts.concat(rssPosts), previousPosts);
+            const allPosts = await Promise.all([
+                loadSocialPostsFromFeeds(swarm, feedsWithoutOnboarding, dispatch),
+                loadRSSPostsFromFeeds(feedsWithoutOnboarding),
+            ]);
+            const posts = mergeUpdatedPosts(allPosts[0].concat(allPosts[1]), previousPosts);
             dispatch(Actions.updateRssPosts(posts));
         };
     },
@@ -512,8 +515,8 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
 
 const loadSocialPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[], dispatch: any): Promise<Post[]> => {
     const socialFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-    dispatch(InternalActions.updateFeedsData(socialFeeds));
     const recentPostFeeds = await loadRecentPostFeeds(swarm, socialFeeds);
+    dispatch(InternalActions.updateFeedsData(recentPostFeeds));
     return await getPostsFromRecentPostFeeds(recentPostFeeds);
 };
 
