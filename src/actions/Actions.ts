@@ -54,7 +54,7 @@ export enum ActionTypes {
     UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
     UPDATE_AUTHOR_IMAGE = 'UPDATE-AUTHOR-IMAGE',
     UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
-    UPDATEE_FEEDS_DATA = 'UPDATE-FEEDS-DATA',
+    UPDATE_FEEDS_DATA = 'UPDATE-FEEDS-DATA',
     INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
     APP_STATE_RESET = 'APP-STATE-RESET',
     APP_STATE_SET = 'APP-STATE-SET',
@@ -79,7 +79,7 @@ const InternalActions = {
     updateFeedFavicon: (feed: Feed, favicon: string) =>
         createAction(ActionTypes.UPDATE_FEED_FAVICON, {feed, favicon}),
     updateFeedsData: (feeds: Feed[]) =>
-        createAction(ActionTypes.UPDATEE_FEEDS_DATA, { feeds }),
+        createAction(ActionTypes.UPDATE_FEEDS_DATA, { feeds }),
     appStateSet: (appState: AppState) =>
         createAction(ActionTypes.APP_STATE_SET, { appState }),
     updateAuthorName: (name: string) =>
