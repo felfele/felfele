@@ -180,7 +180,9 @@ export const AsyncActions = {
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
             const allPosts = await Promise.all([
-                loadSocialPostsFromFeeds(swarm, feedsWithoutOnboarding, dispatch),
+                loadSocialPostsAndUpdateFeeds(swarm, feedsWithoutOnboarding, (recentPostFeeds: RecentPostFeed[]) => {
+                    dispatch(InternalActions.updateFeedsData(recentPostFeeds));
+                }),
                 loadRSSPostsFromFeeds(feedsWithoutOnboarding),
             ]);
             const posts = mergeUpdatedPosts(allPosts[0].concat(allPosts[1]), previousPosts);
@@ -513,10 +515,10 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadSocialPostsFromFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[], dispatch: any): Promise<Post[]> => {
+const loadSocialPostsAndUpdateFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[], updateFeeds: (feeds: RecentPostFeed[]) => void): Promise<Post[]> => {
     const socialFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
     const recentPostFeeds = await loadRecentPostFeeds(swarm, socialFeeds);
-    dispatch(InternalActions.updateFeedsData(recentPostFeeds));
+    updateFeeds(recentPostFeeds);
     return await getPostsFromRecentPostFeeds(recentPostFeeds);
 };
 
