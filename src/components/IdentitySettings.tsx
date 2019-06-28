@@ -38,12 +38,11 @@ import { InvitedContact, Contact } from '../models/Contact';
 import { Debug } from '../Debug';
 import { TouchableView } from './TouchableView';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
-import { PublicIdentity } from '../models/Identity';
 import { advanceContactState } from '../helpers/contactHelpers';
 import { SECOND } from '../DateUtils';
 import * as Swarm from '../swarm/Swarm';
-import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
-import { getInviteLink } from '../helpers/deepLinking';
+import { fetchRecentPostFeed } from '../helpers/feedHelpers';
+import { getInviteLink, getFollowLink } from '../helpers/deepLinking';
 import { PublicProfile } from '../models/Profile';
 
 const defaultUserImage = defaultImages.defaultUser;
@@ -63,6 +62,7 @@ export interface StateProps {
     navigation: TypedNavigation;
     gatewayAddress: string;
     invitedContact?: InvitedContact;
+    showInviteCode: boolean;
 }
 
 const NAME_LABEL = 'NAME';
@@ -73,11 +73,18 @@ const VIEW_POSTS_LABEL = 'View all your posts';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
-const generateQRCodeValue = (invitedContact?: InvitedContact): string | undefined => {
+const generateInviteQRCodeValue = (invitedContact?: InvitedContact): string | undefined => {
     if (invitedContact == null) {
         return undefined;
     }
     return getInviteLink(invitedContact);
+};
+
+const generateFollowRCodeValue = (feed?: Feed): string | undefined => {
+    if (feed == null) {
+        return undefined;
+    }
+    return getFollowLink(feed.feedUrl);
 };
 
 interface ContactStateChangeListenerProps {
@@ -131,10 +138,17 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
 }
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
-    const qrCodeValue = generateQRCodeValue(props.invitedContact);
-    if (qrCodeValue == null) {
+    const qrCodeValue = props.showInviteCode
+        ? generateInviteQRCodeValue(props.invitedContact)
+        : generateFollowRCodeValue(props.ownFeed)
+    ;
+    if (props.showInviteCode && qrCodeValue == null) {
         props.onChangeQRCode();
     }
+    const onPressShare = props.showInviteCode
+        ? () => props.invitedContact && showShareContactDialog(props.invitedContact)
+        : () => showShareFeedDialog(props.ownFeed)
+    ;
     Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
@@ -220,7 +234,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         leftButton={{
                             label: 'Share',
                             icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
-                            onPress: async () => props.invitedContact && showShareContactDialog(props.invitedContact),
+                            onPress: onPressShare,
                         }}
                         rightButton={{
                             label: 'Add channel',
