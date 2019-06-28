@@ -8,7 +8,7 @@ import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/co
 import { Buffer } from 'buffer';
 import { Utils } from '../Utils';
 
-const ZERO_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const ZERO_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
@@ -294,7 +294,7 @@ export const makeFeedAddressFromBzzFeedUrl = (bzzFeedUrl: string): FeedAddress =
     };
 };
 
-export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity, topic: string = ZERO_TOPIC): FeedAddress => {
+export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity, topic: string = ''): FeedAddress => {
     return {
         topic,
         user: publicIdentity.address,

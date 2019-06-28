@@ -11,6 +11,7 @@ import { SECOND } from '../DateUtils';
 import { Utils } from '../Utils';
 import { Debug } from '../Debug';
 import { PublicProfile } from '../models/Profile';
+import { ZERO_TOPIC } from '../swarm/Swarm';
 
 export const createSwarmContactRandomHelper = (
     generateRandom: (length: number) => Promise<Uint8Array>
@@ -60,7 +61,7 @@ export const createSwarmContactHelper = (
             throw new Error('SwarmContactHelper.read: timeout');
         },
         write: async (privateIdentity: PrivateIdentity, data: string, timeout: number) => {
-            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
+            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity, ZERO_TOPIC);
             const signDigest = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
             const feed = Swarm.makeFeedApi(feedAddress, signDigest, swarmGateway);
             const feedTemplate: Swarm.FeedTemplate = {
