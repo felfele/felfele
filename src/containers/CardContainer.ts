@@ -48,7 +48,7 @@ const getAuthorFeedOrUndefined = (
         }
         : undefined
     ;
-}
+};
 
 const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
     if (post.author == null) {
