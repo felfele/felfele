@@ -69,7 +69,7 @@ const VerificationCodeView = (props: {
                     onPress: () => {
                         LayoutAnimation.linear();
                         props.onConfirmContact(props.contact);
-                    }
+                    },
                 }}
                 rightButton={{
                     label: 'Cancel',

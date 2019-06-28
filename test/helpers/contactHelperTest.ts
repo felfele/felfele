@@ -264,5 +264,5 @@ test('accepted contact failed to read public key', async () => {
 
 test('verification code', () => {
     const verificationCode = calculateVerificationCode(testRemoteIdentity.publicKey);
-    console.log(verificationCode);
+    expect(verificationCode).toEqual('3011-1672-7906');
 });
