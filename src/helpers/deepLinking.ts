@@ -49,6 +49,10 @@ export const getInviteLink = (contact: InvitedContact): string => {
     const contactPulicKeyBytes = hexToUint8Array(contact.contactIdentity.publicKey);
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
     const base64ContactPublicKey = urlSafeBase64Encode(contactPulicKeyBytes);
+    return getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
+};
+
+export const getInviteLinkWithBase64Params = (base64RandomSeed: string, base64ContactPublicKey: string) => {
     return `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}`;
 };
 

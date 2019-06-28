@@ -41,6 +41,10 @@ export interface Routes {
     FeedInfoDeepLink: {
         feedUrl: string;
     };
+    FeedInfoInviteLink: {
+        randomSeed: string;
+        contactPublicKey: string;
+    };
     EditFilter: {
         filter: ContentFilter,
     };

@@ -4,13 +4,15 @@ import { StateProps, FeedInfo } from '../components/FeedInfo';
 import { TypedNavigation } from '../helpers/navigation';
 import { mapDispatchToProps } from './FeedInfoContainer';
 import { Clipboard } from 'react-native';
-// @ts-ignore
-import * as base64 from 'base-64';
+import { getInviteLinkWithBase64Params } from '../helpers/deepLinking';
+import { Debug } from '../Debug';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const base64FeedUrl = ownProps.navigation.getParam<'FeedInfoDeepLink', 'feedUrl'>('feedUrl');
-    const feedUrl = base64.decode(base64FeedUrl);
-    Clipboard.setString(feedUrl);
+    const base64RandomSeed = ownProps.navigation.getParam<'FeedInfoInviteLink', 'randomSeed'>('randomSeed');
+    const base64ContactPublicKey = ownProps.navigation.getParam<'FeedInfoInviteLink', 'contactPublicKey'>('contactPublicKey');
+    Debug.log('FeedInfoDeepLinkContainer.mapStateToProps', {base64RandomSeed, base64ContactPublicKey});
+    const link = getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
+    Clipboard.setString(link);
 
     const profile = {
         name: state.author.name,
@@ -32,7 +34,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     };
 };
 
-export const FeedInfoDeepLinkContainer = connect(
+export const FeedInfoInviteLinkContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedInfo);

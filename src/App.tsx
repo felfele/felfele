@@ -53,8 +53,9 @@ import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownC
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
 // @ts-ignore
 import { BottomTabBar } from 'react-navigation-tabs';
-import { FeedInfoDeepLinkContainer } from './containers/FeedInfoDeepLinkContainer';
+import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
+import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -333,8 +334,12 @@ const Scenes: NavigationRouteConfigMap = {
         screen: FeedInfoContainer,
     },
     FeedInfoDeepLink: {
-        screen: FeedInfoDeepLinkContainer,
+        screen: FeedInfoFollowLinkContainer,
         path: 'follow/:feedUrl',
+    },
+    FeedInfoInviteLink: {
+        screen: FeedInfoInviteLinkContainer,
+        path: 'invite/:randomSeed/:contactPublicKey',
     },
     ContactView: {
         screen: ContactViewContainer,
@@ -371,7 +376,7 @@ const LoadingNavigator = createStackNavigator({
 
 const InitialNavigator = createSwitchNavigator({
     Loading: LoadingNavigator,
-    App: AppNavigator,
+    App: () => <AppNavigator uriPrefix={BASE_URL} />,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
@@ -384,7 +389,7 @@ export default class App extends React.Component {
             <TopLevelErrorBoundary>
                 <Provider store={store}>
                     <PersistGate loading={null} persistor={persistor}>
-                        <InitialNavigator uriPrefix={BASE_URL}/>
+                        <InitialNavigator/>
                     </PersistGate>
                 </Provider>
             </TopLevelErrorBoundary>
