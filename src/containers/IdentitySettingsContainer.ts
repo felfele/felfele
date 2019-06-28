@@ -12,8 +12,14 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
         ? state.ownFeeds[0]
         : undefined;
     const invitedContact = state.contacts.find(contact => contact.type === 'invited-contact') as (InvitedContact | undefined);
+    const profile = {
+        name: state.author.name,
+        image: state.author.image,
+        identity: state.author.identity!,
+    };
+
     return {
-        author: state.author,
+        profile,
         navigation: ownProps.navigation,
         ownFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,

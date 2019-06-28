@@ -272,9 +272,19 @@ export const flowTestCommandDefinition =
             return randomBytes;
         };
         const aliceIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
-        const aliceContactHelper = await createSwarmContactHelper(aliceIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const aliceProfile = {
+            name: 'Alice',
+            image: {},
+            identity: aliceIdentity,
+        };
+        const aliceContactHelper = await createSwarmContactHelper(aliceProfile, swarmConfig.gatewayAddress, generateDeterministicRandom);
         const bobIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
-        const bobContactHelper = await createSwarmContactHelper(bobIdentity, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const bobProfile = {
+            name: 'Bob',
+            image: {},
+            identity: bobIdentity,
+        };
+        const bobContactHelper = await createSwarmContactHelper(bobProfile, swarmConfig.gatewayAddress, generateDeterministicRandom);
         const createdAt = Date.now();
         const aliceInvitedContact = await createInvitedContact(aliceContactHelper, createdAt);
         const bobCodeReceivedContact = await createCodeReceivedContact(

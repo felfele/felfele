@@ -35,6 +35,10 @@ export const ContactView = (props: Props) => {
         ...props,
         feeds: [props.feed],
     };
+    const contactName = props.contact.type === 'mutual-contact'
+        ? props.contact.name
+        : 'Contact'
+    ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...refreshableFeedProps}>
             {{
@@ -44,7 +48,7 @@ export const ContactView = (props: Props) => {
                         onPress: props.onBack,
                         label: HeaderDefaultLeftButtonIcon,
                     }}
-                    title={'Contact'}
+                    title={contactName}
                 />,
             }}
         </RefreshableFeed>

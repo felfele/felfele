@@ -28,13 +28,13 @@ import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { getFeedUrlFromFollowLink, getInviteCodeFromInviteLink } from '../helpers/deepLinking';
-import { advanceContactState, createCodeReceivedContact } from '../helpers/contactHelpers';
+import { advanceContactState, createCodeReceivedContact, ProfileData } from '../helpers/contactHelpers';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
-import { PublicIdentity } from '../models/Identity';
 import { SECOND } from '../DateUtils';
 import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
 import { InviteCode } from '../models/InviteCode';
 import { Contact } from '../models/Contact';
+import { PublicProfile } from '../models/Profile';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -61,7 +61,7 @@ export interface StateProps {
     feed: Feed;
     navigation: TypedNavigation;
     isKnownFeed: boolean;
-    identity: PublicIdentity;
+    profile: PublicProfile;
 }
 
 type Props = DispatchProps & StateProps;
@@ -231,7 +231,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private async handleInviteCode(inviteCode: InviteCode) {
-        const swarmContactHelper = createSwarmContactHelper(this.props.identity, this.props.swarmGateway, generateSecureRandom);
+        const swarmContactHelper = createSwarmContactHelper(
+            this.props.profile,
+            this.props.swarmGateway,
+            generateSecureRandom
+        );
         const invitedContact = await createCodeReceivedContact(inviteCode.randomSeed, inviteCode.contactPublicKey, swarmContactHelper);
         const contact = await advanceContactState(invitedContact, swarmContactHelper, 300 * SECOND);
         Debug.log('tryGetFeedUrlFromFollowLink', contact);

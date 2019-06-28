@@ -41,7 +41,7 @@ export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
         name: contact.name,
         url: makeBzzFeedUrlFromIdentity(contact.identity),
         feedUrl: makeBzzFeedUrlFromIdentity(contact.identity),
-        favicon: '',
+        favicon: contact.image.uri || '',
         followed: true,
         contact,
     } as ContactFeed));

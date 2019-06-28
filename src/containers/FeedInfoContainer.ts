@@ -11,13 +11,18 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     updateNavParam(state.feeds, ownProps.navigation);
     const navParamFeed = ownProps.navigation.getParam<'FeedInfo', 'feed'>('feed');
     const isKnownFeed = state.feeds.find(feed => navParamFeed.feedUrl === feed.feedUrl) != null;
+    const profile = {
+        name: state.author.name,
+        image: state.author.image,
+        identity: state.author.identity!,
+    };
 
     return {
         feed: navParamFeed,
         swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
         isKnownFeed: isKnownFeed,
-        identity: state.author.identity!,
+        profile,
     };
 };
 

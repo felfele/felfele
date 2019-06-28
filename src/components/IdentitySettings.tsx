@@ -44,6 +44,7 @@ import { SECOND } from '../DateUtils';
 import * as Swarm from '../swarm/Swarm';
 import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
 import { getInviteLink } from '../helpers/deepLinking';
+import { PublicProfile } from '../models/Profile';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -57,7 +58,7 @@ export interface DispatchProps {
 }
 
 export interface StateProps {
-    author: Author;
+    profile: PublicProfile;
     ownFeed?: LocalFeed;
     navigation: TypedNavigation;
     gatewayAddress: string;
@@ -81,7 +82,7 @@ const generateQRCodeValue = (invitedContact?: InvitedContact): string | undefine
 
 interface ContactStateChangeListenerProps {
     contact: InvitedContact;
-    identity: PublicIdentity;
+    profile: PublicProfile;
     swarmGateway: string;
     navigation: TypedNavigation;
 
@@ -108,7 +109,7 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
     private async tryAdvanceContactState() {
         this.isCanceled = false;
         const swarmContactHelper = createSwarmContactHelper(
-            this.props.identity,
+            this.props.profile,
             this.props.swarmGateway,
             generateSecureRandom,
             () => this.isCanceled,
@@ -141,7 +142,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             { props.invitedContact &&
                 <ContactStateChangeListener
                     contact={props.invitedContact}
-                    identity={props.author.identity!}
+                    profile={props.profile}
                     swarmGateway={props.gatewayAddress}
                     onContactStateChanged={props.onContactStateChange}
                     onAddFeed={props.onAddFeed}
@@ -174,7 +175,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         style={styles.imagePickerContainer}
                     >
                         <ImageDataView
-                            source={props.author.image}
+                            source={props.profile.image}
                             defaultImage={defaultUserImage}
                             style={styles.imagePicker}
                             modelHelper={modelHelper}
@@ -183,10 +184,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
                     <SimpleTextInput
                         style={styles.row}
-                        defaultValue={props.author.name}
+                        defaultValue={props.profile.name}
                         placeholder={NAME_PLACEHOLDER}
                         autoCapitalize='none'
-                        autoFocus={props.author.name === ''}
+                        autoFocus={props.profile.name === ''}
                         autoCorrect={false}
                         selectTextOnFocus={true}
                         returnKeyType={'done'}

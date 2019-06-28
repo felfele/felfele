@@ -29,7 +29,17 @@ const testRemoteIdentity: PublicIdentity = {
     address: '0x402a3387abceef20ea3e384b62504a7d07541f1b',
 };
 
-const encrypt = (data: HexString, secret: HexString): Promise<HexString> => Promise.resolve(data);
+const testRemoteProfileData = {
+    name: 'Remote',
+    image: {},
+};
+
+const testRemoteContactMessage = {
+    ...testRemoteProfileData,
+    publicKey: testRemoteIdentity.publicKey,
+};
+
+const encrypt = (data: string, secret: HexString): Promise<HexString> => Promise.resolve(data as HexString);
 const decrypt = (data: HexString, secret: HexString): HexString => data;
 
 const testContactHelper: ContactHelper = {
@@ -40,6 +50,10 @@ const testContactHelper: ContactHelper = {
     encrypt,
     decrypt,
     ownIdentity: testOwnIdentity,
+    profileData: {
+        name: 'name',
+        image: {},
+    },
 };
 
 const throwError = (message: string = ''): never => {
@@ -90,7 +104,10 @@ test('invited contact failed to write public key', async () => {
 });
 
 test('successful invited contact to mutual contact', async () => {
-    const mockRead = jest.fn(x => Promise.resolve(testRemoteContactIdentity.publicKey));
+    const mockRead = jest.fn()
+        .mockReturnValueOnce(Promise.resolve(testRemoteContactIdentity.publicKey))
+        .mockReturnValueOnce(Promise.resolve(JSON.stringify(testRemoteContactMessage)))
+    ;
     const mockWrite = jest.fn(x => Promise.resolve({}));
     const helper: ContactHelper = {
         ...testContactHelper,
@@ -101,6 +118,8 @@ test('successful invited contact to mutual contact', async () => {
     const contact = await advanceContactState(invitedContact, helper, 0);
 
     expect(contact.type).toEqual('mutual-contact');
+    expect(mockRead.mock.calls.length).toBe(2);
+    expect(mockWrite.mock.calls.length).toBe(1);
 });
 
 test('code receive contact failed to write contact key', async () => {
@@ -125,7 +144,7 @@ test('code receive contact failed to write contact key', async () => {
 });
 
 test('code receive contact succeded', async () => {
-    const mockRead = jest.fn(x => Promise.resolve(testRemoteIdentity.publicKey));
+    const mockRead = jest.fn(x => Promise.resolve(JSON.stringify(testRemoteContactMessage)));
     const mockWrite = jest.fn(x => Promise.resolve({}));
     const helper: ContactHelper = {
         ...testContactHelper,
@@ -143,10 +162,14 @@ test('code receive contact succeded', async () => {
     expect(contact.type).toEqual('mutual-contact');
     expect(mockRead.mock.calls.length).toBe(1);
     expect(mockWrite.mock.calls.length).toBe(2);
+    if (contact.type === 'mutual-contact') {
+        expect(contact.identity).toEqual(testRemoteIdentity);
+        expect(contact.name).toEqual(testRemoteProfileData.name);
+    }
 });
 
 test('successful accepted contact to mutual contact', async () => {
-    const mockRead = jest.fn(x => Promise.resolve(testRemoteIdentity.publicKey));
+    const mockRead = jest.fn(x => Promise.resolve(JSON.stringify(testRemoteContactMessage)));
     const mockWrite = jest.fn(x => Promise.resolve({}));
     const helper: ContactHelper = {
         ...testContactHelper,
@@ -165,7 +188,8 @@ test('successful accepted contact to mutual contact', async () => {
     expect(mutualContact.type).toEqual('mutual-contact');
     if (mutualContact.type === 'mutual-contact') {
         expect(mutualContact.identity).toEqual(testRemoteIdentity);
-        expect(mutualContact.confirmed).toBeTruthy();
+        expect(mutualContact.name).toEqual(testRemoteProfileData.name);
+        expect(mutualContact.confirmed).toBeFalsy();
     }
 });
 

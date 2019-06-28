@@ -1,15 +1,13 @@
 import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact } from '../models/Contact';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { HexString } from './opaqueTypes';
-import { byteArrayToHex } from './conversion';
+import { byteArrayToHex, stripHexPrefix } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
 import { Debug } from '../Debug';
-
-const stripHexPrefix = (hex: string) => hex.startsWith('0x')
-    ? hex.slice(2)
-    : hex
-;
+import { ImageData } from '../models/ImageData';
+import { serialize } from '../social/serialization';
+import { PublicProfile } from '../models/Profile';
 
 const publicKeyToAddress = (publicKey: HexString): HexString => {
     const curve = new ec('secp256k1');
@@ -32,9 +30,20 @@ export interface ContactRandomHelper {
 export interface ContactHelper extends ContactRandomHelper {
     read: (publicIdentity: PublicIdentity, timeout: number) => Promise<string | never>;
     write: (privateIdentity: PrivateIdentity, data: string, timeout: number) => Promise<void | never>;
-    encrypt: (data: HexString, key: HexString) => Promise<HexString>;
-    decrypt: (data: HexString, key: HexString) => HexString;
+    encrypt: (data: string, key: HexString) => Promise<HexString>;
+    decrypt: (data: HexString, key: HexString) => string;
+
+    profileData: ProfileData;
     ownIdentity: PublicIdentity;
+}
+
+export interface ProfileData {
+    name: string;
+    image: ImageData;
+}
+
+interface ContactMessage extends ProfileData {
+    publicKey: string;
 }
 
 const tryRead = async (helper: ContactHelper, publicIdentity: PublicIdentity, timeout: number) => {
@@ -151,38 +160,67 @@ const advanceCodeReceivedContactState = async (
     return advanceAcceptedContactState(acceptedContact, helper, timeout);
 };
 
+const writeEncryptedContactMessage = async (
+    acceptedContact: AcceptedContact,
+    helper: ContactHelper,
+    timeout: number
+): Promise<void | never> => {
+    const contactMessage: ContactMessage = {
+        ...helper.profileData,
+        publicKey: helper.ownIdentity.publicKey,
+    };
+    const serializedContactMessage = serialize(contactMessage);
+    const encryptedContactMessage = await helper.encrypt(serializedContactMessage, acceptedContact.sharedKey);
+    Debug.log('writeEncryptedContactMessage', 'write', acceptedContact.contactIdentity.address);
+    await helper.write(acceptedContact.contactIdentity, encryptedContactMessage, timeout);
+};
+
+const tryDeserializeContactMessage = (data: string): ContactMessage | undefined => {
+    try {
+        const contactMessage = JSON.parse(data) as ContactMessage;
+        return contactMessage;
+    } catch (e) {
+        return undefined;
+    }
+};
+
 const advanceAcceptedContactState = async (
     acceptedContact: AcceptedContact,
     helper: ContactHelper,
     timeout: number
 ): Promise<AcceptedContact | MutualContact> => {
     if (!acceptedContact.isPublicKeySent) {
-        const encryptedPublicKey = await helper.encrypt(helper.ownIdentity.publicKey as HexString, acceptedContact.sharedKey);
         try {
-            Debug.log('advanceAcceptedContactState', 'write', acceptedContact.contactIdentity.address);
-            await helper.write(acceptedContact.contactIdentity, encryptedPublicKey, timeout);
+            await writeEncryptedContactMessage(acceptedContact, helper, timeout);
         } catch (e) {
             return acceptedContact;
         }
     }
 
     Debug.log('advanceAcceptedContactState', 'read', acceptedContact.remoteContactIdentity.address);
-    const pollData = await tryRead(helper, acceptedContact.remoteContactIdentity, timeout);
-    if (pollData == null) {
+    const encryptedContactMessage = await tryRead(helper, acceptedContact.remoteContactIdentity, timeout);
+    if (encryptedContactMessage == null) {
         return {
             ...acceptedContact,
             isPublicKeySent: true,
         };
     }
 
-    const remotePublicKey = helper.decrypt(pollData as HexString, acceptedContact.sharedKey);
-    const remoteIdentity = publicKeyToIdentity(remotePublicKey);
+    const contactMessageJSON = helper.decrypt(encryptedContactMessage as HexString, acceptedContact.sharedKey);
+    const contactMessage = tryDeserializeContactMessage(contactMessageJSON);
+    if (contactMessage == null) {
+        return {
+            ...acceptedContact,
+            isPublicKeySent: true,
+        };
+    }
+    const remoteIdentity = publicKeyToIdentity(contactMessage.publicKey);
     const mutualContact: MutualContact = {
         type: 'mutual-contact',
-        name: '',
-        image: {},
+        name: contactMessage.name,
+        image: contactMessage.image,
         identity: remoteIdentity,
-        confirmed: true,
+        confirmed: false,
     };
 
     return mutualContact;

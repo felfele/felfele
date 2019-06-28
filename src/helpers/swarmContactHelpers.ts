@@ -1,4 +1,7 @@
-import { ContactHelper, ContactRandomHelper } from './contactHelpers';
+// @ts-ignore
+import * as utf8 from 'utf8-encoder';
+
+import { ContactHelper, ContactRandomHelper, ProfileData } from './contactHelpers';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import * as Swarm from '../swarm/Swarm';
 import { HexString } from './opaqueTypes';
@@ -7,6 +10,7 @@ import { encrypt, decrypt } from './crypto';
 import { SECOND } from '../DateUtils';
 import { Utils } from '../Utils';
 import { Debug } from '../Debug';
+import { PublicProfile } from '../models/Profile';
 
 export const createSwarmContactRandomHelper = (
     generateRandom: (length: number) => Promise<Uint8Array>
@@ -24,7 +28,7 @@ export const createSwarmContactRandomHelper = (
 });
 
 export const createSwarmContactHelper = (
-    ownIdentity: PublicIdentity,
+    profile: PublicProfile,
     swarmGateway: string,
     generateRandom: (length: number) => Promise<Uint8Array>,
     isCanceled: () => boolean = () => false,
@@ -69,20 +73,23 @@ export const createSwarmContactHelper = (
             };
             Debug.log('swarmContactHelpers.write', feedTemplate);
             await feed.updateWithFeedTemplate(feedTemplate, data);
-            // await feed.update(data);
         },
-        encrypt: async (data: HexString, key: HexString) => {
-            const dataBytes = new Uint8Array(hexToByteArray(data));
+        encrypt: async (data: string, key: HexString) => {
+            const dataBytes = utf8.fromString(data);
             const keyBytes = hexToByteArray(key);
             const encryptedBytes = await encrypt(dataBytes, keyBytes, generateRandom);
             return byteArrayToHex(encryptedBytes, false);
         },
-        decrypt: (data: HexString, key: HexString) => {
+        decrypt: (data: HexString, key: HexString): string => {
             const dataBytes = new Uint8Array(hexToByteArray(data));
             const keyBytes = hexToByteArray(key);
             const decryptedBytes = decrypt(dataBytes, keyBytes);
-            return byteArrayToHex(decryptedBytes, false);
+            return utf8.toString(decryptedBytes);
         },
-        ownIdentity,
+        ownIdentity: profile.identity,
+        profileData: {
+            name: profile.name,
+            image: profile.image,
+        },
     };
 };
