@@ -47,8 +47,8 @@ export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
     } as ContactFeed));
 });
 
-export const getFollowedFeeds = createSelector([ getFeeds, getContactFeeds ], (feeds, contactFeeds) => {
-    return feeds.concat(contactFeeds).filter(feed => feed.followed === true);
+export const getFollowedFeeds = createSelector([ getFeeds ], (feeds) => {
+    return feeds.filter(feed => feed.followed === true);
 });
 
 export const getKnownFeeds = createSelector([ getFeeds ], (feeds) => {
@@ -63,8 +63,8 @@ export const getAllFeeds = createSelector([ getFeeds, getOwnFeeds, getContactFee
     return feeds.concat(ownFeeds).concat(contactFeeds);
 });
 
-export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFeeds ], (rssPosts, followedFeeds) => {
-    return rssPosts.filter(post => isPostFromFollowedFeed(post, followedFeeds));
+export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFeeds, getContactFeeds ], (rssPosts, followedFeeds, contactFeeds) => {
+    return rssPosts.filter(post => isPostFromFollowedFeed(post, followedFeeds.concat(contactFeeds)));
 });
 
 const postUpdateTime = (post: Post): number => {
