@@ -1,13 +1,12 @@
 import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact } from '../models/Contact';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { HexString } from './opaqueTypes';
-import { byteArrayToHex, stripHexPrefix } from './conversion';
+import { byteArrayToHex, stripHexPrefix, hexToByteArray } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { serialize } from '../social/serialization';
-import { PublicProfile } from '../models/Profile';
 
 const publicKeyToAddress = (publicKey: HexString): HexString => {
     const curve = new ec('secp256k1');
@@ -21,6 +20,17 @@ export const publicKeyToIdentity = (publicKey: string): PublicIdentity => ({
     publicKey,
     address: publicKeyToAddress(publicKey as HexString),
 });
+
+export const calculateVerificationCode = (publicKey: string): string => {
+    const start = 4;
+    const numHexDigits = 5;
+    const hexValue = publicKey.slice(start, start + numHexDigits * 2);
+    const numericValue = parseInt(hexValue, 16);
+    const prefix = (s: number, p: string) => ('' + p + s).substring(('' + s).length);
+    const prefix12 = (s: number) => prefix(s, '000000000000');
+    const stringValue = prefix12(numericValue);
+    return `${stringValue.slice(0, 4)}-${stringValue.slice(4, 8)}-${stringValue.slice(8)}`;
+};
 
 export interface ContactRandomHelper {
     generateSecureIdentity: (randomSeed: HexString) => Promise<PrivateIdentity>;

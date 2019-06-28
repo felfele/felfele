@@ -29,7 +29,7 @@ import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
 import { createInvitedContact } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
-import { Contact, NonMutualContact } from '../models/Contact';
+import { Contact, NonMutualContact, MutualContact } from '../models/Contact';
 
 export enum ActionTypes {
     ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
@@ -66,7 +66,9 @@ export enum ActionTypes {
     CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
     ADD_CONTACT = 'ADD-CONTACT',
     UPDATE_CONTACT_STATE = 'UPDATE-CONTACT-STATE',
-    DELETE_CONTACTS = 'DELETE-CONTACTS',
+    CONFIRM_CONTACT = 'CONFIRM-CONTACT',
+    REMOVE_CONTACT = 'REMOVE-CONTACT',
+    DELETE_ALL_CONTACTS = 'DELETE-ALL-CONTACTS',
 }
 
 const InternalActions = {
@@ -137,8 +139,12 @@ export const Actions = {
         createAction(ActionTypes.ADD_CONTACT, { contact }),
     updateContactState: (contact: NonMutualContact, updatedContact: Contact) =>
         createAction(ActionTypes.UPDATE_CONTACT_STATE, { contact, updatedContact }),
-    deleteContacts: () =>
-        createAction(ActionTypes.DELETE_CONTACTS, {}),
+    confirmContact: (contact: MutualContact) =>
+        createAction(ActionTypes.CONFIRM_CONTACT, { contact }),
+    removeContact: (contact: Contact) =>
+        createAction(ActionTypes.REMOVE_CONTACT, { contact }),
+    deleteAllContacts: () =>
+        createAction(ActionTypes.DELETE_ALL_CONTACTS, {}),
 };
 
 export const AsyncActions = {

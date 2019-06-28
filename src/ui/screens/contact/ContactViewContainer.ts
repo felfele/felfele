@@ -27,6 +27,12 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : getFeedPosts(state, feed.feedUrl)
     ;
+    const profile = {
+        name: state.author.name,
+        image: state.author.image,
+        identity: state.author.identity!,
+    };
+
     Debug.log('ContactViewContainer.mapStateToProps', {feed, contact, posts});
     return {
         navigation: ownProps.navigation,
@@ -35,16 +41,18 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         feed,
         contact,
         gatewayAddress: state.settings.swarmGatewayAddress,
+        profile,
     };
 };
 
-const mapDispatchToProps = (dispatch: any): DispatchProps => {
+const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onConfirmContact: (contact: MutualContact) => {
-
+            dispatch(Actions.Actions.confirmContact(contact));
         },
         onRemoveContact: (contact: Contact) => {
-
+            dispatch(Actions.Actions.removeContact(contact));
+            ownProps.navigation.popToTop();
         },
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(Actions.AsyncActions.downloadPostsFromFeeds(feeds));

@@ -1,4 +1,4 @@
-import { ContactHelper, createInvitedContact, advanceContactState } from '../../src/helpers/contactHelpers';
+import { ContactHelper, createInvitedContact, advanceContactState, calculateVerificationCode } from '../../src/helpers/contactHelpers';
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { PrivateIdentity, PublicIdentity } from '../../src/models/Identity';
 import { Debug } from '../../src/Debug';
@@ -260,4 +260,9 @@ test('accepted contact failed to read public key', async () => {
     });
     expect(mockRead.mock.calls.length).toBe(1);
     expect(mockWrite.mock.calls.length).toBe(1);
+});
+
+test('verification code', () => {
+    const verificationCode = calculateVerificationCode(testRemoteIdentity.publicKey);
+    console.log(verificationCode);
 });
