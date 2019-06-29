@@ -33,7 +33,7 @@ This project uses React Native. You will need Android SDK, XCode, Node.js and NP
 Make sure the generated images does not contain transparency for iOS.
 
 ```bash
-$ mogrify -alpha off ios/postmodern/Images.xcassets/AppIcon.appiconset/*.png
+$ mogrify -alpha off ios/felfele/Images.xcassets/AppIcon.appiconset/*.png
 ```
 
 ## Build android release version
@@ -57,3 +57,9 @@ Set the environment variable `REACT_DEBUGGER`, e.g.:
 `REACT_DEBUGGER="node node_modules/react-native-debugger-open/bin/rndebugger-open.js --open --port 8081"`
 
 Then start the packager as normal.
+
+## Running E2E tests
+
+It is iOS only for now.
+
+`npm run e2e:ios`

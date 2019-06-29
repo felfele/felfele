@@ -4,8 +4,9 @@ import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { Debug } from '../Debug';
 import { safeFetch, safeFetchWithTimeout } from '../Network';
-import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../conversion';
+import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { Buffer } from 'buffer';
+import { Utils } from '../Utils';
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
@@ -14,13 +15,12 @@ export const defaultFeedPrefix = 'bzz-feed:/';
 const hashLength = 64;
 
 const upload = async (data: string, swarmGateway: string): Promise<string> => {
-    Debug.log('upload: to Swarm: ', data);
     try {
-        const hash = await uploadData(data, swarmGateway);
-        Debug.log('upload:', 'hash is', hash);
+        const hash = await uploadString(data, swarmGateway);
+        Debug.log('upload', {hash});
         return hash;
     } catch (e) {
-        Debug.log('upload:', 'failed', JSON.stringify(e));
+        Debug.log('upload:', {e});
         throw e;
     }
 };
@@ -97,14 +97,8 @@ export interface File {
     mimeType: MimeType;
 }
 
-const isNode = () => {
-    return typeof process === 'object'
-        && typeof process.versions === 'object'
-        && typeof process.versions.node !== 'undefined';
-};
-
 const uploadFiles = async (files: File[], swarmGateway: string): Promise<string> => {
-    if (isNode()) {
+    if (Utils.isNodeJS()) {
         // avoid metro bundler to try to load the module
         const nodeRequire = require;
         const fs = nodeRequire('fs');
@@ -129,8 +123,8 @@ const uploadFiles = async (files: File[], swarmGateway: string): Promise<string>
     }
 };
 
-const uploadData = async (data: string, swarmGateway: string): Promise<string> => {
-    Debug.log('uploadData: ', data);
+const uploadString = async (data: string, swarmGateway: string): Promise<string> => {
+    Debug.log('uploadString', {data});
     const url = swarmGateway + '/bzz:/';
     const options: RequestInit = {
         headers: {
@@ -144,12 +138,59 @@ const uploadData = async (data: string, swarmGateway: string): Promise<string> =
     return text;
 };
 
-const downloadData = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
+const uploadUint8Array = async (data: Uint8Array, swarmGateway: string): Promise<string> => {
+    Debug.log('uploadUint8Array', 'data.length', data.length);
+    const url = swarmGateway + defaultUrlScheme;
+    const options: RequestInit = {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+        method: 'POST',
+    };
+    options.body = data;
+    const response = await safeFetch(url, options);
+    const text = await response.text();
+    return text;
+};
+
+const downloadString = async (hash: string, timeout: number, swarmGateway: string): Promise<string> => {
     const url = swarmGateway + '/bzz:/' + hash + '/';
-    Debug.log('downloadData:', url);
+    Debug.log('downloadData', {url});
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
+};
+
+const fetchArrayBuffer = (url: string, timeout: number): Promise<Uint8Array> => {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.responseType = 'arraybuffer';
+
+        request.onload = (event) => {
+            const response = request.response as ArrayBuffer;
+            if (response != null) {
+                resolve(new Uint8Array(response));
+            }
+        };
+
+        request.onerror = () => reject();
+        request.onabort = () => reject();
+
+        if (timeout > 0) {
+            setTimeout(() => reject(), timeout);
+        }
+        request.send();
+    });
+};
+
+const downloadUint8Array = async (hash: string, timeout: number, swarmGateway: string): Promise<Uint8Array> => {
+    const url = swarmGateway + defaultUrlScheme + hash + '/';
+    Debug.log('downloadUint8Array', 'url', url);
+
+    const response = await fetchArrayBuffer(url, timeout);
+    Debug.log('downloadUint8Array', 'response.length', response.length);
+    return response;
 };
 
 export const DefaultEpoch = {
@@ -197,7 +238,7 @@ const downloadUserFeedPreviousVersion = async (swarmGateyay: string, address: Fe
 
 const downloadFeed = async (swarmGateway: string, feedUri: string, timeout: number = 0): Promise<string> => {
     const url = swarmGateway + '/' + feedUri;
-    Debug.log('downloadFeed: ', url);
+    Debug.log('downloadFeed', {url});
     const response = await safeFetchWithTimeout(url, undefined, timeout);
     const text = await response.text();
     return text;
@@ -211,14 +252,14 @@ const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate
     const addressPart = calculateFeedAddressQueryString(feedTemplate.feed);
     const signature = await signFeedDigest(digest);
     const url = swarmGateway + `/bzz-feed:/?${addressPart}&level=${feedTemplate.epoch.level}&time=${feedTemplate.epoch.time}&signature=${signature}`;
-    Debug.log('updateFeed: ', url, data);
+    Debug.log('updateFeed', {url, data});
     const options: RequestInit = {
         method: 'POST',
         body: data,
     };
     const response = await safeFetch(url, options);
     const text = await response.text();
-    Debug.log('updateFeed: ', text);
+    Debug.log('updateFeed', {text});
 
     return feedTemplate;
 };
@@ -289,16 +330,20 @@ export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSign
 };
 
 export interface BzzApi {
-    download: (hash: string, timeout: number) => Promise<string>;
-    upload: (data: string) => Promise<string>;
+    downloadString: (hash: string, timeout: number) => Promise<string>;
+    downloadUint8Array: (hash: string, timeout: number) => Promise<Uint8Array>;
+    uploadString: (data: string) => Promise<string>;
+    uploadUint8Array: (data: Uint8Array) => Promise<string>;
     uploadFiles: (files: File[]) => Promise<string>;
     getGatewayUrl: (swarmUrl: string) => string;
 }
 
 export const makeBzzApi = (swarmGateway: string = defaultGateway): BzzApi => {
     return {
-        download: (hash: string, timeout: number = 0) => downloadData(hash, timeout, swarmGateway),
-        upload: (data: string) => upload(data, swarmGateway),
+        downloadString: (hash: string, timeout: number = 0) => downloadString(hash, timeout, swarmGateway),
+        downloadUint8Array: (hash: string, timeout: number = 0) => downloadUint8Array(hash, timeout, swarmGateway),
+        uploadString: (data: string) => upload(data, swarmGateway),
+        uploadUint8Array: (data: Uint8Array) => uploadUint8Array(data, swarmGateway),
         uploadFiles: (files: File[]) => uploadFiles(files, swarmGateway),
         getGatewayUrl: (swarmUrl: string) => getSwarmGatewayUrl(swarmUrl, swarmGateway),
     };
@@ -343,7 +388,7 @@ const updateMinLength = topicLength + userLength + timeLength + levelLength + he
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
-    Debug.log('updateUserFeed', 'digest', byteArrayToHex(digestData));
+    Debug.log('feedUpdateDigest', {digest: byteArrayToHex(digestData)});
     return keccak256.array(digestData);
 }
 
@@ -420,7 +465,7 @@ function publicKeyToAddress(pubKey: any) {
 
 export const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
-    const keyPair = curve.keyFromPrivate(new Buffer(identity.privateKey.substring(2), 'hex'));
+    const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
     const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
     if (sigRaw.recoveryParam != null) {
@@ -439,7 +484,6 @@ export const generateSecureIdentity = async (generateRandom: (length: number) =>
         entropyEnc: 'hex',
         pers: undefined,
     });
-    Debug.log('generateSecureIdentity: ', keyPair, secureRandom);
     const privateKey = '0x' + keyPair.getPrivate('hex');
     const publicKey = '0x' + keyPair.getPublic('hex');
     const address = byteArrayToHex(publicKeyToAddress(keyPair.getPublic()));

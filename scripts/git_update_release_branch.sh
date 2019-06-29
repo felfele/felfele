@@ -1,8 +1,10 @@
 #!/bin/bash -ex
 
-git stash
-git co release
-git merge master
+[ "$1" = "" ] && (echo 'No release_branch set, exiting' && exit 1)
+
+release_branch=$1
+
+git checkout release
+git merge $release_branch
 git push origin release
-git co master
-git stash pop
+git co $release_branch

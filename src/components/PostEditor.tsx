@@ -5,26 +5,33 @@ import {
     Platform,
     Alert,
     AlertIOS,
-    SafeAreaView,
     KeyboardAvoidingView,
     StyleSheet,
+    ActivityIndicator,
+    Dimensions,
+    Keyboard,
 } from 'react-native';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 
-import { ImagePreviewGrid } from './ImagePreviewGrid';
+import { ImagePreviewGrid, GRID_SPACING } from './ImagePreviewGrid';
 import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
 import { markdownEscape, markdownUnescape } from '../markdown';
-import { Colors } from '../styles';
+import { ComponentColors, Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { TypedNavigation } from '../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
+import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
+import { getHttpLinkFromText } from '../helpers/urlUtils';
+import { Utils } from '../Utils';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -44,53 +51,80 @@ type Props = StateProps & DispatchProps;
 
 interface State {
     post: Post;
+    isSending: boolean;
 }
 
 export class PostEditor extends React.Component<Props, State> {
     public state: State;
     private modelHelper: ModelHelper;
+    private textInput: SimpleTextInput | null = null;
 
     constructor(props: Props) {
         super(props);
         this.state = {
             post: this.getPostFromDraft(this.props.draft),
+            isSending: false,
         };
         this.modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
     }
 
     public render() {
         const isPostEmpty = this.isPostEmpty();
-        const sendIconColor = isPostEmpty ? Colors.GRAY : Colors.BRAND_PURPLE;
-        const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
-        const sendButtonOnPress = isPostEmpty ? () => {} : this.onPressSubmit;
+        const isSendEnabled = !isPostEmpty && !this.state.isSending;
+        const sendIconColor = isSendEnabled ? ComponentColors.NAVIGATION_BUTTON_COLOR : ComponentColors.HEADER_COLOR;
+        const sendIcon = this.state.isSending
+            ? <ActivityIndicator size='small' color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
+            : <Icon name='send' size={20} color={sendIconColor} />
+        ;
+        const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
+        const windowWidth = Dimensions.get('window').width;
+
         return (
-            <SafeAreaView style={styles.container}>
+            <FragmentSafeAreaViewWithoutTabBar>
+                <NavigationHeader
+                    leftButton={{
+                        onPress: this.onCancelConfirmation,
+                        label: <Icon
+                            name={'close'}
+                            size={20}
+                            color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                        />,
+                        testID: 'PostEditor/CloseButton',
+                    }}
+                    rightButton1={{
+                        onPress: sendButtonOnPress,
+                        label: sendIcon,
+                        testID: 'PostEditor/SendPostButton',
+                    }}
+                    titleImage={
+                        <Avatar
+                            size='medium'
+                            style={{ marginRight: 10 }}
+                            image={this.props.avatar}
+                            modelHelper={this.modelHelper}
+                        />
+                    }
+                    title={this.props.name}
+                />
                 <KeyboardAvoidingView
                     enabled={Platform.OS === 'ios'}
                     behavior='padding'
                     style={styles.container}
                 >
-                    <NavigationHeader
-                        leftButton={{
-                            onPress: this.onCancelConfirmation,
-                            label: <Icon
-                                name={'close'}
-                                size={20}
-                                color={Colors.DARK_GRAY}
-                            />,
+                    <ImagePreviewGrid
+                        images={this.state.post.images}
+                        imageSize={Math.floor((windowWidth - GRID_SPACING * 4) / 3)}
+                        onRemoveImage={this.onRemoveImage}
+                        modelHelper={this.modelHelper}
+                        onReleaseRow={(_, order: number[]) => {
+                            this.setState({
+                                post: {
+                                    ...this.state.post,
+                                    images: order.map(i => this.state.post.images[i]),
+                                },
+                            });
+                            this.focusTextInput();
                         }}
-                        rightButton1={{
-                            onPress: sendButtonOnPress,
-                            label: sendIcon,
-                        }}
-                        titleImage={
-                            <Avatar
-                                size='medium'
-                                style={{ marginRight: 10 }}
-                                imageUri={this.modelHelper.getImageUri(this.props.avatar)}
-                            />
-                        }
-                        title={this.props.name}
                     />
                     <SimpleTextInput
                         style={styles.textInput}
@@ -102,18 +136,16 @@ export class PostEditor extends React.Component<Props, State> {
                         placeholderTextColor='gray'
                         underlineColorAndroid='transparent'
                         autoFocus={true}
+                        blurOnSubmit={false}
                         testID='PostEditor/TextInput'
+                        ref={ref => this.textInput = ref}
                     />
-                    <ImagePreviewGrid
-                        columns={4}
-                        images={this.state.post.images}
-                        onRemoveImage={this.onRemoveImage}
-                        height={100}
-                        modelHelper={this.modelHelper}
+                    <PhotoWidget
+                        onPressCamera={this.openCamera}
+                        onPressInsert={this.openImagePicker}
                     />
-                    <PhotoWidget onPressCamera={this.openCamera} onPressInsert={this.openImagePicker}/>
                 </KeyboardAvoidingView>
-            </SafeAreaView>
+            </FragmentSafeAreaViewWithoutTabBar>
         );
     }
 
@@ -130,6 +162,7 @@ export class PostEditor extends React.Component<Props, State> {
         this.setState({
             post,
         });
+        this.focusTextInput();
     }
 
     private onChangeText = (text: string) => {
@@ -168,11 +201,13 @@ export class PostEditor extends React.Component<Props, State> {
         this.props.navigation.goBack();
     }
 
-    private showCancelConfirmation = () => {
+    private showCancelConfirmation = async () => {
+        await this.waitUntilKeyboardDisappears();
+
         const options: any[] = [
             { text: 'Save', onPress: () => this.onSave() },
             { text: 'Discard', onPress: () => this.onDiscard() },
-            { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
+            { text: 'Cancel', onPress: () => this.focusTextInput(), style: 'cancel' },
         ];
 
         if (Platform.OS === 'ios') {
@@ -189,6 +224,19 @@ export class PostEditor extends React.Component<Props, State> {
                 { cancelable: true },
             );
         }
+    }
+
+    private waitUntilKeyboardDisappears = async () => {
+        // This is a hack to avoid the keyboard to appear again before discarding the post
+        // It is necessary because on iOS the alert window remembers the state of the
+        // keyboard and restores it after the alert window is closed.
+        //
+        // In the case of 'Discard' this looked bad if the keyboard was visible when the
+        // alert was called, so we have to dismiss the keyboard. However it has an animation
+        // and if the keyboard is somewhat visible, alert will restore it anyhow. Hence the
+        // `waitMillisec` function to wait until it disappears completely.
+        Keyboard.dismiss();
+        await Utils.waitMillisec(50);
     }
 
     private onCancelConfirmation = () => {
@@ -221,23 +269,51 @@ export class PostEditor extends React.Component<Props, State> {
                 post,
             });
         }
+        this.focusTextInput();
     }
 
-    private onPressSubmit = () => {
-        this.sendUpdate();
+    private focusTextInput = () => {
+        if (this.textInput != null) {
+            this.textInput.focus();
+        }
+    }
+
+    private onPressSubmit = async () => {
+        await this.sendUpdate();
         this.props.navigation.goBack();
     }
 
-    private sendUpdate = () => {
+    private createPostFromState = async (): Promise<Post> => {
+        const httpLink = getHttpLinkFromText(this.state.post.text);
+
+        if (httpLink != null) {
+            const url = httpLink;
+            const htmlMetaData = await fetchHtmlMetaData(url);
+            const post = convertPostToParentPost(convertHtmlMetaDataToPost({
+                ...htmlMetaData,
+                description: '',
+            }));
+            return {
+                ...post,
+                createdAt: this.state.post.createdAt,
+                updatedAt: this.state.post.createdAt,
+            };
+        } else {
+            const markdownText = markdownEscape(this.state.post.text);
+            const post = {
+                ...this.state.post,
+                text: markdownText,
+            };
+            return post;
+        }
+    }
+
+    private sendUpdate = async () => {
         this.setState({
-           post: {
-            ...this.state.post,
-            text: markdownEscape(this.state.post.text),
-           },
-        }, () => {
-            Debug.log(this.state.post);
-            this.props.onPost(this.state.post);
+            isSending: true,
         });
+        const post = await this.createPostFromState();
+        this.props.onPost(post);
     }
 }
 
@@ -252,7 +328,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'camera'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
             <TouchableOpacity
@@ -262,7 +338,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'image-multiple'}
                     size={24}
-                    color={Colors.DARK_GRAY}
+                    color={ComponentColors.BUTTON_COLOR}
                 />
             </TouchableOpacity>
         </View>
@@ -271,15 +347,14 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: Colors.WHITE,
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: 'white',
     },
     textInput: {
         flex: 1,
         fontSize: 16,
-        padding: 10,
-        paddingVertical: 10,
+        margin: 10,
         textAlignVertical: 'top',
     },
     photoWidget: {

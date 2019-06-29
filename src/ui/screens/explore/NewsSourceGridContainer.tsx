@@ -3,16 +3,16 @@ import { StateProps, NewsSourceGridScreen, DispatchProps } from './NewsSourceGri
 import { AppState } from '../../../reducers/AppState';
 import { Feed } from '../../../models/Feed';
 import { AsyncActions } from '../../../actions/Actions';
-import { TypedNavigation, Routes } from '../../../helpers/navigation';
+import { TypedNavigation } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const subCategoryName = ownProps.navigation.getParam<'NewsSourceGridContainer', 'subCategoryName'>('subCategoryName');
-    const newsSources = ownProps.navigation.getParam<'NewsSourceGridContainer', 'newsSources'>('newsSources');
+    const feeds = ownProps.navigation.getParam<'NewsSourceGridContainer', 'feeds'>('feeds');
 
     return {
         subCategoryName: subCategoryName,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        newsSource: newsSources,
+        feeds,
         navigation: ownProps.navigation,
     };
 };

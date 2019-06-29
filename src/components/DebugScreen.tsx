@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ViewStyle, ScrollView, SafeAreaView } from 'react-native';
+import { View, ViewStyle, ScrollView, SafeAreaView, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
@@ -10,12 +10,14 @@ import { AppState } from '../reducers/AppState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
 import * as AreYouSureDialog from './AreYouSureDialog';
-import { Colors } from '../styles';
-import { RowItem } from '../ui/misc/RowButton';
+import { ComponentColors, Colors } from '../styles';
+import { RowItem } from '../ui/buttons/RowButton';
 import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+import { localScheduledNotification, localNotification } from '../helpers/notifications';
+import { SECOND } from '../DateUtils';
 
 export interface StateProps {
     appState: AppState;
@@ -55,7 +57,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 );
 
 export const DebugScreen = (props: Props) => (
-    <SafeAreaView style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
         <NavigationHeader
             navigation={props.navigation}
             title='Debug menu'
@@ -100,7 +102,7 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Backup & Restore'
                     onPress={() => props.navigation.navigate('BackupRestore', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                 />
                 <RowItem
                     icon={
@@ -108,7 +110,15 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Swarm settings'
                     onPress={async () => props.navigation.navigate('SwarmSettingsContainer', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
+                />
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='filter-outline' />
+                    }
+                    title='Mute keywords and phrases'
+                    buttonStyle='navigate'
+                    onPress={() => props.navigation.navigate('FilterListEditorContainer', {})}
                 />
                 <RowItem
                     icon={
@@ -116,7 +126,7 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='View logs'
                     onPress={() => props.navigation.navigate('LogViewer', {})}
-                    buttonStyle='none'
+                    buttonStyle='navigate'
                 />
             </ScrollView>
         </View>

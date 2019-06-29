@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Debug } from '../Debug';
-import { BugReportView } from './BugReportView';
+import { BugReportViewWithoutTabBar } from './BugReportView';
 
 export class TopLevelErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     public static getDerivedStateFromError(error: any) {
@@ -16,7 +16,7 @@ export class TopLevelErrorBoundary extends React.Component<{}, { hasError: boole
 
     public render() {
         if (this.state.hasError) {
-            return <BugReportView errorView={true}/>;
+            return <BugReportViewWithoutTabBar errorView={true}/>;
         }
         return this.props.children;
     }

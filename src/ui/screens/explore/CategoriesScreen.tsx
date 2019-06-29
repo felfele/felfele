@@ -1,49 +1,53 @@
 import * as React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Colors } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { RegularText } from '../../misc/text';
-import { Category } from '../../../models/recommendation/NewsSource';
+import { CategoryMap } from '../../../models/recommendation/NewsSource';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { RowItem } from '../../misc/RowButton';
+import { RowItem } from '../../buttons/RowButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
+import { Feed } from '../../../models/Feed';
 
 const CATEGORIES_LABEL = 'CATEGORIES';
 
 export interface StateProps {
-    categories: Category[];
+    categories: CategoryMap<Feed>;
     navigation: TypedNavigation;
 }
 
 export interface DispatchProps { }
 
 export const CategoriesScreen = (props: StateProps & DispatchProps) => {
-    const categories = props.categories.map((category: Category) => {
+    const categories = Object.keys(props.categories).map((categoryName: string) => {
         return (
             <RowItem
-                key={category.name}
-                title={category.name}
+                key={categoryName}
+                title={categoryName}
                 buttonStyle='navigate'
                 onPress={() => {
                     props.navigation.navigate('SubCategoriesContainer', {
-                        title: category.name,
-                        subCategories: category.subCategories,
+                        title: categoryName,
+                        subCategories: props.categories[categoryName],
                     });
                 }}
             />
         );
     });
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
-            <NavigationHeader navigation={props.navigation} title='Explore'/>
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR }}>
-                <RegularText style={styles.label}>
-                    {CATEGORIES_LABEL}
-                </RegularText>
-                {categories}
-            </ScrollView>
-            <TabBarPlaceholder color={Colors.BACKGROUND_COLOR}/>
-        </SafeAreaView>
+        <FragmentSafeAreaViewWithoutTabBar>
+            <SafeAreaView style={{flex: 1}}>
+                <NavigationHeader navigation={props.navigation} title='Explore'/>
+                <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
+                    <RegularText style={styles.label}>
+                        {CATEGORIES_LABEL}
+                    </RegularText>
+                    {categories}
+                </ScrollView>
+                <TabBarPlaceholder color={ComponentColors.BACKGROUND_COLOR}/>
+            </SafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     );
 };
 

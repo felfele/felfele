@@ -15,6 +15,7 @@ import { ImageData } from '../models/ImageData';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
+import { ImageDataView } from '../components/ImageDataView';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -69,7 +70,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     style={styles.cameraIconContainer}
                 >
                     <Icon
-                        name='camera-alt'
+                        name='photo-camera'
                         size={30}
                         color={Colors.BRAND_PURPLE}
                     />
@@ -81,12 +82,12 @@ export class FeedHeader extends React.PureComponent<Props> {
 
 const ProfileIcon = (props: { profileImage: ImageData, gatewayAddress: string }) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const imageUri = modelHelper.getImageUri(props.profileImage);
-    const imageSource = imageUri === ''
-        ? defaultImages.userCircle
-        : { uri: imageUri };
     return (
-        <Image source={imageSource} style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
+        <ImageDataView
+            source={props.profileImage}
+            modelHelper={modelHelper}
+            defaultImage={defaultImages.defaultUser}
+            style={[DefaultStyle.faviconLarge, { marginLeft: 10 }]}/>
     );
 };
 
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerText: {
-        color: 'gray',
+        color: Colors.PINKISH_GRAY,
         fontSize: 18,
         paddingLeft: 10,
     },

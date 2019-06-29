@@ -41,6 +41,9 @@ export const getBaseUrl = (url: string): string => {
 };
 
 export const getCanonicalUrl = (url: string): string => {
+    if (url === '') {
+        return '';
+    }
     const parts = url.split('//', 2);
     if (parts.length === 1) {
         if (!url.includes('/')) {
@@ -61,11 +64,12 @@ export const getCanonicalUrl = (url: string): string => {
     return url;
 };
 
-export const compareUrlWithoutProtocol = (url1: string, url2: string): boolean => {
-    const strippedUrl1 = url1.split('//', 2)[1];
-    const strippedUrl2 = url2.split('//', 2)[1];
-
-    return strippedUrl1 === strippedUrl2;
+export const getHttpsUrl = (url: string): string => {
+    const httpProtocol = 'http:';
+    if (url.startsWith(httpProtocol)) {
+        return 'https:' + url.slice(httpProtocol.length);
+    }
+    return url;
 };
 
 export const stripNonAscii = (s: string): string => {
@@ -73,17 +77,61 @@ export const stripNonAscii = (s: string): string => {
 };
 
 export const getLinkFromText = (text: string): string | undefined => {
-    const httpLink = text.match(/(http.?:\/\/.*?\/)( |$)/);
+    const bzzFeedLink = getBzzFeedLinkFromText(text);
+    if (bzzFeedLink != null) {
+        return bzzFeedLink;
+    }
+    const bzzLink = getBzzLinkFromText(text);
+    if (bzzLink != null) {
+        return bzzLink;
+    }
+    const httpLink = getHttpLinkFromText(text);
+    if (httpLink != null) {
+        return httpLink;
+    }
+    return undefined;
+};
+
+export const getHttpLinkFromText = (text: string): string | undefined => {
+    const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
     if (httpLink != null) {
         return httpLink[1];
     }
+    return undefined;
+};
+
+export const getBzzFeedLinkFromText = (text: string): string | undefined => {
     const bzzFeedLink = text.match(/(bzz-feed:\/\?user=0x[a-f0-9]{40})( |$)/);
     if (bzzFeedLink != null) {
         return bzzFeedLink[1];
     }
+    return undefined;
+};
+
+export const getBzzLinkFromText = (text: string): string | undefined => {
     const bzzLink = text.match(/(bzz:\/\/[a-f0-9]{64})( |$)/);
     if (bzzLink != null) {
         return bzzLink[1];
     }
     return undefined;
+};
+
+export const compareUrls = (url1: string, url2: string): boolean => {
+    const canonicalUrl1 = getCanonicalUrl(url1);
+    const canonicalUrl2 = getCanonicalUrl(url2);
+    if (canonicalUrl1 === canonicalUrl2) {
+        return true;
+    }
+
+    const hostname1 = Url.parse(canonicalUrl1).hostname;
+    const hostname2 = Url.parse(canonicalUrl2).hostname;
+    const wwwPrefix = 'www.';
+    const stripWWWPrefix = (url: string) => url.startsWith(wwwPrefix)
+        ? url.slice(wwwPrefix.length)
+        : url
+    ;
+    const hostname1WithoutWWW = stripWWWPrefix(hostname1);
+    const hostname2WithoutWWW = stripWWWPrefix(hostname2);
+
+    return hostname1WithoutWWW === hostname2WithoutWWW;
 };

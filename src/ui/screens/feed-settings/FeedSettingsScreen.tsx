@@ -8,13 +8,14 @@ import {
  } from 'react-native';
 
 import { Settings } from '../../../models/Settings';
-import { Colors } from '../../../styles';
+import { ComponentColors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { RowItem } from '../../../ui/misc/RowButton';
+import { RowItem } from '../../../ui/buttons/RowButton';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';
 import { LocalFeed } from '../../../social/api';
+import { ImageDataView } from '../../../components/ImageDataView';
 
 export interface StateProps {
     navigation: any;
@@ -28,27 +29,24 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const FEED_NAME_PROFILE_LABEL = 'FEED NAME & PROFILE';
+const FEED_NAME_PROFILE_LABEL = 'CHANNEL NAME & PROFILE';
 const PRIVACY_SHARING_LABEL = 'PRIVACY & SHARING';
-const ASSOCIATED_EXPLANATION = 'This feed is associated with a profile featuring the same name and picture.';
-const UNLISTED_EXPLANATION = 'Anyone with a link to your feed can follow it.';
+const ASSOCIATED_EXPLANATION = 'This channel is associated with a profile featuring the same name and picture.';
+const UNLISTED_EXPLANATION = 'Anyone with a link to your channel can follow it.';
 
 export const FeedSettingsScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
-    const sourceImageUri = modelHelper.getImageUri(props.feed.authorImage);
-    const source = sourceImageUri !== ''
-        ? { uri: sourceImageUri }
-        : defaultImages.userCircle
-    ;
     return (
-        <SafeAreaView style={{ backgroundColor: Colors.WHITE, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
             <NavigationHeader
                 navigation={props.navigation}
                 title={props.feed.name}
             />
-            <ScrollView style={{ backgroundColor: Colors.BACKGROUND_COLOR, flex: 1 }}>
-                <Image
-                    source={source}
+            <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
+                <ImageDataView
+                    source={props.feed.authorImage}
+                    defaultImage={defaultImages.defaultUser}
+                    modelHelper={modelHelper}
                     style={styles.image}
                     resizeMode='cover'
                 />
@@ -88,13 +86,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
     explanation: {
         paddingHorizontal: 10,
         paddingTop: 20,
         paddingBottom: 7,
-        color: Colors.GRAY,
+        color: ComponentColors.TEXT_COLOR,
     },
     image: {
         width: 170,

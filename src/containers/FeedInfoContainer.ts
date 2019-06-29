@@ -29,10 +29,10 @@ const updateNavParam = (feeds: Feed[], navigation: TypedNavigation) => {
     }
 };
 
-const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onAddFeed: (feed: Feed) => {
-            dispatch(Actions.addFeed(feed));
+            dispatch(AsyncActions.addFeed(feed));
             dispatch(AsyncActions.downloadPostsFromFeeds([feed]));
         },
         onRemoveFeed: (feed: Feed) => {

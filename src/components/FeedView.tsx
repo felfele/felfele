@@ -3,7 +3,7 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader, HeaderDefaultLeftButtonIcon } from './NavigationHeader';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from './AreYouSureDialog';
@@ -20,64 +20,69 @@ export interface DispatchProps {
     onRemoveFeed: (feed: Feed) => void;
 }
 
+export interface ViewFeed extends Feed {
+    isOwnFeed: boolean;
+    isLocalFeed: boolean;
+}
+
 export interface StateProps {
     navigation: TypedNavigation;
     onBack: () => void;
-    feedUrl: string;
-    feedName: string;
+    feed: ViewFeed;
     posts: Post[];
-    feeds: Feed[];
-    isOwnFeed: boolean;
     gatewayAddress: string;
 }
 
 type Props = StateProps & DispatchProps;
 
 export const FeedView = (props: Props) => {
-    const isOnboardingFeed = props.feeds[0] != null && props.feeds[0].feedUrl === FELFELE_ASSISTANT_URL;
-    const isFollowedFeed = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed === true) != null;
+    const isOnboardingFeed = props.feed.feedUrl === FELFELE_ASSISTANT_URL;
+
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const isLocalFeed = props.isOwnFeed || props.feeds.length === 0;
     const icon = (name: string, color: string) => <Icon name={name} size={20} color={color} />;
     const button = (iconName: string, color: string, onPress: () => void) => ({
         label: icon(iconName, color),
         onPress,
     });
-    const toggleFavorite = () => props.onToggleFavorite(props.feedUrl);
+    const toggleFavorite = () => props.onToggleFavorite(props.feed.feedUrl);
     const navigateToFeedSettings = () => props.navigation.navigate(
         'FeedSettings',
-        { feed: props.feeds[0] as LocalFeed },
+        { feed: props.feed as unknown as LocalFeed },
     );
     const navigateToFeedInfo = () => props.navigation.navigate(
         'FeedInfo', {
-            feed: props.feeds[0],
+            feed: props.feed,
         }
     );
-    const onLinkPressed = async () => onFollowPressed(props.feedUrl,
-        props.feeds,
+    const onLinkPressed = async () => onFollowPressed(props.feed.feedUrl,
+        props.feed,
         props.onUnfollowFeed,
         props.onFollowFeed
-    );
+);
 
-    const rightButton1 = props.isOwnFeed
-        ? props.feedName.length > 0
-            ? button('dots-vertical', Colors.DARK_GRAY, navigateToFeedSettings)
+    const rightButton1 = props.feed.isOwnFeed
+        ? props.feed.name.length > 0
+            ? button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
             : undefined
         : isOnboardingFeed
             ? undefined
-            : isFollowedFeed
-                ? isFavorite(props.feeds, props.feedUrl)
-                    ? button('star', Colors.BRAND_PURPLE, toggleFavorite)
-                    : button('star', Colors.DARK_GRAY, toggleFavorite)
-                : button('link-variant', Colors.DARK_GRAY, onLinkPressed)
+            : props.feed.followed === true
+                ? props.feed.favorite === true
+                    ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                    : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
+                : button('link', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
     ;
 
-    const rightButton2 = isLocalFeed || isOnboardingFeed
+    const rightButton2 = props.feed.isLocalFeed || isOnboardingFeed
         ? undefined
-        : button('dots-vertical', Colors.DARK_GRAY, navigateToFeedInfo)
+        : button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
+    const refreshableFeedProps = {
+        ...props,
+        feeds: [props.feed],
+    };
     return (
-        <RefreshableFeed modelHelper={modelHelper} {...props}>
+        <RefreshableFeed modelHelper={modelHelper} {...refreshableFeedProps}>
             {{
                 navigationHeader: <NavigationHeader
                     navigation={props.navigation}
@@ -87,24 +92,18 @@ export const FeedView = (props: Props) => {
                     }}
                     rightButton1={rightButton1}
                     rightButton2={rightButton2}
-                    title={props.feedName}
+                    title={props.feed.name}
                 />,
             }}
         </RefreshableFeed>
     );
 };
 
-const isFavorite = (feeds: Feed[], uri: string): boolean => {
-    const feed = feeds.find(value => value.feedUrl === uri);
-    return feed != null && !!feed.favorite;
-};
-
-const onFollowPressed = async (uri: string, feeds: Feed[], onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
-    const followedFeed = feeds.find(feed => feed.feedUrl === uri && feed.followed === true);
-    if (followedFeed != null) {
-        await unfollowFeed(followedFeed, onUnfollowFeed);
+const onFollowPressed = async (uri: string, feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
+    if (feed.followed === true) {
+        await unfollowFeed(feed, onUnfollowFeed);
     } else {
-        followFeed(uri, feeds, onFollowFeed);
+        onFollowFeed(feed);
     }
 };
 
@@ -112,21 +111,5 @@ export const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => v
     const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to unfollow?');
     if (confirmUnfollow) {
         onUnfollowFeed(feed);
-    }
-};
-
-const followFeed = (uri: string, feeds: Feed[], onFollowFeed: (feed: Feed) => void) => {
-    const knownFeed = feeds.find(feed => feed.feedUrl === uri && feed.followed !== true);
-    if (knownFeed != null) {
-        onFollowFeed(knownFeed);
-    }
-};
-
-const removeFeedAndGoBack = async (props: Props) => {
-    const confirmRemove = await AreYouSureDialog.show('Are you sure you want to delete?');
-    const feedToRemove = props.feeds.find(feed => feed.feedUrl === props.feedUrl && feed.followed !== true);
-    if (feedToRemove != null && confirmRemove) {
-        props.onRemoveFeed(feedToRemove);
-        props.onBack();
     }
 };

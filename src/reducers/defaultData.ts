@@ -4,6 +4,7 @@ import * as Swarm from '../swarm/Swarm';
 import { Author } from '../models/Author';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
+import { defaultImages } from '../defaultImages';
 
 export const defaultSettings: Settings = {
     saveToCameraRoll: true,
@@ -12,7 +13,7 @@ export const defaultSettings: Settings = {
     swarmGatewayAddress: Swarm.defaultGateway,
 };
 
-export const DEFAULT_AUTHOR_NAME = 'Space Cowboy';
+export const DEFAULT_AUTHOR_NAME = '';
 
 export const defaultAuthor: Author = {
     name: DEFAULT_AUTHOR_NAME,
@@ -25,24 +26,33 @@ export const defaultAuthor: Author = {
 
 export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
 export const FELFELE_ASSISTANT_URL = 'local/onboarding';
+export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda';
 
 const onboardingAuthor: Author = {
     name: FELFELE_ASSISTANT_NAME,
     uri: FELFELE_ASSISTANT_URL,
-    image: {},
+    image: {
+        localPath: defaultImages.felfeleAssistant,
+    },
 };
 
 const defaultPost1: Post = {
     _id: 0,
     createdAt: Date.now(),
     images: [],
-    text: `Basic features:.
+    text: `Basic features:
 
-Post text and images privately, and later add the posts to your public feed.
+- Post text and images. If you post multiple images they will be displayed as a slide show.
 
-Follow the public feed of others, or add your favorite RSS/Atom feeds.
+- Follow other people using the Felfele app, or follow your favorite website/blog.
 
-If you feel overwhelmed by the news, you can define your own filters in the Settings.`,
+- Share interesting posts in your feed by pressing the three vertical dots on a post.
+
+We would like to hear about you! You can always ask questions or send feedback to us at [hello@felfele.org](mailto:hello@felfele.org)
+
+If you find something is broken or you don't like please send us a bug report from the Settings menu.
+
+`,
     author: onboardingAuthor,
 };
 
@@ -50,7 +60,12 @@ const defaultPost2: Post = {
     _id: 1,
     createdAt: Date.now(),
     images: [],
-    text: `You can follow others by getting an invite link from them. It can be sent on any kind of channel, or you can read your friend's QR code from his phone`,
+    text: `You can follow others by getting an invite link from them or scanning a QR code on their phones. Press the + button in the top right corner to do this.
+
+Paste a link here or enter a website address.
+
+If you want to share your posts, go to the Profile tab. Press the share button in the top right corner or show your QR code.
+    `,
     author: onboardingAuthor,
 };
 
@@ -58,7 +73,10 @@ const defaultPost3: Post = {
     _id: 2,
     createdAt: Date.now(),
     images: [],
-    text: `We have added some feeds that you follow automatically on the news tab (second tab). You can unfollow them if you don't like them. Enjoy!`,
+    text: `You can also find new content if you press the All channels button on the top left, then the Explore button.
+
+Enjoy!
+`,
     author: onboardingAuthor,
 };
 
@@ -75,42 +93,14 @@ export const defaultFeeds: Feed[] = [
         name: 'Felfele Assistant',
         url: FELFELE_ASSISTANT_URL,
         feedUrl: FELFELE_ASSISTANT_URL,
-        favicon: '',
+        favicon: defaultImages.felfeleAssistant,
         followed: true,
     },
     {
         name: 'Felfele Foundation',
-        url: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
-        feedUrl: 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda',
+        url: FELFELE_FOUNDATION_URL,
+        feedUrl: FELFELE_FOUNDATION_URL,
         favicon: 'bzz:/f06957d9a208c1ef26b358e23726b16925f7f5eb32ab19438dfeaec1aa81b041/image.png',
-        followed: true,
-    },
-    {
-        name: 'The Verge',
-        url: 'https://theverge.com/',
-        feedUrl: 'https://www.theverge.com/rss/index.xml',
-        favicon: 'https://cdn.vox-cdn.com/uploads/chorus_asset/file/7395351/android-chrome-192x192.0.png',
-        followed: true,
-    },
-    {
-        name: 'Wired Photos',
-        url: 'https://www.wired.com/',
-        feedUrl: 'https://www.wired.com/feed/category/photo/latest/rss',
-        favicon: 'https://static.savings-united.com/image_setting/132/logo/wired_coupons_logo.png',
-        followed: true,
-    },
-    {
-        name: '500px Blog',
-        url: 'https://iso.500px.com',
-        feedUrl: 'https://iso.500px.com/feed',
-        favicon: 'https://iso.500px.com/wp-content/uploads/2017/10/cropped-FAVICON-180x180.png',
-        followed: true,
-    },
-    {
-        name: 'Favorite Places – Outdoor Photographer',
-        url: 'https://www.outdoorphotographer.com',
-        feedUrl: 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/',
-        favicon: 'https://www.outdoorphotographer.com/wp-content/themes/odp/assets/img/favicon.ico',
         followed: true,
     },
 ];

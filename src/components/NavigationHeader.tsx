@@ -1,54 +1,63 @@
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Colors, DefaultNavigationBarHeight } from '../styles';
+import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
+import { TypedNavigation } from '../helpers/navigation';
 
-interface HeaderButton {
+export interface ButtonProps {
     label: string | React.ReactNode;
     onPress: () => void;
+    disabled?: boolean;
+    testID?: string;
 }
 
 interface HeaderProps {
-    leftButton?: HeaderButton;
-    rightButton1?: HeaderButton;
-    rightButton2?: HeaderButton;
+    leftButton?: ButtonProps;
+    rightButton1?: ButtonProps;
+    rightButton2?: ButtonProps;
     title?: string;
     titleImage?: React.ReactNode;
     onPressTitle?: () => void;
-    navigation?: any;
+    onLongPressTitle?: () => void;
+    navigation?: TypedNavigation;
+    style?: StyleProp<ViewStyle>;
 }
 
 export type Props = HeaderProps;
 
-const BUTTON_COLOR = Colors.DARK_GRAY;
+const BUTTON_COLOR = Colors.WHITE;
 
 export const HeaderDefaultLeftButtonIcon = <Icon name={'arrow-left'} color={BUTTON_COLOR} size={24} />;
 
 export const NavigationHeader = (props: Props) => (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerContainer, props.style]}>
         <TouchableView onPress={
                 props.leftButton != null
                     ? props.leftButton.onPress
                     : props.navigation != null
-                        ? () => props.navigation.goBack(null)
+                        ? () => props.navigation!.goBack(null)
                         : undefined
             }
             style={styles.leftContainer}
+            testID={(props.leftButton && props.leftButton.testID) || 'NavigationHeader/LeftButton'}
         >
-            <RegularText style={styles.headerLeftButtonText}>
-                {
+            <ButtonLabel label={
                     props.leftButton != null
                         ? props.leftButton.label
                         : props.navigation != null
                             ? HeaderDefaultLeftButtonIcon
                             : undefined
                 }
-            </RegularText>
+            />
         </TouchableView>
-        <TouchableView onPress={props.onPressTitle} style={styles.middleContainer}>
+        <TouchableView
+            onPress={props.onPressTitle}
+            onLongPress={props.onLongPressTitle}
+            style={styles.middleContainer}
+        >
             {props.titleImage}
             <MediumText
                 style={styles.titleText}
@@ -60,27 +69,42 @@ export const NavigationHeader = (props: Props) => (
         </TouchableView>
         <View style={styles.rightContainer}>
             {props.rightButton1 &&
-                <RightButton onPress={props.rightButton1.onPress} text={props.rightButton1.label} />}
+                <RightButton
+                    onPress={props.rightButton1.onPress}
+                    label={props.rightButton1.label}
+                    testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
+                />}
             {props.rightButton2 &&
-                <View style={{paddingRight: 20}}>
-                    <RightButton onPress={props.rightButton2.onPress} text={props.rightButton2.label} />
+                <View style={{paddingRight: 10}}>
+                    <RightButton
+                        onPress={props.rightButton2.onPress}
+                        label={props.rightButton2.label}
+                        testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
+                    />
                 </View>
             }
         </View>
     </View>
 );
 
-const RightButton = (props: { onPress?: () => void, text?: string | React.ReactNode }) => {
+const ButtonLabel = (props: { label?: string | React.ReactNode }) => {
+    return typeof props.label === 'string'
+        ? <RegularText style={styles.headerButtonText}>
+                {props.label}
+            </RegularText>
+        : <View>{props.label}</View>
+    ;
+};
+
+const RightButton = (props: { onPress?: () => void, label?: string | React.ReactNode, testID?: string }) => {
     return (
         <TouchableView
             onPress={props.onPress}
-            testID={'NavigationHeader/RightButton'}
+            testID={props.testID}
             style={styles.rightButtonContainer}
             hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
         >
-            <RegularText style={styles.headerRightButtonText}>
-                {props.text ? props.text : ''}
-            </RegularText>
+            <ButtonLabel label={props.label} />
         </TouchableView>
     );
 };
@@ -94,12 +118,11 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 2,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.LIGHT_GRAY,
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.HEADER_COLOR,
+        zIndex: 100,
     },
-    headerLeftButtonText: {
-        color: BUTTON_COLOR,
+    headerButtonText: {
+        color: Colors.WHITE,
         fontSize: 18,
     },
     leftContainer: {
@@ -109,6 +132,7 @@ const styles = StyleSheet.create({
         maxWidth: '50%',
         flexDirection: 'row',
         alignItems: 'center',
+        marginRight: 5,
     },
     rightContainer: {
         flex: 1,
@@ -118,12 +142,8 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 15,
-        color: Colors.DARK_GRAY,
+        color: Colors.WHITE,
         textAlign: 'center',
-    },
-    headerRightButtonText: {
-        fontSize: 18,
-        color: BUTTON_COLOR,
     },
     rightButtonContainer: {
         marginLeft: 30,

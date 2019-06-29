@@ -8,7 +8,7 @@ import { ReactNativeModelHelper } from '../../src/models/ReactNativeModelHelper'
 import { Debug } from '../../src/Debug';
 import { TypedNavigation } from '../../src/helpers/navigation';
 
-Debug.setDebug(true);
+Debug.setDebugMode(true);
 jest.mock('../../src/models/ReactNativeModelHelper');
 jest.mock('../../src/components/CardMarkdown');
 jest.mock('../../src/ui/misc/Carousel');
@@ -17,6 +17,7 @@ const mockNavigation: TypedNavigation = {
     goBack: (routeKey?: string | null) => true,
     navigate: (routeKey: any, params: any) => true,
     pop: (n?: number, params?: { immediate?: boolean }) => true,
+    popToTop: () => {},
     getParam: (param: any) => param.name,
     setParams: (newParams: any) => true,
 };
@@ -69,10 +70,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -89,10 +92,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -109,10 +114,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -130,10 +137,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));
@@ -151,10 +160,12 @@ describe('card test', () => {
                 onDeletePost={(_) => {}}
                 onSharePost={(_) => {}}
                 togglePostSelection={(_) => {}}
-                showSquareImages={true}
                 currentTimestamp={0}
                 author={testAuthor}
                 modelHelper={modelHelper}
+                onDownloadFeedPosts={() => {}}
+                originalAuthorFeed={undefined}
+                authorFeed={undefined}
             />
         ).root;
         expect(result.findByProps({ testID: `YourFeed/Post${result.props.post._id}` }));

@@ -3,14 +3,14 @@ import { RefreshableFeed } from './RefreshableFeed';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
-import { Colors } from '../styles';
+import { Colors, ComponentColors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../ui/misc/PlaceholderCard';
 
 // @ts-ignore
 import SnorkelingIcon from '../../images/snorkeling.svg';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -25,8 +25,8 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-const PLACEHOLDER_TEXT_1 = "You don't have any favorite feed yet.";
-const PLACEHOLDER_TEXT_2 = 'Go to any feed and simply tap the star icon to add it to your favorites.';
+const PLACEHOLDER_TEXT_1 = "You don't have favorite channels.";
+const PLACEHOLDER_TEXT_2 = 'Go to a channel and simply tap the star icon on the top-right corner to add it here.';
 
 export const FavoritesFeedView = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
@@ -36,26 +36,26 @@ export const FavoritesFeedView = (props: Props) => {
                 navigationHeader:
                     <NavigationHeader
                         title='Favorites'
-                        rightButton1={{
+                        leftButton={{
                             onPress: () => props.navigation.navigate(
                                 'FavoriteListViewerContainer', {
                                     feeds: props.feeds,
                                 }
                             ),
                             label: <Icon
-                                name={'view-grid'}
-                                size={20}
-                                color={Colors.DARK_GRAY}
+                                name={'apps'}
+                                size={24}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}
                     />,
                 placeholder: <PlaceholderCard
                                  boldText={PLACEHOLDER_TEXT_1}
                                  regularText={PLACEHOLDER_TEXT_2}
-                                 image={<SnorkelingIcon
-                                            width={29}
-                                            height={29}
-                                            fill={Colors.BRAND_PURPLE}
+                                 image={<Icon
+                                            name='star-outline'
+                                            size={48}
+                                            color={Colors.BLACK}
                                 />}
                              />,
             }}

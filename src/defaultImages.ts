@@ -1,3 +1,7 @@
+import { BundledImage } from './models/ImageData';
+
+declare var require: (id: string) => BundledImage;
+
 export const defaultImages = {
     balloon: require('../images/balloon.svg'),
     bug: require('../images/bug.svg'),
@@ -6,6 +10,6 @@ export const defaultImages = {
     iconWhiteTransparent: require('../images/icon-white-transparent.png'),
     link: require('../images/link.svg'),
     snorkeling: require('../images/snorkeling.svg'),
-    userCircleWhite: require('../images/user_circle-white.png'),
-    userCircle: require('../images/assets/user_circle.png'),
+    defaultUser: require('../images/assets/defaultuser.png'),
+    felfeleAssistant: require('../images/felfele-assistant.png'),
 };

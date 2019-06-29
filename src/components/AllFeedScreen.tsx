@@ -4,12 +4,12 @@ import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Colors } from '../styles';
+import { ComponentColors } from '../styles';
 import { ImageData } from '../models/ImageData';
 import { FeedHeader } from './FeedHeader';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import SplashScreen from 'react-native-splash-screen';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -36,20 +36,36 @@ export class AllFeedScreen extends React.Component<Props> {
                 ref={value => this.ref = value || undefined}
             >
                 {{
-                    navigationHeader: <NavigationHeader
-                                    title='Home'
-                                    rightButton1={{
-                                        onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
-                                            showExplore: true,
-                                        }),
-                                        label: <Icon
-                                            name={'view-grid'}
-                                            size={20}
-                                            color={Colors.DARK_GRAY}
-                                        />,
-                                    }}
-                                    onPressTitle={this.ref && this.ref.scrollToTop}
+                    navigationHeader:
+                        <NavigationHeader
+                            title='Home'
+                            leftButton={{
+                                onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
+                                    showExplore: true,
+                                }),
+                                label: <Icon
+                                    name={'apps'}
+                                    size={24}
+                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
+                            }}
+                            rightButton1={{
+                                onPress: () => this.props.navigation.navigate('FeedInfo', {
+                                     feed: {
+                                         name: '',
+                                         url: '',
+                                         feedUrl: '',
+                                         favicon: '',
+                                     },
+                                }),
+                                label: <Icon
+                                    name='account-plus'
+                                    size={24}
+                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                                />,
+                            }}
+                            onPressTitle={this.ref && this.ref.scrollToTop}
+                        />,
                     listHeader: <FeedHeader
                                     navigation={this.props.navigation}
                                     onSaveDraft={this.props.onSaveDraft}

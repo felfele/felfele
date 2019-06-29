@@ -4,12 +4,13 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
 import { Feed } from '../models/Feed';
 import { getFollowedFeeds, getKnownFeeds } from '../selectors/selectors';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+import { sortFeedsByName } from '../helpers/feedHelpers';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
         return [{
-            title: `${title} ${feeds.length}`,
+            title: `${title} (${feeds.length})`,
             data: feeds,
         }];
     }
@@ -23,26 +24,26 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : state.ownFeeds
     ;
-    const followedFeeds = navParamFeeds
+    const followedFeeds = sortFeedsByName(navParamFeeds
         ? navParamFeeds
         : getFollowedFeeds(state)
-    ;
-    const knownFeeds = navParamFeeds
+    );
+    const knownFeeds = sortFeedsByName(navParamFeeds
         ? []
         : getKnownFeeds(state)
-    ;
+    );
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
-        addSection('Your feeds', ownFeeds),
-        addSection('Public feeds you follow', followedFeeds),
-        addSection('Other feeds', knownFeeds),
+        addSection('Channels you follow', followedFeeds),
+        addSection('Your channels', ownFeeds),
+        addSection('Other channels', knownFeeds),
     );
 
     return {
         sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'All feeds',
+        title: 'All channels',
         showExplore: navParamShowExplore,
     };
 };
