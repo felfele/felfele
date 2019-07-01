@@ -25,6 +25,7 @@
     "jest": "=24.6.0",
     "jest-fetch-mock": "=1.6.6",
     "jest-serializer": "=23.0.1",
+    "jetifier": "^1.6.0",
     "metro-react-native-babel-preset": "0.53.1",
     "mocha": "=6.1.2",
     "mock-async-storage": "=2.0.3",
@@ -40,6 +41,7 @@
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
+    "fix-androidx": "scripts/fix_androidx.sh",
     "ios": "react-native run-ios",
     "link": "react-native link",
     "link-assets": "react-native-asset",
@@ -56,7 +58,8 @@
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "e2e:build:ios": "detox build",
     "e2e:ios": "detox test -c ios.sim.debug --cleanup",
-    "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh"
+    "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh",
+    "postinstall": "npm run fix-androidx"
   },
   "dependencies": {
     "base-64": "=0.1.0",

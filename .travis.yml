@@ -30,6 +30,7 @@ matrix:
         - nvm install 10
         - node --version
       install:
+        - npm install -g npx
         - npm install
         - npm run link
       script:
