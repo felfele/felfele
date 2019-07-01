@@ -38,6 +38,7 @@ import {
 } from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
 import { Contact } from '../models/Contact';
+import { contactsReducer } from './contactsReducer';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -294,65 +295,6 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
             return metadata;
         }
     }
-};
-
-const contactsReducer = (contacts: Contact[] = [], action: Actions): Contact[] => {
-    switch (action.type) {
-        case 'ADD-CONTACT': {
-            return [action.payload.contact, ...contacts];
-        }
-        case 'UPDATE-CONTACT-STATE': {
-            const index = contacts.findIndex(contact =>
-                contact.type === action.payload.contact.type &&
-                contact.contactIdentity.publicKey === action.payload.contact.contactIdentity.publicKey
-            );
-            return index !== -1
-                ? replaceItemInArray(contacts, action.payload.updatedContact, index)
-                : contacts
-            ;
-        }
-        case 'DELETE-ALL-CONTACTS': {
-            return [];
-        }
-        case 'CONFIRM-CONTACT': {
-            const index = contacts.findIndex(contact =>
-                contact.type === 'mutual-contact' &&
-                contact.identity.publicKey === action.payload.contact.identity.publicKey
-            );
-            if (index === -1) {
-                return contacts;
-            }
-            const confirmedContact = {
-                ...contacts[index],
-                confirmed: true,
-            };
-            return replaceItemInArray(contacts, confirmedContact, index);
-        }
-        case 'REMOVE-CONTACT': {
-            if (action.payload.contact.type === 'mutual-contact') {
-                const publicKey = action.payload.contact.identity.publicKey;
-                const index = contacts.findIndex(contact =>
-                    contact.type === 'mutual-contact' &&
-                    contact.identity.publicKey === publicKey
-                );
-                return index !== -1
-                    ? removeFromArray(contacts, index)
-                    : contacts
-                ;
-            } else {
-                const publicKey = action.payload.contact.contactIdentity.publicKey;
-                const index = contacts.findIndex(contact =>
-                    contact.type !== 'mutual-contact' &&
-                    contact.contactIdentity.publicKey === publicKey
-                );
-                return index !== -1
-                    ? removeFromArray(contacts, index)
-                    : contacts
-                ;
-            }
-        }
-    }
-    return contacts;
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
