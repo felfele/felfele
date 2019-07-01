@@ -23,7 +23,7 @@ import { Post } from '../models/Post';
 import { Author } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
-import { LocalFeed } from '../social/api';
+import { LocalFeed, RecentPostFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
 import { removeFromArray, updateArrayItem, insertInArray, containsItem, replaceItemInArray } from '../helpers/immutable';
@@ -116,6 +116,20 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 ...feed,
                 favicon: action.payload.favicon,
             }));
+        }
+        case 'UPDATE-FEEDS-DATA': {
+            const updatedFeeds = feeds.map(feed => {
+                const updatedFeed = action.payload.feeds.find(value => feed.feedUrl === value.feedUrl);
+                return updatedFeed != null
+                    ? {
+                        ...feed,
+                        name: updatedFeed.name,
+                        authorImage: updatedFeed.authorImage,
+                    }
+                    : feed;
+            });
+
+            return updatedFeeds;
         }
         case 'TOGGLE-FEED-FAVORITE': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feedUrl === feed.feedUrl);
