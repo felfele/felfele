@@ -468,12 +468,15 @@ export const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
     const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
-    const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
-    if (sigRaw.recoveryParam != null) {
-        const signature = partialSignature.concat(sigRaw.recoveryParam);
-        return byteArrayToHex(signature);
+    if (sigRaw.recoveryParam == null) {
+        throw new Error('signDigest recovery param was null');
     }
-    throw new Error('signDigest recovery param was null');
+    const signature = [
+        ...sigRaw.r.toArray('be', 32),
+        ...sigRaw.s.toArray('be', 32),
+        sigRaw.recoveryParam,
+    ];
+    return byteArrayToHex(signature);
 };
 
 export const generateSecureIdentity = async (generateRandom: (length: number) => Promise<Uint8Array>): Promise<PrivateIdentity> => {
