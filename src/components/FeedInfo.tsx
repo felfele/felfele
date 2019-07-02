@@ -10,15 +10,15 @@ import {
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+// @ts-ignore
+import { generateSecureRandom } from 'react-native-securerandom';
 
-import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { ComponentColors, Colors, defaultMediumFont } from '../styles';
 import * as Swarm from '../swarm/Swarm';
-import { downloadRecentPostFeed } from '../swarm-social/swarmStorage';
 import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
@@ -27,7 +27,14 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
-import { getFeedUrlFromFollowLink } from '../helpers/deepLinking';
+import { getFeedUrlFromFollowLink, getInviteCodeFromInviteLink } from '../helpers/deepLinking';
+import { advanceContactState, createCodeReceivedContact, ProfileData } from '../helpers/contactHelpers';
+import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
+import { SECOND } from '../DateUtils';
+import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
+import { InviteCode } from '../models/InviteCode';
+import { Contact } from '../models/Contact';
+import { PublicProfile } from '../models/Profile';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -45,6 +52,8 @@ export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRemoveFeed: (feed: Feed) => void;
     onUnfollowFeed: (feed: Feed) => void;
+
+    onAddContact: (contact: Contact) => void;
 }
 
 export interface StateProps {
@@ -52,6 +61,7 @@ export interface StateProps {
     feed: Feed;
     navigation: TypedNavigation;
     isKnownFeed: boolean;
+    profile: PublicProfile;
 }
 
 type Props = DispatchProps & StateProps;
@@ -70,41 +80,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     public async componentDidMount() {
-        await this.tryToAddFeedFromClipboard();
+        await this.tryToAddLinkFromClipboard();
         this.setState({
             showQRCamera: true,
         });
-    }
-
-    public async onAdd(feed: Feed) {
-        this.props.onAddFeed(feed);
-    }
-
-    public async fetchFeed(feedUrl?: string) {
-        Debug.log('fetchFeed', 'this.state', this.state);
-        if (this.state.loading === true) {
-            return;
-        }
-
-        this.setState({
-            loading: true,
-            activityText: 'Loading channel...',
-        });
-
-        const url = this.tryGetFeedUrlFromFollowLink(feedUrl != null ? feedUrl : this.state.url);
-        const feed = await this.fetchFeedFromUrl(url);
-        if (feed != null && feed.feedUrl !== '') {
-            this.setState({
-                loading: false,
-            });
-            this.onAdd(feed);
-            this.props.navigation.navigate('Feed', {
-                feedUrl: feed.feedUrl,
-                name: feed.name,
-            });
-        } else {
-            this.onFailedFeedLoad();
-        }
     }
 
     public render() {
@@ -149,7 +128,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         autoCorrect={false}
                         editable={!isExistingFeed}
                         returnKeyType='done'
-                        onSubmitEditing={async () => await this.fetchFeed()}
+                        onSubmitEditing={async () => await this.handleLink(this.state.url)}
                         onEndEditing={() => {}}
                     />
                     { this.state.loading
@@ -210,7 +189,72 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         );
     }
 
-    private tryToAddFeedFromClipboard = async () => {
+    private async handleLink(link: string) {
+        Debug.log('FeedInfo.processLink', 'this.state', this.state);
+        if (this.state.loading === true) {
+            return;
+        }
+
+        this.setState({
+            loading: true,
+            activityText: 'Loading channel...',
+        });
+
+        const feedUrlFromFollowLink = getFeedUrlFromFollowLink(link);
+        if (feedUrlFromFollowLink != null) {
+            this.handleFeedUrl(feedUrlFromFollowLink);
+            return;
+        }
+        const inviteCode = getInviteCodeFromInviteLink(link);
+        if (inviteCode != null) {
+            this.handleInviteCode(inviteCode);
+            return;
+        }
+        const feedUrl = link;
+        this.handleFeedUrl(feedUrl);
+    }
+
+    private async handleFeedUrl(feedUrl: string) {
+        const feed = await fetchFeedFromUrl(feedUrl, this.props.swarmGateway);
+        this.setState({
+            loading: false,
+        });
+        if (feed != null && feed.feedUrl !== '') {
+            this.props.onAddFeed(feed);
+            this.props.navigation.navigate('Feed', {
+                feedUrl: feed.feedUrl,
+                name: feed.name,
+            });
+        } else {
+            this.onFailedFeedLoad();
+        }
+    }
+
+    private async handleInviteCode(inviteCode: InviteCode) {
+        const swarmContactHelper = createSwarmContactHelper(
+            this.props.profile,
+            this.props.swarmGateway,
+            generateSecureRandom
+        );
+        const invitedContact = await createCodeReceivedContact(inviteCode.randomSeed, inviteCode.contactPublicKey, swarmContactHelper);
+        const contact = await advanceContactState(invitedContact, swarmContactHelper, 300 * SECOND);
+        Debug.log('tryGetFeedUrlFromFollowLink', contact);
+        if (contact.type === 'mutual-contact') {
+            this.props.onAddContact(contact);
+            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
+            const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
+            if (feed != null && feed.feedUrl !== '') {
+                this.props.navigation.navigate('ContactView', {
+                    publicKey: contact.identity.publicKey,
+                    feed,
+                });
+            }
+        } else {
+            this.onFailedFeedLoad();
+        }
+    }
+
+    private tryToAddLinkFromClipboard = async () => {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
         if (!isExistingFeed) {
             const value = await Clipboard.getString();
@@ -220,37 +264,8 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     url: link,
                 });
                 Clipboard.setString('');
-                await this.fetchFeed(link);
+                await this.handleLink(link);
             }
-        }
-    }
-
-    private tryGetFeedUrlFromFollowLink = (followLink: string): string => {
-        const feedUrlFromFollowLink = getFeedUrlFromFollowLink(followLink);
-        return feedUrlFromFollowLink != null
-            ? feedUrlFromFollowLink
-            : followLink
-        ;
-    }
-
-    private fetchFeedFromUrl = async (url: string): Promise<Feed | null> => {
-        try {
-            if (url.startsWith(Swarm.defaultFeedPrefix)) {
-                const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(url);
-                const swarm = Swarm.makeReadableApi(feedAddress, this.props.swarmGateway);
-                const feed: Feed = await downloadRecentPostFeed(swarm, url, 60 * 1000);
-                return feed;
-            } else {
-                Debug.log('fetchFeedFromUrl', 'url', url);
-                const canonicalUrl = urlUtils.getCanonicalUrl(url);
-                Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-                const feed = await RSSFeedManager.fetchFeedFromUrl(url);
-                Debug.log('fetchFeedFromUrl', 'feed', feed);
-                return feed;
-            }
-        } catch (e) {
-            Debug.log(e);
-            return null;
         }
     }
 
@@ -290,11 +305,14 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     private onScanSuccess = async (data: any) => {
         try {
             Debug.log('FeedInfo.onScanSuccess', 'data', data);
-            const feedUrl = data;
+            const inviteLink = getInviteCodeFromInviteLink(data);
+            const feedUrl = inviteLink != null
+                ? inviteLink
+                : data;
             this.setState({
                 url: feedUrl,
             });
-            await this.fetchFeed(feedUrl);
+            await this.handleLink(feedUrl);
         } catch (e) {
             Debug.log(e);
         }

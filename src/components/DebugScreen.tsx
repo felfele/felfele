@@ -16,8 +16,6 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
-import { localScheduledNotification, localNotification } from '../helpers/notifications';
-import { SECOND } from '../DateUtils';
 
 export interface StateProps {
     appState: AppState;
@@ -27,6 +25,7 @@ export interface StateProps {
 export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
+    onDeleteContacts: () => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -70,6 +69,14 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='App state reset'
                     onPress={async () => await onAppStateReset(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Delete contacts'
+                    onPress={async () => await onDeleteContacts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -143,6 +150,16 @@ const onAppStateReset = async (props: Props) => {
         props.onAppStateReset();
         await Utils.waitMillisec(3 * 1000);
         restartApp();
+    }
+};
+
+const onDeleteContacts = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to delete contacts?',
+        'This will delete all your contacts and there is no undo!'
+    );
+    if (confirmed) {
+        props.onDeleteContacts();
     }
 };
 

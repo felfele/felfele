@@ -15,15 +15,16 @@ import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TwoButton } from '../ui/buttons/TwoButton';
 import { getFeedImage } from '../helpers/feedHelpers';
+import { ContactFeed } from '../models/ContactFeed';
 
 export interface DispatchProps {
-    onPressFeed: (feed: Feed) => void;
+    onPressFeed: (feed: ContactFeed) => void;
     openExplore: () => void;
 }
 
 export interface FeedSection {
     title?: string;
-    data: Feed[];
+    data: ContactFeed[];
 }
 
 export interface StateProps {

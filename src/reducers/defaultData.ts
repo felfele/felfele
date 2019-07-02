@@ -116,4 +116,5 @@ export const defaultState: AppState = {
     localPosts: [],
     draft: null,
     metadata: defaultMetadata,
+    contacts: [],
 };

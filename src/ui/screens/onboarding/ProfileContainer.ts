@@ -4,6 +4,8 @@ import { AsyncActions } from '../../../actions/Actions';
 import { StateProps, DispatchProps, ProfileScreen } from './ProfileScreen';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
+import { Feed } from '../../../models/Feed';
+import { InvitedContact, Contact } from '../../../models/Contact';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -25,6 +27,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             await dispatch(AsyncActions.createUser(name, image));
             navigation.navigate('Loading', {});
         },
+        onChangeQRCode: () => {},
+        onAddFeed: (feed: Feed) => {},
+        onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => {},
     };
 };
 

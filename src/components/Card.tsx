@@ -29,8 +29,9 @@ import { Author } from '../models/Author';
 import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
+import { ContactFeed } from '../models/ContactFeed';
 
-export interface AuthorFeed extends Feed {
+export interface AuthorFeed extends ContactFeed {
     isKnownFeed: boolean;
 }
 
@@ -109,10 +110,15 @@ const CardBody = (props: {
     const authorFeed = props.authorFeed;
     const cardTopOnPress = authorFeed != null
         ? authorFeed.isKnownFeed
-            ? () => props.navigation.navigate('Feed', {
-                feedUrl: authorFeed.feedUrl,
-                name: authorFeed.name,
-            })
+            ? authorFeed.contact != null
+                ? () => props.navigation.navigate('ContactView', {
+                    publicKey: authorFeed.contact!.identity.publicKey,
+                    feed: authorFeed,
+                })
+                : () => props.navigation.navigate('Feed', {
+                    feedUrl: authorFeed.feedUrl,
+                    name: authorFeed.name,
+                })
             : authorFeed.feedUrl !== ''
                 ?   () => {
                     props.onDownloadFeedPosts(authorFeed);

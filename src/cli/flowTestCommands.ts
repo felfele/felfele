@@ -5,6 +5,12 @@ import { generateUnsecureRandom } from '../helpers/unsecureRandom';
 import { output } from './cliHelpers';
 import { stringToByteArray, byteArrayToHex, hexToByteArray } from '../helpers/conversion';
 import { Debug } from '../Debug';
+import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
+import * as Swarm from '../swarm/Swarm';
+import { swarmConfig } from './swarmConfig';
+import { createInvitedContact, createCodeReceivedContact, advanceContactState } from '../helpers/contactHelpers';
+import { HexString } from '../helpers/opaqueTypes';
+import { SECOND } from '../DateUtils';
 
 const stringToUint8Array = (s: string): Uint8Array => new Uint8Array(stringToByteArray(s));
 
@@ -51,6 +57,14 @@ const createRandomGenerator = (randomArray: string[]) => {
         return random;
     };
     return nextRandom;
+};
+
+const createDeterministicRandomGenerator = (randomSeed: string): () => string => {
+    return () => {
+        const randomSeedBytes = hexToByteArray(randomSeed);
+        randomSeed = byteArrayToHex(keccak256.array(randomSeedBytes), false);
+        return randomSeed;
+    };
 };
 
 const throwError = (msg: string): never => {
@@ -134,6 +148,8 @@ const bobSharesContactPublicKeyAndContactFeed = (
     qrCode: RandomWithContactPublicKey,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nBob shares contactPublicKey');
+
     bob.aliceContactPublicKey = qrCode.contactPublicKey;
     const contactFeedKeyPair = genKeyPair(qrCode.randomSeed);
     const contactPublicKey: ContactPublicKey = {
@@ -146,6 +162,8 @@ const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = (
     alice: Alice,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nAlice reads Bob\'s contactPublicKey and shares encrypted publicKey');
+
     const contactFeedKeyPair = genKeyPair(alice.randomSeed);
     const encryptedContactFeedData = swarmFeeds.read(contactFeedKeyPair, contactTopic) || throwError('contact feed is empty!');
     const contactFeedData = decrypt(encryptedContactFeedData, alice.randomSeed);
@@ -163,6 +181,8 @@ const bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey = (
     bob: Bob,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nBob reads Alice\'s contactPublicKey and shares encrypted publicKey');
+
     const curve = new ec('secp256k1');
     const aliceContactPublicKeyPair = curve.keyFromPublic(bob.aliceContactPublicKey!, 'hex');
     const sharedKey = deriveSharedKey(bob.contactKeyPair, aliceContactPublicKeyPair);
@@ -178,6 +198,8 @@ const aliceReadsBobsEncryptedPublicKey = (
     alice: Alice,
     swarmFeeds: SwarmFeeds,
 ) => {
+    Debug.log('\nAlice reads Bob\'s encrypted publicKey');
+
     const curve = new ec('secp256k1');
     const bobContactPublicKeyPair = curve.keyFromPublic(alice.bobContactPublicKey!, 'hex');
     const sharedKey = deriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
@@ -238,5 +260,47 @@ export const flowTestCommandDefinition =
             const random = await generateUnsecureRandom(32);
             output(byteArrayToHex(random, false));
         }
+    })
+    .
+    addCommand('swarmInvite [randomSeed]', 'Test invite flow on Swarm', async (randomSeed?: string) => {
+        randomSeed = randomSeed ? randomSeed : randomNumbers[0];
+        const nextRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = async (length: number) => {
+            const randomString = nextRandom();
+            Debug.log('generateDeterministicRandom', {randomString});
+            const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
+            return randomBytes;
+        };
+        const aliceIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const aliceProfile = {
+            name: 'Alice',
+            image: {},
+            identity: aliceIdentity,
+        };
+        const aliceContactHelper = await createSwarmContactHelper(aliceProfile, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const bobIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const bobProfile = {
+            name: 'Bob',
+            image: {},
+            identity: bobIdentity,
+        };
+        const bobContactHelper = await createSwarmContactHelper(bobProfile, swarmConfig.gatewayAddress, generateDeterministicRandom);
+        const createdAt = Date.now();
+        const aliceInvitedContact = await createInvitedContact(aliceContactHelper, createdAt);
+        const bobCodeReceivedContact = await createCodeReceivedContact(
+            aliceInvitedContact.randomSeed,
+            aliceInvitedContact.contactIdentity.publicKey as HexString,
+            bobContactHelper
+        );
+
+        output({aliceInvitedContact, bobCodeReceivedContact});
+
+        const timeout = 30 * SECOND;
+        const [aliceContact, bobContact] = await Promise.all([
+            advanceContactState(aliceInvitedContact, aliceContactHelper, timeout),
+            advanceContactState(bobCodeReceivedContact, bobContactHelper, timeout),
+        ]);
+
+        output({aliceContact, bobContact});
     })
 ;

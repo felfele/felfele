@@ -20,6 +20,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onCreateIdentity: () => {
             dispatch(AsyncActions.createUserIdentity());
         },
+        onDeleteContacts: () => {
+            dispatch(Actions.deleteAllContacts());
+        },
    };
 };
 

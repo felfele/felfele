@@ -6,7 +6,8 @@ import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/Actions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { getAllFeeds } from '../selectors/selectors';
+import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
+import { ContactFeed } from '../models/ContactFeed';
 
 interface OwnProps {
     isSelected: boolean;
@@ -37,21 +38,35 @@ const getOriginalAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefi
     ;
 };
 
+const getAuthorFeedOrUndefined = (
+    feed: ContactFeed | undefined
+) => {
+    return feed != null
+        ? {
+            ...feed,
+            isKnownFeed: true,
+        }
+        : undefined
+    ;
+};
+
 const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
     if (post.author == null) {
         return;
     }
     const postAuthor = post.author;
-    const knownFeed = state.feeds.find(feed => feed.feedUrl === postAuthor.uri)
-        || state.ownFeeds.find(feed => feed.name === postAuthor.name)
+    const authorFeed = getAuthorFeedOrUndefined(
+            state.feeds.find(feed => feed.feedUrl === postAuthor.uri),
+        ) ||
+        getAuthorFeedOrUndefined(
+            state.ownFeeds.find(feed => feed.name === postAuthor.name),
+        ) ||
+        getAuthorFeedOrUndefined(
+            getContactFeeds(state).find(feed => feed.feedUrl === postAuthor.uri),
+        )
     ;
-    return knownFeed != null
-        ? {
-            ...knownFeed,
-            isKnownFeed: true,
-        }
-        : undefined
-    ;
+
+    return authorFeed;
 };
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {

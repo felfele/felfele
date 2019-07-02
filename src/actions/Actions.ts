@@ -1,4 +1,5 @@
 import { ActionsUnion } from './types';
+import { ActionTypes } from './ActionTypes';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
@@ -6,7 +7,6 @@ import { migrateAppStateToCurrentVersion } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
-import { Author } from '../models/Author';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -22,49 +22,22 @@ import * as Swarm from '../swarm/Swarm';
 import { PrivateIdentity } from '../models/Identity';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
-import { isPostFeedUrl, loadRecentPostFeeds, makeSwarmStorage, makeSwarmStorageSyncer, SwarmHelpers, getPostsFromRecentPostFeeds } from '../swarm-social/swarmStorage';
+import {
+    isPostFeedUrl,
+    makeSwarmStorage,
+    makeSwarmStorageSyncer,
+    loadRecentPostFeeds,
+    getPostsFromRecentPostFeeds,
+    SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defaultData';
 import { registerBackgroundTask } from '../helpers/backgroundTask';
 import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
-
-export enum ActionTypes {
-    ADD_CONTENT_FILTER = 'ADD-CONTENT-FILTER',
-    REMOVE_CONTENT_FILTER = 'REMOVE-CONTENT-FILTER',
-    CLEANUP_CONTENT_FILTERS = 'CLEANUP-CONTENT-FILTERS',
-    ADD_FEED = 'ADD-FEED',
-    REMOVE_FEED = 'REMOVE-FEED',
-    FOLLOW_FEED = 'FOLLOW-FEED',
-    UNFOLLOW_FEED = 'UNFOLLOW-FEED',
-    TOGGLE_FEED_FAVORITE = 'TOGGLE-FEED-FAVORITE',
-    UPDATE_FEED_FAVICON = 'UPDATE-FEED-FAVICON',
-    ADD_OWN_FEED = 'ADD-OWN-FEED',
-    UPDATE_OWN_FEED = 'UPDATE-OWN-FEED',
-    TIME_TICK = 'TIME-TICK',
-    UPDATE_RSS_POSTS = 'UPDATE-RSS-POSTS',
-    REMOVE_POST = 'REMOVE-POST',
-    ADD_DRAFT = 'ADD-DRAFT',
-    REMOVE_DRAFT = 'REMOVE-DRAFT',
-    ADD_POST = 'ADD-POST',
-    DELETE_POST = 'DELETE-POST',
-    UPDATE_POST_LINK = 'UPDATE-POST-LINK',
-    UPDATE_POST_IMAGES = 'UPDATE-POST-IMAGES',
-    UPDATE_POST_IS_UPLOADING = 'UPDATE-POST-IS-UPLOADING',
-    UPDATE_AUTHOR_NAME = 'UPDATE-AUTHOR-NAME',
-    UPDATE_AUTHOR_IMAGE = 'UPDATE-AUTHOR-IMAGE',
-    UPDATE_AUTHOR_IDENTITY = 'UPDATE-AUTHOR-IDENTITY',
-    UPDATE_FEEDS_DATA = 'UPDATE-FEEDS-DATA',
-    INCREASE_HIGHEST_SEEN_POST_ID = 'INCREASE-HIGHEST-SEEN-POST-ID',
-    APP_STATE_RESET = 'APP-STATE-RESET',
-    APP_STATE_SET = 'APP-STATE-SET',
-    CHANGE_SETTING_SAVE_TO_CAMERA_ROLL = 'CHANGE-SETTING-SAVE-TO-CAMERA-ROLL',
-    CHANGE_SETTING_SHOW_SQUARE_IMAGES = 'CHANGE-SETTING-SHOW-SQUARE-IMAGES',
-    CHANGE_SETTING_SHOW_DEBUG_MENU = 'CHANGE-SETTING-SHOW-DEBUG-MENU',
-    CHANGE_SETTING_SWARM_GATEWAY_ADDRESS = 'CHANGE-SETTING-SWARM-GATEWAY-ADDRESS',
-    CLEAN_FEEDS_FROM_OWN_FEEDS = 'CLEAN-FEEDS-FROM-OWN-FEEDS',
-}
+import { createInvitedContact } from '../helpers/contactHelpers';
+import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
+import { ContactActions } from './ContactActions';
 
 const InternalActions = {
     addPost: (post: Post) =>
@@ -90,6 +63,7 @@ const InternalActions = {
 };
 
 export const Actions = {
+    ...ContactActions,
     addContentFilter: (text: string, createdAt: number, validUntil: number) =>
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilter: (filter: ContentFilter) =>
@@ -175,6 +149,7 @@ export const AsyncActions = {
     },
     downloadPostsFromFeeds: (feeds: Feed[]): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('downloadPostsFromFeeds', feeds);
             const previousPosts = getState().rssPosts;
             const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
             // TODO this is a hack, because we don't need a feed address
@@ -490,6 +465,14 @@ export const AsyncActions = {
                     }
                 });
             }
+        };
+    },
+    generateInvitedContact: (): Thunk => {
+        return async (dispatch, getState) => {
+            const contactRandomHelper = createSwarmContactRandomHelper(generateSecureRandom);
+            const createdAt = Date.now();
+            const invitedContact = await createInvitedContact(contactRandomHelper, createdAt);
+            dispatch(Actions.addContact(invitedContact));
         };
     },
 };

@@ -115,7 +115,7 @@ const fetchSwarmPostCommandLog = async (swarmFeedApi: Swarm.ReadableFeedApi, unt
         commands: [],
     };
     try {
-        let postCommandJSON = await swarmFeedApi.download();
+        let postCommandJSON = await swarmFeedApi.download(0);
         while (true) {
             Debug.log('fetchSwarmPostCommandLog', {postCommandJSON});
             const postCommand = deserialize(postCommandJSON) as PostCommand;
@@ -163,7 +163,7 @@ const uploadPostCommandToSwarm = async (postCommand: PostCommand, swarmApi: Swar
     return postCommandAfterRecentPostFeedUpdated;
 };
 
-const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.WriteableFeedApi): Promise<PostCommand> => {
+const addPostCommandToFeed = async (postCommand: PostCommand, swarmFeedApi: Swarm.FeedApi): Promise<PostCommand> => {
     const feedTemplate = await swarmFeedApi.downloadFeedTemplate();
     const updatedCommand = {
         ...postCommand,

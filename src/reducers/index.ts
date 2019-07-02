@@ -26,7 +26,7 @@ import { Debug } from '../Debug';
 import { LocalFeed, RecentPostFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { removeFromArray, updateArrayItem, insertInArray, containsItem } from '../helpers/immutable';
+import { removeFromArray, updateArrayItem, insertInArray, containsItem, replaceItemInArray } from '../helpers/immutable';
 import {
     defaultFeeds,
     defaultSettings,
@@ -37,6 +37,8 @@ import {
     defaultState,
 } from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
+import { Contact } from '../models/Contact';
+import { contactsReducer } from './contactsReducer';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -359,6 +361,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    contacts: contactsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);

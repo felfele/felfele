@@ -12,6 +12,12 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     const feedUrl = base64.decode(base64FeedUrl);
     Clipboard.setString(feedUrl);
 
+    const profile = {
+        name: state.author.name,
+        image: state.author.image,
+        identity: state.author.identity!,
+    };
+
     return {
         feed: {
             name: '',
@@ -22,10 +28,11 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
         isKnownFeed: false,
+        profile,
     };
 };
 
-export const FeedInfoDeepLinkContainer = connect(
+export const FeedInfoFollowLinkContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedInfo);

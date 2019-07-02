@@ -4,13 +4,17 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    Image,
     TouchableOpacity,
     Dimensions,
     ScrollView,
     SafeAreaView,
+    ActivityIndicator,
+    Alert,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+// @ts-ignore
+import { generateSecureRandom } from 'react-native-securerandom';
+import { withNavigationFocus, NavigationEvents } from 'react-navigation';
 
 import { SimpleTextInput } from './SimpleTextInput';
 import { Author } from '../models/Author';
@@ -19,7 +23,6 @@ import { Feed } from '../models/Feed';
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { ComponentColors, Colors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
-import { Debug } from '../Debug';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { RowItem } from '../ui/buttons/RowButton';
 import { RegularText } from '../ui/misc/text';
@@ -28,9 +31,19 @@ import { defaultImages } from '../defaultImages';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
-import { showShareFeedDialog } from '../helpers/shareDialogs';
+import { showShareFeedDialog, showShareContactDialog } from '../helpers/shareDialogs';
 import { TwoButton } from '../ui/buttons/TwoButton';
 import { ImageDataView } from '../components/ImageDataView';
+import { InvitedContact, Contact } from '../models/Contact';
+import { Debug } from '../Debug';
+import { TouchableView } from './TouchableView';
+import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
+import { advanceContactState } from '../helpers/contactHelpers';
+import { SECOND } from '../DateUtils';
+import * as Swarm from '../swarm/Swarm';
+import { fetchRecentPostFeed } from '../helpers/feedHelpers';
+import { getInviteLink, getFollowLink } from '../helpers/deepLinking';
+import { PublicProfile } from '../models/Profile';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -38,13 +51,18 @@ export interface DispatchProps {
     onUpdateAuthor: (text: string) => void;
     onUpdatePicture: (image: ImageData) => void;
     onChangeText?: (text: string) => void;
+    onChangeQRCode: () => void;
+    onAddFeed: (feed: Feed) => void;
+    onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => void;
 }
 
 export interface StateProps {
-    author: Author;
+    profile: PublicProfile;
     ownFeed?: LocalFeed;
     navigation: TypedNavigation;
     gatewayAddress: string;
+    invitedContact?: InvitedContact;
+    showInviteCode: boolean;
 }
 
 const NAME_LABEL = 'NAME';
@@ -55,18 +73,96 @@ const VIEW_POSTS_LABEL = 'View all your posts';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
-const generateQRCodeValue = (feed?: Feed): string => {
-    if (feed == null) {
-        return '';
+const generateInviteQRCodeValue = (invitedContact?: InvitedContact): string | undefined => {
+    if (invitedContact == null) {
+        return undefined;
     }
-    return feed.url;
+    return getInviteLink(invitedContact);
 };
 
+const generateFollowRCodeValue = (feed?: Feed): string | undefined => {
+    if (feed == null) {
+        return undefined;
+    }
+    return getFollowLink(feed.feedUrl);
+};
+
+interface ContactStateChangeListenerProps {
+    contact: InvitedContact;
+    profile: PublicProfile;
+    swarmGateway: string;
+    navigation: TypedNavigation;
+
+    onContactStateChanged: (invitedContact: InvitedContact, updatedContact: Contact) => void;
+    onAddFeed: (feed: Feed) => void;
+}
+
+class ContactStateChangeListener extends React.PureComponent<ContactStateChangeListenerProps> {
+    private isCanceled = false;
+
+    public render = () => (
+        <NavigationEvents
+            onDidFocus={payload => {
+                Debug.log('ContactStateChangeListener.render', 'onDidFocus', this.props);
+                this.tryAdvanceContactState();
+            }}
+            onDidBlur={payload => {
+                Debug.log('ContactStateChangeListener.render', 'onDidBlur', this.props);
+                this.isCanceled = true;
+            }}
+        />
+    )
+
+    private async tryAdvanceContactState() {
+        this.isCanceled = false;
+        const swarmContactHelper = createSwarmContactHelper(
+            this.props.profile,
+            this.props.swarmGateway,
+            generateSecureRandom,
+            () => this.isCanceled,
+        );
+        const contact = await advanceContactState(this.props.contact, swarmContactHelper, 300 * SECOND);
+        Debug.log('ContactStateChangeListener.componentDidMount', contact);
+        this.props.onContactStateChanged(this.props.contact, contact);
+        if (contact.type === 'mutual-contact') {
+            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
+            const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
+            if (feed != null && feed.feedUrl !== '') {
+                this.props.navigation.navigate('ContactView', {
+                    publicKey: contact.identity.publicKey,
+                    feed,
+                });
+            }
+        }
+    }
+}
+
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
-    const qrCodeValue = generateQRCodeValue(props.ownFeed);
+    const qrCodeValue = props.showInviteCode
+        ? generateInviteQRCodeValue(props.invitedContact)
+        : generateFollowRCodeValue(props.ownFeed)
+    ;
+    if (props.showInviteCode && qrCodeValue == null) {
+        props.onChangeQRCode();
+    }
+    const onPressShare = props.showInviteCode
+        ? () => props.invitedContact && showShareContactDialog(props.invitedContact)
+        : () => showShareFeedDialog(props.ownFeed)
+    ;
+    Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
+            { props.invitedContact &&
+                <ContactStateChangeListener
+                    contact={props.invitedContact}
+                    profile={props.profile}
+                    swarmGateway={props.gatewayAddress}
+                    onContactStateChanged={props.onContactStateChange}
+                    onAddFeed={props.onAddFeed}
+                    navigation={props.navigation}
+                />
+            }
             <KeyboardAvoidingView style={styles.mainContainer}>
                 <NavigationHeader
                     rightButton1={
@@ -93,7 +189,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         style={styles.imagePickerContainer}
                     >
                         <ImageDataView
-                            source={props.author.image}
+                            source={props.profile.image}
                             defaultImage={defaultUserImage}
                             style={styles.imagePicker}
                             modelHelper={modelHelper}
@@ -102,10 +198,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
                     <SimpleTextInput
                         style={styles.row}
-                        defaultValue={props.author.name}
+                        defaultValue={props.profile.name}
                         placeholder={NAME_PLACEHOLDER}
                         autoCapitalize='none'
-                        autoFocus={props.author.name === ''}
+                        autoFocus={props.profile.name === ''}
                         autoCorrect={false}
                         selectTextOnFocus={true}
                         returnKeyType={'done'}
@@ -121,21 +217,24 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         buttonStyle='navigate'
                         onPress={() => props.navigation.navigate('YourTab', {})}
                     />
-                    { props.ownFeed &&
-                        <View style={styles.qrCodeContainer}>
+                    <TouchableView style={styles.qrCodeContainer} onLongPress={props.onChangeQRCode}>
+                    { qrCodeValue != null
+                        ?
                             <QRCode
                                 value={qrCodeValue}
                                 size={QRCodeWidth}
                                 color={Colors.BLACK}
                                 backgroundColor={ComponentColors.BACKGROUND_COLOR}
                             />
-                        </View>
+                        :
+                            <ActivityIndicator />
                     }
+                    </TouchableView>
                     <TwoButton
                         leftButton={{
                             label: 'Share',
                             icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
-                            onPress: async () => showShareFeedDialog(props.ownFeed),
+                            onPress: onPressShare,
                         }}
                         rightButton={{
                             label: 'Add channel',
