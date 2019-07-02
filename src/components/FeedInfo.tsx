@@ -7,6 +7,8 @@ import {
     ActivityIndicator,
     Dimensions,
     Clipboard,
+    RegisteredStyle,
+    ViewStyle,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -174,8 +176,8 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     <View style={styles.qrCameraContainer}>
                         <QRCodeScanner
                             onRead={async (event) => await this.onScanSuccess(event.data)}
-                            containerStyle={styles.qrCameraStyle}
-                            cameraStyle={styles.qrCameraStyle}
+                            containerStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
+                            cameraStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
                             fadeIn={false}
                             cameraProps={{ratio: '1:1'}}
                         />
