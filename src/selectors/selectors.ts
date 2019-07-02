@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { AppState } from '../reducers/AppState';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { MutualContact } from '../models/Contact';
+import { MutualContact, Contact } from '../models/Contact';
 import { makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 
@@ -35,8 +35,12 @@ const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
         });
 };
 
+const isMutualContact = (contact: Contact): contact is MutualContact => {
+    return contact.type === 'mutual-contact';
+};
+
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
-    const mutualContacts = contacts.filter(contact => contact.type === 'mutual-contact') as MutualContact[];
+    const mutualContacts = contacts.filter(isMutualContact);
     return mutualContacts.map(contact => ({
         name: contact.name,
         url: makeBzzFeedUrlFromIdentity(contact.identity),
