@@ -147,6 +147,7 @@ export const feedCommandDefinition =
                 url: feedUrl,
                 feedUrl: feedUrl,
                 favicon: '',
+                publicKey: privateIdentity.publicKey,
             };
 
             let postCommandLog = emptyPostCommandLog;
