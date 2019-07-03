@@ -5,7 +5,7 @@ module.exports = {
   preset: 'react-native',
   transform: {
     ...tsjPreset.transform,
-    '\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js',
+    '^.+\\.tsx?$': 'ts-jest'
   },
   "transformIgnorePatterns": [
     "node_modules/(?!react-native|react-navigation)/"
