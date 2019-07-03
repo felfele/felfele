@@ -451,6 +451,12 @@ const uploadRecentPostFeed = async (
 
     const uploadedAuthorImage = await uploadImage(swarm.bzz, recentPostFeed.authorImage, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
     const uploadedPosts = await uploadPosts(swarm.bzz, posts, swarmHelpers.imageResizer, swarmHelpers.getLocalPath);
+    const optionalPublicKey = recentPostFeed.publicKey != null
+        ? {
+            publicKey: recentPostFeed.publicKey,
+        }
+        : {}
+    ;
     const postFeed: RecentPostFeed = {
         name: recentPostFeed.name,
         url: recentPostFeed.url,
@@ -458,6 +464,7 @@ const uploadRecentPostFeed = async (
         favicon: recentPostFeed.favicon,
         posts: uploadedPosts,
         authorImage: uploadedAuthorImage,
+        ...optionalPublicKey,
     };
     const updatedRecentPostFeed = await updateRecentPostFeed(swarm, postFeed);
     Debug.log('uploadRecentPostFeed', {updatedRecentPostFeed});
