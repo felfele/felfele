@@ -301,17 +301,18 @@ export const AsyncActions = {
                 return;
             }
 
+            const identity = getState().author.identity!;
             const localFeedToSync = {
                 ...localFeed,
                 authorImage: getState().author.image,
                 name: getState().author.name,
+                publicKey: localFeed.autoShare ? identity.publicKey : undefined,
                 isSyncing: true,
             };
             dispatch(Actions.updateOwnFeed({
                 ...localFeedToSync,
             }));
 
-            const identity = getState().author.identity!;
             const signFeedDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
             const swarmGateway = getState().settings.swarmGatewayAddress;
             const swarmStorageSyncer = getSwarmStorageSyncer(signFeedDigest, localFeedToSync.feedUrl, swarmGateway);
