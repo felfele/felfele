@@ -28,7 +28,8 @@ import {
     makeSwarmStorageSyncer,
     loadRecentPostFeeds,
     getPostsFromRecentPostFeeds,
-    SwarmHelpers } from '../swarm-social/swarmStorage';
+    SwarmHelpers,
+    RecentPostFeedUpdate} from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defaultData';
@@ -154,10 +155,12 @@ export const AsyncActions = {
             const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
             // TODO this is a hack, because we don't need a feed address
             const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
+            const updateFeeds = (recentPostFeedUpdates: RecentPostFeedUpdate[]) => {
+                const recentPostFeeds = recentPostFeedUpdates.map(update => update.updated);
+                dispatch(InternalActions.updateFeedsData(recentPostFeeds));
+            };
             const allPosts = await Promise.all([
-                loadSocialPostsAndUpdateFeeds(swarm, feedsWithoutOnboarding, (recentPostFeeds: RecentPostFeed[]) => {
-                    dispatch(InternalActions.updateFeedsData(recentPostFeeds));
-                }),
+                loadSocialPostsAndUpdateFeeds(swarm, feedsWithoutOnboarding, updateFeeds),
                 loadRSSPostsFromFeeds(feedsWithoutOnboarding),
             ]);
             const posts = mergeUpdatedPosts(allPosts[0].concat(allPosts[1]), previousPosts);
@@ -456,8 +459,9 @@ export const AsyncActions = {
                     const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
                     const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
                     const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
-                    const recentFeeds = await loadRecentPostFeeds(swarm, foundationFeeds);
-                    const recentPosts = await getPostsFromRecentPostFeeds(recentFeeds);
+                    const feedUpdates = await loadRecentPostFeeds(swarm, foundationFeeds as RecentPostFeed[]);
+                    const updatedFeeds = feedUpdates.map(feedUpdate => feedUpdate.updated);
+                    const recentPosts = await getPostsFromRecentPostFeeds(updatedFeeds);
                     if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
                         const posts = mergeUpdatedPosts(recentPosts, previousPosts);
                         dispatch(Actions.updateRssPosts(posts));
@@ -498,11 +502,17 @@ const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): Ima
     return mergedImages;
 };
 
-const loadSocialPostsAndUpdateFeeds = async (swarm: Swarm.ReadableApi, feeds: Feed[], updateFeeds: (feeds: RecentPostFeed[]) => void): Promise<Post[]> => {
-    const socialFeeds = feeds.filter(feed => isPostFeedUrl(feed.url));
-    const recentPostFeeds = await loadRecentPostFeeds(swarm, socialFeeds);
-    updateFeeds(recentPostFeeds);
-    return await getPostsFromRecentPostFeeds(recentPostFeeds);
+const loadSocialPostsAndUpdateFeeds = async (
+    swarm: Swarm.ReadableApi,
+    feeds: Feed[],
+    updateFeeds: (feedUpdates: RecentPostFeedUpdate[]) => void,
+): Promise<Post[]> => {
+    const isSocialFeed = (feed: Feed): feed is RecentPostFeed => isPostFeedUrl(feed.url);
+    const socialFeeds = feeds.filter(isSocialFeed);
+    const recentPostFeedUpdates = await loadRecentPostFeeds(swarm, socialFeeds);
+    updateFeeds(recentPostFeedUpdates);
+    const updatedFeeds = recentPostFeedUpdates.map(feedUpdate => feedUpdate.updated);
+    return await getPostsFromRecentPostFeeds(updatedFeeds);
 };
 
 const loadRSSPostsFromFeeds = async (feeds: Feed[]): Promise<Post[]> => {

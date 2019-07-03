@@ -5,6 +5,7 @@ import { Feed } from '../models/Feed';
 import { MutualContact, Contact } from '../models/Contact';
 import { makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
+import { LocalFeed } from '../social/api';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -64,7 +65,7 @@ export const getFavoriteFeeds = createSelector([ getFeeds ], (feeds) => {
 });
 
 export const getAllFeeds = createSelector([ getFeeds, getOwnFeeds, getContactFeeds ], (feeds, ownFeeds, contactFeeds) => {
-    return feeds.concat(ownFeeds).concat(contactFeeds);
+    return feeds.concat(ownFeeds).concat(contactFeeds) as (Feed | LocalFeed | ContactFeed)[];
 });
 
 export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFeeds, getContactFeeds ], (rssPosts, followedFeeds, contactFeeds) => {

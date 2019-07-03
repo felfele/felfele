@@ -346,13 +346,13 @@ const updateRecentPostFeed = async (swarm: Swarm.Api, postFeed: RecentPostFeed):
     }
 };
 
-export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: string, timeout: number = 5000): Promise<RecentPostFeed> => {
+export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: string, timeout: number = 10000): Promise<RecentPostFeed> => {
     try {
         const contentHash = await swarm.feed.downloadFeed(url, timeout);
-        Debug.log('downloadPostFeed', {contentHash});
+        Debug.log('downloadRecentPostFeed', {contentHash});
 
         const content = await swarm.bzz.downloadString(contentHash, timeout);
-        Debug.log('downloadPostFeed', {content});
+        Debug.log('downloadRecentPostFeed', {content});
 
         const postFeed = deserialize(content) as RecentPostFeed;
         const authorImage = {
@@ -378,30 +378,39 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
         };
         return postFeedWithGatewayImageLinks;
     } catch (e) {
-        Debug.log('downloadPostFeed failed: ', e);
+        Debug.log('downloadRecentPostFeed failed: ', e);
         throw e;
     }
 };
 
-const safeDownloadRecentPostFeed = async (swarm: Swarm.ReadableApi, feedUrl: string): Promise<RecentPostFeed> => {
+export interface RecentPostFeedUpdate {
+    original: RecentPostFeed;
+    updated: RecentPostFeed;
+}
+
+const safeDownloadRecentPostFeed = async (swarm: Swarm.ReadableApi, feed: RecentPostFeed): Promise<RecentPostFeedUpdate> => {
     try {
-        const recentPostFeed = await downloadRecentPostFeed(swarm, feedUrl);
-        return recentPostFeed;
-    } catch (e) {
+        const recentPostFeed = await downloadRecentPostFeed(swarm, feed.feedUrl, 0);
         return {
+            original: feed,
+            updated: recentPostFeed,
+        };
+    } catch (e) {
+        const original = {
+            ...feed,
             posts: [],
-            authorImage: {},
-            name: '',
-            url: '',
-            feedUrl: '',
-            favicon: '',
+        };
+        return {
+            original,
+            updated: original,
         };
     }
 };
 
-export const loadRecentPostFeeds = async (swarm: Swarm.ReadableApi, postFeeds: Feed[]): Promise<RecentPostFeed[]> => {
-    const loadFeedPromises = postFeeds.map(feed => safeDownloadRecentPostFeed(swarm, feed.feedUrl));
-    return await Promise.all(loadFeedPromises);
+export const loadRecentPostFeeds = async (swarm: Swarm.ReadableApi, postFeeds: RecentPostFeed[]): Promise<RecentPostFeedUpdate[]> => {
+    const loadFeedPromises = postFeeds.map(feed => safeDownloadRecentPostFeed(swarm, feed));
+    const loadFeeds = await Promise.all(loadFeedPromises);
+    return loadFeeds;
 };
 
 export const getPostsFromRecentPostFeeds = (feeds: RecentPostFeed[]): PublicPost[] => {
