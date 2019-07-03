@@ -17,6 +17,9 @@ import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
 
+import debugIdentities from '../../debugIdentities.json';
+import { Feed } from '../models/Feed';
+
 export interface StateProps {
     appState: AppState;
     navigation: TypedNavigation;
@@ -26,6 +29,8 @@ export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
     onDeleteContacts: () => void;
+    onAddFeed: (feed: Feed) => void;
+    onRefreshFeeds: (feeds: Feed[]) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -77,6 +82,14 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Follow 100 feeds'
+                    onPress={async () => await onLoadFeeds(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -186,4 +199,20 @@ const onLogAppStateVersion = async () => {
     const serializedAppState = await getSerializedAppState();
     const appState = await getAppStateFromSerialized(serializedAppState);
     Debug.log('onLogAppStateVersion', appState._persist);
+};
+
+const onLoadFeeds = async (props: Props) => {
+    const feeds = debugIdentities.map((identity, index) => {
+        const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
+        const feed: Feed = {
+            name: `Feed ${index}`,
+            feedUrl,
+            url: feedUrl,
+            favicon: '',
+        };
+        props.onAddFeed(feed);
+        return feed;
+    });
+    props.onRefreshFeeds(feeds);
+    Debug.log('onLoadFeeds', 'finished');
 };
