@@ -3,7 +3,7 @@ import { Utils } from './Utils';
 export const safeFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     const response = await fetch(input, init);
     if (!response.ok) {
-        throw new Error('Network error: ' + response.status + ', error: ' + response.statusText);
+        throw new Error('Network error: ' + response.status + ', text: ' + response.statusText + ', request: ' + input.toString());
     }
     return response;
 };
