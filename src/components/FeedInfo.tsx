@@ -30,13 +30,14 @@ import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { getFeedUrlFromFollowLink, getInviteCodeFromInviteLink } from '../helpers/deepLinking';
-import { advanceContactState, createCodeReceivedContact, ProfileData } from '../helpers/contactHelpers';
+import { advanceContactState, createCodeReceivedContact } from '../helpers/contactHelpers';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import { SECOND } from '../DateUtils';
 import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
 import { InviteCode } from '../models/InviteCode';
 import { Contact } from '../models/Contact';
 import { PublicProfile } from '../models/Profile';
+import { getFelfeleLinkFromClipboardData } from '../helpers/feedInfoHelper';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -82,7 +83,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     public async componentDidMount() {
-        await this.tryToAddLinkFromClipboard();
+        await this.addFelfeleFeedsFromClipboard();
         this.setState({
             showQRCamera: true,
         });
@@ -212,8 +213,15 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.handleInviteCode(inviteCode);
             return;
         }
-        const feedUrl = link;
-        this.handleFeedUrl(feedUrl);
+        if (urlUtils.isFelfeleResource(link)) {
+            this.handleFeedUrl(link);
+            return;
+        }
+        const feedUrl = urlUtils.getCanonicalUrl(link);
+        if (feedUrl != null) {
+            this.handleFeedUrl(feedUrl);
+            return;
+        }
     }
 
     private async handleFeedUrl(feedUrl: string) {
@@ -256,18 +264,16 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         }
     }
 
-    private tryToAddLinkFromClipboard = async () => {
+    private addFelfeleFeedsFromClipboard = async () => {
         const isExistingFeed = this.props.feed.feedUrl.length > 0;
-        if (!isExistingFeed) {
-            const value = await Clipboard.getString();
-            const link = urlUtils.getLinkFromText(value);
-            if (link != null) {
-                this.setState({
-                    url: link,
-                });
-                Clipboard.setString('');
-                await this.handleLink(link);
-            }
+        const data = await Clipboard.getString();
+        const link = getFelfeleLinkFromClipboardData(data);
+        if (!isExistingFeed && link != null) {
+            this.setState({
+                url: link,
+            });
+            Clipboard.setString('');
+            await this.handleLink(link);
         }
     }
 

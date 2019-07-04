@@ -4,6 +4,11 @@ import { Utils } from '../Utils';
 
 export const REDDIT_COM = 'reddit.com';
 
+const HTTP_URL_MATCHER = /(http.?:\/\/.*?)( |$)/;
+const BZZ_FEED_MATCHER = /(bzz-feed:\/\?user=0x[a-f0-9]{40})( |$)/;
+const BZZ_RESOURCE_MATCHER = /(bzz:\/\/[a-f0-9]{64})( |$)/;
+const FELFELE_DEEP_LINK_MATCHER = /(http.?:\/\/app.felfele.org\/.*?)( |$)/;
+
 export const getHumanHostname = (url: string): string => {
     if (url.startsWith('//')) {
         url = 'https:' + url;
@@ -93,7 +98,7 @@ export const getLinkFromText = (text: string): string | undefined => {
 };
 
 export const getHttpLinkFromText = (text: string): string | undefined => {
-    const httpLink = text.match(/(http.?:\/\/.*?)( |$)/);
+    const httpLink = text.match(HTTP_URL_MATCHER);
     if (httpLink != null) {
         return httpLink[1];
     }
@@ -101,7 +106,7 @@ export const getHttpLinkFromText = (text: string): string | undefined => {
 };
 
 export const getBzzFeedLinkFromText = (text: string): string | undefined => {
-    const bzzFeedLink = text.match(/(bzz-feed:\/\?user=0x[a-f0-9]{40})( |$)/);
+    const bzzFeedLink = text.match(BZZ_FEED_MATCHER);
     if (bzzFeedLink != null) {
         return bzzFeedLink[1];
     }
@@ -109,11 +114,15 @@ export const getBzzFeedLinkFromText = (text: string): string | undefined => {
 };
 
 export const getBzzLinkFromText = (text: string): string | undefined => {
-    const bzzLink = text.match(/(bzz:\/\/[a-f0-9]{64})( |$)/);
+    const bzzLink = text.match(BZZ_RESOURCE_MATCHER);
     if (bzzLink != null) {
         return bzzLink[1];
     }
     return undefined;
+};
+
+export const isFelfeleResource = (text: string): boolean => {
+    return text.match(BZZ_FEED_MATCHER) != null || text.match(BZZ_RESOURCE_MATCHER) != null || text.match(FELFELE_DEEP_LINK_MATCHER) != null;
 };
 
 export const compareUrls = (url1: string, url2: string): boolean => {
