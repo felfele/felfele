@@ -122,7 +122,7 @@ export const getBzzLinkFromText = (text: string): string | undefined => {
 };
 
 export const isFelfeleResource = (text: string): boolean => {
-    return text.match(BZZ_FEED_MATCHER) != null || text.match(BZZ_RESOURCE_MATCHER) != null || text.match(FELFELE_DEEP_LINK_MATCHER) != null;
+    return text.match(BZZ_FEED_MATCHER) != null || text.match(FELFELE_DEEP_LINK_MATCHER) != null;
 };
 
 export const compareUrls = (url1: string, url2: string): boolean => {
