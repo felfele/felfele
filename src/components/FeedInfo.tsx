@@ -213,15 +213,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             this.handleInviteCode(inviteCode);
             return;
         }
-        if (urlUtils.isFelfeleResource(link)) {
-            this.handleFeedUrl(link);
-            return;
-        }
-        const feedUrl = urlUtils.getCanonicalUrl(link);
-        if (feedUrl != null) {
-            this.handleFeedUrl(feedUrl);
-            return;
-        }
+        this.handleFeedUrl(link);
     }
 
     private async handleFeedUrl(feedUrl: string) {
