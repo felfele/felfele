@@ -33,7 +33,7 @@ import { getFeedUrlFromFollowLink, getInviteCodeFromInviteLink } from '../helper
 import { advanceContactState, createCodeReceivedContact, ProfileData } from '../helpers/contactHelpers';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import { SECOND } from '../DateUtils';
-import { fetchFeedFromUrl, fetchRecentPostFeed } from '../helpers/feedHelpers';
+import { fetchFeedFromUrl, fetchRecentPostFeed, isContactFeed } from '../helpers/feedHelpers';
 import { InviteCode } from '../models/InviteCode';
 import { Contact } from '../models/Contact';
 import { PublicProfile } from '../models/Profile';
@@ -221,7 +221,15 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.setState({
             loading: false,
         });
-        if (feed != null && feed.feedUrl !== '') {
+        if (feed != null && isContactFeed(feed) && feed.contact != null) {
+            const contact = feed.contact;
+            this.props.onAddContact(contact);
+            this.props.navigation.navigate('ContactView', {
+                publicKey: contact.identity.publicKey,
+                feed,
+            });
+        }
+        else if (feed != null && feed.feedUrl !== '') {
             this.props.onAddFeed(feed);
             this.props.navigation.navigate('Feed', {
                 feedUrl: feed.feedUrl,
