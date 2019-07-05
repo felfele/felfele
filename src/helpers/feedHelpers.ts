@@ -47,7 +47,7 @@ export const fetchFeedFromUrl = async (url: string, swarmGateway: string): Promi
             Debug.log('fetchFeedFromUrl', 'url', url);
             const canonicalUrl = urlUtils.getCanonicalUrl(url);
             Debug.log('fetchFeedFromUrl', 'canonicalUrl', canonicalUrl);
-            const feed = await RSSFeedManager.fetchFeedFromUrl(url);
+            const feed = await RSSFeedManager.fetchFeedFromUrl(canonicalUrl);
             Debug.log('fetchFeedFromUrl', 'feed', feed);
             return feed;
         }
