@@ -6,7 +6,7 @@ import { ContentFilter } from '../models/ContentFilter';
 import { migrateAppStateToCurrentVersion } from '../reducers';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
+import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -36,9 +36,12 @@ import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defau
 import { registerBackgroundTask } from '../helpers/backgroundTask';
 import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
-import { createInvitedContact } from '../helpers/contactHelpers';
+import { createInvitedContact, publicKeyToIdentity } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { ContactActions } from './ContactActions';
+import { isRecentPostFeed, isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
+import { MutualContact } from '../models/Contact';
+import { ContactFeed } from '../models/ContactFeed';
 
 const InternalActions = {
     addPost: (post: Post) =>
@@ -107,6 +110,8 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
     cleanFeedsFromOwnFeeds: (feedUrls: string[]) =>
         createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
+    removeAllFeeds: () =>
+        createAction(ActionTypes.REMOVE_ALL_FEEDS),
 };
 
 export const AsyncActions = {
@@ -153,9 +158,22 @@ export const AsyncActions = {
             Debug.log('downloadPostsFromFeeds', feeds);
             const previousPosts = getState().rssPosts;
             const feedsWithoutOnboarding = feeds.filter(feed => feed.feedUrl !== FELFELE_ASSISTANT_URL);
+            const swarmGatewayAddress = getState().settings.swarmGatewayAddress;
             // TODO this is a hack, because we don't need a feed address
-            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, getState().settings.swarmGatewayAddress);
+            const swarm = Swarm.makeReadableApi({user: '', topic: ''}, swarmGatewayAddress);
             const updateFeeds = (recentPostFeedUpdates: RecentPostFeedUpdate[]) => {
+                for (const feedUpdate of recentPostFeedUpdates) {
+                    Debug.log('downloadPostsFromFeeds.updateFeeds', feedUpdate);
+                    if (!isContactFeed(feedUpdate.original) &&
+                        feedUpdate.updated.publicKey != null
+                    ) {
+                        const mutualContact = makeContactFromRecentPostFeed(feedUpdate.updated);
+                        if (mutualContact != null) {
+                            dispatch(Actions.addContact(mutualContact));
+                            dispatch(Actions.removeFeed(feedUpdate.original));
+                        }
+                    }
+                }
                 const recentPostFeeds = recentPostFeedUpdates.map(update => update.updated);
                 dispatch(InternalActions.updateFeedsData(recentPostFeeds));
             };
@@ -397,7 +415,7 @@ export const AsyncActions = {
         };
     },
     createUser: (name: string, image: ImageData): Thunk => {
-        return async (dispatch, getState) => {
+        return async (dispatch) => {
             await dispatch(AsyncActions.chainActions([
                 AsyncActions.updateProfileName(name),
                 AsyncActions.updateProfileImage(image),
@@ -407,13 +425,13 @@ export const AsyncActions = {
         };
     },
     createUserIdentity: (): Thunk => {
-        return async (dispatch, getState) => {
+        return async (dispatch) => {
             const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
     restoreAppStateFromBackup: (appState: AppState): Thunk => {
-        return async (dispatch, getState) => {
+        return async (dispatch) => {
             const currentVersionAppState = await migrateAppStateToCurrentVersion(appState);
             dispatch(InternalActions.appStateSet(currentVersionAppState));
         };
@@ -473,7 +491,7 @@ export const AsyncActions = {
         };
     },
     generateInvitedContact: (): Thunk => {
-        return async (dispatch, getState) => {
+        return async (dispatch) => {
             const contactRandomHelper = createSwarmContactRandomHelper(generateSecureRandom);
             const createdAt = Date.now();
             const invitedContact = await createInvitedContact(contactRandomHelper, createdAt);
@@ -508,8 +526,8 @@ const loadSocialPostsAndUpdateFeeds = async (
     feeds: Feed[],
     updateFeeds: (feedUpdates: RecentPostFeedUpdate[]) => void,
 ): Promise<Post[]> => {
-    const isSocialFeed = (feed: Feed): feed is RecentPostFeed => isPostFeedUrl(feed.url);
-    const socialFeeds = feeds.filter(isSocialFeed);
+    const isRecentPostFeedByUrl = (feed: Feed): feed is (RecentPostFeed | ContactFeed) => isPostFeedUrl(feed.feedUrl);
+    const socialFeeds = feeds.filter(isRecentPostFeedByUrl);
     const recentPostFeedUpdates = await loadRecentPostFeeds(swarm, socialFeeds);
     updateFeeds(recentPostFeedUpdates);
     const updatedFeeds = recentPostFeedUpdates.map(feedUpdate => feedUpdate.updated);
