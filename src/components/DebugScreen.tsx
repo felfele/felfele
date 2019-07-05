@@ -29,6 +29,7 @@ export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
     onDeleteContacts: () => void;
+    onDeleteFeeds: () => void;
     onAddFeed: (feed: Feed) => void;
     onRefreshFeeds: (feeds: Feed[]) => void;
 }
@@ -82,6 +83,14 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Delete feeds'
+                    onPress={async () => await onDeleteFeeds(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -173,6 +182,16 @@ const onDeleteContacts = async (props: Props) => {
     );
     if (confirmed) {
         props.onDeleteContacts();
+    }
+};
+
+const onDeleteFeeds = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to delete feeds?',
+        'This will delete all your feeds and there is no undo!'
+    );
+    if (confirmed) {
+        props.onDeleteFeeds();
     }
 };
 

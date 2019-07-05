@@ -23,6 +23,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onDeleteContacts: () => {
             dispatch(Actions.deleteAllContacts());
         },
+        onDeleteFeeds: () => {
+            dispatch(Actions.removeAllFeeds());
+        },
         onAddFeed: (feed: Feed) => {
             dispatch(AsyncActions.addFeed(feed));
         },
