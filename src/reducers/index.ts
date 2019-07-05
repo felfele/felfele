@@ -146,6 +146,9 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 .filter((feed: Feed) => !containsItem(action.payload.feedUrls, (feedUrl: string) => feedUrl === feed.feedUrl));
             return feedsWithoutOwnFeeds;
         }
+        case 'REMOVE-ALL-FEEDS': {
+            return [];
+        }
         default: {
             return feeds;
         }
