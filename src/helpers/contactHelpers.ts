@@ -1,12 +1,23 @@
 import { Contact, InvitedContact, CodeReceivedContact, AcceptedContact, MutualContact } from '../models/Contact';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { HexString } from './opaqueTypes';
-import { byteArrayToHex, stripHexPrefix, hexToByteArray } from './conversion';
+import { byteArrayToHex, stripHexPrefix } from './conversion';
 import { ec } from 'elliptic';
 import { keccak256 } from 'js-sha3';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { serialize } from '../social/serialization';
+
+export interface UnknownContact {
+    type: 'unknown-contact';
+}
+
+export const findContactByPublicKey = (publicKey: string, contacts: Contact[]): Contact | undefined => {
+    return contacts.find(
+        c => c.type === 'mutual-contact' &&
+        c.identity.publicKey === publicKey
+    );
+};
 
 const publicKeyToAddress = (publicKey: HexString): HexString => {
     const curve = new ec('secp256k1');
