@@ -8,6 +8,7 @@ matrix:
         - "10"
       script:
         - npm run check
+        - cat package-lock.json
 
     - os: linux
       language: android
