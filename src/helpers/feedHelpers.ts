@@ -33,17 +33,26 @@ export const makeContactFeedFromMutualContact = (contact: MutualContact): Contac
     contact,
 });
 
-export const makeContactFromRecentPostFeed = (feed: RecentPostFeed ): MutualContact | undefined => {
+export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualContact | undefined => {
     if (feed.publicKey == null) {
         return undefined;
     }
-    return {
-        type: 'mutual-contact',
-        name: feed.name,
-        image: feed.authorImage,
-        confirmed: false,
-        identity: publicKeyToIdentity(feed.publicKey),
-    };
+    try {
+        const feedAddress = Swarm.makeFeedAddressFromBzzFeedUrl(feed.feedUrl);
+        const identity = publicKeyToIdentity(feed.publicKey);
+        if (feedAddress.user !== identity.address) {
+            return undefined;
+        }
+        return {
+            type: 'mutual-contact',
+            name: feed.name,
+            image: feed.authorImage,
+            confirmed: false,
+            identity,
+        };
+    } catch (e) {
+        return undefined;
+    }
 };
 
 export const getFeedImage = (feed: Feed): ImageData => {

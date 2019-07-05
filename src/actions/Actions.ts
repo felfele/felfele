@@ -41,6 +41,7 @@ import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { ContactActions } from './ContactActions';
 import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
+import { Contact } from '../models/Contact';
 
 const InternalActions = {
     addPost: (post: Post) =>
@@ -122,6 +123,15 @@ export const AsyncActions = {
             }
         };
     },
+    addContact: (contact: Contact): Thunk => {
+        return async (dispatch, getState) => {
+            const identity = getState().author.identity!;
+            if (contact.type === 'mutual-contact' && contact.identity.publicKey === identity.publicKey) {
+                return;
+            }
+            dispatch(ContactActions.addContact(contact));
+        };
+    },
     cleanupContentFilters: (currentTimestamp: number = Date.now()): Thunk => {
         return async (dispatch, getState) => {
             const expiredFilters = getState().contentFilters.filter(filter =>
@@ -168,7 +178,7 @@ export const AsyncActions = {
                     ) {
                         const mutualContact = makeContactFromRecentPostFeed(feedUpdate.updated);
                         if (mutualContact != null) {
-                            dispatch(Actions.addContact(mutualContact));
+                            dispatch(AsyncActions.addContact(mutualContact));
                             dispatch(Actions.removeFeed(feedUpdate.original));
                         }
                     }
