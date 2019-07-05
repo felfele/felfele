@@ -36,11 +36,10 @@ import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defau
 import { registerBackgroundTask } from '../helpers/backgroundTask';
 import { localNotification } from '../helpers/notifications';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
-import { createInvitedContact, publicKeyToIdentity } from '../helpers/contactHelpers';
+import { createInvitedContact } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { ContactActions } from './ContactActions';
-import { isRecentPostFeed, isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
-import { MutualContact } from '../models/Contact';
+import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 
 const InternalActions = {
