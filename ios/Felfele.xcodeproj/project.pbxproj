@@ -37,6 +37,7 @@
 		75E4D965E9574E3FAD25F309 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B467920DF2C4F6A8F9EBC12 /* libRNFS.a */; };
 		77F7381D6839444D8F349DCA /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3961119899504AD8AD6378B7 /* MaterialIcons.ttf */; };
 		7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */; };
+		796D420FB78645D6BE243192 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE65378E32B24CDDABAE1F18 /* libRNCAsyncStorage.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		9433A2A9637C4EE1BD8F70B7 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64CDFEF29F854BA190B5DE2C /* TSBackgroundFetch.framework */; };
 		9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD9E60E512304A688F30EDBD /* libRCTImageResizer.a */; };
@@ -265,6 +266,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 835318541D52293F005738CD;
 			remoteInfo = RNBackgroundFetch;
+		};
+		9A6DF14F22CD03D300D997B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F3184C397FD34AEEA2D5B902 /* RNCAsyncStorage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNCAsyncStorage;
 		};
 		9A7D879A218CD6550046F42B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -529,6 +537,8 @@
 		E064342914AF49558CD0B871 /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EDEAC26023B94CD5B26D863A /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		EE65378E32B24CDDABAE1F18 /* libRNCAsyncStorage.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCAsyncStorage.a; sourceTree = "<group>"; };
+		F3184C397FD34AEEA2D5B902 /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCAsyncStorage.xcodeproj; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; };
 		F6F5F318AAC344DE97A5FF0F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -565,6 +575,7 @@
 				7954F170C85149F188B8EE69 /* libRNDeviceInfo.a in Frameworks */,
 				A857D095C9CB4640B1F562BE /* libRNBackgroundFetch.a in Frameworks */,
 				9433A2A9637C4EE1BD8F70B7 /* TSBackgroundFetch.framework in Frameworks */,
+				796D420FB78645D6BE243192 /* libRNCAsyncStorage.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -736,6 +747,7 @@
 				D31543CE69A94CD890C46310 /* SplashScreen.xcodeproj */,
 				69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */,
 				9EC6D6134AF3441789BFA659 /* RNBackgroundFetch.xcodeproj */,
+				F3184C397FD34AEEA2D5B902 /* RNCAsyncStorage.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -789,6 +801,7 @@
 				2BA4DA5CA723494F95D56AD6 /* libRNDeviceInfo.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5617E374D5C04CA0A7B0FF7D /* libRNBackgroundFetch.a */,
+				EE65378E32B24CDDABAE1F18 /* libRNCAsyncStorage.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -805,6 +818,14 @@
 			isa = PBXGroup;
 			children = (
 				9A56C61E225B421C00FCE4D1 /* libRNBackgroundFetch.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9A6DF14C22CD03D300D997B9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9A6DF15022CD03D300D997B9 /* libRNCAsyncStorage.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1082,6 +1103,10 @@
 					ProjectRef = B8083CC7D5394B6FB0F3A700 /* RNCamera.xcodeproj */;
 				},
 				{
+					ProductGroup = 9A6DF14C22CD03D300D997B9 /* Products */;
+					ProjectRef = F3184C397FD34AEEA2D5B902 /* RNCAsyncStorage.xcodeproj */;
+				},
+				{
 					ProductGroup = 9ABA1D18224BCFF700F2FD2C /* Products */;
 					ProjectRef = 69495740C4FC449FB4C464ED /* RNDeviceInfo.xcodeproj */;
 				},
@@ -1323,6 +1348,13 @@
 			fileType = archive.ar;
 			path = libRNBackgroundFetch.a;
 			remoteRef = 9A56C61D225B421C00FCE4D1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9A6DF15022CD03D300D997B9 /* libRNCAsyncStorage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCAsyncStorage.a;
+			remoteRef = 9A6DF14F22CD03D300D997B9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		9A7D879B218CD6550046F42B /* libRNCamera.a */ = {
@@ -1606,12 +1638,14 @@
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
+					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
 				);
 				INFOPLIST_FILE = Felfele/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
@@ -1655,12 +1689,14 @@
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
+					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
 				);
 				INFOPLIST_FILE = Felfele/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
