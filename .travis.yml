@@ -5,9 +5,10 @@ matrix:
   include:
     - language: node_js
       node_js:
-        - "9"
+        - "10"
       script:
         - npm run check
+        - cat package-lock.json
 
     - os: linux
       language: android
