@@ -91,6 +91,7 @@
     "react-native-qrcode-svg": "=5.1.2",
     "react-native-restart": "0.0.9",
     "react-native-securerandom": "=0.3.0",
+    "react-native-share-extension": "=2.0.0",
     "react-native-sortable-list": "git+https://github.com/felfele/react-native-sortable-list",
     "react-native-splash-screen": "=3.2.0",
     "react-native-super-grid": "=3.0.1",
