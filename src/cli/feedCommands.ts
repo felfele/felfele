@@ -112,6 +112,23 @@ export const feedCommandDefinition =
         output('Updated the feed', storageSyncUpdate.updatedPosts.length);
     })
     .
+    addCommand('sharePublicKey', 'Share the public key in the feed', async () => {
+        const privateIdentity = getPrivateIdentity() || throwError('missing identity file, please provide one with the -i option');
+        const feedAddress: Swarm.FeedAddress = {
+            topic: '',
+            user: privateIdentity.address,
+        };
+        const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
+        const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
+        const storageApi = makeSwarmStorage(swarmApi);
+        const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
+        const publicRecentPostFeed = {
+            ...recentPostFeed,
+            publicKey: privateIdentity.publicKey,
+        };
+        await storageApi.uploadRecentPostFeed(emptyPostCommandLog, publicRecentPostFeed);
+    })
+    .
     addCommand('createMany [numFeeds] [numPosts]', 'Create feeds with posts', async (numFeedsArg, numPostsArg) => {
         const numFeeds = parseInt(numFeedsArg, 10);
         const numPosts = parseInt(numPostsArg, 10);
