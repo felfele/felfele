@@ -221,7 +221,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.setState({
             loading: false,
         });
-        if (feed != null && isContactFeed(feed) && feed.contact != null) {
+        if (feed != null &&
+            isContactFeed(feed) &&
+            feed.contact != null &&
+            feed.contact.identity.publicKey !== this.props.profile.identity.publicKey
+        ) {
             const contact = feed.contact;
             this.props.onAddContact(contact);
             this.props.navigation.navigate('ContactView', {
