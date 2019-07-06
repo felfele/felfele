@@ -4,7 +4,7 @@ import {
     applyMiddleware,
     compose,
 } from 'redux';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import thunkMiddleware from 'redux-thunk';
 import {
     persistStore,

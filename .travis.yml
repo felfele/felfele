@@ -5,7 +5,7 @@ matrix:
   include:
     - language: node_js
       node_js:
-        - "9"
+        - "10"
       script:
         - npm run check
 
@@ -35,6 +35,8 @@ matrix:
         - npm run link
       script:
         - npm run check
+        - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+        - sudo sysctl -p
         - npm run build:android
 
     - os: osx

@@ -3,6 +3,7 @@ package org.felfele.mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -36,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new AsyncStoragePackage(),
             new RNBackgroundFetchPackage(),
             new ReactNativePushNotificationPackage(),
             new RNDeviceInfo(),
