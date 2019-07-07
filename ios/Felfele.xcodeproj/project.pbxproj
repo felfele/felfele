@@ -56,62 +56,39 @@
 		BC524AAA22CF3EF500879B0E /* Share.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = BC524A9F22CF3EF400879B0E /* Share.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC524AE822CF3F3F00879B0E /* Share.m in Sources */ = {isa = PBXBuildFile; fileRef = BC524AE722CF3F3F00879B0E /* Share.m */; };
 		BC524AEF22CF441F00879B0E /* libcxxreact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA91DF850E9000B6D8A /* libcxxreact.a */; };
-		BC524AF022CF441F00879B0E /* libcxxreact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EAB1DF850E9000B6D8A /* libcxxreact.a */; };
 		BC524AF122CF441F00879B0E /* libdouble-conversion.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE1EDCA1F38ED7C0098CC9B /* libdouble-conversion.a */; };
-		BC524AF222CF441F00879B0E /* libdouble-conversion.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE1EDCC1F38ED7C0098CC9B /* libdouble-conversion.a */; };
-		BC524AF322CF441F00879B0E /* libfishhook-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2506F420A1DBED003E4375 /* libfishhook-tvOS.a */; };
 		BC524AF422CF441F00879B0E /* libfishhook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2506F220A1DBED003E4375 /* libfishhook.a */; };
-		BC524AF522CF441F00879B0E /* libjsi-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE9BBC42251FF5E00C85BAA /* libjsi-tvOS.a */; };
 		BC524AF622CF441F00879B0E /* libjsi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE9BBC02251FF5E00C85BAA /* libjsi.a */; };
-		BC524AF722CF441F00879B0E /* libjsiexecutor-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE9BBC62251FF5E00C85BAA /* libjsiexecutor-tvOS.a */; };
 		BC524AF822CF441F00879B0E /* libjsiexecutor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE9BBC22251FF5E00C85BAA /* libjsiexecutor.a */; };
-		BC524AF922CF441F00879B0E /* libjsinspector-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A25070820A1DBED003E4375 /* libjsinspector-tvOS.a */; };
-		BC524AFA22CF441F00879B0E /* libjsinspector.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A25070620A1DBED003E4375 /* libjsinspector.a */; };
 		BC524AFB22CF441F00879B0E /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		BC524AFC22CF441F00879B0E /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
-		BC524AFD22CF441F00879B0E /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157351DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		BC524AFE22CF441F00879B0E /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFF87DA1F448F700033DA0B /* libRCTCameraRoll.a */; };
 		BC524AFF22CF441F00879B0E /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
-		BC524B0022CF441F00879B0E /* libRCTImage-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E841DF850E9000B6D8A /* libRCTImage-tvOS.a */; };
 		BC524B0122CF441F00879B0E /* libRCTImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302C01ABCB91800DB3ED1 /* libRCTImage.a */; };
 		BC524B0222CF441F00879B0E /* libRCTImageResizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2AA88821AE8BC400604FD7 /* libRCTImageResizer.a */; };
-		BC524B0322CF441F00879B0E /* libRCTLinking-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E881DF850E9000B6D8A /* libRCTLinking-tvOS.a */; };
 		BC524B0422CF441F00879B0E /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
-		BC524B0522CF441F00879B0E /* libRCTNetwork-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E8C1DF850E9000B6D8A /* libRCTNetwork-tvOS.a */; };
 		BC524B0622CF441F00879B0E /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
-		BC524B0722CF441F00879B0E /* libRCTPushNotification-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE6B74F22565D8A00BF8A2C /* libRCTPushNotification-tvOS.a */; };
 		BC524B0822CF441F00879B0E /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE6B74D22565D8A00BF8A2C /* libRCTPushNotification.a */; };
 		BC524B0922CF441F00879B0E /* libRCTRestart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC81A3472212CBCF00BD3327 /* libRCTRestart.a */; };
-		BC524B0A22CF441F00879B0E /* libRCTSettings-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E901DF850E9000B6D8A /* libRCTSettings-tvOS.a */; };
 		BC524B0B22CF441F00879B0E /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
-		BC524B0C22CF441F00879B0E /* libRCTText-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E941DF850E9000B6D8A /* libRCTText-tvOS.a */; };
 		BC524B0D22CF441F00879B0E /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		BC524B0E22CF441F00879B0E /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
-		BC524B0F22CF441F00879B0E /* libRCTWebSocket-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E991DF850E9000B6D8A /* libRCTWebSocket-tvOS.a */; };
 		BC524B1022CF441F00879B0E /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139FDEF41B06529B00C62182 /* libRCTWebSocket.a */; };
 		BC524B1122CF441F00879B0E /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		BC524B1222CF441F00879B0E /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		BC524B1322CF441F00879B0E /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D882A218D08D10046F42B /* libReactNativePermissions.a */; };
 		BC524B1422CF441F00879B0E /* libReactNativeShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC524AEE22CF400800879B0E /* libReactNativeShareExtension.a */; };
-		BC524B1522CF441F00879B0E /* libRNBackgroundFetch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A56C61E225B421C00FCE4D1 /* libRNBackgroundFetch.a */; };
 		BC524B1622CF441F00879B0E /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D879B218CD6550046F42B /* libRNCamera.a */; };
-		BC524B1722CF441F00879B0E /* libRNDeviceInfo-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ABA1D1F224BCFF800F2FD2C /* libRNDeviceInfo-tvOS.a */; };
 		BC524B1822CF441F00879B0E /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ABA1D1D224BCFF800F2FD2C /* libRNDeviceInfo.a */; };
 		BC524B1922CF441F00879B0E /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5E57218B1C940011F13D /* libRNFS.a */; };
-		BC524B1A22CF441F00879B0E /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5E59218B1C940011F13D /* libRNFS.a */; };
 		BC524B1B22CF441F00879B0E /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFF87741F3F456E0033DA0B /* libRNImagePicker.a */; };
-		BC524B1C22CF441F00879B0E /* libRNRandomBytes-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D052188B2930011F13D /* libRNRandomBytes-tvOS.a */; };
 		BC524B1D22CF441F00879B0E /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D032188B2930011F13D /* libRNRandomBytes.a */; };
 		BC524B1E22CF441F00879B0E /* libRNSecureRandom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D8871218F571A0046F42B /* libRNSecureRandom.a */; };
-		BC524B1F22CF441F00879B0E /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C680921A6AF9B001F933A /* libRNSVG-tvOS.a */; };
 		BC524B2022CF441F00879B0E /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C680721A6AF9B001F933A /* libRNSVG.a */; };
-		BC524B2122CF441F00879B0E /* libRNVectorIcons-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A967E3B2167F7E1006F558B /* libRNVectorIcons-tvOS.a */; };
 		BC524B2222CF441F00879B0E /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE1EDD21F38ED7C0098CC9B /* libRNVectorIcons.a */; };
 		BC524B2322CF441F00879B0E /* libSplashScreen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC4DB92622241E4B005C5E08 /* libSplashScreen.a */; };
 		BC524B2422CF441F00879B0E /* libthird-party.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE1EDC61F38ED7C0098CC9B /* libthird-party.a */; };
-		BC524B2522CF441F00879B0E /* libthird-party.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE1EDC81F38ED7C0098CC9B /* libthird-party.a */; };
 		BC524B2622CF441F00879B0E /* libyoga.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA51DF850E9000B6D8A /* libyoga.a */; };
-		BC524B2722CF441F00879B0E /* libyoga.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA71DF850E9000B6D8A /* libyoga.a */; };
+		BC524C1022D2173100879B0E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		BCF37078228EBA2E00ED6E16 /* Felfele.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = BCF37077228EB8D900ED6E16 /* Felfele.entitlements */; };
 		C5430E3289DB4BF9B2D510DE /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2626095CA0404F308AD61EED /* libRNVectorIcons.a */; };
 		DF4F9F98D92F4CE2A7CE51E9 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C8AF205986984C049387326C /* FontAwesome5_Solid.ttf */; };
@@ -676,63 +653,40 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC524C1022D2173100879B0E /* JavaScriptCore.framework in Frameworks */,
 				BC524AEF22CF441F00879B0E /* libcxxreact.a in Frameworks */,
-				BC524AF022CF441F00879B0E /* libcxxreact.a in Frameworks */,
 				BC524AF122CF441F00879B0E /* libdouble-conversion.a in Frameworks */,
-				BC524AF222CF441F00879B0E /* libdouble-conversion.a in Frameworks */,
-				BC524AF322CF441F00879B0E /* libfishhook-tvOS.a in Frameworks */,
 				BC524AF422CF441F00879B0E /* libfishhook.a in Frameworks */,
-				BC524AF522CF441F00879B0E /* libjsi-tvOS.a in Frameworks */,
 				BC524AF622CF441F00879B0E /* libjsi.a in Frameworks */,
-				BC524AF722CF441F00879B0E /* libjsiexecutor-tvOS.a in Frameworks */,
 				BC524AF822CF441F00879B0E /* libjsiexecutor.a in Frameworks */,
-				BC524AF922CF441F00879B0E /* libjsinspector-tvOS.a in Frameworks */,
-				BC524AFA22CF441F00879B0E /* libjsinspector.a in Frameworks */,
 				BC524AFB22CF441F00879B0E /* libRCTActionSheet.a in Frameworks */,
 				BC524AFC22CF441F00879B0E /* libRCTAnimation.a in Frameworks */,
-				BC524AFD22CF441F00879B0E /* libRCTAnimation.a in Frameworks */,
 				BC524AFE22CF441F00879B0E /* libRCTCameraRoll.a in Frameworks */,
 				BC524AFF22CF441F00879B0E /* libRCTGeolocation.a in Frameworks */,
-				BC524B0022CF441F00879B0E /* libRCTImage-tvOS.a in Frameworks */,
 				BC524B0122CF441F00879B0E /* libRCTImage.a in Frameworks */,
 				BC524B0222CF441F00879B0E /* libRCTImageResizer.a in Frameworks */,
-				BC524B0322CF441F00879B0E /* libRCTLinking-tvOS.a in Frameworks */,
 				BC524B0422CF441F00879B0E /* libRCTLinking.a in Frameworks */,
-				BC524B0522CF441F00879B0E /* libRCTNetwork-tvOS.a in Frameworks */,
 				BC524B0622CF441F00879B0E /* libRCTNetwork.a in Frameworks */,
-				BC524B0722CF441F00879B0E /* libRCTPushNotification-tvOS.a in Frameworks */,
 				BC524B0822CF441F00879B0E /* libRCTPushNotification.a in Frameworks */,
 				BC524B0922CF441F00879B0E /* libRCTRestart.a in Frameworks */,
-				BC524B0A22CF441F00879B0E /* libRCTSettings-tvOS.a in Frameworks */,
 				BC524B0B22CF441F00879B0E /* libRCTSettings.a in Frameworks */,
-				BC524B0C22CF441F00879B0E /* libRCTText-tvOS.a in Frameworks */,
 				BC524B0D22CF441F00879B0E /* libRCTText.a in Frameworks */,
 				BC524B0E22CF441F00879B0E /* libRCTVibration.a in Frameworks */,
-				BC524B0F22CF441F00879B0E /* libRCTWebSocket-tvOS.a in Frameworks */,
 				BC524B1022CF441F00879B0E /* libRCTWebSocket.a in Frameworks */,
 				BC524B1122CF441F00879B0E /* libReact.a in Frameworks */,
-				BC524B1222CF441F00879B0E /* libReact.a in Frameworks */,
 				BC524B1322CF441F00879B0E /* libReactNativePermissions.a in Frameworks */,
 				BC524B1422CF441F00879B0E /* libReactNativeShareExtension.a in Frameworks */,
-				BC524B1522CF441F00879B0E /* libRNBackgroundFetch.a in Frameworks */,
 				BC524B1622CF441F00879B0E /* libRNCamera.a in Frameworks */,
-				BC524B1722CF441F00879B0E /* libRNDeviceInfo-tvOS.a in Frameworks */,
 				BC524B1822CF441F00879B0E /* libRNDeviceInfo.a in Frameworks */,
 				BC524B1922CF441F00879B0E /* libRNFS.a in Frameworks */,
-				BC524B1A22CF441F00879B0E /* libRNFS.a in Frameworks */,
 				BC524B1B22CF441F00879B0E /* libRNImagePicker.a in Frameworks */,
-				BC524B1C22CF441F00879B0E /* libRNRandomBytes-tvOS.a in Frameworks */,
 				BC524B1D22CF441F00879B0E /* libRNRandomBytes.a in Frameworks */,
 				BC524B1E22CF441F00879B0E /* libRNSecureRandom.a in Frameworks */,
-				BC524B1F22CF441F00879B0E /* libRNSVG-tvOS.a in Frameworks */,
 				BC524B2022CF441F00879B0E /* libRNSVG.a in Frameworks */,
-				BC524B2122CF441F00879B0E /* libRNVectorIcons-tvOS.a in Frameworks */,
 				BC524B2222CF441F00879B0E /* libRNVectorIcons.a in Frameworks */,
 				BC524B2322CF441F00879B0E /* libSplashScreen.a in Frameworks */,
 				BC524B2422CF441F00879B0E /* libthird-party.a in Frameworks */,
-				BC524B2522CF441F00879B0E /* libthird-party.a in Frameworks */,
 				BC524B2622CF441F00879B0E /* libyoga.a in Frameworks */,
-				BC524B2722CF441F00879B0E /* libyoga.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2068,7 +2022,10 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = L28HZC6MAV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native-share-extension/ios/**";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../node_modules/react-native-share-extension/ios/**",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
+				);
 				INFOPLIST_FILE = Share/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -2108,7 +2065,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = L28HZC6MAV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native-share-extension/ios/**";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../node_modules/react-native-share-extension/ios/**",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
+				);
 				INFOPLIST_FILE = Share/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
