@@ -1136,6 +1136,7 @@
 				BC524A9B22CF3EF400879B0E /* Sources */,
 				BC524A9C22CF3EF400879B0E /* Frameworks */,
 				BC524A9D22CF3EF400879B0E /* Resources */,
+				BC524C1122D36A5300879B0E /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -1770,6 +1771,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		BC524C1122D36A5300879B0E /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
