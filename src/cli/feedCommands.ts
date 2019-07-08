@@ -142,6 +142,12 @@ export const feedCommandDefinition =
             const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
             return randomBytes;
         };
+        const generateRandomName = () => {
+            const randomBytes = hexToByteArray(nextRandom()).slice(0, 10);
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            const chars = randomBytes.map(byte => alphabet[Math.floor(byte / 256 * alphabet.length)]);
+            return chars.join('');
+        };
         for (let f = 0; f < numFeeds; f++) {
             const privateIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
             const identiconHash = byteArrayToHex(keccak256.array(privateIdentity.publicKey), false);
@@ -153,7 +159,7 @@ export const feedCommandDefinition =
             const storageApi = makeSwarmStorage(swarmApi);
             const storageSyncApi = makeSwarmStorageSyncer(storageApi);
             const feedUrl = Swarm.makeBzzFeedUrl(address);
-            const authorName = `Author ${f}`;
+            const authorName = generateRandomName();
             const authorImage = {
                 uri: identiconUri,
             };
