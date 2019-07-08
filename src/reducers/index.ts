@@ -146,6 +146,9 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 .filter((feed: Feed) => !containsItem(action.payload.feedUrls, (feedUrl: string) => feedUrl === feed.feedUrl));
             return feedsWithoutOwnFeeds;
         }
+        case 'REMOVE-ALL-FEEDS': {
+            return [];
+        }
         default: {
             return feeds;
         }
@@ -312,6 +315,7 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+    const startTime = Date.now();
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -325,8 +329,9 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             try {
                 const newState = combinedReducers(state, action);
                 if (action.type !== 'TIME-TICK') {
+                    const elapsed = Date.now() - startTime;
                     // tslint:disable-next-line:no-console
-                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                    console.log('appStateReducer', 'elapsed', elapsed, 'action', action, 'newState', newState);
                 }
                 return newState;
             } catch (e) {

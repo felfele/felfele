@@ -39,7 +39,7 @@ export class Debug {
         }
         const maxLengthArgs = args.map((value) => {
             const stringValue = (value instanceof Error)
-                ? 'Error: ' + (value as Error).message
+                ? ': ' + (value as Error).message
                 : JSON.stringify(value);
             if (stringValue && stringValue.length > Debug.maxLength) {
                 return stringValue.substring(0, Debug.maxLength);

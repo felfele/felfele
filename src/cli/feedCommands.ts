@@ -9,6 +9,12 @@ import { Post } from '../models/Post';
 
 import fs from 'fs';
 import { generateUnsecureRandomHexString } from '../helpers/unsecureRandom';
+import { hexToByteArray, byteArrayToHex } from '../helpers/conversion';
+import { keccak256 } from 'js-sha3';
+import { HexString } from '../helpers/opaqueTypes';
+// @ts-ignore
+import Identicon from 'identicon.js';
+import { Debug } from '../Debug';
 
 let privateIdentityFromFile: PrivateIdentity | undefined;
 const loadIdentityFile = (filename: string) => {
@@ -19,6 +25,14 @@ const getPrivateIdentity = (): PrivateIdentity | undefined => privateIdentityFro
 
 const throwError = (msg: string): never => {
     throw new Error(msg);
+};
+
+const createDeterministicRandomGenerator = (randomSeed: HexString): () => string => {
+    return () => {
+        const randomSeedBytes = hexToByteArray(randomSeed);
+        randomSeed = byteArrayToHex(keccak256.array(randomSeedBytes), false);
+        return randomSeed;
+    };
 };
 
 export const feedCommandDefinition =
@@ -96,5 +110,97 @@ export const feedCommandDefinition =
         const postCommandLog = shareNewPost(post, source, emptyPostCommandLog);
         const storageSyncUpdate = await storageSyncApi.sync(postCommandLog, recentPostFeed);
         output('Updated the feed', storageSyncUpdate.updatedPosts.length);
+    })
+    .
+    addCommand('sharePublicKey', 'Share the public key in the feed', async () => {
+        const privateIdentity = getPrivateIdentity() || throwError('missing identity file, please provide one with the -i option');
+        const feedAddress: Swarm.FeedAddress = {
+            topic: '',
+            user: privateIdentity.address,
+        };
+        const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
+        const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
+        const storageApi = makeSwarmStorage(swarmApi);
+        const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
+        const publicRecentPostFeed = {
+            ...recentPostFeed,
+            publicKey: privateIdentity.publicKey,
+        };
+        await storageApi.uploadRecentPostFeed(emptyPostCommandLog, publicRecentPostFeed);
+    })
+    .
+    addCommand('createMany [numFeeds] [numPosts]', 'Create feeds with posts', async (numFeedsArg, numPostsArg) => {
+        const numFeeds = parseInt(numFeedsArg, 10);
+        const numPosts = parseInt(numPostsArg, 10);
+
+        const syncFunctions: Promise<PrivateIdentity | undefined>[] = [];
+
+        const randomSeed = generateUnsecureRandomHexString(32);
+        const nextRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = async (length: number) => {
+            const randomString = nextRandom();
+            const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
+            return randomBytes;
+        };
+        for (let f = 0; f < numFeeds; f++) {
+            const privateIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+            const identiconHash = byteArrayToHex(keccak256.array(privateIdentity.publicKey), false);
+            const identiconData = new Identicon(identiconHash, {size: 16, margin: 0.2}).toString();
+            const identiconUri = `data:image/png;base64,${identiconData}`;
+            const address = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
+            const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
+            const swarmApi = Swarm.makeApi(address, signer, swarmConfig.gatewayAddress);
+            const storageApi = makeSwarmStorage(swarmApi);
+            const storageSyncApi = makeSwarmStorageSyncer(storageApi);
+            const feedUrl = Swarm.makeBzzFeedUrl(address);
+            const authorName = `Author ${f}`;
+            const authorImage = {
+                uri: identiconUri,
+            };
+            const recentPostFeed: RecentPostFeed = {
+                posts: [],
+                authorImage,
+                name: authorName,
+                url: feedUrl,
+                feedUrl: feedUrl,
+                favicon: '',
+                publicKey: privateIdentity.publicKey,
+            };
+
+            let postCommandLog = emptyPostCommandLog;
+            const author = {
+                name: authorName,
+                image: authorImage,
+                uri: feedUrl,
+            };
+            for (let p = 0; p < numPosts; p++) {
+                const post: Post = {
+                    text: `Post ${p} of Author ${f}`,
+                    images: [],
+                    createdAt: Date.now(),
+                    author,
+                    _id: p,
+                };
+                postCommandLog = shareNewPost(post, '', postCommandLog);
+            }
+            const safeSync = async () => {
+                try {
+                    output(`Syncing ${f}`);
+                    const storageSyncUpdate = await storageSyncApi.sync(postCommandLog, recentPostFeed);
+                    return privateIdentity;
+                } catch (e) {
+                    output('Error', e);
+                    return undefined;
+                }
+            };
+
+            syncFunctions.push(safeSync());
+        }
+        const isIdentity = (identity?: PrivateIdentity): identity is PrivateIdentity => identity != null;
+        const result = await Promise.all(syncFunctions);
+        const identities = result.filter(isIdentity);
+        output(JSON.stringify(identities));
+        const numErrors = numFeeds - identities.length;
+        Debug.log(`number of errors: ${numErrors}`);
     })
 ;

@@ -3,8 +3,9 @@ import { AppState } from '../reducers/AppState';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { MutualContact, Contact } from '../models/Contact';
-import { makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
+import { makeBzzFeedUrlFromIdentity, makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
+import { LocalFeed } from '../social/api';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -41,14 +42,7 @@ const isMutualContact = (contact: Contact): contact is MutualContact => {
 
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
     const mutualContacts = contacts.filter(isMutualContact);
-    return mutualContacts.map(contact => ({
-        name: contact.name,
-        url: makeBzzFeedUrlFromIdentity(contact.identity),
-        feedUrl: makeBzzFeedUrlFromIdentity(contact.identity),
-        favicon: contact.image.uri || '',
-        followed: true,
-        contact,
-    } as ContactFeed));
+    return mutualContacts.map(makeContactFeedFromMutualContact);
 });
 
 export const getFollowedFeeds = createSelector([ getFeeds ], (feeds) => {
@@ -64,7 +58,7 @@ export const getFavoriteFeeds = createSelector([ getFeeds ], (feeds) => {
 });
 
 export const getAllFeeds = createSelector([ getFeeds, getOwnFeeds, getContactFeeds ], (feeds, ownFeeds, contactFeeds) => {
-    return feeds.concat(ownFeeds).concat(contactFeeds);
+    return feeds.concat(ownFeeds).concat(contactFeeds) as (Feed | LocalFeed | ContactFeed)[];
 });
 
 export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFeeds, getContactFeeds ], (rssPosts, followedFeeds, contactFeeds) => {

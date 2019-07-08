@@ -2,6 +2,7 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed, RecentPostFeed } from '../social/api';
+import { Contact } from '../models/Contact';
 
 export interface Routes {
     App: {};
@@ -73,6 +74,9 @@ export interface Routes {
     ContactView: {
         publicKey: string;
         feed: Feed;
+    };
+    ContactInfo: {
+        publicKey: string;
     };
 }
 

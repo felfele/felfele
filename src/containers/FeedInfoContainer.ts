@@ -51,7 +51,7 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             dispatch(Actions.unfollowFeed(feed));
         },
         onAddContact: (contact: Contact) => {
-            dispatch(Actions.addContact(contact));
+            dispatch(AsyncActions.addContact(contact));
         },
     };
 };

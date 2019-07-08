@@ -56,6 +56,7 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -343,6 +344,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     ContactView: {
         screen: ContactViewContainer,
+    },
+    ContactInfo: {
+        screen: ContactInfoContainer,
     },
 };
 
