@@ -69,7 +69,7 @@ export const getFeedImage = (feed: Feed): ImageData => {
 };
 
 export const sortFeedsByName = (feeds: Feed[]): Feed[] => {
-    return feeds.sort((a, b) => a.name.localeCompare(b.name));
+    return feeds.sort((a, b) => a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()));
 };
 
 export const makeBzzFeedUrlFromIdentity = (identity: PublicIdentity): string => {
