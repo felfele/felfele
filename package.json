@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "7.5.0",
-    "@babel/runtime": "7.5.0",
+    "@babel/runtime": "7.5.1",
     "@microsoft/tsdoc": "0.12.5",
     "@types/base64-arraybuffer": "0.1.0",
     "@types/elliptic": "6.4.5",
