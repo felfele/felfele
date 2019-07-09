@@ -142,9 +142,8 @@ export const feedCommandDefinition =
             const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
             return randomBytes;
         };
-        const generateRandomName = () => {
-            const randomBytes = hexToByteArray(nextRandom()).slice(0, 10);
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const generateRandomName = (length: number = 10, alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz') => {
+            const randomBytes = hexToByteArray(nextRandom()).slice(0, length);
             const chars = randomBytes.map(byte => alphabet[Math.floor(byte / 256 * alphabet.length)]);
             return chars.join('');
         };
@@ -185,7 +184,6 @@ export const feedCommandDefinition =
                     images: [],
                     createdAt: Date.now(),
                     author,
-                    _id: p,
                 };
                 postCommandLog = shareNewPost(post, '', postCommandLog);
             }
