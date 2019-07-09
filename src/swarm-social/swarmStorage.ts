@@ -343,7 +343,10 @@ export const downloadRecentPostFeed = async (swarm: Swarm.ReadableApi, url: stri
             uri: postFeed.url,
             image: authorImage,
         };
-        const getPostId = (post: Post, index: number) => url + '/' + index;
+        const getPostId = (post: Post, index: number) => post.link != null
+            ? post.link
+            : url + '/' + index
+        ;
         const postFeedWithGatewayImageLinks = {
             ...postFeed,
             posts: postFeed.posts.map((post, index) => ({
