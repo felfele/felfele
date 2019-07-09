@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, MemoizedCard, AuthorFeed } from '../components/Card';
-import { Post, PostReferences } from '../models/Post';
+import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/Actions';
 import { ModelHelper } from '../models/ModelHelper';
@@ -9,7 +9,6 @@ import { TypedNavigation } from '../helpers/navigation';
 import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
 import { ContactFeed } from '../models/ContactFeed';
 import { isChildrenPostUploading } from '../helpers/postHelpers';
-import { Debug } from '../Debug';
 
 interface OwnProps {
     isSelected: boolean;
