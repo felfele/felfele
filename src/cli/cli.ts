@@ -15,6 +15,7 @@ import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
+import { flowTestCommandDefinition } from './flowTestCommands';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -32,6 +33,7 @@ global.fetch = fetch;
 global.FormData = FormData;
 
 Debug.setDebugMode(false);
+Debug.showTimestamp = true;
 
 const definitions =
     addOption('-q, --quiet', 'quiet mode', () => setOutput(() => {}))
@@ -127,6 +129,8 @@ const definitions =
         const data = await fetchHtmlMetaData(canonicalUrl);
         output({data});
     })
+    .
+    addCommand('flowTest', 'Test interactive workflows', flowTestCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);

@@ -4,18 +4,25 @@ import { Actions, AsyncActions } from '../actions/Actions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 import { TypedNavigation, Routes } from '../helpers/navigation';
+import { Contact } from '../models/Contact';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     // this fixes rerendering after unfollow
     updateNavParam(state.feeds, ownProps.navigation);
     const navParamFeed = ownProps.navigation.getParam<'FeedInfo', 'feed'>('feed');
     const isKnownFeed = state.feeds.find(feed => navParamFeed.feedUrl === feed.feedUrl) != null;
+    const profile = {
+        name: state.author.name,
+        image: state.author.image,
+        identity: state.author.identity!,
+    };
 
     return {
         feed: navParamFeed,
         swarmGateway: state.settings.swarmGatewayAddress,
         navigation: ownProps.navigation,
         isKnownFeed: isKnownFeed,
+        profile,
     };
 };
 
@@ -42,6 +49,9 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         },
         onUnfollowFeed: (feed: Feed) => {
             dispatch(Actions.unfollowFeed(feed));
+        },
+        onAddContact: (contact: Contact) => {
+            dispatch(AsyncActions.addContact(contact));
         },
     };
 };

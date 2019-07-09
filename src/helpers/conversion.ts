@@ -6,6 +6,11 @@ export const hexToString = (hex: string): string => {
     return byteArrayToString(byteArray);
 };
 
+export const stripHexPrefix = (hex: string) => hex.startsWith('0x')
+    ? hex.slice(2)
+    : hex
+;
+
 const byteArrayToStringBuiltin = (byteArray: number[]): string => {
     if (String.fromCodePoint != null) {
         return String.fromCodePoint.apply(null, byteArray);
@@ -47,6 +52,10 @@ export const hexToByteArray = (hex: string): number[] => {
         subStrings.push(hexWithoutPrefix.substr(i, 2));
     }
     return subStrings.map(s => parseInt(s, 16));
+};
+
+export const hexToUint8Array = (hex: string): Uint8Array => {
+    return new Uint8Array(hexToByteArray(hex));
 };
 
 export const isHexString = (s: string, strict: boolean = false): boolean => {

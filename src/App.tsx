@@ -50,10 +50,13 @@ import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
+import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
 // @ts-ignore
 import { BottomTabBar } from 'react-navigation-tabs';
-import { FeedInfoDeepLinkContainer } from './containers/FeedInfoDeepLinkContainer';
+import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
+import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -332,8 +335,18 @@ const Scenes: NavigationRouteConfigMap = {
         screen: FeedInfoContainer,
     },
     FeedInfoDeepLink: {
-        screen: FeedInfoDeepLinkContainer,
+        screen: FeedInfoFollowLinkContainer,
         path: 'follow/:feedUrl',
+    },
+    FeedInfoInviteLink: {
+        screen: FeedInfoInviteLinkContainer,
+        path: 'invite/:randomSeed/:contactPublicKey',
+    },
+    ContactView: {
+        screen: ContactViewContainer,
+    },
+    ContactInfo: {
+        screen: ContactInfoContainer,
     },
 };
 
@@ -361,9 +374,13 @@ const OnboardingNavigator = createStackNavigator({
     initialRouteName: 'Welcome',
 });
 
-const InitialNavigator = createSwitchNavigator({
+const LoadingNavigator = createStackNavigator({
     Loading: LoadingScreenContainer,
-    App: () => <AppNavigator uriPrefix={BASE_URL}/>,
+});
+
+const InitialNavigator = createSwitchNavigator({
+    Loading: LoadingNavigator,
+    App: () => <AppNavigator uriPrefix={BASE_URL} />,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',

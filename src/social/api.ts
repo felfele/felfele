@@ -88,6 +88,7 @@ export const emptyPostCommandLog: PostCommandLog = {
 export interface RecentPostFeed extends Feed {
     posts: PublicPost[];
     authorImage: ImageData;
+    publicKey?: string;
 }
 
 /**
@@ -206,7 +207,7 @@ export const shareNewPost = (
 ): PostCommandLog => {
     const parentId = getParentIdFromLog(post, postCommandLog);
     if (parentId.timestamp !== 0) {
-        Debug.log('shareNewPost found a post with the same id: ' + post._id);
+        Debug.log('shareNewPost found a post with the same id: ', post._id, parentId.timestamp);
         return postCommandLog;
     }
     const previousEpoch = getPreviousCommandEpochFromLog(postCommandLog);

@@ -1,4 +1,4 @@
-import { mergeUpdatedPosts } from '../../src/helpers/postHelpers';
+import { mergeUpdatedPosts, isChildrenPostUploading } from '../../src/helpers/postHelpers';
 import { Post } from '../../src/models/Post';
 import { Author } from '../../src/models/Author';
 
@@ -89,4 +89,136 @@ test('merge posts with multiple author only updates newer ones that matches the 
     expect(mergedPosts.length).toBe(2);
     expect(mergedPosts[0].text).toBe(newPostA.text);
     expect(mergedPosts[1].text).toBe(oldPostB.text);
+});
+
+test('is children post uploading', () => {
+    const authorA: Author = {
+        name: 'A',
+        uri: 'A',
+        image: {},
+    };
+    const link = 'post1';
+    const post: Post = {
+        images: [],
+        text: '',
+        createdAt: 1,
+        link,
+        author: authorA,
+    };
+    const localPosts: Post[] = [{
+        images: [],
+        text: '',
+        createdAt: 2,
+        isUploading: true,
+        references: {
+            parent: link,
+            original: link,
+            originalAuthor: authorA,
+        },
+    }];
+
+    const isUploading = isChildrenPostUploading(post, localPosts);
+
+    expect(isUploading).toBeTruthy();
+});
+
+test('is children post uploading when first is not uploading but second is', () => {
+    const authorA: Author = {
+        name: 'A',
+        uri: 'A',
+        image: {},
+    };
+    const link = 'post1';
+    const post: Post = {
+        images: [],
+        text: '',
+        createdAt: 1,
+        link,
+        author: authorA,
+    };
+    const localPosts: Post[] = [{
+        images: [],
+        text: '',
+        createdAt: 2,
+        references: {
+            parent: link,
+            original: link,
+            originalAuthor: authorA,
+        },
+    }, {
+        images: [],
+        text: '',
+        createdAt: 2,
+        isUploading: true,
+        references: {
+            parent: link,
+            original: link,
+            originalAuthor: authorA,
+        },
+    }];
+
+    const isUploading = isChildrenPostUploading(post, localPosts);
+
+    expect(isUploading).toBeTruthy();
+});
+
+test('is children post not uploading', () => {
+    const authorA: Author = {
+        name: 'A',
+        uri: 'A',
+        image: {},
+    };
+    const link = 'post1';
+    const post: Post = {
+        images: [],
+        text: '',
+        createdAt: 1,
+        link,
+        author: authorA,
+    };
+    const localPosts: Post[] = [{
+        images: [],
+        text: '',
+        createdAt: 2,
+        references: {
+            parent: link,
+            original: link,
+            originalAuthor: authorA,
+        },
+    }];
+
+    const isUploading = isChildrenPostUploading(post, localPosts);
+
+    expect(isUploading).toBeFalsy();
+});
+
+test('is post uploading but children post not uploading', () => {
+    const authorA: Author = {
+        name: 'A',
+        uri: 'A',
+        image: {},
+    };
+    const link = 'post1';
+    const post: Post = {
+        images: [],
+        text: '',
+        createdAt: 1,
+        link,
+        author: authorA,
+        isUploading: true,
+    };
+    const localPosts: Post[] = [{
+        images: [],
+        text: '',
+        createdAt: 2,
+        references: {
+            parent: link,
+            original: link,
+            originalAuthor: authorA,
+        },
+    }];
+
+    const isUploading = isChildrenPostUploading(post, localPosts);
+
+    expect(isUploading).toBeFalsy();
 });

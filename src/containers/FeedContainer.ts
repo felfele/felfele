@@ -3,7 +3,7 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView, ViewFeed } from '../components/FeedView';
 import { AsyncActions, Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
-import { getFeedPosts, getYourPosts } from '../selectors/selectors';
+import { getFeedPosts, getYourPosts, getContactFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
 
 const emptyFeed = (name: string = '', isOwnFeed: boolean = false, isLocalFeed = false): ViewFeed => ({
@@ -21,6 +21,10 @@ const feedToViewFeed = (feed: Feed): ViewFeed => ({
     isLocalFeed: false,
 });
 
+const getAllOtherFeeds = (state: AppState): Feed[] => {
+    return state.feeds.concat(getContactFeeds(state));
+};
+
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const feedUrl = ownProps.navigation.getParam<'Feed', 'feedUrl'>('feedUrl');
     const feedName = ownProps.navigation.getParam<'Feed', 'name'>('name');
@@ -34,7 +38,8 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
             isLocalFeed: true,
         }
         : emptyFeed('', isOwnFeed);
-    const otherFeed = state.feeds.find(feed => feed.feedUrl === feedUrl);
+    const otherFeeds = getAllOtherFeeds(state);
+    const otherFeed = otherFeeds.find(feed => feed.feedUrl === feedUrl);
     const selectedFeed = isOwnFeed
         ? ownFeed
         : otherFeed != null

@@ -4,7 +4,7 @@ import {
     applyMiddleware,
     compose,
 } from 'redux';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import thunkMiddleware from 'redux-thunk';
 import {
     persistStore,
@@ -23,10 +23,10 @@ import { Post } from '../models/Post';
 import { Author } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
-import { LocalFeed } from '../social/api';
+import { LocalFeed, RecentPostFeed } from '../social/api';
 import { migrateAppState } from './migration';
 import { immutableTransformHack } from './immutableTransformHack';
-import { removeFromArray, updateArrayItem, insertInArray, containsItem } from '../helpers/immutable';
+import { removeFromArray, updateArrayItem, insertInArray, containsItem, replaceItemInArray } from '../helpers/immutable';
 import {
     defaultFeeds,
     defaultSettings,
@@ -37,6 +37,8 @@ import {
     defaultState,
 } from './defaultData';
 import { AppState, currentAppStateVersion } from './AppState';
+import { Contact } from '../models/Contact';
+import { contactsReducer } from './contactsReducer';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -115,6 +117,20 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 favicon: action.payload.favicon,
             }));
         }
+        case 'UPDATE-FEEDS-DATA': {
+            const updatedFeeds = feeds.map(feed => {
+                const updatedFeed = action.payload.feeds.find(value => feed.feedUrl === value.feedUrl);
+                return updatedFeed != null
+                    ? {
+                        ...feed,
+                        name: updatedFeed.name,
+                        authorImage: updatedFeed.authorImage,
+                    }
+                    : feed;
+            });
+
+            return updatedFeeds;
+        }
         case 'TOGGLE-FEED-FAVORITE': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feedUrl === feed.feedUrl);
             if (ind === -1) {
@@ -129,6 +145,9 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
             const feedsWithoutOwnFeeds = feeds
                 .filter((feed: Feed) => !containsItem(action.payload.feedUrls, (feedUrl: string) => feedUrl === feed.feedUrl));
             return feedsWithoutOwnFeeds;
+        }
+        case 'REMOVE-ALL-FEEDS': {
+            return [];
         }
         default: {
             return feeds;
@@ -244,6 +263,9 @@ const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Pos
             }
             return removeFromArray(localPosts, ind);
         }
+        case 'REMOVE-ALL-POSTS': {
+            return [];
+        }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
@@ -296,6 +318,7 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+    const startTime = Date.now();
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -309,8 +332,9 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
             try {
                 const newState = combinedReducers(state, action);
                 if (action.type !== 'TIME-TICK') {
+                    const elapsed = Date.now() - startTime;
                     // tslint:disable-next-line:no-console
-                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                    console.log('appStateReducer', 'elapsed', elapsed, 'action', action, 'newState', newState);
                 }
                 return newState;
             } catch (e) {
@@ -345,6 +369,7 @@ export const combinedReducers = combineReducers<AppState>({
     localPosts: localPostsReducer,
     draft: draftReducer,
     metadata: metadataReducer,
+    contacts: contactsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appStateReducer);

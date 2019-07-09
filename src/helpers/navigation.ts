@@ -1,7 +1,8 @@
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
-import { LocalFeed } from '../social/api';
+import { LocalFeed, RecentPostFeed } from '../social/api';
+import { Contact } from '../models/Contact';
 
 export interface Routes {
     App: {};
@@ -41,6 +42,10 @@ export interface Routes {
     FeedInfoDeepLink: {
         feedUrl: string;
     };
+    FeedInfoInviteLink: {
+        randomSeed: string;
+        contactPublicKey: string;
+    };
     EditFilter: {
         filter: ContentFilter,
     };
@@ -66,6 +71,13 @@ export interface Routes {
         subCategoryName: string,
     };
     YourTab: {};
+    ContactView: {
+        publicKey: string;
+        feed: Feed;
+    };
+    ContactInfo: {
+        publicKey: string;
+    };
 }
 
 export interface TypedNavigation {

@@ -6,7 +6,9 @@ import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/Actions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { getAllFeeds } from '../selectors/selectors';
+import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
+import { ContactFeed } from '../models/ContactFeed';
+import { isChildrenPostUploading } from '../helpers/postHelpers';
 
 interface OwnProps {
     isSelected: boolean;
@@ -37,28 +39,46 @@ const getOriginalAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefi
     ;
 };
 
-const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
-    if (post.author == null) {
-        return;
-    }
-    const postAuthor = post.author;
-    const knownFeed = state.feeds.find(feed => feed.feedUrl === postAuthor.uri)
-        || state.ownFeeds.find(feed => feed.name === postAuthor.name)
-    ;
-    return knownFeed != null
+const getAuthorFeedOrUndefined = (
+    feed: ContactFeed | undefined
+) => {
+    return feed != null
         ? {
-            ...knownFeed,
+            ...feed,
             isKnownFeed: true,
         }
         : undefined
     ;
 };
 
+const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
+    if (post.author == null) {
+        return;
+    }
+    const postAuthor = post.author;
+    const authorFeed = getAuthorFeedOrUndefined(
+            state.feeds.find(feed => feed.feedUrl === postAuthor.uri),
+        ) ||
+        getAuthorFeedOrUndefined(
+            state.ownFeeds.find(feed => feed.name === postAuthor.name),
+        ) ||
+        getAuthorFeedOrUndefined(
+            getContactFeeds(state).find(feed => feed.feedUrl === postAuthor.uri),
+        )
+    ;
+
+    return authorFeed;
+};
+
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     const authorFeed = getAuthorFeed(ownProps.post, state);
     const originalAuthorFeed = getOriginalAuthorFeed(ownProps.post, state);
+    const isUploading = ownProps.post.isUploading === true || isChildrenPostUploading(ownProps.post, state.localPosts);
     return {
-        post: ownProps.post,
+        post: {
+            ...ownProps.post,
+            isUploading,
+        },
         currentTimestamp: state.currentTimestamp,
         isSelected: ownProps.isSelected,
         author: state.author,

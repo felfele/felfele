@@ -8,6 +8,8 @@ import { hexToByteArray, byteArrayToHex, stringToByteArray } from '../helpers/co
 import { Buffer } from 'buffer';
 import { Utils } from '../Utils';
 
+export const ZERO_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz:/';
@@ -208,7 +210,7 @@ export interface FeedAddress {
     user: string;
 }
 
-interface FeedTemplate {
+export interface FeedTemplate {
     feed: FeedAddress;
     epoch: Epoch;
     protocolVersion: number;
@@ -226,7 +228,7 @@ const downloadUserFeedTemplate = async (swarmGateway: string, address: FeedAddre
     return feedUpdateResponse;
 };
 
-const downloadUserFeed = async (swarmGateway: string, address: FeedAddress): Promise<string> => {
+const downloadUserFeed = async (swarmGateway: string, address: FeedAddress, timeout: number = 0): Promise<string> => {
     const addressPart = calculateFeedAddressQueryString(address);
     return await downloadFeed(swarmGateway, `bzz-feed:/?${addressPart}`);
 };
@@ -265,7 +267,7 @@ const updateUserFeedWithSignFunction = async (swarmGateway: string, feedTemplate
 };
 
 export interface ReadableFeedApi {
-    download: () => Promise<string>;
+    download: (timeout: number) => Promise<string>;
     downloadPreviousVersion: (epoch: Epoch) => Promise<string>;
     downloadFeedTemplate: () => Promise<FeedTemplate>;
     downloadFeed: (feedUri: string, timeout: number) => Promise<string>;
@@ -292,15 +294,15 @@ export const makeFeedAddressFromBzzFeedUrl = (bzzFeedUrl: string): FeedAddress =
     };
 };
 
-export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity): FeedAddress => {
+export const makeFeedAddressFromPublicIdentity = (publicIdentity: PublicIdentity, topic: string = ''): FeedAddress => {
     return {
-        topic: '',
+        topic,
         user: publicIdentity.address,
     };
 };
 
 export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string = defaultGateway): ReadableFeedApi => ({
-    download: async (): Promise<string> => downloadUserFeed(swarmGateway, address),
+    download: async (timeout: number = 0): Promise<string> => downloadUserFeed(swarmGateway, address, timeout),
     downloadPreviousVersion: async (epoch: Epoch) => downloadUserFeedPreviousVersion(swarmGateway, address, epoch),
     downloadFeedTemplate: async () => downloadUserFeedTemplate(swarmGateway, address),
     downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(swarmGateway, feedUri, timeout),
@@ -310,13 +312,13 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
 
 export type FeedDigestSigner = (digest: number[]) => string | Promise<string>;
 
-export interface WriteableFeedApi extends ReadableFeedApi {
+export interface FeedApi extends ReadableFeedApi {
     updateWithFeedTemplate: (feedTemplate: FeedTemplate, data: string) => Promise<FeedTemplate>;
     update: (data: string) => Promise<FeedTemplate>;
     signFeedDigest: FeedDigestSigner;
 }
 
-export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): WriteableFeedApi => {
+export const makeFeedApi = (address: FeedAddress, signFeedDigest: FeedDigestSigner, swarmGateway: string = defaultGateway): FeedApi => {
     return {
         ...makeReadableFeedApi(address, swarmGateway),
 
@@ -355,7 +357,7 @@ export interface BaseApi {
 
 export interface WriteableApi extends BaseApi {
     readonly bzz: BzzApi;
-    readonly feed: WriteableFeedApi;
+    readonly feed: FeedApi;
 }
 
 export type Api = WriteableApi;
@@ -388,7 +390,6 @@ const updateMinLength = topicLength + userLength + timeLength + levelLength + he
 
 function feedUpdateDigest(feedTemplate: FeedTemplate, data: string): number[] {
     const digestData = feedUpdateDigestData(feedTemplate, data);
-    Debug.log('feedUpdateDigest', {digest: byteArrayToHex(digestData)});
     return keccak256.array(digestData);
 }
 
@@ -467,25 +468,28 @@ export const signDigest = (digest: number[], identity: PrivateIdentity) => {
     const curve = new ec('secp256k1');
     const keyPair = curve.keyFromPrivate(Buffer.from(identity.privateKey.substring(2), 'hex'));
     const sigRaw = curve.sign(digest, keyPair, { canonical: true, pers: undefined });
-    const partialSignature = sigRaw.r.toArray().concat(sigRaw.s.toArray());
-    if (sigRaw.recoveryParam != null) {
-        const signature = partialSignature.concat(sigRaw.recoveryParam);
-        return byteArrayToHex(signature);
+    if (sigRaw.recoveryParam == null) {
+        throw new Error('signDigest recovery param was null');
     }
-    throw new Error('signDigest recovery param was null');
+    const signature = [
+        ...sigRaw.r.toArray('be', 32),
+        ...sigRaw.s.toArray('be', 32),
+        sigRaw.recoveryParam,
+    ];
+    return byteArrayToHex(signature);
 };
 
 export const generateSecureIdentity = async (generateRandom: (length: number) => Promise<Uint8Array>): Promise<PrivateIdentity> => {
     const secureRandomUint8Array = await generateRandom(32);
     const secureRandom = byteArrayToHex(secureRandomUint8Array).substring(2);
     const curve = new ec('secp256k1');
-    const keyPair = await curve.genKeyPair({
+    const keyPair = curve.genKeyPair({
         entropy: secureRandom,
         entropyEnc: 'hex',
         pers: undefined,
     });
     const privateKey = '0x' + keyPair.getPrivate('hex');
-    const publicKey = '0x' + keyPair.getPublic('hex');
+    const publicKey = '0x' + keyPair.getPublic(true, 'hex');
     const address = byteArrayToHex(publicKeyToAddress(keyPair.getPublic()));
     return {
         privateKey,

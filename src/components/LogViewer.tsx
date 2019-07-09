@@ -76,7 +76,7 @@ export class LogViewer extends React.PureComponent<Props> {
                         <Text style={styles.logText}>{item[1]}</Text>
                     </View>
                 }
-                keyExtractor={(item) => item[0]}
+                keyExtractor={(item, index) => `${index}${item[0]}`}
             />
         </FragmentSafeAreaViewWithoutTabBar>
     )
