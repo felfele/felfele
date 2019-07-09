@@ -1,3 +1,3 @@
 export interface Model {
-    _id?: number;
+    _id?: number | string;
 }

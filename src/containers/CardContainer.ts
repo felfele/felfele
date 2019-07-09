@@ -8,6 +8,7 @@ import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
 import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
 import { ContactFeed } from '../models/ContactFeed';
+import { isChildrenPostUploading } from '../helpers/postHelpers';
 
 interface OwnProps {
     isSelected: boolean;
@@ -72,8 +73,12 @@ const getAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefined => {
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     const authorFeed = getAuthorFeed(ownProps.post, state);
     const originalAuthorFeed = getOriginalAuthorFeed(ownProps.post, state);
+    const isUploading = ownProps.post.isUploading === true || isChildrenPostUploading(ownProps.post, state.localPosts);
     return {
-        post: ownProps.post,
+        post: {
+            ...ownProps.post,
+            isUploading,
+        },
         currentTimestamp: state.currentTimestamp,
         isSelected: ownProps.isSelected,
         author: state.author,
