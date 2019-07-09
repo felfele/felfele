@@ -1,4 +1,4 @@
-import { Post } from '../models/Post';
+import { Post, PostReferences } from '../models/Post';
 import { Author } from '../models/Author';
 import { HtmlMetaData } from './htmlMetaData';
 import { ImageData } from '../models/ImageData';
@@ -16,7 +16,7 @@ export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[
     const allPosts = notUpdatedPosts.concat(updatedPosts);
     const sortedPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
     const startId = Date.now();
-    const posts = sortedPosts.map((post, index) => ({...post, _id: startId + index}));
+    const posts = sortedPosts.map((post, index) => ({...post, _id: post._id ? post._id : startId + index}));
     return posts;
 };
 
@@ -53,4 +53,21 @@ export const convertPostToParentPost = (post: Post): Post => {
             }
             : undefined,
     };
+};
+
+export const isChildrenPostUploading = (post: Post, localPosts: Post[]): boolean => {
+    const isReference = (link: string, references: PostReferences) =>
+        references.original === link ||
+        references.parent === link
+    ;
+    for (const localPost of localPosts) {
+        if (localPost.isUploading === true &&
+            localPost.references != null &&
+            typeof(post.link) === 'string' &&
+            isReference(post.link, localPost.references)
+        ) {
+            return true;
+        }
+    }
+    return false;
 };

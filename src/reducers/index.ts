@@ -263,6 +263,9 @@ const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Pos
             }
             return removeFromArray(localPosts, ind);
         }
+        case 'REMOVE-ALL-POSTS': {
+            return [];
+        }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
