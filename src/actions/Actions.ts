@@ -84,6 +84,8 @@ export const Actions = {
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>
         createAction(ActionTypes.DELETE_POST, { post }),
+    removeAllPosts: () =>
+        createAction(ActionTypes.REMOVE_ALL_POSTS),
     updatePostLink: (post: Post, link?: string) =>
         createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
     updatePostIsUploading: (post: Post, isUploading?: boolean) =>
