@@ -106,8 +106,6 @@ android {
         versionName "1.0.4"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        minSdkVersion 16
-        targetSdkVersion 26
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
