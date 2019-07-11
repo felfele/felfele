@@ -4,7 +4,14 @@ import FSStorage from 'redux-persist-fs-storage';
 import * as RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
-import { createMigrate, PersistConfig, persistReducer, persistStore, getStoredState, KEY_PREFIX } from 'redux-persist';
+import {
+    createMigrate,
+    PersistConfig,
+    persistReducer,
+    persistStore,
+    getStoredState,
+    KEY_PREFIX,
+} from 'redux-persist';
 import { createStore, compose, applyMiddleware } from 'redux';
 
 import { currentAppStateVersion, AppState } from '../reducers/AppState';
