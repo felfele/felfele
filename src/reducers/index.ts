@@ -1,21 +1,5 @@
-import {
-    createStore,
-    combineReducers,
-    applyMiddleware,
-    compose,
-} from 'redux';
-import AsyncStorage from '@react-native-community/async-storage';
-import thunkMiddleware from 'redux-thunk';
-import {
-    persistStore,
-    persistReducer,
-    createMigrate,
-    getStoredState,
-    KEY_PREFIX,
-    PersistConfig,
-} from 'redux-persist';
-
-import { Actions, AsyncActions } from '../actions/Actions';
+import { combineReducers } from 'redux';
+import { Actions } from '../actions/Actions';
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { Settings } from '../models/Settings';
@@ -23,10 +7,13 @@ import { Post } from '../models/Post';
 import { Author } from '../models/Author';
 import { Metadata } from '../models/Metadata';
 import { Debug } from '../Debug';
-import { LocalFeed, RecentPostFeed } from '../social/api';
-import { migrateAppState } from './migration';
-import { immutableTransformHack } from './immutableTransformHack';
-import { removeFromArray, updateArrayItem, insertInArray, containsItem, replaceItemInArray } from '../helpers/immutable';
+import { LocalFeed } from '../social/api';
+import {
+    removeFromArray,
+    updateArrayItem,
+    insertInArray,
+    containsItem,
+} from '../helpers/immutable';
 import {
     defaultFeeds,
     defaultSettings,
@@ -36,8 +23,7 @@ import {
     defaultMetadata,
     defaultState,
 } from './defaultData';
-import { AppState, currentAppStateVersion } from './AppState';
-import { Contact } from '../models/Contact';
+import { AppState } from './AppState';
 import { contactsReducer } from './contactsReducer';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
@@ -311,7 +297,7 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
-const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+export const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -337,19 +323,6 @@ const appStateReducer = (state: AppState = defaultState, action: Actions): AppSt
     }
 };
 
-class FelfelePersistConfig implements PersistConfig {
-    public transforms = [immutableTransformHack({
-        whitelist: ['contentFilters', 'feeds', 'ownFeeds', 'rssPosts', 'localPosts', 'postUploadQueue'],
-    })];
-    public blacklist = ['currentTimestamp'];
-    public key = 'root';
-    public storage = AsyncStorage;
-    public version = currentAppStateVersion;
-    public migrate = createMigrate(migrateAppState, { debug: false});
-}
-
-export const persistConfig = new FelfelePersistConfig();
-
 export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
@@ -363,65 +336,3 @@ export const combinedReducers = combineReducers<AppState>({
     metadata: metadataReducer,
     contacts: contactsReducer,
 });
-
-const persistedReducer = persistReducer(persistConfig, appStateReducer);
-
-export const store = createStore(
-    persistedReducer,
-    defaultState,
-    compose(
-        applyMiddleware(thunkMiddleware),
-    ),
-);
-
-const initStore = () => {
-    // tslint:disable-next-line:no-console
-    console.log('initStore: ', store.getState());
-
-    // @ts-ignore
-    store.dispatch(AsyncActions.cleanupContentFilters());
-    store.dispatch(Actions.cleanFeedsFromOwnFeeds(store.getState().ownFeeds.map(feed => feed.feedUrl)));
-    for (const ownFeed of store.getState().ownFeeds) {
-        store.dispatch(Actions.updateOwnFeed({
-            ...ownFeed,
-            isSyncing: false,
-        }));
-    }
-    // @ts-ignore
-    store.dispatch(AsyncActions.cleanUploadingPostState());
-    store.dispatch(Actions.timeTick());
-    // @ts-ignore
-    store.dispatch(AsyncActions.registerBackgroundTasks());
-    // @ts-ignore
-    store.dispatch(AsyncActions.downloadFollowedFeedPosts());
-
-    setInterval(() => store.dispatch(Actions.timeTick()), 60000);
-};
-
-export const persistor = persistStore(store, {}, initStore);
-
-export const getSerializedAppState = async (): Promise<string> => {
-    const serializedAppState = await persistConfig.storage.getItem(KEY_PREFIX + persistConfig.key);
-    if (serializedAppState != null) {
-        return serializedAppState;
-    }
-    throw new Error('serialized app state is null');
-};
-
-export const getAppStateFromSerialized = async (serializedAppState: string): Promise<AppState> => {
-    const storagePersistConfig = {
-        ...persistConfig,
-        storage: {
-            getItem: (key: string) => new Promise<string>((resolve, reject) => resolve(serializedAppState)),
-            setItem: (key: string, value: any) => { /* do nothing */ },
-            removeItem: (key: string) => { /* do nothing */ },
-        },
-    };
-    const appState = await getStoredState(storagePersistConfig) as AppState;
-    return appState;
-};
-
-export const migrateAppStateToCurrentVersion = async (appState: AppState): Promise<AppState> => {
-    const currentVersionAppState = await persistConfig.migrate(appState, currentAppStateVersion) as AppState;
-    return currentVersionAppState;
-};

@@ -9,14 +9,13 @@ import {
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Platform, YellowBox, View } from 'react-native';
-import { Provider } from 'react-redux';
+import { Provider, Store } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
 import { setCustomText } from 'react-native-global-props';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { store, persistor } from './reducers';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
@@ -56,6 +55,9 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { initStore } from './store';
+import { Persistor } from 'redux-persist';
+import { AnyAction } from 'redux';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -383,16 +385,32 @@ const InitialNavigator = createSwitchNavigator({
     backBehavior: 'initialRoute',
 });
 
-export default class App extends React.Component {
+export default class App extends React.Component<{}, { store: any, persistor: Persistor | null }> {
+    public state = {
+        store: null,
+        persistor: null,
+    };
+
     public render() {
+        if (this.state.store == null) {
+            return null;
+        }
         return (
             <TopLevelErrorBoundary>
-                <Provider store={store}>
-                    <PersistGate loading={null} persistor={persistor}>
+                <Provider store={this.state.store!}>
+                    <PersistGate loading={null} persistor={this.state.persistor!}>
                         <InitialNavigator/>
                     </PersistGate>
                 </Provider>
             </TopLevelErrorBoundary>
         );
+    }
+
+    public async componentDidMount() {
+        const { store, persistor } = await initStore();
+        this.setState({
+            store,
+            persistor,
+        });
     }
 }
