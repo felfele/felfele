@@ -20,6 +20,7 @@ import { immutableTransformHack } from '../reducers/immutableTransformHack';
 import { appStateReducer } from '../reducers';
 import { defaultState } from '../reducers/defaultData';
 import { Actions, AsyncActions } from '../actions/Actions';
+import { getLegacyAppState } from './legacy';
 
 // This is not very nice, but it's initialized at app startup
 export let persistConfig: FelfelePersistConfig;
@@ -47,9 +48,12 @@ export const initStore = async () => {
     persistConfig = new FelfelePersistConfig(storageEngine);
     const persistedReducer = persistReducer(persistConfig, appStateReducer);
 
+    const legacyAppState = await getLegacyAppState();
+    const initialState = legacyAppState != null ? legacyAppState : defaultState;
+
     const storeInner = createStore(
         persistedReducer,
-        defaultState,
+        initialState,
         compose(
             applyMiddleware(thunkMiddleware),
         ),

@@ -3,7 +3,7 @@ import { ActionTypes } from './ActionTypes';
 import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
-import { migrateAppStateToCurrentVersion } from '../reducers';
+import { migrateAppStateToCurrentVersion } from '../store';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
 import { Post, PublicPost } from '../models/Post';
