@@ -34,7 +34,7 @@ import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
 
 export interface StateProps {
-    navigation: TypedNavigation;
+    goBack: () => boolean;
     draft: Post | null;
     name: string;
     avatar: ImageData;
@@ -192,13 +192,13 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onDiscard = () => {
         this.props.onDeleteDraft();
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private onSave = () => {
         Debug.log(this.state.post);
         this.props.onSaveDraft(this.state.post);
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private showCancelConfirmation = async () => {
@@ -244,7 +244,7 @@ export class PostEditor extends React.Component<Props, State> {
         if (this.state.post.text !== '' || this.state.post.images.length > 0) {
             this.showCancelConfirmation();
         } else {
-            this.props.navigation.goBack();
+            this.props.goBack();
         }
     }
 
@@ -280,7 +280,7 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onPressSubmit = async () => {
         await this.sendUpdate();
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private createPostFromState = async (): Promise<Post> => {
