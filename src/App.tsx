@@ -6,9 +6,10 @@ import {
     createSwitchNavigator,
     NavigationScreenProps,
 } from 'react-navigation';
+import DeviceInfo from 'react-native-device-info';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, YellowBox, View } from 'react-native';
+import { Platform, YellowBox, View, AppState, AppStateStatus } from 'react-native';
 import { Provider, Store } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
@@ -55,9 +56,11 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
-import { initStore } from './store';
-import { Persistor } from 'redux-persist';
+import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
+import { Persistor, REHYDRATE, getStoredState, PersistConfig } from 'redux-persist';
 import { AnyAction } from 'redux';
+import { Actions } from './actions/Actions';
+import { restartApp } from './helpers/restart';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -385,10 +388,17 @@ const InitialNavigator = createSwitchNavigator({
     backBehavior: 'initialRoute',
 });
 
-export default class App extends React.Component<{}, { store: any, persistor: Persistor | null }> {
-    public state = {
+interface ApplicationState {
+    store: any;
+    persistor: Persistor | null;
+    nativeAppState: AppStateStatus;
+}
+
+export default class App extends React.Component<{}, ApplicationState> {
+    public state: ApplicationState = {
         store: null,
         persistor: null,
+        nativeAppState: AppState.currentState,
     };
 
     public render() {
@@ -407,10 +417,33 @@ export default class App extends React.Component<{}, { store: any, persistor: Pe
     }
 
     public async componentDidMount() {
+        AppState.addEventListener('change', this.handleAppStateChange);
         const { store, persistor } = await initStore();
         this.setState({
             store,
             persistor,
+        });
+    }
+
+    public componentWillUnmount() {
+      AppState.removeEventListener('change', this.handleAppStateChange);
+    }
+
+    private handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        if (this.state.nativeAppState.match(/inactive|background/) && nextAppState === 'active') {
+            Debug.log('App has come to the foreground');
+            if (this.state.store != null) {
+                const appName = DeviceInfo.getBundleId();
+                const serializedAppState = await getSerializedAppState();
+                const appState = await getAppStateFromSerialized(serializedAppState);
+                if (appState.lastEditingApp != null && appState.lastEditingApp !== appName) {
+                    this.state.store.dispatch(Actions.updateAppLastEditing(appName));
+                    restartApp();
+                }
+            }
+        }
+        this.setState({
+            nativeAppState: nextAppState,
         });
     }
 }

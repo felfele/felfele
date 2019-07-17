@@ -1,11 +1,13 @@
 import { connect } from 'react-redux';
+// @ts-ignore
+import ShareExtension from 'react-native-share-extension';
 
 import { AppState } from '../reducers/AppState';
-import { StateProps } from '../components/PostEditor';
+import { StateProps, PostEditor } from '../components/PostEditor';
 import { mapDispatchToProps } from '../containers/PostEditorContainer';
 import { Post } from '../models/Post';
 
-const mapStateToProps = (state: AppState, ownProps: { text: string }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { text: string | null, goBack: () => boolean }): StateProps => {
     const draft: Post = {
         images: [],
         createdAt: Date.now(),
@@ -14,7 +16,7 @@ const mapStateToProps = (state: AppState, ownProps: { text: string }): StateProp
     return {
         name: state.author.name,
         avatar: state.author.image,
-        goBack: () => true,
+        goBack: ownProps.goBack,
         draft: draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
    };
@@ -23,4 +25,4 @@ const mapStateToProps = (state: AppState, ownProps: { text: string }): StateProp
 export const SharePostEditorContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-);
+)(PostEditor);

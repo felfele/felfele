@@ -6,7 +6,7 @@ import { ContentFilter } from '../models/ContentFilter';
 import { migrateAppStateToCurrentVersion } from '../store';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post, PublicPost } from '../models/Post';
+import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -106,6 +106,8 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_OWN_FEED, { partialFeed }),
     cleanFeedsFromOwnFeeds: (feedUrls: string[]) =>
         createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
+    updateAppLastEditing: (appName: string) =>
+        createAction(ActionTypes.UPDATE_APP_LAST_EDITING, { appName }),
 };
 
 export const AsyncActions = {

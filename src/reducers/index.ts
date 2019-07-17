@@ -25,6 +25,7 @@ import {
 } from './defaultData';
 import { AppState } from './AppState';
 import { contactsReducer } from './contactsReducer';
+import { ActionTypes } from '../actions/ActionTypes';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -323,6 +324,17 @@ export const appStateReducer = (state: AppState = defaultState, action: Actions)
     }
 };
 
+export const lastEditingAppReducer = (lastEditingApp: string | null = null, action: Actions): string | null => {
+    switch (action.type) {
+        case ActionTypes.UPDATE_APP_LAST_EDITING: {
+            return action.payload.appName;
+        }
+        default: {
+            return lastEditingApp;
+        }
+    }
+};
+
 export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
@@ -335,4 +347,5 @@ export const combinedReducers = combineReducers<AppState>({
     draft: draftReducer,
     metadata: metadataReducer,
     contacts: contactsReducer,
+    lastEditingApp: lastEditingAppReducer,
 });
