@@ -16,7 +16,15 @@
 #import <React/RCTPushNotificationManager.h>
 #import "RNSplashScreen.h"
 
+#import <Statusgo/Statusgo.h>
+
 @implementation AppDelegate
+
+- (NSString *)getPathForDirectory:(int)directory
+{
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, YES);
+  return [paths firstObject];
+}
 
 // Required to register for notifications
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
@@ -44,6 +52,12 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 
+  NSString *appFolderPath = [self getPathForDirectory:NSDocumentDirectory];
+  NSLog(@"App Directory is: %@", appFolderPath);
+  const char *cfilename=[appFolderPath UTF8String];
+  char *result = StartNode((char *)cfilename, ":0", "", "debug");
+  NSLog(@"result: %s", result);
+  
   [RNSplashScreen show];
   return YES;
 }

@@ -50,7 +50,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNCameraPackage(),
             new ImagePickerPackage(),
             new VectorIconsPackage(),
-            new RNGRPPackage()
+            new RNGRPPackage(),
+            new SwarmPackage()
       );
     }
   };
