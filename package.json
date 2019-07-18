@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.5.0",
+    "aes-js": "3.1.2",
     "base-64": "0.1.0",
     "base64-arraybuffer": "0.1.5",
     "buffer": "5.2.1",

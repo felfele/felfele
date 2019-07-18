@@ -16,6 +16,7 @@ import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { flowTestCommandDefinition } from './flowTestCommands';
+import { aesTestCommandDefinition} from './aesTestCommands';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -131,6 +132,8 @@ const definitions =
     })
     .
     addCommand('flowTest', 'Test interactive workflows', flowTestCommandDefinition)
+    .
+    addCommand('aesTest', '', aesTestCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);
