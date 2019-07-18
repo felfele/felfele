@@ -9,7 +9,6 @@ import { addCommand } from './cliParser';
 import { hexToUint8Array, byteArrayToHex, stringToByteArray } from '../helpers/conversion';
 import { generateUnsecureRandomHexString } from '../helpers/unsecureRandom';
 import { HexString } from '../helpers/opaqueTypes';
-import console = require('console');
 
 const urlSafeBase64Encode = (data: Uint8Array) => {
     const unsafeBase64 = base64ab.encode(data.buffer);
