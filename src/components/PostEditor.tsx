@@ -26,7 +26,6 @@ import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
-import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
@@ -39,6 +38,7 @@ export interface StateProps {
     name: string;
     avatar: ImageData;
     gatewayAddress: string;
+    discardWithoutConfirm?: boolean;
 }
 
 export interface DispatchProps {
@@ -241,10 +241,10 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onCancelConfirmation = () => {
         Debug.log('Cancel');
-        if (this.state.post.text !== '' || this.state.post.images.length > 0) {
-            this.showCancelConfirmation();
-        } else {
+        if (this.props.discardWithoutConfirm || (this.state.post.text === '' && this.state.post.images.length === 0)) {
             this.props.goBack();
+        } else {
+            this.showCancelConfirmation();
         }
     }
 

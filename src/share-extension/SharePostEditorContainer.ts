@@ -7,7 +7,7 @@ import { StateProps, PostEditor } from '../components/PostEditor';
 import { mapDispatchToProps } from '../containers/PostEditorContainer';
 import { Post } from '../models/Post';
 
-const mapStateToProps = (state: AppState, ownProps: { text: string | null, goBack: () => boolean }): StateProps => {
+const mapStateToProps = (state: AppState, ownProps: { text: string, goBack: () => boolean }): StateProps => {
     const draft: Post = {
         images: [],
         createdAt: Date.now(),
@@ -19,6 +19,7 @@ const mapStateToProps = (state: AppState, ownProps: { text: string | null, goBac
         goBack: ownProps.goBack,
         draft: draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
+        discardWithoutConfirm: true,
    };
 };
 
