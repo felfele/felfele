@@ -117,4 +117,5 @@ export const defaultState: AppState = {
     draft: null,
     metadata: defaultMetadata,
     contacts: [],
+    lastEditingApp: null,
 };

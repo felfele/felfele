@@ -2,7 +2,7 @@ import { PersistConfig, createMigrate, KEY_PREFIX, getStoredState } from 'redux-
 import { immutableTransformHack } from '../reducers/immutableTransformHack';
 import { currentAppStateVersion, AppState } from '../reducers/AppState';
 import { migrateAppState } from '../reducers/migration';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Platform } from 'react-native';
 import { AppStateV3 } from '../reducers/version3';
 
 class LegacyPersistConfig implements PersistConfig {
