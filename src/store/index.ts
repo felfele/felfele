@@ -10,7 +10,6 @@ import {
     persistReducer,
     persistStore,
     getStoredState,
-    KEY_PREFIX,
 } from 'redux-persist';
 import { createStore, compose, applyMiddleware } from 'redux';
 
@@ -37,6 +36,7 @@ class FelfelePersistConfig implements PersistConfig {
     })];
     public blacklist = ['currentTimestamp'];
     public key = 'root';
+    public keyPrefix = '';
     public version = currentAppStateVersion;
     public migrate = createMigrate(migrateAppState, { debug: false });
 
@@ -95,7 +95,7 @@ export const initStore = async () => {
 };
 
 export const getSerializedAppState = async (): Promise<string> => {
-    const serializedAppState = await persistConfig.storage.getItem(KEY_PREFIX + persistConfig.key);
+    const serializedAppState = await persistConfig.storage.getItem(persistConfig.key);
     if (serializedAppState != null) {
         return serializedAppState;
     }
