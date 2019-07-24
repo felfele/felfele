@@ -61,10 +61,12 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
-import { initStore, getSerializedAppState, getAppStateFromSerialized, felfeleInitAppActions } from './store';
+import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
 import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
+import { felfeleInitAppActions } from './store/felfeleInit';
+import { Store } from 'redux';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',

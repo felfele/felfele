@@ -12,6 +12,7 @@ import {
 } from '../social/api';
 import { PrivateIdentity } from '../models/Identity';
 import { ContactActions } from './ContactActions';
+import { PostEditorActions } from './PostEditorActions';
 
 export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;
 
@@ -40,6 +41,7 @@ export const InternalActions = {
 
 export const Actions = {
     ...ContactActions,
+    ...PostEditorActions,
     addContentFilter: (text: string, createdAt: number, validUntil: number) =>
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilter: (filter: ContentFilter) =>
@@ -64,10 +66,6 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_POST_IMAGES, {post, images}),
     updateRssPosts: (posts: Post[]) =>
         createAction(ActionTypes.UPDATE_RSS_POSTS, { posts }),
-    addDraft: (draft: Post) =>
-        createAction(ActionTypes.ADD_DRAFT, { draft }),
-    removeDraft: () =>
-        createAction(ActionTypes.REMOVE_DRAFT),
     appStateReset: () =>
         createAction(ActionTypes.APP_STATE_RESET),
     changeSettingSaveToCameraRoll: (value: boolean) =>

@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { Actions } from '../actions/Actions';
 import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
 import { TypedNavigation } from '../helpers/navigation';
+import { PostEditorActions } from '../actions/PostEditorActions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -22,10 +22,10 @@ export const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.createPost(post));
        },
        onSaveDraft: (draft: Post) => {
-           dispatch(Actions.addDraft(draft));
+           dispatch(PostEditorActions.addDraft(draft));
        },
        onDeleteDraft: () => {
-           dispatch(Actions.removeDraft());
+           dispatch(PostEditorActions.removeDraft());
        },
    };
 };

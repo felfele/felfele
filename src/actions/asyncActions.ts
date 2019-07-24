@@ -14,9 +14,7 @@ import {
     SwarmHelpers } from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { FELFELE_ASSISTANT_URL, FELFELE_FOUNDATION_URL } from '../reducers/defaultData';
-import { registerBackgroundTask } from '../helpers/backgroundTask';
-import { localNotification } from '../helpers/notifications';
+import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
 import { createInvitedContact } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
@@ -372,32 +370,6 @@ export const AsyncActions = {
                     favicon: undefined,
                 }));
                 dispatch(AsyncActions.syncLocalFeed(ownFeed));
-            }
-        };
-    },
-    registerBackgroundTasks: (): Thunk => {
-        return async (dispatch, getState) => {
-            const foundationFeeds = getState().feeds.filter(feed => feed.feedUrl === FELFELE_FOUNDATION_URL);
-            if (foundationFeeds.length > 0) {
-                const foundationFeed = foundationFeeds[0];
-                const getLatestPostCreateTime = (posts: Post[]) => posts.length > 0
-                    ? posts[0].createdAt
-                    : 0
-                ;
-                const backgroundTaskIntervalMinutes = 12 * 60;
-                registerBackgroundTask(backgroundTaskIntervalMinutes, async () => {
-                    const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
-                    const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
-                    const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
-                    const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
-                    const recentFeeds = await loadRecentPostFeeds(swarm, foundationFeeds);
-                    const recentPosts = await getPostsFromRecentPostFeeds(recentFeeds);
-                    if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
-                        const posts = mergeUpdatedPosts(recentPosts, previousPosts);
-                        dispatch(Actions.updateRssPosts(posts));
-                        localNotification('There is a new version available!');
-                    }
-                });
             }
         };
     },
