@@ -63,5 +63,5 @@ output "Updating the git release branch with to the master..."
 
 ask "Merge the release branch to master on Github"
 
-ask "Announce the release on Slack in the #releases channel"
+ask "Announce the release on Slack in the #updates channel"
 output "Release of version $version was successful!"

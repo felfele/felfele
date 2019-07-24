@@ -58,3 +58,4 @@ fastlane/screenshots
 ios/build
 
 android/app/src/main/assets/index.android.bundle*
+debugIdentities.json

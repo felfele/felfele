@@ -7,6 +7,7 @@ import { mergeUpdatedPosts } from '../helpers/postHelpers';
 import { localNotification } from '../helpers/notifications';
 import { Post } from '../models/Post';
 import { Actions } from './Actions';
+import { RecentPostFeed } from '../social/api';
 
 // this is a workaround for not having a dependency on backgroundFetch in the share extension
 export const BackgroundTaskActions = {
@@ -25,8 +26,9 @@ export const BackgroundTaskActions = {
                     const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
                     const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
                     const swarm = Swarm.makeReadableApi(address, getState().settings.swarmGatewayAddress);
-                    const recentFeeds = await loadRecentPostFeeds(swarm, foundationFeeds);
-                    const recentPosts = await getPostsFromRecentPostFeeds(recentFeeds);
+                    const feedUpdates = await loadRecentPostFeeds(swarm, foundationFeeds as RecentPostFeed[]);
+                    const updatedFeeds = feedUpdates.map(feedUpdate => feedUpdate.updated);
+                    const recentPosts = await getPostsFromRecentPostFeeds(updatedFeeds);
                     if (getLatestPostCreateTime(recentPosts) > getLatestPostCreateTime(previousSortedPosts)) {
                         const posts = mergeUpdatedPosts(recentPosts, previousPosts);
                         dispatch(Actions.updateRssPosts(posts));
@@ -36,4 +38,4 @@ export const BackgroundTaskActions = {
             }
         };
     },
-}
+};

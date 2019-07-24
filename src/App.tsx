@@ -66,6 +66,7 @@ import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
+import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -353,6 +354,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     ContactView: {
         screen: ContactViewContainer,
+    },
+    ContactInfo: {
+        screen: ContactInfoContainer,
     },
 };
 

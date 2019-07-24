@@ -1,3 +1,15 @@
+## v1.0.4 (2019-07-09)
+
+This release adds the following new features and fixes:
+
+- Feature: We introduce contacts, that is someone you follow who also follows you (https://github.com/felfele/felfele/pull/418). In the future you will be able to have private conversations or private groups with your contacts.
+- Feature: Automatic contact detection with the people you already follow (https://github.com/felfele/felfele/pull/429)
+- Feature: Invite contacts with QR code and link (debug mode only) (https://github.com/felfele/felfele/pull/424)
+- Bugfix: When refreshing your feeds the names and avatars will also be updated (https://github.com/felfele/felfele/pull/423)
+- Bugfix: Channels are now ordered correctly alphabetically (https://github.com/felfele/felfele/pull/434)
+- Bugfix: Sometimes updates were failing, we found a bug related to this (https://github.com/felfele/felfele/pull/428)
+- Bugfix: When sharing a post from others' channel we show a loading indicator (https://github.com/felfele/felfele/pull/435)
+
 ## v1.0.4 (2019-06-11) Alpha update
 
 This release adds the following new features and fixes:

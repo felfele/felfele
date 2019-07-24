@@ -17,6 +17,10 @@ import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
 
+import debugIdentities from '../../debugIdentities.json';
+import { Feed } from '../models/Feed';
+import { Post } from '../models/Post';
+
 export interface StateProps {
     appState: AppState;
     navigation: TypedNavigation;
@@ -26,6 +30,11 @@ export interface DispatchProps {
     onAppStateReset: () => void;
     onCreateIdentity: () => void;
     onDeleteContacts: () => void;
+    onDeleteFeeds: () => void;
+    onDeletePosts: () => void;
+    onAddFeed: (feed: Feed) => void;
+    onRefreshFeeds: (feeds: Feed[]) => void;
+    onAddPost: (post: Post) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -77,6 +86,38 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Delete feeds'
+                    onPress={async () => await onDeleteFeeds(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Delete all posts'
+                    onPress={async () => await onDeletePosts(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Follow debug feeds'
+                    onPress={async () => await onLoadFeeds(props)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <IonIcon name='md-warning' />
+                    }
+                    title='Generate 100 posts'
+                    onPress={async () => await onGeneratePosts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -163,6 +204,26 @@ const onDeleteContacts = async (props: Props) => {
     }
 };
 
+const onDeleteFeeds = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to delete feeds?',
+        'This will delete all your feeds and there is no undo!'
+    );
+    if (confirmed) {
+        props.onDeleteFeeds();
+    }
+};
+
+const onDeletePosts = async (props: Props) => {
+    const confirmed = await AreYouSureDialog.show(
+        'Are you sure you want to delete all posts?',
+        'This will delete all your posts and there is no undo!'
+    );
+    if (confirmed) {
+        props.onDeletePosts();
+    }
+};
+
 const onCreateIdentity = async (props: Props) => {
     const confirmed = await AreYouSureDialog.show(
         'Are you sure you want to create new identity?',
@@ -186,4 +247,35 @@ const onLogAppStateVersion = async () => {
     const serializedAppState = await getSerializedAppState();
     const appState = await getAppStateFromSerialized(serializedAppState);
     Debug.log('onLogAppStateVersion', appState._persist);
+};
+
+const onLoadFeeds = async (props: Props) => {
+    const feeds = debugIdentities.map((identity, index) => {
+        const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
+        const feed: Feed = {
+            name: `Feed ${index}`,
+            feedUrl,
+            url: feedUrl,
+            favicon: '',
+        };
+        props.onAddFeed(feed);
+        return feed;
+    });
+    props.onRefreshFeeds(feeds);
+    Debug.log('onLoadFeeds', 'finished');
+};
+
+const onGeneratePosts = async (props: Props) => {
+    const numPosts = 100;
+    for (let i = 0; i < numPosts; i++) {
+        const postTime = Date.now();
+        const post: Post = {
+            text: `Post ${i + 1} of ${numPosts} at ${postTime}`,
+            images: [],
+            createdAt: Date.now(),
+            author: props.appState.author,
+        };
+        props.onAddPost(post);
+        await Utils.waitUntil(postTime + 1);
+    }
 };

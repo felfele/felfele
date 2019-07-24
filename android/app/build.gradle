@@ -102,12 +102,10 @@ android {
 
     defaultConfig {
         applicationId "org.felfele.mobile"
-        versionCode 6
-        versionName "1.0.4"
+        versionCode 7
+        versionName "1.0.5"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        minSdkVersion 16
-        targetSdkVersion 26
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

@@ -1,29 +1,20 @@
 import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
-import { StateProps, DispatchProps, ContactView, UnknownContact } from './ContactView';
+import { StateProps, DispatchProps, ContactView } from './ContactView';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { Feed } from '../../../models/Feed';
 import { Contact, MutualContact } from '../../../models/Contact';
 import { Debug } from '../../../Debug';
 import { getFeedPosts } from '../../../selectors/selectors';
 import { AsyncActions } from '../../../actions/asyncActions';
+import { findContactByPublicKey, UnknownContact } from '../../../helpers/contactHelpers';
 import { Actions } from '../../../actions/Actions';
-
-const findContactByPublicKey = (publicKey: string, contacts: Contact[]): Contact | UnknownContact => {
-    return contacts.find(
-        c => c.type === 'mutual-contact' &&
-        c.identity.publicKey === publicKey
-    )
-    ||
-    {
-        type: 'unknown-contact',
-    };
-};
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const publicKey = ownProps.navigation.getParam<'ContactView', 'publicKey'>('publicKey');
     const feed = ownProps.navigation.getParam<'ContactView', 'feed'>('feed');
-    const contact = findContactByPublicKey(publicKey, state.contacts);
+    const unknownContact: UnknownContact = { type: 'unknown-contact' };
+    const contact = findContactByPublicKey(publicKey, state.contacts) || unknownContact;
     const posts = contact.type !== 'mutual-contact'
         ? []
         : getFeedPosts(state, feed.feedUrl)

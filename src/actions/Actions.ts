@@ -4,6 +4,7 @@ import { createAction } from './actionHelpers';
 import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers/AppState';
+import { RSSPostManager } from '../RSSPostManager';
 import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import {
@@ -56,6 +57,8 @@ export const Actions = {
         createAction(ActionTypes.TIME_TICK),
     deletePost: (post: Post) =>
         createAction(ActionTypes.DELETE_POST, { post }),
+    removeAllPosts: () =>
+        createAction(ActionTypes.REMOVE_ALL_POSTS),
     updatePostLink: (post: Post, link?: string) =>
         createAction(ActionTypes.UPDATE_POST_LINK, {post, link}),
     updatePostIsUploading: (post: Post, isUploading?: boolean) =>
@@ -84,4 +87,6 @@ export const Actions = {
         createAction(ActionTypes.CLEAN_FEEDS_FROM_OWN_FEEDS, { feedUrls }),
     updateAppLastEditing: (appName: string) =>
         createAction(ActionTypes.UPDATE_APP_LAST_EDITING, { appName }),
+    removeAllFeeds: () =>
+        createAction(ActionTypes.REMOVE_ALL_FEEDS),
 };

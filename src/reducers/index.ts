@@ -133,6 +133,9 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
                 .filter((feed: Feed) => !containsItem(action.payload.feedUrls, (feedUrl: string) => feedUrl === feed.feedUrl));
             return feedsWithoutOwnFeeds;
         }
+        case 'REMOVE-ALL-FEEDS': {
+            return [];
+        }
         default: {
             return feeds;
         }
@@ -247,6 +250,9 @@ const localPostsReducer = (localPosts = defaultLocalPosts, action: Actions): Pos
             }
             return removeFromArray(localPosts, ind);
         }
+        case 'REMOVE-ALL-POSTS': {
+            return [];
+        }
         case 'UPDATE-POST-LINK': {
             const ind = localPosts.findIndex(post => post != null && action.payload.post._id === post._id);
             if (ind === -1) {
@@ -299,6 +305,7 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
 };
 
 export const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
+    const startTime = Date.now();
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
@@ -312,8 +319,9 @@ export const appStateReducer = (state: AppState = defaultState, action: Actions)
             try {
                 const newState = combinedReducers(state, action);
                 if (action.type !== 'TIME-TICK') {
+                    const elapsed = Date.now() - startTime;
                     // tslint:disable-next-line:no-console
-                    console.log('appStateReducer', 'action', action, 'newState', newState);
+                    console.log('appStateReducer', 'elapsed', elapsed, 'action', action, 'newState', newState);
                 }
                 return newState;
             } catch (e) {

@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     label: {
-        fontSize: 12,
+        fontSize: 14,
         color: Colors.BRAND_PURPLE,
     },
     icon: {
