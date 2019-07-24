@@ -1,5 +1,4 @@
 import * as React from 'react';
-import DeviceInfo from 'react-native-device-info';
 import { Persistor } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
@@ -40,9 +39,12 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
                         <SharePostEditorContainer
                             text={this.state.value}
                             goBack={() => {
-                                this.state.store.dispatch(Actions.updateAppLastEditing(DeviceInfo.getBundleId()));
+                                this.state.store.dispatch(Actions.updateAppLastEditing('ShareExtension'));
                                 ShareExtension.close();
                                 return true;
+                            }}
+                            dismiss={() => {
+                                ShareExtension.close();
                             }}
                         />
                     </PersistGate>

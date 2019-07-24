@@ -38,7 +38,7 @@ export interface StateProps {
     name: string;
     avatar: ImageData;
     gatewayAddress: string;
-    discardWithoutConfirm?: boolean;
+    dismiss?: () => void;
 }
 
 export interface DispatchProps {
@@ -241,8 +241,8 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onCancelConfirmation = () => {
         Debug.log('Cancel');
-        if (this.props.discardWithoutConfirm || (this.state.post.text === '' && this.state.post.images.length === 0)) {
-            this.props.goBack();
+        if (this.props.dismiss || (this.state.post.text === '' && this.state.post.images.length === 0)) {
+            this.props.dismiss != null ? this.props.dismiss() : this.props.goBack();
         } else {
             this.showCancelConfirmation();
         }
