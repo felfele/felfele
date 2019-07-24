@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
 import { TypedNavigation } from '../helpers/navigation';

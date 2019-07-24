@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { StateProps, DispatchProps, AllFeedScreen } from '../components/AllFeedScreen';
 import { getAllFeeds, getAllPostsSorted } from '../selectors/selectors';
 import { Post } from '../models/Post';
 import { TypedNavigation } from '../helpers/navigation';
+import { AsyncActions } from '../actions/asyncActions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const followedFeeds = getAllFeeds(state);

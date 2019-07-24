@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScreen';
-import { Post } from '../models/Post';
 import { TypedNavigation } from '../helpers/navigation';
+import { AsyncActions } from '../actions/asyncActions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
    return {

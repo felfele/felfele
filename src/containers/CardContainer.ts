@@ -3,7 +3,7 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, MemoizedCard, AuthorFeed } from '../components/Card';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { AsyncActions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
 import { getAllFeeds, getContactFeeds } from '../selectors/selectors';

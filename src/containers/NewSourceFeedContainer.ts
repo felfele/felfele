@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView, ViewFeed } from '../components/FeedView';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts } from '../selectors/selectors';
 import { mapDispatchToProps as defaultMapDispatchToProps } from '../containers/FeedContainer';

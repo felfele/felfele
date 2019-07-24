@@ -54,7 +54,7 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
     }
 
     public async componentDidMount() {
-        const { store, persistor } = await initStore();
+        const { store, persistor } = await initStore(() => {});
         try {
             const { type, value } =  await ShareExtension.data();
             this.setState({

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
-import { AsyncActions } from '../../../actions/Actions';
+import { AsyncActions } from '../../../actions/asyncActions';
 import { StateProps, DispatchProps, ProfileScreen } from './ProfileScreen';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';

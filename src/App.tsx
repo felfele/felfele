@@ -61,7 +61,7 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
-import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
+import { initStore, getSerializedAppState, getAppStateFromSerialized, felfeleInitAppActions } from './store';
 import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
@@ -422,7 +422,7 @@ export default class FelfeleApp extends React.Component<{}, FelfeleAppState> {
 
     public async componentDidMount() {
         AppState.addEventListener('change', this.handleAppStateChange);
-        const { store, persistor } = await initStore();
+        const { store, persistor } = await initStore(felfeleInitAppActions);
         this.setState({
             store,
             persistor,
