@@ -66,7 +66,6 @@ import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
-import { Store } from 'redux';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',

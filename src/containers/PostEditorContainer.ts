@@ -4,7 +4,7 @@ import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
 import { TypedNavigation } from '../helpers/navigation';
-import { PostEditorActions } from '../actions/PostEditorActions';
+import { Actions } from '../actions/Actions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -22,10 +22,10 @@ export const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.createPost(post));
        },
        onSaveDraft: (draft: Post) => {
-           dispatch(PostEditorActions.addDraft(draft));
+           dispatch(Actions.addDraft(draft));
        },
        onDeleteDraft: () => {
-           dispatch(PostEditorActions.removeDraft());
+           dispatch(Actions.removeDraft());
        },
    };
 };
