@@ -19,7 +19,7 @@ import { immutableTransformHack } from '../reducers/immutableTransformHack';
 import { appStateReducer } from '../reducers';
 import { defaultState } from '../reducers/defaultData';
 import { Actions } from '../actions/Actions';
-import { getLegacyAppState } from './legacy';
+import { getLegacyAppState } from './legacyAsyncStorage';
 
 // This is not very nice, but it's initialized at app startup
 export let persistConfig: FelfelePersistConfig;

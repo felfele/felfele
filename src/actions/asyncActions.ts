@@ -37,13 +37,7 @@ import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHel
 import { ContactFeed } from '../models/ContactFeed';
 import { Contact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
-
-type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
-type ThunkTypes = Thunk | Actions;
-
-const isActionTypes = (t: ThunkTypes): t is Actions => {
-    return (t as Actions).type !== undefined;
-};
+import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
