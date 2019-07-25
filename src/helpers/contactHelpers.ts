@@ -120,10 +120,10 @@ export const advanceContactState = async (
     }
 };
 
-const deriveSharedKey = (privateIdentity: PrivateIdentity, publicIdentity: PublicIdentity): HexString => {
+export const deriveSharedKey = (privateIdentity: PrivateIdentity, publicIdentity: PublicIdentity): HexString => {
     const curve = new ec('secp256k1');
-    const publicKeyPair = curve.keyFromPublic(stripHexPrefix(publicIdentity.publicKey), 'hex');
-    const privateKeyPair = curve.keyFromPrivate(stripHexPrefix(privateIdentity.privateKey), 'hex');
+    const publicKeyPair = curve.keyFromPublic(stripHexPrefix(publicIdentity.publicKey as HexString), 'hex');
+    const privateKeyPair = curve.keyFromPrivate(stripHexPrefix(privateIdentity.privateKey as HexString), 'hex');
 
     return privateKeyPair.derive(publicKeyPair.getPublic()).toString(16);
 };

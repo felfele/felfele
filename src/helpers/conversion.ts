@@ -6,8 +6,8 @@ export const hexToString = (hex: string): string => {
     return byteArrayToString(byteArray);
 };
 
-export const stripHexPrefix = (hex: string) => hex.startsWith('0x')
-    ? hex.slice(2)
+export const stripHexPrefix = (hex: HexString) => hex.startsWith('0x')
+    ? hex.slice(2) as HexString
     : hex
 ;
 

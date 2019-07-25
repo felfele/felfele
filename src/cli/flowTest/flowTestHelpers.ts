@@ -1,6 +1,9 @@
-import { stringToByteArray, byteArrayToHex, hexToByteArray } from '../../helpers/conversion';
+import { stringToByteArray, byteArrayToHex, hexToByteArray, stripHexPrefix } from '../../helpers/conversion';
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
+import { PublicIdentity, PrivateIdentity } from '../../models/Identity';
+import { Debug } from '../../Debug';
+import { HexString } from '../../helpers/opaqueTypes';
 
 export interface EncryptedData<T> {
     secret: string;
@@ -60,6 +63,16 @@ export const genKeyPair = (randomHex: string): ec.KeyPair => {
     };
     const keyPair = curve.genKeyPair(keyPairOptions);
     return keyPair;
+};
+
+export const publicKeyFromPublicIdentity = (publicIdentity: PublicIdentity): ec.KeyPair => {
+    const curve = new ec('secp256k1');
+    return curve.keyFromPublic(stripHexPrefix(publicIdentity.publicKey as HexString), 'hex');
+};
+
+export const privateKeyFromPrivateIdentity = (privateIdentity: PrivateIdentity): ec.KeyPair => {
+    const curve = new ec('secp256k1');
+    return curve.keyFromPrivate(privateIdentity.privateKey, 'hex');
 };
 
 export const deriveSharedKey = (privateKeyPair: ec.KeyPair, publicKeyPair: ec.KeyPair): string => {
