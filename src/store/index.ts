@@ -50,7 +50,6 @@ export const initStore = async (initCallback: (store: Store<AppState, Actions>) 
 
     const legacyAppState = await getLegacyAppState();
     const initialState = legacyAppState != null ? legacyAppState : defaultState;
-
     const storeInner = createStore(
         persistedReducer,
         initialState,

@@ -3,7 +3,7 @@ import { immutableTransformHack } from '../reducers/immutableTransformHack';
 import { currentAppStateVersion, AppState } from '../reducers/AppState';
 import { migrateAppState } from '../reducers/migration';
 import { AsyncStorage } from 'react-native';
-import { AppStateV3 } from '../reducers/version3';
+import { AppStateV4 } from '../reducers/version4';
 
 class LegacyPersistConfig implements PersistConfig {
     public transforms = [immutableTransformHack({
@@ -18,11 +18,15 @@ class LegacyPersistConfig implements PersistConfig {
 
 const legacyPersistConfig = new LegacyPersistConfig();
 
-export const getLegacyAppState = async (): Promise<AppStateV3 | null> => {
+export const getLegacyAppState = async (): Promise<AppStateV4 | null> => {
     try {
         const serializedAppState = await getLegacySerializedAppState();
         const appState = await getLegacyAppStateFromSerialized(serializedAppState);
-        return await migrateLegacyAppStateToCurrentVersion(appState);
+        const legacyAppState =  await migrateLegacyAppStateToCurrentVersion(appState);
+        // clean from redux-persist metadata which breaks it when using it as seed state
+        delete legacyAppState._persist;
+        return legacyAppState;
+
     } catch (e) {
         return null;
     }
