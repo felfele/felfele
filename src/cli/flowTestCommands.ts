@@ -4,16 +4,18 @@ import { output } from './cliHelpers';
 import { byteArrayToHex, hexToByteArray, stripHexPrefix, hexToUint8Array } from '../helpers/conversion';
 import { Debug } from '../Debug';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
-import * as Swarm from '../swarm/Swarm';
+import * as SwarmHelpers from '../swarm/Swarm';
 import { swarmConfig } from './swarmConfig';
 import { createInvitedContact, createCodeReceivedContact, advanceContactState, deriveSharedKey } from '../helpers/contactHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './flowTest/inviteFlow';
-import { SwarmFeeds } from './flowTest/SwarmFeeds';
+import { SwarmFeeds, Swarm } from './flowTest/SwarmFeeds';
 import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity } from './flowTest/flowTestHelpers';
 import { PrivateProfile } from '../models/Profile';
-import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd } from '../helpers/groupHelpers';
+import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
+import { PublicIdentity, PrivateIdentity } from '../models/Identity';
+import { serialize, deserialize } from '../social/serialization';
 
 export const flowTestCommandDefinition =
     addCommand('invite', 'Test invite process', async () => {
@@ -53,14 +55,14 @@ export const flowTestCommandDefinition =
             const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
             return randomBytes;
         };
-        const aliceIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const aliceIdentity = await SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
         const aliceProfile = {
             name: 'Alice',
             image: {},
             identity: aliceIdentity,
         };
         const aliceContactHelper = await createSwarmContactHelper(aliceProfile, swarmConfig.gatewayAddress, generateDeterministicRandom);
-        const bobIdentity = await Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const bobIdentity = await SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
         const bobProfile = {
             name: 'Bob',
             image: {},
@@ -94,7 +96,7 @@ export const flowTestCommandDefinition =
             const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
             return randomBytes;
         };
-        const generateIdentity = () => Swarm.generateSecureIdentity(generateDeterministicRandom);
+        const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
         const generateRandomSecret = () => generateDeterministicRandom(32);
 
         interface Group {
@@ -104,7 +106,9 @@ export const flowTestCommandDefinition =
         }
 
         interface ProfileWithState extends PrivateProfile {
-            commands: GroupCommand[];
+            ownCommands: GroupCommand[];
+            remoteCommands: GroupCommand[];
+            highestSeenTimestamp: number;
             group: Group;
         }
 
@@ -117,17 +121,33 @@ export const flowTestCommandDefinition =
             name: 'Alice',
             image: {},
             identity: await generateIdentity(),
-            commands: [],
+            ownCommands: [],
+            remoteCommands: [],
+            highestSeenTimestamp: 0,
+            group: {
+                sharedSecret: 'secret' as HexString,
+                participants: [],
+            },
+        };
+        const bobProfile: ProfileWithState = {
+            name: 'Bob',
+            image: {},
+            identity: await generateIdentity(),
+            ownCommands: [],
+            remoteCommands: [],
+            highestSeenTimestamp: 0,
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
             },
         };
-        const bobProfile = {
-            name: 'Bob',
+        const carolProfile: ProfileWithState = {
+            name: 'Carol',
             image: {},
             identity: await generateIdentity(),
-            commands: [],
+            ownCommands: [],
+            remoteCommands: [],
+            highestSeenTimestamp: 0,
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
@@ -146,26 +166,96 @@ export const flowTestCommandDefinition =
             return byteArrayToHex(topicBytes);
         };
 
-        interface GroupFlowState extends Group {
+        interface GroupFlowState {
             profiles: ProfileWithState[];
         }
 
-        const swarmFeeds = new SwarmFeeds();
+        type PartialChapter<T> = {
+            protocol: 'timeline',
+            version: 1,
+            timestamp: number,
+            author: string,
+            type: string,
+            content: T,
+            previous?: string,
+            references?: Array<string>,
+            signature?: string,
+        };
 
-        const highestSeenTimestamp = (state: GroupFlowState) => {
-            const allCommands = state.profiles.map(profile => profile.commands);
+        type Chapter<T> = PartialChapter<T> & { id: string };
+
+        const swarm = new Swarm();
+
+        const groupHighestSeenTimestamp = (state: GroupFlowState) => {
+            const allCommands = state.profiles.map(profile => profile.ownCommands);
             return allCommands.reduce((prev, curr) => curr.length > 0 && curr[0].timestamp > prev
                 ? curr[0].timestamp
                 : prev
             , 0);
         };
-        const sendGroupCommand = async (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupFlowState> => {
+        const highestSeenTimestamp = (commands: GroupCommand[]) => {
+            return commands.reduce((prev, curr) => curr.timestamp > prev
+                ? curr.timestamp
+                : prev
+            , 0);
+        };
+        const readPrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
+            const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
+            const hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+            if (hash == null) {
+                return undefined;
+            }
+            const data = swarm.read(hash);
+            if (data == null) {
+                return undefined;
+            }
+            const chapter = deserialize(data) as PartialChapter<string>;
+            return chapter.content;
+        };
+        const readTimeline = (ownerIdentity: PublicIdentity, topic: HexString) => {
+            let hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+            if (hash == null) {
+                return [];
+            }
+            const contents: any[] = [];
+            while (true) {
+                const data = swarm.read(hash);
+                if (data == null) {
+                    return contents;
+                }
+                const chapter = deserialize(data) as PartialChapter<string>;
+                contents.push(chapter.content);
+                if (chapter.previous == null) {
+                    return contents;
+                }
+                hash = chapter.previous;
+            }
+        };
+        const updatePrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: string) => {
+            const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
+            return updateTimeline(ownerIdentity, topic, data);
+        };
+        const updateTimeline = (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
+            const previous = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+            const chapter: PartialChapter<string> = {
+                protocol: 'timeline',
+                version: 1,
+                timestamp: Date.now(),
+                author: ownerIdentity.address,
+                type: 'text/plain',
+                content: data,
+                previous,
+            };
+            const hash = swarm.write(serialize(chapter));
+            return swarm.feeds.write(privateKeyFromPrivateIdentity(ownerIdentity), topic, hash);
+        };
+        const sendGroupCommand = (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): GroupFlowState => {
             const sender = state.profiles[senderIndex];
-            const topic = calculateTopic(state.sharedSecret, state.participants);
-            swarmFeeds.write(privateKeyFromPrivateIdentity(sender.identity), topic, groupCommand);
+            const topic = calculateTopic(sender.group.sharedSecret, sender.group.participants);
+            updateTimeline(sender.identity, topic, serialize(groupCommand));
             const updatedSender = {
                 ...sender,
-                commands: [groupCommand, ...sender.commands],
+                ownCommands: [groupCommand, ...sender.ownCommands],
             };
             return {
                 ...state,
@@ -174,8 +264,8 @@ export const flowTestCommandDefinition =
         };
         const sendGroupMessage = async (state: GroupFlowState, senderIndex: number, message: string): Promise<GroupFlowState> => {
             const command: GroupCommandPost = {
-                type: 'group-command-message',
-                timestamp: highestSeenTimestamp(state) + 1,
+                type: 'group-command-post',
+                timestamp: groupHighestSeenTimestamp(state) + 1,
 
                 post: {
                     images: [],
@@ -185,41 +275,172 @@ export const flowTestCommandDefinition =
             };
             return sendGroupCommand(state, senderIndex, command);
         };
-        const createGroupAndInvite = async (state: GroupFlowState, creatorIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
-            if (creatorIndex === invitedIndex) {
-                throwError('creatorIndex cannot be equal to invitedIndex');
-            }
-            const creator = state.profiles[creatorIndex];
+        const addToGroup = (state: GroupFlowState, senderIndex: number, invitedIndex: number): GroupFlowState => {
+            const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            const addCreatorCommand: GroupCommandAdd = {
-                type: 'group-command-add',
-                timestamp: highestSeenTimestamp(state) + 1,
-
-                identity: creator.identity,
-                name: creator.name,
+            const updatedSender = {
+                ...sender,
+                group: {
+                    ...sender.group,
+                    participants: [...sender.group.participants, invited.identity.publicKey as HexString],
+                },
             };
-            const groupStateWithCreator = await sendGroupCommand(state, creatorIndex, addCreatorCommand);
-
-            const addInvitedCommand: GroupCommandAdd = {
+            return {
+                ...state,
+                profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
+            };
+        };
+        const addToGroupAndSendCommand = (state: GroupFlowState, senderIndex: number, invitedIndex: number): GroupFlowState => {
+            const invited = state.profiles[invitedIndex];
+            const groupCommandAdd: GroupCommandAdd = {
                 type: 'group-command-add',
-                timestamp: highestSeenTimestamp(groupStateWithCreator) + 1,
+                timestamp: groupHighestSeenTimestamp(state) + 1,
 
                 identity: invited.identity,
                 name: invited.name,
             };
-            const groupStateWithInvited = await sendGroupCommand(groupStateWithCreator, creatorIndex, addInvitedCommand);
+            const updatedState = sendGroupCommand(state, senderIndex, groupCommandAdd);
+            return addToGroup(updatedState, senderIndex, invitedIndex);
+        };
+        const createGroupAndInvite = async (groupState: GroupFlowState, creatorIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+            if (creatorIndex === invitedIndex) {
+                throwError('creatorIndex cannot be equal to invitedIndex');
+            }
+            return compose([
+                state => addToGroupAndSendCommand(state, creatorIndex, creatorIndex),
+                state => addToGroupAndSendCommand(state, creatorIndex, invitedIndex),
+            ])(groupState);
+        };
+        const sendPrivateInvite = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+            if (senderIndex === invitedIndex) {
+                throwError('senderIndex cannot be equal to invitedIndex');
+            }
+            const sender = state.profiles[senderIndex];
+            const invited = state.profiles[invitedIndex];
 
-            return groupStateWithInvited;
+            updatePrivateSharedFeed(sender.identity, invited.identity, serialize({
+                type: 'invite-to-group',
+                group: sender.group,
+            }));
+
+            return state;
+        };
+        const receivePrivateInvite = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+            if (senderIndex === invitedIndex) {
+                throwError('senderIndex cannot be equal to invitedIndex');
+            }
+            const sender = state.profiles[senderIndex];
+            const invited = state.profiles[invitedIndex];
+
+            const data = readPrivateSharedFeed(sender.identity, invited.identity);
+            if (data == null) {
+                return state;
+            }
+            const inviteCommand = deserialize(data) as InviteToGroupCommand;
+
+            const updatedInvited = {
+                ...invited,
+                group: inviteCommand.group,
+            };
+
+            return {
+                ...state,
+                profiles: [...state.profiles.slice(0, invitedIndex), updatedInvited, ...state.profiles.slice(invitedIndex + 1)],
+            };
+        };
+        const executeRemoteGroupCommand = (profile: ProfileWithState, command: GroupCommand): ProfileWithState => {
+            switch (command.type) {
+                case 'group-command-add': {
+                    if (profile.group.participants.indexOf(command.identity.publicKey as HexString) !== -1) {
+                        return {
+                            ...profile,
+                            remoteCommands: [command, ...profile.remoteCommands],
+                        };
+                    }
+                    return {
+                        ...profile,
+                        group: {
+                            ...profile.group,
+                            participants: [...profile.group.participants, command.identity.publicKey as HexString],
+                        },
+                        remoteCommands: [command, ...profile.remoteCommands],
+                    };
+                }
+                default: {
+                    return {
+                        ...profile,
+                        remoteCommands: [command, ...profile.remoteCommands],
+                    };
+                }
+            }
+        };
+        const receiveProfileGroupCommands = (profile: ProfileWithState): ProfileWithState => {
+            const remoteCommands = fetchGroupCommands(profile.group);
+            const lastSeenTimestamp = highestSeenTimestamp(profile.remoteCommands);
+            const newCommands = remoteCommands
+                .filter(command => command.source !== profile.identity.publicKey as HexString)
+                .filter(command => command.timestamp > lastSeenTimestamp)
+                .sort((a, b) => b.timestamp - a.timestamp)
+            ;
+            return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), profile);
+        };
+        const receiveGroupCommands = (state: GroupFlowState, receiverIndex: number): GroupFlowState => {
+            Debug.log('receiveGroupCommands', receiverIndex);
+            const receiver = state.profiles[receiverIndex];
+            const updatedReceiver = receiveProfileGroupCommands(receiver);
+            return {
+                ...state,
+                profiles: [...state.profiles.slice(0, receiverIndex), updatedReceiver, ...state.profiles.slice(receiverIndex + 1)],
+            };
+        };
+        const syncGroupCommands = (state: GroupFlowState): GroupFlowState => {
+            const profiles = state.profiles.map(profile => receiveProfileGroupCommands(profile));
+            return {
+                ...state,
+                profiles,
+            };
+        };
+        const fetchGroupCommands = (group: Group): GroupCommandWithSource[] => {
+            const topic = calculateTopic(group.sharedSecret, group.participants);
+            const commandLists = group.participants.map(participant => {
+                const contents = readTimeline({publicKey: participant, address: ''}, topic);
+                return contents.map(content => ({
+                    ...deserialize(content) as GroupCommand,
+                    source: participant,
+                }));
+            });
+            const commands = commandLists
+                .reduce((prev, curr) => prev.concat(curr), [])
+                .sort((a, b) => b.timestamp - a.timestamp)
+            ;
+            return commands;
+        };
+        const areGroupsEqual = (groupA: Group, groupB: Group): boolean => {
+            return groupA.sharedSecret === groupB.sharedSecret &&
+                groupA.participants.length === groupB.participants.length &&
+                groupA.participants.join('/') === groupB.participants.join('/')
+            ;
+        };
+        const assertProfileGroupStatesAreEqual = (groupState: GroupFlowState): void | never => {
+            const reducedGroups = groupState.profiles.reduce<Group[]>((prev, curr, ind, arr) =>
+                ind > 0 && areGroupsEqual(curr.group, arr[ind - 1].group)
+                ? prev
+                : prev.concat(curr.group)
+            , []);
+            if (reducedGroups.length > 1) {
+                throwError(`assertProfileGroupStatesAreEqual: failed ${JSON.stringify(reducedGroups)}`);
+            }
+        };
+        const assertProfileCommandsAreEqual = (groupState: GroupFlowState): void | never => {
+
+        };
+        const assertGroupStateInvariants = (groupState: GroupFlowState): void | never => {
+            assertProfileGroupStatesAreEqual(groupState);
+            assertProfileCommandsAreEqual(groupState);
         };
 
-        const inputState = {
-            sharedSecret: '' as HexString,
-            participants: [],
-            profiles: [aliceProfile, bobProfile],
-        };
-
-        const compose = (functions: ((state: GroupFlowState) => Promise<GroupFlowState>)[]) => {
+        const compose = (functions: ((state: GroupFlowState) => GroupFlowState | Promise<GroupFlowState>)[]) => {
             return async (initialState: GroupFlowState) => {
                 let returnState = initialState;
                 for (const f of functions) {
@@ -229,14 +450,43 @@ export const flowTestCommandDefinition =
             };
         };
 
+        const inputState: GroupFlowState = {
+            profiles: [aliceProfile, bobProfile, carolProfile],
+        };
+
         const outputState = await compose([
             (state) => createGroupAndInvite(state, 0, 1),
+            (state) => sendPrivateInvite(state, 0, 1),
+            (state) => receivePrivateInvite(state, 0, 1),
             (state) => sendGroupMessage(state, 0, 'hello Bob'),
+            (state) => receiveGroupCommands(state, 1),
             (state) => sendGroupMessage(state, 1, 'hello Alice'),
+            (state) => receiveGroupCommands(state, 0),
             (state) => sendGroupMessage(state, 0, 'test'),
+            (state) => receiveGroupCommands(state, 1),
+            (state) => addToGroupAndSendCommand(state, 1, 2),
+            (state) => receiveGroupCommands(state, 0),
+            (state) => sendPrivateInvite(state, 1, 2),
+            (state) => receivePrivateInvite(state, 1, 2),
+            (state) => sendGroupMessage(state, 1, 'hello Carol'),
+            (state) => receiveGroupCommands(state, 0),
+            (state) => receiveGroupCommands(state, 1),
+            (state) => receiveGroupCommands(state, 2),
         ])(inputState);
 
-        output(outputState);
+        assertGroupStateInvariants(outputState);
+
+        const sortedProfileCommands = (profile: ProfileWithState) =>
+            profile.remoteCommands
+                .concat(profile.ownCommands)
+                .sort((a, b) => b.timestamp - a.timestamp)
+        ;
+        const groupCommands = sortedProfileCommands(outputState.profiles[2]);
+        output(groupCommands);
+
+        const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
+        const groupPosts = groupCommands.map(gcws => gcws as GroupCommand).filter(isGroupPost).map(value => value.post);
+        output(groupPosts);
     })
 ;
 /*

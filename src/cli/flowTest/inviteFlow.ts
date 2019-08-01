@@ -3,8 +3,9 @@ import { ec } from 'elliptic';
 import { genKeyPair, throwError, deriveSharedKey } from './flowTestHelpers';
 import { encrypt, decrypt, EncryptedData } from './flowTestHelpers';
 import { SwarmFeeds } from './SwarmFeeds';
+import { HexString } from '../../helpers/opaqueTypes';
 
-const contactTopic = 'contact';
+const contactTopic = 'contact' as HexString;
 
 interface User {
     ownKeyPair: ec.KeyPair;

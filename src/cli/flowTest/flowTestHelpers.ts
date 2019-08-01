@@ -72,7 +72,7 @@ export const publicKeyFromPublicIdentity = (publicIdentity: PublicIdentity): ec.
 
 export const privateKeyFromPrivateIdentity = (privateIdentity: PrivateIdentity): ec.KeyPair => {
     const curve = new ec('secp256k1');
-    return curve.keyFromPrivate(privateIdentity.privateKey, 'hex');
+    return curve.keyFromPrivate(stripHexPrefix(privateIdentity.privateKey as HexString), 'hex');
 };
 
 export const deriveSharedKey = (privateKeyPair: ec.KeyPair, publicKeyPair: ec.KeyPair): string => {

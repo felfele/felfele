@@ -19,13 +19,14 @@ export interface GroupCommandRemove {
 }
 
 export interface GroupCommandPost {
-    type: 'group-command-message';
+    type: 'group-command-post';
     timestamp: number;
 
     post: Post;
 }
 
 export type GroupCommand = GroupCommandAdd | GroupCommandRemove | GroupCommandPost;
+export type GroupCommandWithSource = GroupCommand & { source: HexString };
 
 const flattenUint8Arrays = (inputs: Uint8Array[]): Uint8Array => {
     const numbers = inputs
