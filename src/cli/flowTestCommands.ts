@@ -154,14 +154,9 @@ export const flowTestCommandDefinition =
             },
         };
 
-        const calculateTopic = (secret: HexString, participants: HexString[]): HexString => {
-            const secretWithoutPrefix = stripHexPrefix(secret);
-            const participantList = participants
-                .map(p => stripHexPrefix(p))
-                .sort((a, b) => b.localeCompare(a))
-                .join('')
-            ;
-            const bytes = hexToUint8Array(secretWithoutPrefix + participantList);
+        const calculateGroupTopic = (group: Group): HexString => {
+            const secretWithoutPrefix = stripHexPrefix(group.sharedSecret);
+            const bytes = hexToUint8Array(secretWithoutPrefix);
             const topicBytes = keyDerivationFunction([bytes]);
             return byteArrayToHex(topicBytes);
         };
@@ -251,7 +246,7 @@ export const flowTestCommandDefinition =
         };
         const sendGroupCommand = (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): GroupFlowState => {
             const sender = state.profiles[senderIndex];
-            const topic = calculateTopic(sender.group.sharedSecret, sender.group.participants);
+            const topic = calculateGroupTopic(sender.group);
             updateTimeline(sender.identity, topic, serialize(groupCommand));
             const updatedSender = {
                 ...sender,
@@ -402,7 +397,7 @@ export const flowTestCommandDefinition =
             };
         };
         const fetchGroupCommands = (group: Group): GroupCommandWithSource[] => {
-            const topic = calculateTopic(group.sharedSecret, group.participants);
+            const topic = calculateGroupTopic(group);
             const commandLists = group.participants.map(participant => {
                 const contents = readTimeline({publicKey: participant, address: ''}, topic);
                 return contents.map(content => ({
@@ -432,8 +427,10 @@ export const flowTestCommandDefinition =
                 throwError(`assertProfileGroupStatesAreEqual: failed ${JSON.stringify(reducedGroups)}`);
             }
         };
+        const areCommandsEqual = (commandsA: GroupCommand[], commandsB: GroupCommand[]): boolean => {
+            return JSON.stringify(commandsA) === JSON.stringify(commandsB);
+        };
         const assertProfileCommandsAreEqual = (groupState: GroupFlowState): void | never => {
-
         };
         const assertGroupStateInvariants = (groupState: GroupFlowState): void | never => {
             assertProfileGroupStatesAreEqual(groupState);
@@ -481,7 +478,7 @@ export const flowTestCommandDefinition =
                 .concat(profile.ownCommands)
                 .sort((a, b) => b.timestamp - a.timestamp)
         ;
-        const groupCommands = sortedProfileCommands(outputState.profiles[2]);
+        const groupCommands = sortedProfileCommands(outputState.profiles[0]);
         output(groupCommands);
 
         const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
