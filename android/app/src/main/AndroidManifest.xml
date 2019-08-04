@@ -60,7 +60,6 @@
             <action android:name="android.intent.action.SEND" />
             <category android:name="android.intent.category.DEFAULT" />
             <data android:mimeType="text/plain" />
-            <data android:mimeType="image/*" />
         </intent-filter>
         </activity>
         <!-- Change the resource name to your App's accent color - or any other color you want -->
