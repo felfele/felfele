@@ -1,6 +1,4 @@
 import { connect } from 'react-redux';
-// @ts-ignore
-import ShareExtension from 'react-native-share-extension';
 
 import { AppState } from '../reducers/AppState';
 import { StateProps, PostEditor } from '../components/PostEditor';

@@ -10,6 +10,7 @@ import { initStore } from '../store';
 import { SharePostEditorContainer } from './SharePostEditorContainer';
 import { Debug } from '../Debug';
 import { Actions } from '../actions/Actions';
+import { FELFELE_SHARE_EXTENSION_NAME } from '../reducers/defaultData';
 
 interface ShareState {
     store: any;
@@ -39,8 +40,10 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
                         <SharePostEditorContainer
                             text={this.state.value}
                             goBack={() => {
-                                this.state.store.dispatch(Actions.updateAppLastEditing('ShareExtension'));
-                                ShareExtension.close();
+                                this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
+                                this.state.persistor!.flush().then(() => {
+                                    ShareExtension.close();
+                                });
                                 return true;
                             }}
                             dismiss={() => {

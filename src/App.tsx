@@ -67,6 +67,7 @@ import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
 import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
+import { FELFELE_APP_NAME } from './reducers/defaultData';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -442,11 +443,10 @@ export default class FelfeleApp extends React.Component<{}, FelfeleAppState> {
         if (this.state.nativeAppState.match(/inactive|background/) && nextAppState === 'active') {
             Debug.log('App has come to the foreground');
             if (this.state.store != null) {
-                const appName = 'Felfele';
                 const serializedAppState = await getSerializedAppState();
                 const appState = await getAppStateFromSerialized(serializedAppState);
-                if (appState.lastEditingApp != null && appState.lastEditingApp !== appName) {
-                    this.state.store.dispatch(Actions.updateAppLastEditing(appName));
+                if (appState.lastEditingApp != null && appState.lastEditingApp !== FELFELE_APP_NAME) {
+                    this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_APP_NAME));
                     restartApp();
                 }
             }
