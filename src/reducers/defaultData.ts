@@ -24,6 +24,8 @@ export const defaultAuthor: Author = {
     identity: undefined,
 };
 
+export const FELFELE_APP_NAME = 'Felfele';
+export const FELFELE_SHARE_EXTENSION_NAME = 'ShareExtension';
 export const FELFELE_ASSISTANT_NAME = 'Felfele Assistant';
 export const FELFELE_ASSISTANT_URL = 'local/onboarding';
 export const FELFELE_FOUNDATION_URL = 'bzz-feed:/?user=0xdbbac89704424c90dce46043686c743f0d9dbdda';
@@ -117,4 +119,5 @@ export const defaultState: AppState = {
     draft: null,
     metadata: defaultMetadata,
     contacts: [],
+    lastEditingApp: null,
 };

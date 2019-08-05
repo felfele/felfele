@@ -1,8 +1,9 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScreen';
 import { TypedNavigation } from '../helpers/navigation';
+import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { emptyPostCommandLog } from '../social/api';

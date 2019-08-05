@@ -8,7 +8,13 @@ import {
 } from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, YellowBox, View } from 'react-native';
+import {
+    Platform,
+    YellowBox,
+    View,
+    AppState,
+    AppStateStatus,
+} from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
@@ -16,7 +22,6 @@ import { setCustomText } from 'react-native-global-props';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { store, persistor } from './reducers';
 import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
 import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
@@ -56,7 +61,13 @@ import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
+import { Persistor } from 'redux-persist';
+import { Actions } from './actions/Actions';
+import { restartApp } from './helpers/restart';
+import { felfeleInitAppActions } from './store/felfeleInit';
 import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
+import { FELFELE_APP_NAME } from './reducers/defaultData';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -387,16 +398,61 @@ const InitialNavigator = createSwitchNavigator({
     backBehavior: 'initialRoute',
 });
 
-export default class App extends React.Component {
+interface FelfeleAppState {
+    store: any;
+    persistor: Persistor | null;
+    nativeAppState: AppStateStatus;
+}
+
+export default class FelfeleApp extends React.Component<{}, FelfeleAppState> {
+    public state: FelfeleAppState = {
+        store: null,
+        persistor: null,
+        nativeAppState: AppState.currentState,
+    };
+
     public render() {
+        if (this.state.store == null) {
+            return null;
+        }
         return (
             <TopLevelErrorBoundary>
-                <Provider store={store}>
-                    <PersistGate loading={null} persistor={persistor}>
+                <Provider store={this.state.store!}>
+                    <PersistGate loading={null} persistor={this.state.persistor!}>
                         <InitialNavigator/>
                     </PersistGate>
                 </Provider>
             </TopLevelErrorBoundary>
         );
+    }
+
+    public async componentDidMount() {
+        AppState.addEventListener('change', this.handleAppStateChange);
+        const { store, persistor } = await initStore(felfeleInitAppActions);
+        this.setState({
+            store,
+            persistor,
+        });
+    }
+
+    public componentWillUnmount() {
+      AppState.removeEventListener('change', this.handleAppStateChange);
+    }
+
+    private handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        if (this.state.nativeAppState.match(/inactive|background/) && nextAppState === 'active') {
+            Debug.log('App has come to the foreground');
+            if (this.state.store != null) {
+                const serializedAppState = await getSerializedAppState();
+                const appState = await getAppStateFromSerialized(serializedAppState);
+                if (appState.lastEditingApp != null && appState.lastEditingApp !== FELFELE_APP_NAME) {
+                    this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_APP_NAME));
+                    restartApp();
+                }
+            }
+        }
+        this.setState({
+            nativeAppState: nextAppState,
+        });
     }
 }
