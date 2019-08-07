@@ -292,7 +292,10 @@ export const flowTestCommandDefinition =
                 type: 'group-command-add',
                 timestamp: groupHighestSeenTimestamp(state) + 1,
 
-                identity: invited.identity,
+                identity: {
+                    address: invited.identity.address,
+                    publicKey: invited.identity.publicKey,
+                },
                 name: invited.name,
             };
             const updatedState = sendGroupCommand(state, senderIndex, groupCommandAdd);
@@ -424,7 +427,20 @@ export const flowTestCommandDefinition =
         const areCommandsEqual = (commandsA: GroupCommand[], commandsB: GroupCommand[]): boolean => {
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
+        const sortedProfileCommands = (profile: ProfileWithState) =>
+            profile.remoteCommands
+                .concat(profile.ownCommands)
+                .map(command => ({...command, source: undefined}))
+                .sort((a, b) => b.timestamp - a.timestamp)
+        ;
         const assertProfileCommandsAreEqual = (groupState: GroupFlowState): void | never => {
+            for (let i = 1; i < groupState.profiles.length; i++) {
+                const sortedProfileCommandsA = sortedProfileCommands(groupState.profiles[i - 1]);
+                const sortedProfileCommandsB = sortedProfileCommands(groupState.profiles[i]);
+                if (!areCommandsEqual(sortedProfileCommandsA, sortedProfileCommandsB)) {
+                    throwError(`assertProfileCommandsAreEqual: failed at i=${i},\n\n${JSON.stringify(sortedProfileCommandsA)}\n\n !==\n\n${JSON.stringify(sortedProfileCommandsB)}`);
+                }
+            }
         };
         const assertGroupStateInvariants = (groupState: GroupFlowState): void | never => {
             assertProfileGroupStatesAreEqual(groupState);
@@ -467,12 +483,7 @@ export const flowTestCommandDefinition =
 
         assertGroupStateInvariants(outputState);
 
-        const sortedProfileCommands = (profile: ProfileWithState) =>
-            profile.remoteCommands
-                .concat(profile.ownCommands)
-                .sort((a, b) => b.timestamp - a.timestamp)
-        ;
-        const groupCommands = sortedProfileCommands(outputState.profiles[2]);
+        const groupCommands = sortedProfileCommands(outputState.profiles[1]);
         output(groupCommands);
 
         const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
