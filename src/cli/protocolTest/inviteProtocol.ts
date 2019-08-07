@@ -1,7 +1,7 @@
 import { Debug } from '../../Debug';
 import { ec } from 'elliptic';
-import { genKeyPair, throwError, deriveSharedKey } from './flowTestHelpers';
-import { encrypt, decrypt, EncryptedData } from './flowTestHelpers';
+import { genKeyPair, throwError, deriveSharedKey } from './protocolTestHelpers';
+import { encrypt, decrypt, EncryptedData } from './protocolTestHelpers';
 import { SwarmFeeds } from './SwarmFeeds';
 import { HexString } from '../../helpers/opaqueTypes';
 

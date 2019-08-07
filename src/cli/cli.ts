@@ -15,7 +15,7 @@ import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { flowTestCommandDefinition } from './flowTestCommands';
+import { flowTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -130,7 +130,7 @@ const definitions =
         output({data});
     })
     .
-    addCommand('flowTest', 'Test interactive workflows', flowTestCommandDefinition)
+    addCommand('protocolTest', 'Test protocols', protocolTestCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);

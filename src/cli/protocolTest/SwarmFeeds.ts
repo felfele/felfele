@@ -1,6 +1,6 @@
 import { ec } from 'elliptic';
 import { Debug } from '../../Debug';
-import { publicKeyToAddress } from './flowTestHelpers';
+import { publicKeyToAddress } from './protocolTestHelpers';
 import { keyDerivationFunction } from '../../helpers/groupHelpers';
 import { stringToByteArray, byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
 import { HexString } from '../../helpers/opaqueTypes';
