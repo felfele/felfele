@@ -194,7 +194,7 @@ export const flowTestCommandDefinition =
                 : prev
             , 0);
         };
-        const readPrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
+        const readPrivateSharedFeed = async (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
             const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
             const hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
             if (hash == null) {
@@ -207,21 +207,21 @@ export const flowTestCommandDefinition =
             const chapter = deserialize(data) as PartialChapter<string>;
             return chapter.content;
         };
-        const readTimeline = (ownerIdentity: PublicIdentity, topic: HexString) => {
+        const readTimeline = async <T>(ownerIdentity: PublicIdentity, topic: HexString): Promise<PartialChapter<T>[]> => {
             let hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
             if (hash == null) {
                 return [];
             }
-            const contents: any[] = [];
+            const chapters: any[] = [];
             while (true) {
                 const data = swarm.read(hash);
                 if (data == null) {
-                    return contents;
+                    return chapters;
                 }
                 const chapter = deserialize(data) as PartialChapter<string>;
-                contents.push(chapter.content);
+                chapters.push(chapter);
                 if (chapter.previous == null) {
-                    return contents;
+                    return chapters;
                 }
                 hash = chapter.previous;
             }
@@ -328,7 +328,7 @@ export const flowTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            const data = readPrivateSharedFeed(sender.identity, invited.identity);
+            const data = await readPrivateSharedFeed(sender.identity, invited.identity);
             if (data == null) {
                 return state;
             }
@@ -370,8 +370,8 @@ export const flowTestCommandDefinition =
                 }
             }
         };
-        const receiveProfileGroupCommands = (profile: ProfileWithState): ProfileWithState => {
-            const remoteCommands = fetchGroupCommands(profile.group);
+        const receiveProfileGroupCommands = async (profile: ProfileWithState): Promise<ProfileWithState> => {
+            const remoteCommands = await fetchGroupCommands(profile.group);
             const lastSeenTimestamp = highestSeenTimestamp(profile.remoteCommands);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
@@ -380,31 +380,25 @@ export const flowTestCommandDefinition =
             ;
             return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), profile);
         };
-        const receiveGroupCommands = (state: GroupFlowState, receiverIndex: number): GroupFlowState => {
+        const receiveGroupCommands = async (state: GroupFlowState, receiverIndex: number): Promise<GroupFlowState> => {
             Debug.log('receiveGroupCommands', receiverIndex);
             const receiver = state.profiles[receiverIndex];
-            const updatedReceiver = receiveProfileGroupCommands(receiver);
+            const updatedReceiver = await receiveProfileGroupCommands(receiver);
             return {
                 ...state,
                 profiles: [...state.profiles.slice(0, receiverIndex), updatedReceiver, ...state.profiles.slice(receiverIndex + 1)],
             };
         };
-        const syncGroupCommands = (state: GroupFlowState): GroupFlowState => {
-            const profiles = state.profiles.map(profile => receiveProfileGroupCommands(profile));
-            return {
-                ...state,
-                profiles,
-            };
-        };
-        const fetchGroupCommands = (group: Group): GroupCommandWithSource[] => {
+        const fetchGroupCommands = async (group: Group): Promise<GroupCommandWithSource[]> => {
             const topic = calculateGroupTopic(group);
-            const commandLists = group.participants.map(participant => {
-                const contents = readTimeline({publicKey: participant, address: ''}, topic);
-                return contents.map(content => ({
-                    ...deserialize(content) as GroupCommand,
+            const commandLists: GroupCommandWithSource[][]  = [];
+            for (const participant of group.participants) {
+                const chapters = await readTimeline<string>({publicKey: participant, address: ''}, topic);
+                commandLists.push(chapters.map(chapter => ({
+                    ...deserialize(chapter.content) as GroupCommand,
                     source: participant,
-                }));
-            });
+                })));
+            }
             const commands = commandLists
                 .reduce((prev, curr) => prev.concat(curr), [])
                 .sort((a, b) => b.timestamp - a.timestamp)
@@ -478,7 +472,7 @@ export const flowTestCommandDefinition =
                 .concat(profile.ownCommands)
                 .sort((a, b) => b.timestamp - a.timestamp)
         ;
-        const groupCommands = sortedProfileCommands(outputState.profiles[0]);
+        const groupCommands = sortedProfileCommands(outputState.profiles[2]);
         output(groupCommands);
 
         const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
