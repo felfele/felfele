@@ -16,6 +16,7 @@ import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { flowTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
+import { swarmHelperTests } from './swarmHelperTest';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -48,6 +49,7 @@ const definitions =
             const allTests: any = {
                 ...apiTests,
                 ...syncTests,
+                ...swarmHelperTests,
             };
             if (testName == null) {
                 for (const test of Object.keys(allTests)) {

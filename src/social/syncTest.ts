@@ -17,8 +17,8 @@ import {
     testSharePosts,
     assertPostCommandLogInvariants,
     assertPostCommandLogsAreEqual,
-    assertEquals,
 } from './apiTest';
+import { assertEquals } from '../helpers/assertEquals';
 import { Debug } from '../Debug';
 import {
     syncPostCommandLogWithStorage,
