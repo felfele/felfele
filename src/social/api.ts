@@ -156,7 +156,7 @@ export interface RecentPostFeedStorage {
  * A storage must implement post command log storage and recent
  * feed storage as well.
  */
-export type Storage = PostCommandLogStorage & RecentPostFeedStorage;
+export type PostStorage = PostCommandLogStorage & RecentPostFeedStorage;
 
 /**
  * The updates after a sync is returned in this interface
@@ -179,7 +179,7 @@ export interface StorageSyncUpdate {
 /**
  * This interface must be implemented by storages which supports syncing.
  */
-export interface StorageSyncer {
+export interface PostStorageSyncer {
     /**
      * Syncs the post command logs between the storage and the local command log.
      *

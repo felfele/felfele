@@ -140,6 +140,7 @@ const advanceInvitedContactState = async (
         return contact;
     }
 
+    Debug.log('advanceInvitedContactState', 'after tryRead', pollData, contact);
     const contactPublicKey = helper.decrypt(pollData as HexString, contact.randomSeed);
     const remoteContactIdentity = publicKeyToIdentity(contactPublicKey);
     const sharedKey = deriveSharedKey(contact.contactIdentity, remoteContactIdentity);

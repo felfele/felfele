@@ -24,8 +24,8 @@ import { PrivateIdentity } from '../models/Identity';
 import { generateSecureRandom } from 'react-native-securerandom';
 import {
     isPostFeedUrl,
-    makeSwarmStorage,
-    makeSwarmStorageSyncer,
+    makeSwarmPostStorage,
+    makeSwarmPostStorageSyncer,
     loadRecentPostFeeds,
     getPostsFromRecentPostFeeds,
     SwarmHelpers,
@@ -561,7 +561,7 @@ const getSwarmStorageSyncer = (signFeedDigest: Swarm.FeedDigestSigner, feedUrl: 
         },
         getLocalPath: modelHelper.getLocalPath,
     };
-    const swarmStorage = makeSwarmStorage(swarm, swarmHelpers);
-    const swarmStorageSyncer = makeSwarmStorageSyncer(swarmStorage);
+    const swarmStorage = makeSwarmPostStorage(swarm, swarmHelpers);
+    const swarmStorageSyncer = makeSwarmPostStorageSyncer(swarmStorage);
     return swarmStorageSyncer;
 };

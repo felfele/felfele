@@ -50,8 +50,8 @@ export const createRandomGenerator = (randomArray: string[]) => {
 
 const stringToUint8Array = (s: string): Uint8Array => new Uint8Array(stringToByteArray(s));
 
-export const publicKeyToAddress = (pubKey: any) => {
-    const pubBytes = pubKey.encode();
+export const publicKeyToAddress = (pubKey: ec.KeyPair) => {
+    const pubBytes = pubKey.getPublic().encode();
     return byteArrayToHex(keccak256.array(pubBytes.slice(1)).slice(12));
 };
 

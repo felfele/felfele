@@ -1,45 +1,38 @@
-import { ec } from 'elliptic';
 import { Debug } from '../../Debug';
-import { publicKeyToAddress } from './protocolTestHelpers';
 import { keyDerivationFunction } from '../../helpers/groupHelpers';
 import { stringToByteArray, byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
 import { HexString } from '../../helpers/opaqueTypes';
+import { Storage, StorageFeeds } from './Storage';
 
-export class SwarmFeeds {
-    private feeds: {[name: string]: any} = {};
+export class LocalSwarmStorageFeeds<T> implements StorageFeeds<T> {
+    private feeds: {[name: string]: T} = {};
 
-    public write = (keyPair: ec.KeyPair, topic: HexString, data: any) => {
-        const address = publicKeyToAddress(keyPair.getPublic());
-        const privateKey = keyPair.getPrivate() ? keyPair.getPrivate('hex') : null;
-        const name = keyPair.getPublic(true, 'hex') + '/' + stripHexPrefix(topic);
-        Debug.log('\n--> SwarmFeeds.write', {address, privateKey, name, data});
-        if (keyPair.getPrivate() == null) {
-            throw new Error('missing private key');
-        }
+    public write = async (address: HexString, topic: HexString, data: T) => {
+        const name = stripHexPrefix(address) + '/' + stripHexPrefix(topic);
+        Debug.log('\n--> SwarmFeeds.write', {address, name, data});
         this.feeds[name] = data;
     }
 
-    public read = (keyPair: ec.KeyPair, topic: HexString): any | undefined => {
-        const address = publicKeyToAddress(keyPair.getPublic());
-        const name = keyPair.getPublic(true, 'hex') + '/' + stripHexPrefix(topic);
+    public read = async (address: HexString, topic: HexString) => {
+        const name = stripHexPrefix(address) + '/' + stripHexPrefix(topic);
         const data = this.feeds[name];
         Debug.log('\n<-- SwarmFeeds.read', {address, name, data});
         return data;
     }
 }
 
-export class Swarm {
-    public readonly feeds: SwarmFeeds = new SwarmFeeds();
+export class LocalSwarmStorage implements Storage<string> {
+    public readonly feeds = new LocalSwarmStorageFeeds<string>();
     private store: {[hash: string]: string} = {};
 
-    public write = (data: string): HexString => {
+    public write = async (data: string): Promise<HexString> => {
         const hash = byteArrayToHex(keyDerivationFunction([new Uint8Array(stringToByteArray(data))]), false);
         this.store[hash] = data;
         Debug.log('Swarm.write', {data, hash});
         return hash;
     }
 
-    public read = (hash: HexString): string => {
+    public read = async (hash: HexString): Promise<string> => {
         const data = this.store[hash];
         Debug.log('Swarm.read', {data, hash});
         return data;

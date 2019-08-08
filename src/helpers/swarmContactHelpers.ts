@@ -85,6 +85,7 @@ export const createSwarmContactHelper = (
             const dataBytes = new Uint8Array(hexToByteArray(data));
             const keyBytes = hexToByteArray(key);
             const decryptedBytes = decrypt(dataBytes, keyBytes);
+            Debug.log('decrypt', decryptedBytes);
             return utf8.toString(decryptedBytes);
         },
         ownIdentity: profile.identity,

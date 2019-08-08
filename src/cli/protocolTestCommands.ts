@@ -10,7 +10,7 @@ import { createInvitedContact, createCodeReceivedContact, advanceContactState, d
 import { HexString } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
-import { SwarmFeeds, Swarm } from './protocolTest/SwarmFeeds';
+import { LocalSwarmStorageFeeds, LocalSwarmStorage } from './protocolTest/SwarmFeeds';
 import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
@@ -20,7 +20,7 @@ import { serialize, deserialize } from '../social/serialization';
 export const flowTestCommandDefinition =
     addCommand('invite', 'Test invite process', async () => {
         const nextRandom = createRandomGenerator(randomNumbers);
-        const swarmFeeds = new SwarmFeeds();
+        const swarmFeeds = new LocalSwarmStorageFeeds();
         const alice = createAliceForContact(nextRandom);
         Debug.log('Alice publicKey', alice.ownKeyPair.getPublic('hex'));
         const bob = createBobForContact(nextRandom);
@@ -28,10 +28,10 @@ export const flowTestCommandDefinition =
 
         const qrCode = aliceGeneratesQRCode(alice);
         Debug.log('\n<-- QR code read', qrCode);
-        bobSharesContactPublicKeyAndContactFeed(bob, qrCode, swarmFeeds);
-        aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey(alice, swarmFeeds);
-        bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey(bob, swarmFeeds);
-        aliceReadsBobsEncryptedPublicKey(alice, swarmFeeds);
+        await bobSharesContactPublicKeyAndContactFeed(bob, qrCode, swarmFeeds);
+        await aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey(alice, swarmFeeds);
+        await bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey(bob, swarmFeeds);
+        await aliceReadsBobsEncryptedPublicKey(alice, swarmFeeds);
 
         if (alice.bobPublicKey !== bob.ownKeyPair.getPublic('hex') ||
             bob.alicePublicKey !== alice.ownKeyPair.getPublic('hex')) {
@@ -179,8 +179,6 @@ export const flowTestCommandDefinition =
 
         type Chapter<T> = PartialChapter<T> & { id: string };
 
-        const swarm = new Swarm();
-
         const groupHighestSeenTimestamp = (state: GroupFlowState) => {
             const allCommands = state.profiles.map(profile => profile.ownCommands);
             return allCommands.reduce((prev, curr) => curr.length > 0 && curr[0].timestamp > prev
@@ -196,11 +194,11 @@ export const flowTestCommandDefinition =
         };
         const readPrivateSharedFeed = async (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
             const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
-            const hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+            const hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
             if (hash == null) {
                 return undefined;
             }
-            const data = swarm.read(hash);
+            const data = await swarm.read(hash as HexString);
             if (data == null) {
                 return undefined;
             }
@@ -208,13 +206,13 @@ export const flowTestCommandDefinition =
             return chapter.content;
         };
         const readTimeline = async <T>(ownerIdentity: PublicIdentity, topic: HexString): Promise<PartialChapter<T>[]> => {
-            let hash = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+            let hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
             if (hash == null) {
                 return [];
             }
             const chapters: any[] = [];
             while (true) {
-                const data = swarm.read(hash);
+                const data = await swarm.read(hash as HexString);
                 if (data == null) {
                     return chapters;
                 }
@@ -230,8 +228,8 @@ export const flowTestCommandDefinition =
             const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
             return updateTimeline(ownerIdentity, topic, data);
         };
-        const updateTimeline = (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
-            const previous = swarm.feeds.read(publicKeyFromPublicIdentity(ownerIdentity), topic);
+        const updateTimeline = async (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
+            const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
             const chapter: PartialChapter<string> = {
                 protocol: 'timeline',
                 version: 1,
@@ -241,8 +239,8 @@ export const flowTestCommandDefinition =
                 content: data,
                 previous,
             };
-            const hash = swarm.write(serialize(chapter));
-            return swarm.feeds.write(privateKeyFromPrivateIdentity(ownerIdentity), topic, hash);
+            const hash = await swarm.write(serialize(chapter));
+            return swarm.feeds.write(ownerIdentity.address as HexString, topic, hash);
         };
         const sendGroupCommand = (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): GroupFlowState => {
             const sender = state.profiles[senderIndex];
@@ -457,6 +455,7 @@ export const flowTestCommandDefinition =
             };
         };
 
+        const swarm = new LocalSwarmStorage();
         const inputState: GroupFlowState = {
             profiles: [aliceProfile, bobProfile, carolProfile],
         };
