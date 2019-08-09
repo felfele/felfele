@@ -2,7 +2,7 @@ import { Debug } from '../../Debug';
 import { ec } from 'elliptic';
 import { genKeyPair, throwError, deriveSharedKey, publicKeyToAddress } from './protocolTestHelpers';
 import { encrypt, decrypt, EncryptedData } from './protocolTestHelpers';
-import { LocalSwarmStorageFeeds } from './SwarmFeeds';
+import { MemoryStorageFeeds } from './MemoryStorage';
 import { HexString } from '../../helpers/opaqueTypes';
 
 const contactTopic = 'contact' as HexString;
@@ -63,7 +63,7 @@ export const createBobForContact = (nextRandom: () => string): Bob => {
 export const bobSharesContactPublicKeyAndContactFeed = async (
     bob: Bob,
     qrCode: RandomWithContactPublicKey,
-    swarmFeeds: LocalSwarmStorageFeeds<any>,
+    swarmFeeds: MemoryStorageFeeds<any>,
 ) => {
     Debug.log('\nBob shares contactPublicKey');
 
@@ -78,7 +78,7 @@ export const bobSharesContactPublicKeyAndContactFeed = async (
 
 export const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = async (
     alice: Alice,
-    swarmFeeds: LocalSwarmStorageFeeds<any>,
+    swarmFeeds: MemoryStorageFeeds<any>,
 ) => {
     Debug.log('\nAlice reads Bob\'s contactPublicKey and shares encrypted publicKey');
 
@@ -98,7 +98,7 @@ export const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = async (
 
 export const bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey = async (
     bob: Bob,
-    swarmFeeds: LocalSwarmStorageFeeds<any>,
+    swarmFeeds: MemoryStorageFeeds<any>,
 ) => {
     Debug.log('\nBob reads Alice\'s contactPublicKey and shares encrypted publicKey');
 
@@ -117,7 +117,7 @@ export const bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey = async
 
 export const aliceReadsBobsEncryptedPublicKey = async (
     alice: Alice,
-    swarmFeeds: LocalSwarmStorageFeeds<any>,
+    swarmFeeds: MemoryStorageFeeds<any>,
 ) => {
     Debug.log('\nAlice reads Bob\'s encrypted publicKey');
 

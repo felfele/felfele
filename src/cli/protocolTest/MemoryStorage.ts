@@ -4,7 +4,7 @@ import { stringToByteArray, byteArrayToHex, stripHexPrefix } from '../../helpers
 import { HexString } from '../../helpers/opaqueTypes';
 import { Storage, StorageFeeds } from './Storage';
 
-export class LocalSwarmStorageFeeds<T> implements StorageFeeds<T> {
+export class MemoryStorageFeeds<T> implements StorageFeeds<T> {
     private feeds: {[name: string]: T} = {};
 
     public write = async (address: HexString, topic: HexString, data: T) => {
@@ -14,6 +14,10 @@ export class LocalSwarmStorageFeeds<T> implements StorageFeeds<T> {
     }
 
     public read = async (address: HexString, topic: HexString) => {
+        if (address === '') {
+            Debug.log('\n<-- SwarmFeeds.read', 'address is empty');
+            throw new Error('address is empty');
+        }
         const name = stripHexPrefix(address) + '/' + stripHexPrefix(topic);
         const data = this.feeds[name];
         Debug.log('\n<-- SwarmFeeds.read', {address, name, data});
@@ -21,8 +25,8 @@ export class LocalSwarmStorageFeeds<T> implements StorageFeeds<T> {
     }
 }
 
-export class LocalSwarmStorage implements Storage<string> {
-    public readonly feeds = new LocalSwarmStorageFeeds<string>();
+export class MemoryStorage implements Storage<string> {
+    public readonly feeds = new MemoryStorageFeeds<string>();
     private store: {[hash: string]: string} = {};
 
     public write = async (data: string): Promise<HexString> => {

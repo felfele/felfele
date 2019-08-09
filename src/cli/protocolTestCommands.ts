@@ -10,17 +10,18 @@ import { createInvitedContact, createCodeReceivedContact, advanceContactState, d
 import { HexString } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
-import { LocalSwarmStorageFeeds, LocalSwarmStorage } from './protocolTest/SwarmFeeds';
-import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity } from './protocolTest/protocolTestHelpers';
+import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
+import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity, publicKeyToAddress } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
+import { SwarmStorage } from './protocolTest/SwarmStorage';
 
 export const flowTestCommandDefinition =
     addCommand('invite', 'Test invite process', async () => {
         const nextRandom = createRandomGenerator(randomNumbers);
-        const swarmFeeds = new LocalSwarmStorageFeeds();
+        const swarmFeeds = new MemoryStorageFeeds();
         const alice = createAliceForContact(nextRandom);
         Debug.log('Alice publicKey', alice.ownKeyPair.getPublic('hex'));
         const bob = createBobForContact(nextRandom);
@@ -193,8 +194,9 @@ export const flowTestCommandDefinition =
             , 0);
         };
         const readPrivateSharedFeed = async (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
-            const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
-            const hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
+            const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
+            Debug.log('readPrivateSharedFeed', {ownerIdentity, recipientIdentity});
+            const hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic as HexString);
             if (hash == null) {
                 return undefined;
             }
@@ -205,8 +207,9 @@ export const flowTestCommandDefinition =
             const chapter = deserialize(data) as PartialChapter<string>;
             return chapter.content;
         };
-        const readTimeline = async <T>(ownerIdentity: PublicIdentity, topic: HexString): Promise<PartialChapter<T>[]> => {
-            let hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
+        const readTimeline = async <T>(address: HexString, topic: HexString): Promise<PartialChapter<T>[]> => {
+            let hash = await swarm.feeds.read(address, topic);
+            Debug.log('readTimeline', {hash});
             if (hash == null) {
                 return [];
             }
@@ -225,10 +228,11 @@ export const flowTestCommandDefinition =
             }
         };
         const updatePrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: string) => {
-            const topic = deriveSharedKey(ownerIdentity, recipientIdentity);
-            return updateTimeline(ownerIdentity, topic, data);
+            const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
+            return updateTimeline(ownerIdentity, topic as HexString, data);
         };
         const updateTimeline = async (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
+            Debug.log('updateTimeline', {ownerIdentity, topic, data});
             const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
             const chapter: PartialChapter<string> = {
                 protocol: 'timeline',
@@ -240,12 +244,13 @@ export const flowTestCommandDefinition =
                 previous,
             };
             const hash = await swarm.write(serialize(chapter));
-            return swarm.feeds.write(ownerIdentity.address as HexString, topic, hash);
+            const signFeed = (digest: number[]) => SwarmHelpers.signDigest(digest, ownerIdentity);
+            return swarm.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
         };
-        const sendGroupCommand = (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): GroupFlowState => {
+        const sendGroupCommand = async (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupFlowState> => {
             const sender = state.profiles[senderIndex];
             const topic = calculateGroupTopic(sender.group);
-            updateTimeline(sender.identity, topic, serialize(groupCommand));
+            await updateTimeline(sender.identity, topic, serialize(groupCommand));
             const updatedSender = {
                 ...sender,
                 ownCommands: [groupCommand, ...sender.ownCommands],
@@ -284,7 +289,7 @@ export const flowTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
             };
         };
-        const addToGroupAndSendCommand = (state: GroupFlowState, senderIndex: number, invitedIndex: number): GroupFlowState => {
+        const addToGroupAndSendCommand = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
             const invited = state.profiles[invitedIndex];
             const groupCommandAdd: GroupCommandAdd = {
                 type: 'group-command-add',
@@ -296,7 +301,7 @@ export const flowTestCommandDefinition =
                 },
                 name: invited.name,
             };
-            const updatedState = sendGroupCommand(state, senderIndex, groupCommandAdd);
+            const updatedState = await sendGroupCommand(state, senderIndex, groupCommandAdd);
             return addToGroup(updatedState, senderIndex, invitedIndex);
         };
         const createGroupAndInvite = async (groupState: GroupFlowState, creatorIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
@@ -315,7 +320,7 @@ export const flowTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            updatePrivateSharedFeed(sender.identity, invited.identity, serialize({
+            await updatePrivateSharedFeed(sender.identity, invited.identity, serialize({
                 type: 'invite-to-group',
                 group: sender.group,
             }));
@@ -394,7 +399,8 @@ export const flowTestCommandDefinition =
             const topic = calculateGroupTopic(group);
             const commandLists: GroupCommandWithSource[][]  = [];
             for (const participant of group.participants) {
-                const chapters = await readTimeline<string>({publicKey: participant, address: ''}, topic);
+                const address = publicKeyToAddress(publicKeyFromPublicIdentity({publicKey: participant, address: ''}));
+                const chapters = await readTimeline<string>(address, topic);
                 commandLists.push(chapters.map(chapter => ({
                     ...deserialize(chapter.content) as GroupCommand,
                     source: participant,
@@ -440,9 +446,14 @@ export const flowTestCommandDefinition =
                 }
             }
         };
-        const assertGroupStateInvariants = (groupState: GroupFlowState): void | never => {
+        const assertGroupStateInvariants = (groupState: GroupFlowState): GroupFlowState | never => {
             assertProfileGroupStatesAreEqual(groupState);
             assertProfileCommandsAreEqual(groupState);
+            return groupState;
+        };
+        const debugState = (groupState: GroupFlowState): GroupFlowState => {
+            Debug.log('debugState', groupState);
+            return groupState;
         };
 
         const compose = (functions: ((state: GroupFlowState) => GroupFlowState | Promise<GroupFlowState>)[]) => {
@@ -455,7 +466,16 @@ export const flowTestCommandDefinition =
             };
         };
 
-        const swarm = new LocalSwarmStorage();
+        const swarmApiIdentity = await generateIdentity();
+        const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
+        const swarmGateway = process.env.SWARM_GATEWAY || '';
+        const swarmApi = SwarmHelpers.makeApi({user: '', topic: ''}, swarmApiSigner, swarmGateway);
+        const swarmStorage = new SwarmStorage(swarmApi);
+        const memoryStorage = new MemoryStorage();
+        const swarm = swarmGateway !== ''
+            ? swarmStorage
+            : memoryStorage
+        ;
         const inputState: GroupFlowState = {
             profiles: [aliceProfile, bobProfile, carolProfile],
         };
@@ -478,13 +498,12 @@ export const flowTestCommandDefinition =
             (state) => receiveGroupCommands(state, 0),
             (state) => receiveGroupCommands(state, 1),
             (state) => receiveGroupCommands(state, 2),
+            (state) => debugState(state),
         ])(inputState);
 
         assertGroupStateInvariants(outputState);
 
         const groupCommands = sortedProfileCommands(outputState.profiles[1]);
-        output(groupCommands);
-
         const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
         const groupPosts = groupCommands.map(gcws => gcws as GroupCommand).filter(isGroupPost).map(value => value.post);
         output(groupPosts);

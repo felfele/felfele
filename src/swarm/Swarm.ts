@@ -274,6 +274,7 @@ export interface ReadableFeedApi {
     getUri: () => string;
 
     readonly address: FeedAddress;
+    readonly swarmGateway: string;
 }
 
 export const makeBzzFeedUrl = (address: FeedAddress): string => {
@@ -308,6 +309,7 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
     downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(swarmGateway, feedUri, timeout),
     getUri: () => `bzz-feed:/?${calculateFeedAddressQueryString(address)}`,
     address,
+    swarmGateway,
 });
 
 export type FeedDigestSigner = (digest: number[]) => string | Promise<string>;

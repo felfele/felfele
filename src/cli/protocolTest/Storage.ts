@@ -1,8 +1,8 @@
 import { HexString } from '../../helpers/opaqueTypes';
 
 export interface StorageFeeds<T> {
-    read: (address: HexString, topic: HexString) => Promise<T>;
-    write: (address: HexString, topic: HexString, data: T) => Promise<void>;
+    read: (address: HexString, topic: HexString) => Promise<T | undefined>;
+    write: (address: HexString, topic: HexString, data: T, signFeedDigest: (digest: number[]) => string | Promise<string>) => Promise<void>;
 }
 
 export interface Storage<T> {
