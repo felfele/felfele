@@ -11,6 +11,7 @@ import { HexString, BrandedType } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
+import { Storage } from './protocolTest/Storage';
 import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity, publicKeyToAddress } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
@@ -157,8 +158,11 @@ export const protocolTestCommandDefinition =
             return byteArrayToHex(topicBytes);
         };
 
+        type ProtocolStorage = Storage<string>;
+
         interface GroupProtocolState {
             profiles: ProfileWithState[];
+            storage: ProtocolStorage;
         }
 
         type ChapterReference = BrandedType<HexString, 'ChapterReference'>;
@@ -190,40 +194,40 @@ export const protocolTestCommandDefinition =
             , 0);
         };
 
-        const readPrivateSharedFeed = async <T>(ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
+        const readPrivateSharedFeed = async <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
             Debug.log('readPrivateSharedFeed', {ownerIdentity, recipientIdentity});
-            const hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic as HexString);
+            const hash = await storage.feeds.read(ownerIdentity.address as HexString, topic as HexString);
             if (hash == null) {
                 return undefined;
             }
-            const data = await swarm.read(hash as HexString);
+            const data = await storage.read(hash as HexString);
             if (data == null) {
                 return undefined;
             }
             const chapter = deserialize(data) as PartialChapter<T>;
             return chapter.content;
         };
-        const readTimeline = async (address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
-            const hash = await swarm.feeds.read(address, topic);
+        const readTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
+            const hash = await storage.feeds.read(address, topic);
             Debug.log('readTimeline', {hash});
             return hash as ChapterReference | undefined;
         };
-        const readChapter = async <T>(reference: ChapterReference): Promise<PartialChapter<T> | undefined> => {
-            const data = await swarm.read(reference as HexString);
+        const readChapter = async <T>(storage: ProtocolStorage, reference: ChapterReference): Promise<PartialChapter<T> | undefined> => {
+            const data = await storage.read(reference as HexString);
             if (data == null) {
                 return undefined;
             }
             const chapter = deserialize(data) as PartialChapter<T>;
             return chapter;
         };
-        const updatePrivateSharedFeed = <T>(ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: T) => {
+        const updatePrivateSharedFeed = <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: T) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
-            return updateTimeline(ownerIdentity, topic as HexString, data);
+            return updateTimeline(storage, ownerIdentity, topic as HexString, data);
         };
-        const updateTimeline = async <T>(ownerIdentity: PrivateIdentity, topic: HexString, data: T) => {
+        const updateTimeline = async <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, topic: HexString, data: T) => {
             Debug.log('updateTimeline', {ownerIdentity, topic, data});
-            const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
+            const previous = await storage.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
             const chapter: PartialChapter<T> = {
                 protocol: 'timeline',
                 version: 1,
@@ -233,14 +237,14 @@ export const protocolTestCommandDefinition =
                 content: data,
                 previous,
             };
-            const hash = await swarm.write(serialize(chapter));
+            const hash = await storage.write(serialize(chapter));
             const signFeed = (digest: number[]) => SwarmHelpers.signDigest(digest, ownerIdentity);
-            return swarm.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
+            return storage.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
         };
         const sendGroupCommand = async (state: GroupProtocolState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const topic = calculateGroupTopic(sender.group);
-            await updateTimeline(sender.identity, topic, groupCommand);
+            await updateTimeline(state.storage, sender.identity, topic, groupCommand);
             const updatedSender = {
                 ...sender,
                 group: {
@@ -315,7 +319,7 @@ export const protocolTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            await updatePrivateSharedFeed(sender.identity, invited.identity, {
+            await updatePrivateSharedFeed(state.storage, sender.identity, invited.identity, {
                 type: 'invite-to-group',
                 group: {
                     ...sender.group,
@@ -332,7 +336,7 @@ export const protocolTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            const data = await readPrivateSharedFeed<InviteToGroupCommand>(sender.identity, invited.identity);
+            const data = await readPrivateSharedFeed<InviteToGroupCommand>(state.storage, sender.identity, invited.identity);
             if (data == null) {
                 return state;
             }
@@ -382,10 +386,10 @@ export const protocolTestCommandDefinition =
                 }
             }
         };
-        const receiveProfileGroupCommands = async (profile: ProfileWithState): Promise<ProfileWithState> => {
+        const receiveProfileGroupCommands = async (storage: ProtocolStorage, profile: ProfileWithState): Promise<ProfileWithState> => {
             const lastSeenTimestamp = highestSeenTimestamp(profile.group.commands);
             const highestRemoteTimestamp = highestSeenRemoteTimestamp(profile.group.commands as GroupCommandWithSource[]);
-            const remoteCommands = await fetchGroupCommands(profile.group, highestRemoteTimestamp);
+            const remoteCommands = await fetchGroupCommands(storage, profile.group, highestRemoteTimestamp);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
                 .filter(command => command.timestamp > lastSeenTimestamp)
@@ -396,17 +400,17 @@ export const protocolTestCommandDefinition =
         const receiveGroupCommands = async (state: GroupProtocolState, receiverIndex: number): Promise<GroupProtocolState> => {
             Debug.log('receiveGroupCommands', receiverIndex);
             const receiver = state.profiles[receiverIndex];
-            const updatedReceiver = await receiveProfileGroupCommands(receiver);
+            const updatedReceiver = await receiveProfileGroupCommands(state.storage, receiver);
             return {
                 ...state,
                 profiles: [...state.profiles.slice(0, receiverIndex), updatedReceiver, ...state.profiles.slice(receiverIndex + 1)],
             };
         };
-        const fetchGroupTimeline = async (address: HexString, topic: HexString, until: number) => {
-            let reference = await readTimeline(address, topic);
+        const fetchGroupTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString, until: number) => {
+            let reference = await readTimeline(storage, address, topic);
             const commands: GroupCommand[] = [];
             while (reference != null) {
-                const chapter = await readChapter<GroupCommand>(reference);
+                const chapter = await readChapter<GroupCommand>(storage, reference);
                 if (chapter == null) {
                     return commands;
                 }
@@ -419,12 +423,12 @@ export const protocolTestCommandDefinition =
             }
             return commands;
         };
-        const fetchGroupCommands = async (group: Group, highestRemoteTimestamp: number): Promise<GroupCommandWithSource[]> => {
+        const fetchGroupCommands = async (storage: ProtocolStorage, group: Group, highestRemoteTimestamp: number): Promise<GroupCommandWithSource[]> => {
             const topic = calculateGroupTopic(group);
             const commandLists: GroupCommandWithSource[][]  = [];
             for (const participant of group.participants) {
                 const address = publicKeyToAddress(publicKeyFromPublicIdentity({publicKey: participant, address: ''}));
-                const participantCommands = await fetchGroupTimeline(address, topic, highestRemoteTimestamp);
+                const participantCommands = await fetchGroupTimeline(storage, address, topic, highestRemoteTimestamp);
                 commandLists.push(participantCommands.map(command => ({
                     ...command,
                     source: participant,
@@ -483,7 +487,7 @@ export const protocolTestCommandDefinition =
             return groupState;
         };
         const debugState = (groupState: GroupProtocolState): GroupProtocolState => {
-            Debug.log('debugState', groupState);
+            Debug.log('debugState', groupState.profiles);
             return groupState;
         };
 
@@ -497,18 +501,22 @@ export const protocolTestCommandDefinition =
             };
         };
 
-        const swarmApiIdentity = await generateIdentity();
-        const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
-        const swarmGateway = process.env.SWARM_GATEWAY || '';
-        const swarmApi = SwarmHelpers.makeApi({user: '', topic: ''}, swarmApiSigner, swarmGateway);
-        const swarmStorage = new SwarmStorage(swarmApi);
-        const memoryStorage = new MemoryStorage();
-        const swarm = swarmGateway !== ''
-            ? swarmStorage
-            : memoryStorage
-        ;
+        const makeStorage = async () => {
+            const swarmApiIdentity = await generateIdentity();
+            const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
+            const swarmGateway = process.env.SWARM_GATEWAY || '';
+            const swarmApi = SwarmHelpers.makeApi({user: '', topic: ''}, swarmApiSigner, swarmGateway);
+            const swarmStorage = new SwarmStorage(swarmApi);
+            const memoryStorage = new MemoryStorage();
+            const storage = swarmGateway !== ''
+                ? swarmStorage
+                : memoryStorage
+            ;
+            return storage;
+        };
         const inputState: GroupProtocolState = {
             profiles: [aliceProfile, bobProfile, carolProfile],
+            storage: await makeStorage(),
         };
 
         const outputState = await compose([
