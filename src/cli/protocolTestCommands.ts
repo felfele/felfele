@@ -7,7 +7,7 @@ import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { swarmConfig } from './swarmConfig';
 import { createInvitedContact, createCodeReceivedContact, advanceContactState, deriveSharedKey } from '../helpers/contactHelpers';
-import { HexString, BrandedString, BrandedType } from '../helpers/opaqueTypes';
+import { HexString, BrandedType } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
@@ -18,8 +18,8 @@ import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
 import { SwarmStorage } from './protocolTest/SwarmStorage';
 
-export const flowTestCommandDefinition =
-    addCommand('invite', 'Test invite process', async () => {
+export const protocolTestCommandDefinition =
+    addCommand('invite', 'Test invite protocol', async () => {
         const nextRandom = createRandomGenerator(randomNumbers);
         const swarmFeeds = new MemoryStorageFeeds();
         const alice = createAliceForContact(nextRandom);
@@ -47,7 +47,7 @@ export const flowTestCommandDefinition =
         }
     })
     .
-    addCommand('swarmInvite [randomSeed]', 'Test invite flow on Swarm', async (randomSeed?: string) => {
+    addCommand('swarmInvite [randomSeed]', 'Test invite protocol on Swarm', async (randomSeed?: string) => {
         randomSeed = randomSeed ? randomSeed : randomNumbers[0];
         const nextRandom = createDeterministicRandomGenerator(randomSeed);
         const generateDeterministicRandom = async (length: number) => {
@@ -106,9 +106,12 @@ export const flowTestCommandDefinition =
             participants: HexString[];
         }
 
-        interface ProfileWithState extends PrivateProfile {
+        interface GroupWithCommands extends Group {
             commands: GroupCommand[];
-            group: Group;
+        }
+
+        interface ProfileWithState extends PrivateProfile {
+            group: GroupWithCommands;
         }
 
         interface InviteToGroupCommand {
@@ -120,30 +123,30 @@ export const flowTestCommandDefinition =
             name: 'Alice',
             image: {},
             identity: await generateIdentity(),
-            commands: [],
             group: {
                 sharedSecret: 'secret' as HexString,
                 participants: [],
+                commands: [],
             },
         };
         const bobProfile: ProfileWithState = {
             name: 'Bob',
             image: {},
             identity: await generateIdentity(),
-            commands: [],
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
+                commands: [],
             },
         };
         const carolProfile: ProfileWithState = {
             name: 'Carol',
             image: {},
             identity: await generateIdentity(),
-            commands: [],
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
+                commands: [],
             },
         };
 
@@ -154,7 +157,7 @@ export const flowTestCommandDefinition =
             return byteArrayToHex(topicBytes);
         };
 
-        interface GroupFlowState {
+        interface GroupProtocolState {
             profiles: ProfileWithState[];
         }
 
@@ -234,24 +237,27 @@ export const flowTestCommandDefinition =
             const signFeed = (digest: number[]) => SwarmHelpers.signDigest(digest, ownerIdentity);
             return swarm.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
         };
-        const sendGroupCommand = async (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupFlowState> => {
+        const sendGroupCommand = async (state: GroupProtocolState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const topic = calculateGroupTopic(sender.group);
             await updateTimeline(sender.identity, topic, groupCommand);
             const updatedSender = {
                 ...sender,
-                commands: [groupCommand, ...sender.commands],
+                group: {
+                    ...sender.group,
+                    commands: [groupCommand, ...sender.group.commands],
+                },
             };
             return {
                 ...state,
                 profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
             };
         };
-        const sendGroupMessage = async (state: GroupFlowState, senderIndex: number, message: string): Promise<GroupFlowState> => {
+        const sendGroupMessage = async (state: GroupProtocolState, senderIndex: number, message: string): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const command: GroupCommandPost = {
                 type: 'group-command-post',
-                timestamp: highestSeenTimestamp(sender.commands) + 1,
+                timestamp: highestSeenTimestamp(sender.group.commands) + 1,
 
                 post: {
                     images: [],
@@ -261,7 +267,7 @@ export const flowTestCommandDefinition =
             };
             return sendGroupCommand(state, senderIndex, command);
         };
-        const addToGroup = (state: GroupFlowState, senderIndex: number, invitedIndex: number): GroupFlowState => {
+        const addToGroup = (state: GroupProtocolState, senderIndex: number, invitedIndex: number): GroupProtocolState => {
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
@@ -277,12 +283,12 @@ export const flowTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
             };
         };
-        const addToGroupAndSendCommand = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+        const addToGroupAndSendCommand = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
             const groupCommandAdd: GroupCommandAdd = {
                 type: 'group-command-add',
-                timestamp: highestSeenTimestamp(sender.commands) + 1,
+                timestamp: highestSeenTimestamp(sender.group.commands) + 1,
 
                 identity: {
                     address: invited.identity.address,
@@ -293,7 +299,7 @@ export const flowTestCommandDefinition =
             const updatedState = await sendGroupCommand(state, senderIndex, groupCommandAdd);
             return addToGroup(updatedState, senderIndex, invitedIndex);
         };
-        const createGroupAndInvite = async (groupState: GroupFlowState, creatorIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+        const createGroupAndInvite = async (groupState: GroupProtocolState, creatorIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (creatorIndex === invitedIndex) {
                 throwError('creatorIndex cannot be equal to invitedIndex');
             }
@@ -302,7 +308,7 @@ export const flowTestCommandDefinition =
                 state => addToGroupAndSendCommand(state, creatorIndex, invitedIndex),
             ])(groupState);
         };
-        const sendPrivateInvite = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+        const sendPrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (senderIndex === invitedIndex) {
                 throwError('senderIndex cannot be equal to invitedIndex');
             }
@@ -311,12 +317,15 @@ export const flowTestCommandDefinition =
 
             await updatePrivateSharedFeed(sender.identity, invited.identity, {
                 type: 'invite-to-group',
-                group: sender.group,
+                group: {
+                    ...sender.group,
+                    commands: undefined,
+                },
             });
 
             return state;
         };
-        const receivePrivateInvite = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+        const receivePrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (senderIndex === invitedIndex) {
                 throwError('senderIndex cannot be equal to invitedIndex');
             }
@@ -330,7 +339,10 @@ export const flowTestCommandDefinition =
             const inviteCommand = data;
             const updatedInvited = {
                 ...invited,
-                group: inviteCommand.group,
+                group: {
+                    ...inviteCommand.group,
+                    commands: [],
+                },
             };
 
             return {
@@ -344,29 +356,35 @@ export const flowTestCommandDefinition =
                     if (profile.group.participants.indexOf(command.identity.publicKey as HexString) !== -1) {
                         return {
                             ...profile,
-                            commands: [command, ...profile.commands],
+                            group: {
+                                ...profile.group,
+                                commands: [command, ...profile.group.commands],
+                            },
                         };
                     }
                     return {
                         ...profile,
                         group: {
                             ...profile.group,
+                            commands: [command, ...profile.group.commands],
                             participants: [...profile.group.participants, command.identity.publicKey as HexString],
                         },
-                        commands: [command, ...profile.commands],
                     };
                 }
                 default: {
                     return {
                         ...profile,
-                        commands: [command, ...profile.commands],
+                        group: {
+                            ...profile.group,
+                            commands: [command, ...profile.group.commands],
+                        },
                     };
                 }
             }
         };
         const receiveProfileGroupCommands = async (profile: ProfileWithState): Promise<ProfileWithState> => {
-            const lastSeenTimestamp = highestSeenTimestamp(profile.commands);
-            const highestRemoteTimestamp = highestSeenRemoteTimestamp(profile.commands as GroupCommandWithSource[]);
+            const lastSeenTimestamp = highestSeenTimestamp(profile.group.commands);
+            const highestRemoteTimestamp = highestSeenRemoteTimestamp(profile.group.commands as GroupCommandWithSource[]);
             const remoteCommands = await fetchGroupCommands(profile.group, highestRemoteTimestamp);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
@@ -375,7 +393,7 @@ export const flowTestCommandDefinition =
             ;
             return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), profile);
         };
-        const receiveGroupCommands = async (state: GroupFlowState, receiverIndex: number): Promise<GroupFlowState> => {
+        const receiveGroupCommands = async (state: GroupProtocolState, receiverIndex: number): Promise<GroupProtocolState> => {
             Debug.log('receiveGroupCommands', receiverIndex);
             const receiver = state.profiles[receiverIndex];
             const updatedReceiver = await receiveProfileGroupCommands(receiver);
@@ -424,7 +442,7 @@ export const flowTestCommandDefinition =
                 groupA.participants.join('/') === groupB.participants.join('/')
             ;
         };
-        const assertProfileGroupStatesAreEqual = (groupState: GroupFlowState): void | never => {
+        const assertProfileGroupStatesAreEqual = (groupState: GroupProtocolState): void | never => {
             const reducedGroups = groupState.profiles.reduce<Group[]>((prev, curr, ind, arr) =>
                 ind > 0 && areGroupsEqual(curr.group, arr[ind - 1].group)
                 ? prev
@@ -438,11 +456,11 @@ export const flowTestCommandDefinition =
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
         const sortedProfileCommands = (profile: ProfileWithState, withSource: boolean = false) =>
-            profile.commands
+            profile.group.commands
                 .map(command => ({...command, source: withSource ? (command as GroupCommandWithSource).source : undefined}))
                 .sort((a, b) => b.timestamp - a.timestamp)
         ;
-        const assertProfileCommandsAreEqual = (groupState: GroupFlowState): void | never => {
+        const assertProfileCommandsAreEqual = (groupState: GroupProtocolState): void | never => {
             for (let i = 1; i < groupState.profiles.length; i++) {
                 const sortedProfileCommandsA = sortedProfileCommands(groupState.profiles[i - 1]);
                 const sortedProfileCommandsB = sortedProfileCommands(groupState.profiles[i]);
@@ -458,19 +476,19 @@ export const flowTestCommandDefinition =
                 }
             }
         };
-        const assertGroupStateInvariants = (groupState: GroupFlowState): GroupFlowState | never => {
-            groupState.profiles.map(profile => assertCommandsAreOrdered(profile.commands));
+        const assertGroupStateInvariants = (groupState: GroupProtocolState): GroupProtocolState | never => {
+            groupState.profiles.map(profile => assertCommandsAreOrdered(profile.group.commands));
             assertProfileGroupStatesAreEqual(groupState);
             assertProfileCommandsAreEqual(groupState);
             return groupState;
         };
-        const debugState = (groupState: GroupFlowState): GroupFlowState => {
+        const debugState = (groupState: GroupProtocolState): GroupProtocolState => {
             Debug.log('debugState', groupState);
             return groupState;
         };
 
-        const compose = (functions: ((state: GroupFlowState) => GroupFlowState | Promise<GroupFlowState>)[]) => {
-            return async (initialState: GroupFlowState) => {
+        const compose = (functions: ((state: GroupProtocolState) => GroupProtocolState | Promise<GroupProtocolState>)[]) => {
+            return async (initialState: GroupProtocolState) => {
                 let returnState = initialState;
                 for (const f of functions) {
                     returnState = await f(returnState);
@@ -489,7 +507,7 @@ export const flowTestCommandDefinition =
             ? swarmStorage
             : memoryStorage
         ;
-        const inputState: GroupFlowState = {
+        const inputState: GroupProtocolState = {
             profiles: [aliceProfile, bobProfile, carolProfile],
         };
 

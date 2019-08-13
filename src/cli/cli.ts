@@ -15,7 +15,7 @@ import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { flowTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
+import { protocolTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
 import { swarmHelperTests } from './swarmHelperTest';
 
 // tslint:disable-next-line:no-var-requires
