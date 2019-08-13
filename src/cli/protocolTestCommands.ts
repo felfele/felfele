@@ -107,9 +107,7 @@ export const flowTestCommandDefinition =
         }
 
         interface ProfileWithState extends PrivateProfile {
-            ownCommands: GroupCommand[];
-            remoteCommands: GroupCommand[];
-            highestSeenTimestamp: number;
+            commands: GroupCommand[];
             group: Group;
         }
 
@@ -122,9 +120,7 @@ export const flowTestCommandDefinition =
             name: 'Alice',
             image: {},
             identity: await generateIdentity(),
-            ownCommands: [],
-            remoteCommands: [],
-            highestSeenTimestamp: 0,
+            commands: [],
             group: {
                 sharedSecret: 'secret' as HexString,
                 participants: [],
@@ -134,9 +130,7 @@ export const flowTestCommandDefinition =
             name: 'Bob',
             image: {},
             identity: await generateIdentity(),
-            ownCommands: [],
-            remoteCommands: [],
-            highestSeenTimestamp: 0,
+            commands: [],
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
@@ -146,9 +140,7 @@ export const flowTestCommandDefinition =
             name: 'Carol',
             image: {},
             identity: await generateIdentity(),
-            ownCommands: [],
-            remoteCommands: [],
-            highestSeenTimestamp: 0,
+            commands: [],
             group: {
                 sharedSecret: '' as HexString,
                 participants: [],
@@ -181,7 +173,7 @@ export const flowTestCommandDefinition =
         type Chapter<T> = PartialChapter<T> & { id: string };
 
         const groupHighestSeenTimestamp = (state: GroupFlowState) => {
-            const allCommands = state.profiles.map(profile => profile.ownCommands);
+            const allCommands = state.profiles.map(profile => profile.commands);
             return allCommands.reduce((prev, curr) => curr.length > 0 && curr[0].timestamp > prev
                 ? curr[0].timestamp
                 : prev
@@ -253,7 +245,7 @@ export const flowTestCommandDefinition =
             await updateTimeline(sender.identity, topic, serialize(groupCommand));
             const updatedSender = {
                 ...sender,
-                ownCommands: [groupCommand, ...sender.ownCommands],
+                commands: [groupCommand, ...sender.commands],
             };
             return {
                 ...state,
@@ -356,7 +348,7 @@ export const flowTestCommandDefinition =
                     if (profile.group.participants.indexOf(command.identity.publicKey as HexString) !== -1) {
                         return {
                             ...profile,
-                            remoteCommands: [command, ...profile.remoteCommands],
+                            commands: [command, ...profile.commands],
                         };
                     }
                     return {
@@ -365,20 +357,20 @@ export const flowTestCommandDefinition =
                             ...profile.group,
                             participants: [...profile.group.participants, command.identity.publicKey as HexString],
                         },
-                        remoteCommands: [command, ...profile.remoteCommands],
+                        commands: [command, ...profile.commands],
                     };
                 }
                 default: {
                     return {
                         ...profile,
-                        remoteCommands: [command, ...profile.remoteCommands],
+                        commands: [command, ...profile.commands],
                     };
                 }
             }
         };
         const receiveProfileGroupCommands = async (profile: ProfileWithState): Promise<ProfileWithState> => {
             const remoteCommands = await fetchGroupCommands(profile.group);
-            const lastSeenTimestamp = highestSeenTimestamp(profile.remoteCommands);
+            const lastSeenTimestamp = highestSeenTimestamp(profile.commands);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
                 .filter(command => command.timestamp > lastSeenTimestamp)
@@ -432,8 +424,7 @@ export const flowTestCommandDefinition =
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
         const sortedProfileCommands = (profile: ProfileWithState) =>
-            profile.remoteCommands
-                .concat(profile.ownCommands)
+            profile.commands
                 .map(command => ({...command, source: undefined}))
                 .sort((a, b) => b.timestamp - a.timestamp)
         ;
