@@ -187,7 +187,7 @@ export const flowTestCommandDefinition =
             , 0);
         };
 
-        const readPrivateSharedFeed = async (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
+        const readPrivateSharedFeed = async <T>(ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
             Debug.log('readPrivateSharedFeed', {ownerIdentity, recipientIdentity});
             const hash = await swarm.feeds.read(ownerIdentity.address as HexString, topic as HexString);
@@ -198,7 +198,7 @@ export const flowTestCommandDefinition =
             if (data == null) {
                 return undefined;
             }
-            const chapter = deserialize(data) as PartialChapter<string>;
+            const chapter = deserialize(data) as PartialChapter<T>;
             return chapter.content;
         };
         const readTimeline = async (address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
@@ -214,19 +214,19 @@ export const flowTestCommandDefinition =
             const chapter = deserialize(data) as PartialChapter<T>;
             return chapter;
         };
-        const updatePrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: string) => {
+        const updatePrivateSharedFeed = <T>(ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: T) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
             return updateTimeline(ownerIdentity, topic as HexString, data);
         };
-        const updateTimeline = async (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
+        const updateTimeline = async <T>(ownerIdentity: PrivateIdentity, topic: HexString, data: T) => {
             Debug.log('updateTimeline', {ownerIdentity, topic, data});
             const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
-            const chapter: PartialChapter<string> = {
+            const chapter: PartialChapter<T> = {
                 protocol: 'timeline',
                 version: 1,
                 timestamp: Date.now(),
                 author: ownerIdentity.address,
-                type: 'text/plain',
+                type: 'application/json',
                 content: data,
                 previous,
             };
@@ -237,7 +237,7 @@ export const flowTestCommandDefinition =
         const sendGroupCommand = async (state: GroupFlowState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupFlowState> => {
             const sender = state.profiles[senderIndex];
             const topic = calculateGroupTopic(sender.group);
-            await updateTimeline(sender.identity, topic, serialize(groupCommand));
+            await updateTimeline(sender.identity, topic, groupCommand);
             const updatedSender = {
                 ...sender,
                 commands: [groupCommand, ...sender.commands],
@@ -309,10 +309,10 @@ export const flowTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            await updatePrivateSharedFeed(sender.identity, invited.identity, serialize({
+            await updatePrivateSharedFeed(sender.identity, invited.identity, {
                 type: 'invite-to-group',
                 group: sender.group,
-            }));
+            });
 
             return state;
         };
@@ -323,12 +323,11 @@ export const flowTestCommandDefinition =
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            const data = await readPrivateSharedFeed(sender.identity, invited.identity);
+            const data = await readPrivateSharedFeed<InviteToGroupCommand>(sender.identity, invited.identity);
             if (data == null) {
                 return state;
             }
-            const inviteCommand = deserialize(data) as InviteToGroupCommand;
-
+            const inviteCommand = data;
             const updatedInvited = {
                 ...invited,
                 group: inviteCommand.group,
@@ -389,11 +388,11 @@ export const flowTestCommandDefinition =
             let reference = await readTimeline(address, topic);
             const commands: GroupCommand[] = [];
             while (reference != null) {
-                const chapter = await readChapter<string>(reference);
+                const chapter = await readChapter<GroupCommand>(reference);
                 if (chapter == null) {
                     return commands;
                 }
-                const command = deserialize(chapter.content) as GroupCommand;
+                const command = chapter.content;
                 if (command.timestamp <= until) {
                     return commands;
                 }
