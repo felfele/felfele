@@ -7,7 +7,7 @@ import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { swarmConfig } from './swarmConfig';
 import { createInvitedContact, createCodeReceivedContact, advanceContactState, deriveSharedKey } from '../helpers/contactHelpers';
-import { HexString } from '../helpers/opaqueTypes';
+import { HexString, BrandedString, BrandedType } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
@@ -158,6 +158,8 @@ export const flowTestCommandDefinition =
             profiles: ProfileWithState[];
         }
 
+        type ChapterReference = BrandedType<HexString, 'ChapterReference'>;
+
         type PartialChapter<T> = {
             protocol: 'timeline',
             version: 1,
@@ -165,26 +167,26 @@ export const flowTestCommandDefinition =
             author: string,
             type: string,
             content: T,
-            previous?: string,
-            references?: Array<string>,
+            previous?: ChapterReference,
+            references?: Array<ChapterReference>,
             signature?: string,
         };
 
         type Chapter<T> = PartialChapter<T> & { id: string };
 
-        const groupHighestSeenTimestamp = (state: GroupFlowState) => {
-            const allCommands = state.profiles.map(profile => profile.commands);
-            return allCommands.reduce((prev, curr) => curr.length > 0 && curr[0].timestamp > prev
-                ? curr[0].timestamp
-                : prev
-            , 0);
-        };
         const highestSeenTimestamp = (commands: GroupCommand[]) => {
             return commands.reduce((prev, curr) => curr.timestamp > prev
                 ? curr.timestamp
                 : prev
             , 0);
         };
+        const highestSeenRemoteTimestamp = (commands: GroupCommandWithSource[]) => {
+            return commands.reduce((prev, curr) => curr.source != null && curr.timestamp > prev
+                ? curr.timestamp
+                : prev
+            , 0);
+        };
+
         const readPrivateSharedFeed = async (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
             Debug.log('readPrivateSharedFeed', {ownerIdentity, recipientIdentity});
@@ -199,25 +201,18 @@ export const flowTestCommandDefinition =
             const chapter = deserialize(data) as PartialChapter<string>;
             return chapter.content;
         };
-        const readTimeline = async <T>(address: HexString, topic: HexString): Promise<PartialChapter<T>[]> => {
-            let hash = await swarm.feeds.read(address, topic);
+        const readTimeline = async (address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
+            const hash = await swarm.feeds.read(address, topic);
             Debug.log('readTimeline', {hash});
-            if (hash == null) {
-                return [];
+            return hash as ChapterReference | undefined;
+        };
+        const readChapter = async <T>(reference: ChapterReference): Promise<PartialChapter<T> | undefined> => {
+            const data = await swarm.read(reference as HexString);
+            if (data == null) {
+                return undefined;
             }
-            const chapters: any[] = [];
-            while (true) {
-                const data = await swarm.read(hash as HexString);
-                if (data == null) {
-                    return chapters;
-                }
-                const chapter = deserialize(data) as PartialChapter<string>;
-                chapters.push(chapter);
-                if (chapter.previous == null) {
-                    return chapters;
-                }
-                hash = chapter.previous;
-            }
+            const chapter = deserialize(data) as PartialChapter<T>;
+            return chapter;
         };
         const updatePrivateSharedFeed = (ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: string) => {
             const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
@@ -225,7 +220,7 @@ export const flowTestCommandDefinition =
         };
         const updateTimeline = async (ownerIdentity: PrivateIdentity, topic: HexString, data: string) => {
             Debug.log('updateTimeline', {ownerIdentity, topic, data});
-            const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic);
+            const previous = await swarm.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
             const chapter: PartialChapter<string> = {
                 protocol: 'timeline',
                 version: 1,
@@ -253,9 +248,10 @@ export const flowTestCommandDefinition =
             };
         };
         const sendGroupMessage = async (state: GroupFlowState, senderIndex: number, message: string): Promise<GroupFlowState> => {
+            const sender = state.profiles[senderIndex];
             const command: GroupCommandPost = {
                 type: 'group-command-post',
-                timestamp: groupHighestSeenTimestamp(state) + 1,
+                timestamp: highestSeenTimestamp(sender.commands) + 1,
 
                 post: {
                     images: [],
@@ -282,10 +278,11 @@ export const flowTestCommandDefinition =
             };
         };
         const addToGroupAndSendCommand = async (state: GroupFlowState, senderIndex: number, invitedIndex: number): Promise<GroupFlowState> => {
+            const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
             const groupCommandAdd: GroupCommandAdd = {
                 type: 'group-command-add',
-                timestamp: groupHighestSeenTimestamp(state) + 1,
+                timestamp: highestSeenTimestamp(sender.commands) + 1,
 
                 identity: {
                     address: invited.identity.address,
@@ -369,12 +366,13 @@ export const flowTestCommandDefinition =
             }
         };
         const receiveProfileGroupCommands = async (profile: ProfileWithState): Promise<ProfileWithState> => {
-            const remoteCommands = await fetchGroupCommands(profile.group);
             const lastSeenTimestamp = highestSeenTimestamp(profile.commands);
+            const highestRemoteTimestamp = highestSeenRemoteTimestamp(profile.commands as GroupCommandWithSource[]);
+            const remoteCommands = await fetchGroupCommands(profile.group, highestRemoteTimestamp);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
                 .filter(command => command.timestamp > lastSeenTimestamp)
-                .sort((a, b) => b.timestamp - a.timestamp)
+                .sort((a, b) => a.timestamp - b.timestamp) // reverse order!
             ;
             return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), profile);
         };
@@ -387,14 +385,31 @@ export const flowTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, receiverIndex), updatedReceiver, ...state.profiles.slice(receiverIndex + 1)],
             };
         };
-        const fetchGroupCommands = async (group: Group): Promise<GroupCommandWithSource[]> => {
+        const fetchGroupTimeline = async (address: HexString, topic: HexString, until: number) => {
+            let reference = await readTimeline(address, topic);
+            const commands: GroupCommand[] = [];
+            while (reference != null) {
+                const chapter = await readChapter<string>(reference);
+                if (chapter == null) {
+                    return commands;
+                }
+                const command = deserialize(chapter.content) as GroupCommand;
+                if (command.timestamp <= until) {
+                    return commands;
+                }
+                commands.push(command);
+                reference = chapter.previous;
+            }
+            return commands;
+        };
+        const fetchGroupCommands = async (group: Group, highestRemoteTimestamp: number): Promise<GroupCommandWithSource[]> => {
             const topic = calculateGroupTopic(group);
             const commandLists: GroupCommandWithSource[][]  = [];
             for (const participant of group.participants) {
                 const address = publicKeyToAddress(publicKeyFromPublicIdentity({publicKey: participant, address: ''}));
-                const chapters = await readTimeline<string>(address, topic);
-                commandLists.push(chapters.map(chapter => ({
-                    ...deserialize(chapter.content) as GroupCommand,
+                const participantCommands = await fetchGroupTimeline(address, topic, highestRemoteTimestamp);
+                commandLists.push(participantCommands.map(command => ({
+                    ...command,
                     source: participant,
                 })));
             }
@@ -423,9 +438,9 @@ export const flowTestCommandDefinition =
         const areCommandsEqual = (commandsA: GroupCommand[], commandsB: GroupCommand[]): boolean => {
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
-        const sortedProfileCommands = (profile: ProfileWithState) =>
+        const sortedProfileCommands = (profile: ProfileWithState, withSource: boolean = false) =>
             profile.commands
-                .map(command => ({...command, source: undefined}))
+                .map(command => ({...command, source: withSource ? (command as GroupCommandWithSource).source : undefined}))
                 .sort((a, b) => b.timestamp - a.timestamp)
         ;
         const assertProfileCommandsAreEqual = (groupState: GroupFlowState): void | never => {
@@ -433,11 +448,19 @@ export const flowTestCommandDefinition =
                 const sortedProfileCommandsA = sortedProfileCommands(groupState.profiles[i - 1]);
                 const sortedProfileCommandsB = sortedProfileCommands(groupState.profiles[i]);
                 if (!areCommandsEqual(sortedProfileCommandsA, sortedProfileCommandsB)) {
-                    throwError(`assertProfileCommandsAreEqual: failed at i=${i},\n\n${JSON.stringify(sortedProfileCommandsA)}\n\n !==\n\n${JSON.stringify(sortedProfileCommandsB)}`);
+                    throwError(`assertProfileCommandsAreEqual: failed at i == ${i},\n\n${JSON.stringify(sortedProfileCommandsA)}\n\n !==\n\n${JSON.stringify(sortedProfileCommandsB)}`);
+                }
+            }
+        };
+        const assertCommandsAreOrdered = (commands: GroupCommand[]) => {
+            for (let i = 1; i < commands.length; i++) {
+                if (commands[i].timestamp > commands[i - 1].timestamp) {
+                    throwError(`assertCommandsAreOrdered: failed at i == ${i},\n\n${JSON.stringify(commands)}`);
                 }
             }
         };
         const assertGroupStateInvariants = (groupState: GroupFlowState): GroupFlowState | never => {
+            groupState.profiles.map(profile => assertCommandsAreOrdered(profile.commands));
             assertProfileGroupStatesAreEqual(groupState);
             assertProfileCommandsAreEqual(groupState);
             return groupState;
@@ -494,9 +517,9 @@ export const flowTestCommandDefinition =
 
         assertGroupStateInvariants(outputState);
 
-        const groupCommands = sortedProfileCommands(outputState.profiles[1]);
-        const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost => groupCommand.type === 'group-command-post';
-        const groupPosts = groupCommands.map(gcws => gcws as GroupCommand).filter(isGroupPost).map(value => value.post);
+        const groupCommands = sortedProfileCommands(outputState.profiles[1], true);
+        const isGroupPost = (groupCommand: GroupCommandWithSource): groupCommand is GroupCommandPost & {source: HexString} => groupCommand.type === 'group-command-post';
+        const groupPosts = groupCommands.map(gcws => gcws as GroupCommandWithSource).filter(isGroupPost).map(value => ({...value.post, source: value.source}));
         output(groupPosts);
     })
 ;
