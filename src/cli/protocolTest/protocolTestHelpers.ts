@@ -1,9 +1,12 @@
-import { stringToByteArray, byteArrayToHex, hexToByteArray, stripHexPrefix } from '../../helpers/conversion';
+import { stringToByteArray, byteArrayToHex, hexToByteArray, stripHexPrefix, toUTF8Array } from '../../helpers/conversion';
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../../models/Identity';
+import { HexString, BrandedType } from '../../helpers/opaqueTypes';
 import { Debug } from '../../Debug';
-import { HexString } from '../../helpers/opaqueTypes';
+
+export type PublicKey = BrandedType<HexString, 'PublicKey'>;
+export type Address = BrandedType<HexString, 'Address'>;
 
 export interface EncryptedData<T> {
     secret: string;
@@ -50,12 +53,18 @@ export const createRandomGenerator = (randomArray: string[]) => {
 
 const stringToUint8Array = (s: string): Uint8Array => new Uint8Array(stringToByteArray(s));
 
-export const publicKeyToAddress = (pubKey: ec.KeyPair) => {
+export const publicKeyToAddress = (publicKey: PublicKey): Address => {
+    const curve = new ec('secp256k1');
+    const ecPubKey = curve.keyFromPublic(stripHexPrefix(publicKey), 'hex');
+    return ecPublicKeyToAddress(ecPubKey) as Address;
+};
+
+export const ecPublicKeyToAddress = (pubKey: ec.KeyPair) => {
     const pubBytes = pubKey.getPublic().encode();
     return byteArrayToHex(keccak256.array(pubBytes.slice(1)).slice(12));
 };
 
-export const genKeyPair = (randomHex: string): ec.KeyPair => {
+export const ecGenKeyPair = (randomHex: string): ec.KeyPair => {
     const curve = new ec('secp256k1');
     const keyPairOptions = {
         entropy: stringToUint8Array(randomHex),
@@ -65,17 +74,17 @@ export const genKeyPair = (randomHex: string): ec.KeyPair => {
     return keyPair;
 };
 
-export const publicKeyFromPublicIdentity = (publicIdentity: PublicIdentity): ec.KeyPair => {
+export const ecPublicKeyFromPublicIdentity = (publicIdentity: PublicIdentity): ec.KeyPair => {
     const curve = new ec('secp256k1');
     return curve.keyFromPublic(stripHexPrefix(publicIdentity.publicKey as HexString), 'hex');
 };
 
-export const privateKeyFromPrivateIdentity = (privateIdentity: PrivateIdentity): ec.KeyPair => {
+export const ecPrivateKeyFromPrivateIdentity = (privateIdentity: PrivateIdentity): ec.KeyPair => {
     const curve = new ec('secp256k1');
     return curve.keyFromPrivate(stripHexPrefix(privateIdentity.privateKey as HexString), 'hex');
 };
 
-export const deriveSharedKey = (privateKeyPair: ec.KeyPair, publicKeyPair: ec.KeyPair): string => {
+export const ecDeriveSharedKey = (privateKeyPair: ec.KeyPair, publicKeyPair: ec.KeyPair): string => {
     return privateKeyPair.derive(publicKeyPair.getPublic()).toString(16);
 };
 

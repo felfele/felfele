@@ -1,6 +1,6 @@
 import { Debug } from '../../Debug';
 import { ec } from 'elliptic';
-import { genKeyPair, throwError, deriveSharedKey, publicKeyToAddress } from './protocolTestHelpers';
+import { ecGenKeyPair, throwError, ecDeriveSharedKey, ecPublicKeyToAddress } from './protocolTestHelpers';
 import { encrypt, decrypt, EncryptedData } from './protocolTestHelpers';
 import { MemoryStorageFeeds } from './MemoryStorage';
 import { HexString } from '../../helpers/opaqueTypes';
@@ -24,8 +24,8 @@ export const createAliceForContact = (nextRandom: () => string): Alice => {
     const contactRandom = nextRandom();
     return {
         randomSeed,
-        ownKeyPair: genKeyPair(ownRandom),
-        contactKeyPair: genKeyPair(contactRandom),
+        ownKeyPair: ecGenKeyPair(ownRandom),
+        contactKeyPair: ecGenKeyPair(contactRandom),
     };
 };
 
@@ -55,8 +55,8 @@ export const createBobForContact = (nextRandom: () => string): Bob => {
     const ownRandom = nextRandom();
     const contactRandom = nextRandom();
     return {
-        ownKeyPair: genKeyPair(ownRandom),
-        contactKeyPair: genKeyPair(contactRandom),
+        ownKeyPair: ecGenKeyPair(ownRandom),
+        contactKeyPair: ecGenKeyPair(contactRandom),
     };
 };
 
@@ -68,11 +68,11 @@ export const bobSharesContactPublicKeyAndContactFeed = async (
     Debug.log('\nBob shares contactPublicKey');
 
     bob.aliceContactPublicKey = qrCode.contactPublicKey;
-    const contactFeedKeyPair = genKeyPair(qrCode.randomSeed);
+    const contactFeedKeyPair = ecGenKeyPair(qrCode.randomSeed);
     const contactPublicKey: ContactPublicKey = {
         contactPublicKey: bob.contactKeyPair.getPublic('hex') as string,
     };
-    const address = publicKeyToAddress(contactFeedKeyPair);
+    const address = ecPublicKeyToAddress(contactFeedKeyPair);
     swarmFeeds.write(address, contactTopic, encrypt(qrCode.randomSeed, contactPublicKey));
 };
 
@@ -82,8 +82,8 @@ export const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = async (
 ) => {
     Debug.log('\nAlice reads Bob\'s contactPublicKey and shares encrypted publicKey');
 
-    const contactFeedKeyPair = genKeyPair(alice.randomSeed);
-    const contactFeedAddress = publicKeyToAddress(contactFeedKeyPair);
+    const contactFeedKeyPair = ecGenKeyPair(alice.randomSeed);
+    const contactFeedAddress = ecPublicKeyToAddress(contactFeedKeyPair);
     const encryptedContactFeedData = await swarmFeeds.read(contactFeedAddress, contactTopic) || throwError('contact feed is empty!');
     const contactFeedData = decrypt(encryptedContactFeedData, alice.randomSeed);
     const bobContactPublicKey = contactFeedData as ContactPublicKey;
@@ -91,8 +91,8 @@ export const aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey = async (
 
     const curve = new ec('secp256k1');
     const bobContactPublicKeyPair = curve.keyFromPublic(alice.bobContactPublicKey, 'hex');
-    const sharedKey = deriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
-    const aliceContactFeedAddress = publicKeyToAddress(alice.contactKeyPair);
+    const sharedKey = ecDeriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
+    const aliceContactFeedAddress = ecPublicKeyToAddress(alice.contactKeyPair);
     await swarmFeeds.write(aliceContactFeedAddress, contactTopic, encrypt(sharedKey, alice.ownKeyPair.getPublic('hex') as string));
 };
 
@@ -104,14 +104,14 @@ export const bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey = async
 
     const curve = new ec('secp256k1');
     const aliceContactPublicKeyPair = curve.keyFromPublic(bob.aliceContactPublicKey!, 'hex');
-    const sharedKey = deriveSharedKey(bob.contactKeyPair, aliceContactPublicKeyPair);
-    const aliceContactFeedAddress = publicKeyToAddress(aliceContactPublicKeyPair);
+    const sharedKey = ecDeriveSharedKey(bob.contactKeyPair, aliceContactPublicKeyPair);
+    const aliceContactFeedAddress = ecPublicKeyToAddress(aliceContactPublicKeyPair);
     const aliceEncryptedPublicKey = await swarmFeeds.read(aliceContactFeedAddress, contactTopic) as EncryptedData<string>;
     bob.alicePublicKey = decrypt(aliceEncryptedPublicKey, sharedKey);
 
     Debug.log('bob', bob);
 
-    const bobContactFeedAddress = publicKeyToAddress(bob.contactKeyPair);
+    const bobContactFeedAddress = ecPublicKeyToAddress(bob.contactKeyPair);
     await swarmFeeds.write(bobContactFeedAddress, contactTopic, encrypt(sharedKey, bob.ownKeyPair.getPublic('hex') as string));
 };
 
@@ -123,9 +123,9 @@ export const aliceReadsBobsEncryptedPublicKey = async (
 
     const curve = new ec('secp256k1');
     const bobContactPublicKeyPair = curve.keyFromPublic(alice.bobContactPublicKey!, 'hex');
-    const sharedKey = deriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
+    const sharedKey = ecDeriveSharedKey(alice.contactKeyPair, bobContactPublicKeyPair);
 
-    const bobContactFeedAddress = publicKeyToAddress(bobContactPublicKeyPair);
+    const bobContactFeedAddress = ecPublicKeyToAddress(bobContactPublicKeyPair);
     const bobEncryptedPublicKey = await swarmFeeds.read(bobContactFeedAddress, contactTopic) as EncryptedData<string>;
     alice.bobPublicKey = decrypt(bobEncryptedPublicKey, sharedKey);
 
