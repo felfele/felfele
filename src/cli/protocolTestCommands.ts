@@ -13,7 +13,7 @@ import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQR
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
 import { Storage } from './protocolTest/Storage';
 import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, privateKeyFromPrivateIdentity, publicKeyFromPublicIdentity, publicKeyToAddress } from './protocolTest/protocolTestHelpers';
-import { PrivateProfile } from '../models/Profile';
+import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
@@ -111,7 +111,7 @@ export const protocolTestCommandDefinition =
             commands: GroupCommand[];
         }
 
-        interface ProfileWithState extends PrivateProfile {
+        interface ProfileWithGroup extends PrivateProfile {
             group: GroupWithCommands;
         }
 
@@ -120,7 +120,7 @@ export const protocolTestCommandDefinition =
             group: Group;
         }
 
-        const aliceProfile: ProfileWithState = {
+        const aliceProfile: ProfileWithGroup = {
             name: 'Alice',
             image: {},
             identity: await generateIdentity(),
@@ -130,7 +130,7 @@ export const protocolTestCommandDefinition =
                 commands: [],
             },
         };
-        const bobProfile: ProfileWithState = {
+        const bobProfile: ProfileWithGroup = {
             name: 'Bob',
             image: {},
             identity: await generateIdentity(),
@@ -140,7 +140,7 @@ export const protocolTestCommandDefinition =
                 commands: [],
             },
         };
-        const carolProfile: ProfileWithState = {
+        const carolProfile: ProfileWithGroup = {
             name: 'Carol',
             image: {},
             identity: await generateIdentity(),
@@ -161,7 +161,7 @@ export const protocolTestCommandDefinition =
         type ProtocolStorage = Storage<string>;
 
         interface GroupProtocolState {
-            profiles: ProfileWithState[];
+            profiles: ProfileWithGroup[];
             storage: ProtocolStorage;
         }
 
@@ -194,8 +194,8 @@ export const protocolTestCommandDefinition =
             , 0);
         };
 
-        const readPrivateSharedFeed = async <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity) => {
-            const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
+        const readPrivateSharedFeed = async <T>(storage: ProtocolStorage, ownerIdentity: PublicIdentity, signer: Signer, recipientIdentity: PublicIdentity) => {
+            const topic = '0x' + signer.deriveSharedKey(recipientIdentity.publicKey as HexString);
             Debug.log('readPrivateSharedFeed', {ownerIdentity, recipientIdentity});
             const hash = await storage.feeds.read(ownerIdentity.address as HexString, topic as HexString);
             if (hash == null) {
@@ -221,11 +221,11 @@ export const protocolTestCommandDefinition =
             const chapter = deserialize(data) as PartialChapter<T>;
             return chapter;
         };
-        const updatePrivateSharedFeed = <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, recipientIdentity: PublicIdentity, data: T) => {
-            const topic = '0x' + deriveSharedKey(ownerIdentity, recipientIdentity);
-            return updateTimeline(storage, ownerIdentity, topic as HexString, data);
+        const updatePrivateSharedFeed = <T>(storage: ProtocolStorage, ownerIdentity: PublicIdentity, signer: Signer, recipientIdentity: PublicIdentity, data: T) => {
+            const topic = '0x' + signer.deriveSharedKey(recipientIdentity.publicKey as HexString);
+            return updateTimeline(storage, ownerIdentity, signer.signDigest, topic as HexString, data);
         };
-        const updateTimeline = async <T>(storage: ProtocolStorage, ownerIdentity: PrivateIdentity, topic: HexString, data: T) => {
+        const updateTimeline = async <T>(storage: ProtocolStorage, ownerIdentity: PublicIdentity, signFeed: (digest: number[]) => string | Promise<string>, topic: HexString, data: T) => {
             Debug.log('updateTimeline', {ownerIdentity, topic, data});
             const previous = await storage.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
             const chapter: PartialChapter<T> = {
@@ -238,13 +238,13 @@ export const protocolTestCommandDefinition =
                 previous,
             };
             const hash = await storage.write(serialize(chapter));
-            const signFeed = (digest: number[]) => SwarmHelpers.signDigest(digest, ownerIdentity);
             return storage.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
         };
-        const sendGroupCommand = async (state: GroupProtocolState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupProtocolState> => {
+        const groupStateSendGroupCommand = async (state: GroupProtocolState, senderIndex: number, groupCommand: GroupCommand): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const topic = calculateGroupTopic(sender.group);
-            await updateTimeline(state.storage, sender.identity, topic, groupCommand);
+            const signFeed = (digest: number[]) => SwarmHelpers.signDigest(digest, sender.identity);
+            await updateTimeline(state.storage, sender.identity, signFeed, topic, groupCommand);
             const updatedSender = {
                 ...sender,
                 group: {
@@ -257,7 +257,7 @@ export const protocolTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
             };
         };
-        const sendGroupMessage = async (state: GroupProtocolState, senderIndex: number, message: string): Promise<GroupProtocolState> => {
+        const groupStateSendGroupMessage = async (state: GroupProtocolState, senderIndex: number, message: string): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const command: GroupCommandPost = {
                 type: 'group-command-post',
@@ -269,7 +269,20 @@ export const protocolTestCommandDefinition =
                     createdAt: Date.now(),
                 },
             };
-            return sendGroupCommand(state, senderIndex, command);
+            return groupStateSendGroupCommand(state, senderIndex, command);
+        };
+        const sendGroupMessage = async (context: GroupProtocolContext, message: string): Promise<GroupWithCommands> => {
+            const command: GroupCommandPost = {
+                type: 'group-command-post',
+                timestamp: highestSeenTimestamp(context.group.commands) + 1,
+
+                post: {
+                    images: [],
+                    text: message,
+                    createdAt: Date.now(),
+                },
+            };
+            return sendGroupCommand(context, command);
         };
         const addToGroup = (state: GroupProtocolState, senderIndex: number, invitedIndex: number): GroupProtocolState => {
             const sender = state.profiles[senderIndex];
@@ -287,7 +300,7 @@ export const protocolTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, senderIndex), updatedSender, ...state.profiles.slice(senderIndex + 1)],
             };
         };
-        const addToGroupAndSendCommand = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
+        const groupStateAddToGroupAndSendCommand = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
             const groupCommandAdd: GroupCommandAdd = {
@@ -300,26 +313,61 @@ export const protocolTestCommandDefinition =
                 },
                 name: invited.name,
             };
-            const updatedState = await sendGroupCommand(state, senderIndex, groupCommandAdd);
+            const updatedState = await groupStateSendGroupCommand(state, senderIndex, groupCommandAdd);
             return addToGroup(updatedState, senderIndex, invitedIndex);
         };
-        const createGroupAndInvite = async (groupState: GroupProtocolState, creatorIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
+        const groupStateCreateGroupAndInvite = async (groupState: GroupProtocolState, creatorIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (creatorIndex === invitedIndex) {
                 throwError('creatorIndex cannot be equal to invitedIndex');
             }
-            return compose([
-                state => addToGroupAndSendCommand(state, creatorIndex, creatorIndex),
-                state => addToGroupAndSendCommand(state, creatorIndex, invitedIndex),
+            return compose<GroupProtocolState>([
+                state => groupStateAddToGroupAndSendCommand(state, creatorIndex, creatorIndex),
+                state => groupStateAddToGroupAndSendCommand(state, creatorIndex, invitedIndex),
             ])(groupState);
         };
-        const sendPrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
+        const sendGroupCommand = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithCommands> => {
+            const topic = calculateGroupTopic(context.group);
+            await updateTimeline(context.storage, context.profile.identity, context.profile.signDigest, topic, groupCommand);
+            return {
+                ...context.group,
+                commands: [groupCommand, ...context.group.commands],
+            };
+        };
+        const addToGroupAndSendCommand = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithCommands> => {
+            const groupCommandAdd: GroupCommandAdd = {
+                type: 'group-command-add',
+                timestamp: highestSeenTimestamp(context.group.commands) + 1,
+
+                identity: {
+                    address: invited.identity.address,
+                    publicKey: invited.identity.publicKey,
+                },
+                name: invited.name,
+            };
+            const updatedGroup = await sendGroupCommand(context, groupCommandAdd);
+            return {
+                ...updatedGroup,
+                participants: [...updatedGroup.participants, invited.identity.publicKey as HexString],
+            };
+        };
+        const createGroupAndInvite = async (context: GroupProtocolContext, invitedProfile: PublicProfile): Promise<GroupWithCommands> => {
+            return compose<GroupWithCommands>([
+                group => addToGroupAndSendCommand(context, context.profile),
+                group => addToGroupAndSendCommand(context, invitedProfile),
+            ])(context.group);
+        };
+        const groupStateSendPrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (senderIndex === invitedIndex) {
                 throwError('senderIndex cannot be equal to invitedIndex');
             }
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            await updatePrivateSharedFeed(state.storage, sender.identity, invited.identity, {
+            const signer: Signer = {
+                signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, sender.identity),
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(sender.identity, {publicKey, address: ''}),
+            };
+            await updatePrivateSharedFeed(state.storage, sender.identity, signer, invited.identity, {
                 type: 'invite-to-group',
                 group: {
                     ...sender.group,
@@ -329,14 +377,29 @@ export const protocolTestCommandDefinition =
 
             return state;
         };
-        const receivePrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
+        const sendPrivateInvite = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithCommands> => {
+            await updatePrivateSharedFeed(context.storage, context.profile.identity, context.profile, invited.identity, {
+                type: 'invite-to-group',
+                group: {
+                    ...context.group,
+                    commands: undefined,
+                },
+            });
+
+            return context.group;
+        };
+        const groupStateReceivePrivateInvite = async (state: GroupProtocolState, senderIndex: number, invitedIndex: number): Promise<GroupProtocolState> => {
             if (senderIndex === invitedIndex) {
                 throwError('senderIndex cannot be equal to invitedIndex');
             }
             const sender = state.profiles[senderIndex];
             const invited = state.profiles[invitedIndex];
 
-            const data = await readPrivateSharedFeed<InviteToGroupCommand>(state.storage, sender.identity, invited.identity);
+            const signer: Signer = {
+                signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, sender.identity),
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(sender.identity, {publicKey, address: ''}),
+            };
+            const data = await readPrivateSharedFeed<InviteToGroupCommand>(state.storage, sender.identity, signer, invited.identity);
             if (data == null) {
                 return state;
             }
@@ -354,57 +417,66 @@ export const protocolTestCommandDefinition =
                 profiles: [...state.profiles.slice(0, invitedIndex), updatedInvited, ...state.profiles.slice(invitedIndex + 1)],
             };
         };
-        const executeRemoteGroupCommand = (profile: ProfileWithState, command: GroupCommand): ProfileWithState => {
+        const receivePrivateInvite = async (context: GroupProtocolContext, sender: PublicProfile): Promise<GroupWithCommands> => {
+            const data = await readPrivateSharedFeed<InviteToGroupCommand>(context.storage, context.profile.identity, context.profile, sender.identity);
+            if (data == null) {
+                return context.group;
+            }
+            const inviteCommand = data;
+            return {
+                ...inviteCommand.group,
+                commands: [],
+            };
+        };
+        const executeRemoteGroupCommand = (group: GroupWithCommands, command: GroupCommand): GroupWithCommands => {
             switch (command.type) {
                 case 'group-command-add': {
-                    if (profile.group.participants.indexOf(command.identity.publicKey as HexString) !== -1) {
+                    if (group.participants.indexOf(command.identity.publicKey as HexString) !== -1) {
                         return {
-                            ...profile,
-                            group: {
-                                ...profile.group,
-                                commands: [command, ...profile.group.commands],
-                            },
+                            ...group,
+                            commands: [command, ...group.commands],
                         };
                     }
                     return {
-                        ...profile,
-                        group: {
-                            ...profile.group,
-                            commands: [command, ...profile.group.commands],
-                            participants: [...profile.group.participants, command.identity.publicKey as HexString],
-                        },
+                        ...group,
+                        commands: [command, ...group.commands],
+                        participants: [...group.participants, command.identity.publicKey as HexString],
                     };
                 }
                 default: {
                     return {
-                        ...profile,
-                        group: {
-                            ...profile.group,
-                            commands: [command, ...profile.group.commands],
-                        },
+                        ...group,
+                        commands: [command, ...group.commands],
                     };
                 }
             }
         };
-        const receiveProfileGroupCommands = async (storage: ProtocolStorage, profile: ProfileWithState): Promise<ProfileWithState> => {
-            const lastSeenTimestamp = highestSeenTimestamp(profile.group.commands);
-            const highestRemoteTimestamp = highestSeenRemoteTimestamp(profile.group.commands as GroupCommandWithSource[]);
-            const remoteCommands = await fetchGroupCommands(storage, profile.group, highestRemoteTimestamp);
+        const receiveProfileGroupCommands = async (storage: ProtocolStorage, profile: PublicProfile, group: GroupWithCommands): Promise<GroupWithCommands> => {
+            const lastSeenTimestamp = highestSeenTimestamp(group.commands);
+            const highestRemoteTimestamp = highestSeenRemoteTimestamp(group.commands as GroupCommandWithSource[]);
+            const remoteCommands = await fetchGroupCommands(storage, group, highestRemoteTimestamp);
             const newCommands = remoteCommands
                 .filter(command => command.source !== profile.identity.publicKey as HexString)
                 .filter(command => command.timestamp > lastSeenTimestamp)
                 .sort((a, b) => a.timestamp - b.timestamp) // reverse order!
             ;
-            return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), profile);
+            return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), group);
         };
-        const receiveGroupCommands = async (state: GroupProtocolState, receiverIndex: number): Promise<GroupProtocolState> => {
+        const groupStateReceiveGroupCommands = async (state: GroupProtocolState, receiverIndex: number): Promise<GroupProtocolState> => {
             Debug.log('receiveGroupCommands', receiverIndex);
             const receiver = state.profiles[receiverIndex];
-            const updatedReceiver = await receiveProfileGroupCommands(state.storage, receiver);
+            const updatedGroup = await receiveProfileGroupCommands(state.storage, receiver, receiver.group);
+            const updatedReceiver = {
+                ...receiver,
+                group: updatedGroup,
+            };
             return {
                 ...state,
                 profiles: [...state.profiles.slice(0, receiverIndex), updatedReceiver, ...state.profiles.slice(receiverIndex + 1)],
             };
+        };
+        const receiveGroupCommands = async (context: GroupProtocolContext): Promise<GroupWithCommands> => {
+            return await receiveProfileGroupCommands(context.storage, context.profile, context.group);
         };
         const fetchGroupTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString, until: number) => {
             let reference = await readTimeline(storage, address, topic);
@@ -459,7 +531,7 @@ export const protocolTestCommandDefinition =
         const areCommandsEqual = (commandsA: GroupCommand[], commandsB: GroupCommand[]): boolean => {
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
-        const sortedProfileCommands = (profile: ProfileWithState, withSource: boolean = false) =>
+        const sortedProfileCommands = (profile: ProfileWithGroup, withSource: boolean = false) =>
             profile.group.commands
                 .map(command => ({...command, source: withSource ? (command as GroupCommandWithSource).source : undefined}))
                 .sort((a, b) => b.timestamp - a.timestamp)
@@ -491,8 +563,8 @@ export const protocolTestCommandDefinition =
             return groupState;
         };
 
-        const compose = (functions: ((state: GroupProtocolState) => GroupProtocolState | Promise<GroupProtocolState>)[]) => {
-            return async (initialState: GroupProtocolState) => {
+        const compose = <T>(functions: ((state: T) => T | Promise<T>)[]) => {
+            return async (initialState: T) => {
                 let returnState = initialState;
                 for (const f of functions) {
                     returnState = await f(returnState);
@@ -518,27 +590,141 @@ export const protocolTestCommandDefinition =
             profiles: [aliceProfile, bobProfile, carolProfile],
             storage: await makeStorage(),
         };
+        enum Profile {
+            ALICE = 0,
+            BOB = 1,
+            CAROL = 2,
+        }
 
-        const outputState = await compose([
-            (state) => createGroupAndInvite(state, 0, 1),
-            (state) => sendPrivateInvite(state, 0, 1),
-            (state) => receivePrivateInvite(state, 0, 1),
-            (state) => sendGroupMessage(state, 0, 'hello Bob'),
-            (state) => receiveGroupCommands(state, 1),
-            (state) => sendGroupMessage(state, 1, 'hello Alice'),
-            (state) => receiveGroupCommands(state, 0),
-            (state) => sendGroupMessage(state, 0, 'test'),
-            (state) => receiveGroupCommands(state, 1),
-            (state) => addToGroupAndSendCommand(state, 1, 2),
-            (state) => receiveGroupCommands(state, 0),
-            (state) => sendPrivateInvite(state, 1, 2),
-            (state) => receivePrivateInvite(state, 1, 2),
-            (state) => sendGroupMessage(state, 1, 'hello Carol'),
-            (state) => receiveGroupCommands(state, 0),
-            (state) => receiveGroupCommands(state, 1),
-            (state) => receiveGroupCommands(state, 2),
-            (state) => debugState(state),
-        ])(inputState);
+        // const outputState = await compose<GroupProtocolState>([
+        //     (state) => groupStateCreateGroupAndInvite(state, 0, 1),
+        //     (state) => groupStateSendPrivateInvite(state, 0, 1),
+        //     (state) => groupStateReceivePrivateInvite(state, 0, 1),
+        //     (state) => groupStateSendGroupMessage(state, 0, 'hello Bob'),
+        //     (state) => groupStateReceiveGroupCommands(state, 1),
+        //     (state) => groupStateSendGroupMessage(state, 1, 'hello Alice'),
+        //     (state) => groupStateReceiveGroupCommands(state, 0),
+        //     (state) => groupStateSendGroupMessage(state, 0, 'test'),
+        //     (state) => groupStateReceiveGroupCommands(state, 1),
+        //     (state) => groupStateAddToGroupAndSendCommand(state, 1, 2),
+        //     (state) => groupStateReceiveGroupCommands(state, 0),
+        //     (state) => groupStateSendPrivateInvite(state, 1, 2),
+        //     (state) => groupStateReceivePrivateInvite(state, 1, 2),
+        //     (state) => groupStateSendGroupMessage(state, 1, 'hello Carol'),
+        //     (state) => groupStateReceiveGroupCommands(state, 0),
+        //     (state) => groupStateReceiveGroupCommands(state, 1),
+        //     (state) => groupStateReceiveGroupCommands(state, 2),
+        //     (state) => debugState(state),
+        // ])(inputState);
+
+        const groupToContext = (context: GroupProtocolContext, group: GroupWithCommands): GroupProtocolContext => ({
+            ...context,
+            group,
+        });
+        const composeGroupProtocolFunctions = async (context: GroupProtocolContext, functions: GroupProtocolFunction[]): Promise<GroupWithCommands> => {
+            for (const f of functions) {
+                const group = await f(context);
+                context = groupToContext(context, group);
+            }
+            return context.group;
+        };
+        interface Signer {
+            signDigest: SwarmHelpers.FeedDigestSigner;
+            deriveSharedKey: (publicKey: HexString) => HexString;
+        }
+        type ProfileWithSigner = PublicProfile & Signer;
+        interface GroupProtocolContext {
+            storage: ProtocolStorage;
+            profile: ProfileWithSigner;
+            group: GroupWithCommands;
+        }
+        type GroupProtocolFunction = (context: GroupProtocolContext) => GroupWithCommands | Promise<GroupWithCommands>;
+        type GroupProtocolAction = [Profile, GroupProtocolFunction];
+        const GroupProtocol = {
+            create: (sharedSecret: HexString): GroupProtocolFunction => {
+                return async (initialContext) => {
+                    return composeGroupProtocolFunctions(initialContext, [
+                        context => ({
+                            sharedSecret,
+                            participants: [],
+                            commands: [],
+                        }),
+                        context => addToGroupAndSendCommand(context, context.profile),
+                    ]);
+                };
+            },
+            invite: (invitedProfile: PublicProfile): GroupProtocolFunction => {
+                return async (initialContext) => {
+                    return composeGroupProtocolFunctions(initialContext, [
+                        context => addToGroupAndSendCommand(context, invitedProfile),
+                        context => sendPrivateInvite(context, invitedProfile),
+                    ]);
+                };
+            },
+            sendMessage: (message: string): GroupProtocolFunction => {
+                return async (context) => {
+                    return sendGroupMessage(context, message);
+                };
+            },
+            receive: (): GroupProtocolFunction => {
+                return async (context) => {
+                    return receiveGroupCommands(context);
+                };
+            },
+            receivePrivate: (sender: PublicProfile): GroupProtocolFunction => {
+                return async (context) => {
+                    return receivePrivateInvite(context, sender);
+                };
+            },
+        };
+
+        const composeGroupProtocolWithState = async (initialGroupState: GroupProtocolState, actions: GroupProtocolAction[]): Promise<GroupProtocolState> => {
+            let state = initialGroupState;
+            for (const action of actions) {
+                const p = action[0];
+                const f = action[1];
+                const profile = {
+                    ...state.profiles[p],
+                    signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, state.profiles[p].identity),
+                    deriveSharedKey: (publicKey: HexString) => deriveSharedKey(state.profiles[p].identity, {publicKey, address: ''}),
+                };
+                const context: GroupProtocolContext = {
+                    storage: state.storage,
+                    profile,
+                    group: profile.group,
+                };
+                const updatedGroup = await f(context);
+                const updatedProfile = {
+                    ...profile,
+                    group: updatedGroup,
+                };
+                state = {
+                    ...state,
+                    profiles: [...state.profiles.slice(0, p), updatedProfile, ...state.profiles.slice(p + 1)],
+                };
+            }
+            debugState(state);
+            return state;
+        };
+
+        const outputState = await composeGroupProtocolWithState(inputState, [
+            [Profile.ALICE, GroupProtocol.create('secret' as HexString)],
+            [Profile.ALICE, GroupProtocol.invite(inputState.profiles[Profile.BOB])],
+            [Profile.BOB, GroupProtocol.receivePrivate(inputState.profiles[Profile.ALICE])],
+            [Profile.ALICE, GroupProtocol.sendMessage('hello Bob')],
+            [Profile.BOB, GroupProtocol.receive()],
+            [Profile.BOB, GroupProtocol.sendMessage('hello Alice')],
+            [Profile.ALICE, GroupProtocol.receive()],
+            [Profile.ALICE, GroupProtocol.sendMessage('test')],
+            [Profile.BOB, GroupProtocol.receive()],
+            [Profile.BOB, GroupProtocol.invite(inputState.profiles[Profile.CAROL])],
+            [Profile.ALICE, GroupProtocol.receive()],
+            [Profile.CAROL, GroupProtocol.receivePrivate(inputState.profiles[Profile.BOB])],
+            [Profile.BOB, GroupProtocol.sendMessage('hello Carol')],
+            [Profile.ALICE, GroupProtocol.receive()],
+            [Profile.BOB, GroupProtocol.receive()],
+            [Profile.CAROL, GroupProtocol.receive()],
+        ]);
 
         assertGroupStateInvariants(outputState);
 
