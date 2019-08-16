@@ -3,7 +3,7 @@ import { HexString } from '../../helpers/opaqueTypes';
 import { Storage, StorageFeeds } from './Storage';
 import * as Swarm from '../../swarm/Swarm';
 
-export class SwarmStorageFeeds implements StorageFeeds<string> {
+export class SwarmStorageFeeds implements StorageFeeds {
     public constructor(readonly swarmFeedApi: Swarm.FeedApi) {}
 
     public write = async (address: HexString, topic: HexString, data: string, signFeedDigest: Swarm.FeedDigestSigner = this.swarmFeedApi.signFeedDigest) => {
@@ -30,18 +30,18 @@ export class SwarmStorageFeeds implements StorageFeeds<string> {
     }
 }
 
-export class SwarmStorage implements Storage<string> {
+export class SwarmStorage implements Storage {
     public readonly feeds = new SwarmStorageFeeds(this.swarm.feed);
 
     public constructor(readonly swarm: Swarm.Api) {}
 
-    public write = async (data: string): Promise<HexString> => {
-        const hash = await this.swarm.bzz.uploadString(data) as HexString;
+    public write = async (data: Uint8Array): Promise<HexString> => {
+        const hash = await this.swarm.bzz.uploadUint8Array(data) as HexString;
         return hash;
     }
 
-    public read = async (hash: HexString): Promise<string> => {
-        const data = await this.swarm.bzz.downloadString(hash, 0);
+    public read = async (hash: HexString): Promise<Uint8Array> => {
+        const data = await this.swarm.bzz.downloadUint8Array(hash, 0);
         return data;
     }
 }

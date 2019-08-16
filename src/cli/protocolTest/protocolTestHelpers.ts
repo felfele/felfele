@@ -1,4 +1,4 @@
-import { stringToByteArray, byteArrayToHex, hexToByteArray, stripHexPrefix, toUTF8Array } from '../../helpers/conversion';
+import { stringToByteArray, byteArrayToHex, hexToByteArray, stripHexPrefix } from '../../helpers/conversion';
 import { keccak256 } from 'js-sha3';
 import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../../models/Identity';

@@ -4,10 +4,10 @@ import { stringToByteArray, byteArrayToHex, stripHexPrefix } from '../../helpers
 import { HexString } from '../../helpers/opaqueTypes';
 import { Storage, StorageFeeds } from './Storage';
 
-export class MemoryStorageFeeds<T> implements StorageFeeds<T> {
-    private feeds: {[name: string]: T} = {};
+export class MemoryStorageFeeds implements StorageFeeds {
+    private feeds: {[name: string]: string} = {};
 
-    public write = async (address: HexString, topic: HexString, data: T) => {
+    public write = async (address: HexString, topic: HexString, data: string) => {
         const name = stripHexPrefix(address) + '/' + stripHexPrefix(topic);
         Debug.log('\n--> SwarmFeeds.write', {address, name, data});
         this.feeds[name] = data;
@@ -25,20 +25,20 @@ export class MemoryStorageFeeds<T> implements StorageFeeds<T> {
     }
 }
 
-export class MemoryStorage implements Storage<string> {
-    public readonly feeds = new MemoryStorageFeeds<string>();
-    private store: {[hash: string]: string} = {};
+export class MemoryStorage implements Storage {
+    public readonly feeds = new MemoryStorageFeeds();
+    private store: {[hash: string]: Uint8Array} = {};
 
-    public write = async (data: string): Promise<HexString> => {
-        const hash = byteArrayToHex(keyDerivationFunction([new Uint8Array(stringToByteArray(data))]), false);
+    public write = async (data: Uint8Array): Promise<HexString> => {
+        const hash = byteArrayToHex(keyDerivationFunction([data]), false);
         this.store[hash] = data;
-        Debug.log('Swarm.write', {data, hash});
+        Debug.log('Swarm.write', {hash});
         return hash;
     }
 
-    public read = async (hash: HexString): Promise<string> => {
+    public read = async (hash: HexString): Promise<Uint8Array> => {
         const data = this.store[hash];
-        Debug.log('Swarm.read', {data, hash});
+        Debug.log('Swarm.read', {hash});
         return data;
     }
 }
