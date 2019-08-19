@@ -1,6 +1,6 @@
 import { Debug } from '../../Debug';
-import { keyDerivationFunction } from '../../helpers/groupHelpers';
-import { stringToByteArray, byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
+import { cryptoHash } from '../../helpers/groupHelpers';
+import { byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
 import { HexString } from '../../helpers/opaqueTypes';
 import { Storage, StorageFeeds } from './Storage';
 
@@ -30,7 +30,7 @@ export class MemoryStorage implements Storage {
     private store: {[hash: string]: Uint8Array} = {};
 
     public write = async (data: Uint8Array): Promise<HexString> => {
-        const hash = byteArrayToHex(keyDerivationFunction([data]), false);
+        const hash = byteArrayToHex(cryptoHash([data]), false);
         this.store[hash] = data;
         Debug.log('Swarm.write', {hash});
         return hash;

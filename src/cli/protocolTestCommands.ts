@@ -12,9 +12,17 @@ import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
 import { Storage } from './protocolTest/Storage';
-import { throwError, createDeterministicRandomGenerator, randomNumbers, createRandomGenerator, ecPrivateKeyFromPrivateIdentity, ecPublicKeyFromPublicIdentity, ecPublicKeyToAddress, PublicKey, Address, publicKeyToAddress } from './protocolTest/protocolTestHelpers';
+import {
+    throwError,
+    createDeterministicRandomGenerator,
+    randomNumbers,
+    createRandomGenerator,
+    PublicKey,
+    Address,
+    publicKeyToAddress,
+} from './protocolTest/protocolTestHelpers';
 import { PrivateProfile, PublicProfile } from '../models/Profile';
-import { GroupCommand, GroupCommandPost, keyDerivationFunction, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
+import { GroupCommand, GroupCommandPost, cryptoHash, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
 import { PublicIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
 import { SwarmStorage } from './protocolTest/SwarmStorage';
@@ -153,12 +161,15 @@ export const protocolTestCommandDefinition =
             },
         };
 
-        assertEquals(publicKeyToAddress(aliceProfile.identity.publicKey as PublicKey), aliceProfile.identity.address as Address);
-
         const calculateGroupTopic = (group: Group): HexString => {
             const secretWithoutPrefix = stripHexPrefix(group.sharedSecret);
             const bytes = hexToUint8Array(secretWithoutPrefix);
-            const topicBytes = keyDerivationFunction([bytes]);
+            const topicBytes = cryptoHash([bytes]);
+            return byteArrayToHex(topicBytes);
+        };
+        const calculatePrivateTopic = (sharedKey: HexString): HexString => {
+            const sharedKeyBytes = hexToUint8Array(sharedKey);
+            const topicBytes = cryptoHash(sharedKeyBytes);
             return byteArrayToHex(topicBytes);
         };
 
@@ -210,7 +221,7 @@ export const protocolTestCommandDefinition =
             crypto: Crypto,
         ) => {
             const sharedKey = crypto.deriveSharedKey(publicKey as HexString);
-            const topic = '0x' + sharedKey;
+            const topic = calculatePrivateTopic(sharedKey);
             const address = publicKeyToAddress(publicKey);
             Debug.log('readPrivateSharedFeed', {publicKey, address, topic});
             const hash = await storage.feeds.read(address, topic as HexString);
@@ -249,7 +260,7 @@ export const protocolTestCommandDefinition =
             data: T,
         ) => {
             const sharedKey = crypto.deriveSharedKey(recipientIdentity.publicKey as HexString);
-            const topic = '0x' + sharedKey;
+            const topic = calculatePrivateTopic(sharedKey);
             const random = await crypto.random(32);
             const encryptTimeline = (s: string): Uint8Array => {
                 const dataBytes = stringToUint8Array(s);

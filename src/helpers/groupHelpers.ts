@@ -36,7 +36,10 @@ const flattenUint8Arrays = (inputs: Uint8Array[]): Uint8Array => {
     return new Uint8Array(numbers);
 };
 
-export const keyDerivationFunction = (inputs: Uint8Array[]): Uint8Array => {
-    const flatInput = flattenUint8Arrays(inputs);
+export const cryptoHash = (inputs: Uint8Array | Uint8Array[]): Uint8Array => {
+    const flatInput = Array.isArray(inputs)
+        ? flattenUint8Arrays(inputs)
+        : inputs
+    ;
     return new Uint8Array(keccak256.array(flatInput));
 };
