@@ -11,34 +11,35 @@ import { SharePostEditorContainer } from './SharePostEditorContainer';
 import { Debug } from '../Debug';
 import { Actions } from '../actions/Actions';
 import { FELFELE_SHARE_EXTENSION_NAME } from '../reducers/defaultData';
+import { Image } from 'react-native';
+import { ImageData } from '../models/ImageData';
 
 interface ShareState {
     store: any;
     persistor: Persistor | null;
-    type: any;
-    value: any;
+    images: ImageData[];
+    text: string;
 }
 
 export default class FelfeleShareExtension extends React.Component<{}, ShareState> {
     public state: ShareState = {
         store: null,
         persistor: null,
-        type: null,
-        value: null,
+        images: [],
+        text: '',
     };
 
     public render() {
         if (this.state.store == null) {
-            Debug.log("won't render");
             return null;
         }
-        Debug.log('will render');
         return (
             <TopLevelErrorBoundary>
                 <Provider store={this.state.store!}>
                     <PersistGate loading={null} persistor={this.state.persistor!}>
                         <SharePostEditorContainer
-                            text={this.state.value}
+                            images={this.state.images}
+                            text={this.state.text}
                             goBack={() => {
                                 this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
                                 this.state.persistor!.flush().then(() => {
@@ -60,12 +61,28 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
         const { store, persistor } = await initStore(() => {});
         try {
             const { type, value } =  await ShareExtension.data();
-            this.setState({
-                store,
-                persistor,
-                type,
-                value,
-            });
+            let text: string = '';
+            if (type === 'text/plain') {
+                text = value as string;
+                this.setState({
+                    store,
+                    persistor,
+                    text,
+                });
+            } else if (type === 'image/*') {
+                Image.getSize(value, (width, height) => {
+                    this.setState({
+                        store,
+                        persistor,
+                        images: [ { width, height, localPath: value } ],
+                    });
+
+                }, (e) => {
+                    Debug.log('error sharing image', e);
+                });
+            } else {
+                throw new Error('Unsupported media format for sharing');
+            }
         } catch (e) {
             Debug.log('error getting share data', e);
         }

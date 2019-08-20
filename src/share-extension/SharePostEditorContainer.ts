@@ -4,14 +4,17 @@ import { AppState } from '../reducers/AppState';
 import { StateProps, PostEditor } from '../components/PostEditor';
 import { mapDispatchToProps } from '../containers/PostEditorContainer';
 import { Post } from '../models/Post';
+import { Debug } from '../Debug';
+import { ImageData } from '../models/ImageData';
+import { Image } from 'react-native';
 
 const mapStateToProps = (
     state: AppState,
-    ownProps: { text: string, goBack: () => boolean, dismiss: () => void }
+    ownProps: { images: ImageData[], text: string, goBack: () => boolean, dismiss: () => void }
 ): StateProps => {
     const draft: Post = {
-        images: [],
         createdAt: Date.now(),
+        images: ownProps.images,
         text: ownProps.text,
     };
     return {
