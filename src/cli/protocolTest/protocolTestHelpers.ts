@@ -4,6 +4,10 @@ import { ec } from 'elliptic';
 import { PublicIdentity, PrivateIdentity } from '../../models/Identity';
 import { HexString, BrandedType } from '../../helpers/opaqueTypes';
 import { Debug } from '../../Debug';
+import * as crypto from '../../helpers/crypto';
+import { SwarmStorage } from './SwarmStorage';
+import { MemoryStorage } from './MemoryStorage';
+import * as SwarmHelpers from '../../swarm/Swarm';
 
 export type PublicKey = BrandedType<HexString, 'PublicKey'>;
 export type Address = BrandedType<HexString, 'Address'>;
@@ -98,4 +102,39 @@ export const createDeterministicRandomGenerator = (randomSeed: string): () => st
 
 export const throwError = (msg: string): never => {
     throw new Error(msg);
+};
+
+export interface Encryption {
+    encrypt: (data: Uint8Array, key: Uint8Array, random: Uint8Array) => Uint8Array;
+    decrypt: (data: Uint8Array, key: Uint8Array) => Uint8Array;
+}
+
+export interface Crypto extends Encryption {
+    signDigest: SwarmHelpers.FeedDigestSigner;
+    deriveSharedKey: (publicKey: HexString) => HexString;
+    random: (length: number) => Promise<Uint8Array>;
+}
+
+export const makeNullEncryption = (): Encryption => ({
+    encrypt: (data: Uint8Array, secret: Uint8Array, random: Uint8Array) => data,
+    decrypt: (data: Uint8Array, secret: Uint8Array) => data,
+});
+
+export const makeNaclEncryption = (): Encryption => ({
+    encrypt: (data: Uint8Array, secret: Uint8Array, random: Uint8Array) => crypto.encryptWithNonce(data, secret, random),
+    decrypt: (data: Uint8Array, secret: Uint8Array) => crypto.decrypt(data, secret),
+});
+
+export const makeStorage = async (generateIdentity: () => Promise<PrivateIdentity>) => {
+    const swarmApiIdentity = await generateIdentity();
+    const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
+    const swarmGateway = process.env.SWARM_GATEWAY || '';
+    const swarmApi = SwarmHelpers.makeApi({user: '', topic: ''}, swarmApiSigner, swarmGateway);
+    const swarmStorage = new SwarmStorage(swarmApi);
+    const memoryStorage = new MemoryStorage();
+    const storage = swarmGateway !== ''
+        ? swarmStorage
+        : memoryStorage
+    ;
+    return storage;
 };

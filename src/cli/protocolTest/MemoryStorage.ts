@@ -1,10 +1,10 @@
 import { Debug } from '../../Debug';
-import { cryptoHash } from '../../helpers/groupHelpers';
+import { cryptoHash } from '../../protocols/group';
 import { byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
 import { HexString } from '../../helpers/opaqueTypes';
-import { Storage, StorageFeeds } from './Storage';
+import { ProtocolStorage, ProtocolStorageFeeds } from '../../protocols/ProtocolStorage';
 
-export class MemoryStorageFeeds implements StorageFeeds {
+export class MemoryStorageFeeds implements ProtocolStorageFeeds {
     private feeds: {[name: string]: string} = {};
 
     public write = async (address: HexString, topic: HexString, data: string) => {
@@ -25,7 +25,7 @@ export class MemoryStorageFeeds implements StorageFeeds {
     }
 }
 
-export class MemoryStorage implements Storage {
+export class MemoryStorage implements ProtocolStorage {
     public readonly feeds = new MemoryStorageFeeds();
     private store: {[hash: string]: Uint8Array} = {};
 

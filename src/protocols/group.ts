@@ -1,32 +1,33 @@
 import { keccak256 } from 'js-sha3';
 import { PublicIdentity } from '../models/Identity';
 import { Post } from '../models/Post';
-import { HexString } from './opaqueTypes';
 
-export interface GroupCommandAdd {
+interface GroupCommandBase {
+    logicalTime: number;
+    protocol: 'group';
+    version: 1;
+}
+
+export interface GroupCommandAdd extends GroupCommandBase {
     type: 'group-command-add';
-    timestamp: number;
 
     identity: PublicIdentity;
     name: string;
 }
 
-export interface GroupCommandRemove {
+export interface GroupCommandRemove extends GroupCommandBase {
     type: 'group-command-remove';
-    timestamp: number;
 
     identity: PublicIdentity;
 }
 
-export interface GroupCommandPost {
+export interface GroupCommandPost extends GroupCommandBase {
     type: 'group-command-post';
-    timestamp: number;
 
     post: Post;
 }
 
 export type GroupCommand = GroupCommandAdd | GroupCommandRemove | GroupCommandPost;
-export type GroupCommandWithSource = GroupCommand & { source: HexString };
 
 const flattenUint8Arrays = (inputs: Uint8Array[]): Uint8Array => {
     const numbers = inputs

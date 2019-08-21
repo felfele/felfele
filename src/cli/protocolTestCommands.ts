@@ -11,23 +11,28 @@ import { HexString, BrandedType } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
 import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
-import { Storage } from './protocolTest/Storage';
+import { ProtocolStorage } from '../protocols/ProtocolStorage';
 import {
     throwError,
     createDeterministicRandomGenerator,
     randomNumbers,
     createRandomGenerator,
     PublicKey,
-    Address,
     publicKeyToAddress,
+    makeNaclEncryption,
+    makeStorage,
+    Encryption,
+    Crypto,
 } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile, PublicProfile } from '../models/Profile';
-import { GroupCommand, GroupCommandPost, cryptoHash, GroupCommandAdd, GroupCommandWithSource } from '../helpers/groupHelpers';
-import { PublicIdentity } from '../models/Identity';
+import { GroupCommand, GroupCommandPost, cryptoHash, GroupCommandAdd } from '../protocols/group';
+import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
 import { SwarmStorage } from './protocolTest/SwarmStorage';
-import { assertEquals } from '../helpers/assertEquals';
 import { encryptWithNonce, decrypt } from '../helpers/crypto';
+import { Post } from '../models/Post';
+import { Timeline, PartialChapter, ChapterReference, Chapter, isChapter, uploadTimeline, appendToTimeline, getNewestChapterId, fetchTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime, LogicalTime } from '../protocols/timeline';
+import { PrivateCommand, calculatePrivateTopic, PrivateSharingContext, PrivateCommandPost, uploadLocalPrivateCommands, downloadRemotePrivateCommands, PrivateCommandRemove, highestLogicalTime, listTimelinePosts, privateSharePost, privateDeletePost, privateSync } from '../protocols/privateSharing';
 
 export const protocolTestCommandDefinition =
     addCommand('invite', 'Test invite protocol', async () => {
@@ -100,7 +105,7 @@ export const protocolTestCommandDefinition =
         output({aliceContact, bobContact});
     })
     .
-    addCommand('privateGroup [randomSeed]', 'Test 1on1 private messaging', async (randomSeed?) => {
+    addCommand('privateGroup [randomSeed]', 'Test group private messaging', async (randomSeed?) => {
         randomSeed = randomSeed ? randomSeed : randomNumbers[0];
         const nextRandom = createDeterministicRandomGenerator(randomSeed);
         const generateDeterministicRandom = async (length: number) => {
@@ -117,12 +122,12 @@ export const protocolTestCommandDefinition =
             participants: PublicKey[];
         }
 
-        interface GroupWithCommands extends Group {
-            commands: GroupCommand[];
+        interface GroupWithTimeline extends Group {
+            timeline: Timeline<GroupCommand>;
         }
 
         interface ProfileWithGroup extends PrivateProfile {
-            group: GroupWithCommands;
+            group: GroupWithTimeline;
         }
 
         interface InviteToGroupCommand {
@@ -130,35 +135,28 @@ export const protocolTestCommandDefinition =
             group: Group;
         }
 
+        const emptyGroupWithTimeline: GroupWithTimeline = {
+            sharedSecret: 'secret' as HexString,
+            participants: [],
+            timeline: [],
+        };
         const aliceProfile: ProfileWithGroup = {
             name: 'Alice',
             image: {},
             identity: await generateIdentity(),
-            group: {
-                sharedSecret: 'secret' as HexString,
-                participants: [],
-                commands: [],
-            },
+            group: emptyGroupWithTimeline,
         };
         const bobProfile: ProfileWithGroup = {
             name: 'Bob',
             image: {},
             identity: await generateIdentity(),
-            group: {
-                sharedSecret: '' as HexString,
-                participants: [],
-                commands: [],
-            },
+            group: emptyGroupWithTimeline,
         };
         const carolProfile: ProfileWithGroup = {
             name: 'Carol',
             image: {},
             identity: await generateIdentity(),
-            group: {
-                sharedSecret: '' as HexString,
-                participants: [],
-                commands: [],
-            },
+            group: emptyGroupWithTimeline,
         };
 
         const calculateGroupTopic = (group: Group): HexString => {
@@ -167,53 +165,12 @@ export const protocolTestCommandDefinition =
             const topicBytes = cryptoHash([bytes]);
             return byteArrayToHex(topicBytes);
         };
-        const calculatePrivateTopic = (sharedKey: HexString): HexString => {
-            const sharedKeyBytes = hexToUint8Array(sharedKey);
-            const topicBytes = cryptoHash(sharedKeyBytes);
-            return byteArrayToHex(topicBytes);
-        };
-
-        type ProtocolStorage = Storage;
-
-        interface Encryption {
-            encrypt: (data: Uint8Array, key: Uint8Array, random: Uint8Array) => Uint8Array;
-            decrypt: (data: Uint8Array, key: Uint8Array) => Uint8Array;
-        }
 
         interface GroupProtocolState {
             profiles: ProfileWithGroup[];
             storage: ProtocolStorage;
             encryption: Encryption;
         }
-
-        type ChapterReference = BrandedType<HexString, 'ChapterReference'>;
-
-        type PartialChapter<T> = {
-            protocol: 'timeline',
-            version: 1,
-            timestamp: number,
-            author: string,
-            type: string,
-            content: T,
-            previous?: ChapterReference,
-            references?: Array<ChapterReference>,
-            signature?: string,
-        };
-
-        type Chapter<T> = PartialChapter<T> & { id: string };
-
-        const highestSeenTimestamp = (commands: GroupCommand[]) => {
-            return commands.reduce((prev, curr) => curr.timestamp > prev
-                ? curr.timestamp
-                : prev
-            , 0);
-        };
-        const highestSeenRemoteTimestamp = (commands: GroupCommandWithSource[]) => {
-            return commands.reduce((prev, curr) => curr.source != null && curr.timestamp > prev
-                ? curr.timestamp
-                : prev
-            , 0);
-        };
 
         const readPrivateSharedTimeline = async <T>(
             storage: ProtocolStorage,
@@ -244,13 +201,16 @@ export const protocolTestCommandDefinition =
             Debug.log('readTimeline', {hash});
             return hash as ChapterReference | undefined;
         };
-        const readChapter = async <T>(storage: ProtocolStorage, reference: ChapterReference, decryptData: (data: Uint8Array) => string = Uint8ArrayToString): Promise<PartialChapter<T> | undefined> => {
+        const readChapter = async <T>(storage: ProtocolStorage, reference: ChapterReference, decryptData: (data: Uint8Array) => string = Uint8ArrayToString): Promise<Chapter<T> | undefined> => {
             const data = await storage.read(reference as HexString);
             if (data == null) {
                 return undefined;
             }
-            const chapter = deserialize(decryptData(data)) as PartialChapter<T>;
-            return chapter;
+            const partialChapter = deserialize(decryptData(data)) as PartialChapter<T>;
+            return {
+                ...partialChapter,
+                id: reference,
+            };
         };
         const updatePrivateSharedTimeline = async <T>(
             storage: ProtocolStorage,
@@ -291,10 +251,12 @@ export const protocolTestCommandDefinition =
             const hash = await storage.write(encryptTimeline(serialize(chapter)));
             return storage.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
         };
-        const sendGroupMessage = async (context: GroupProtocolContext, message: string): Promise<GroupWithCommands> => {
+        const sendGroupMessage2 = async (context: GroupProtocolContext, message: string): Promise<GroupWithTimeline> => {
             const command: GroupCommandPost = {
                 type: 'group-command-post',
-                timestamp: highestSeenTimestamp(context.group.commands) + 1,
+                protocol: 'group',
+                version: 1,
+                logicalTime: highestSeenLogicalTime(context.group.timeline) + 1,
 
                 post: {
                     images: [],
@@ -304,25 +266,58 @@ export const protocolTestCommandDefinition =
             };
             return sendGroupCommand(context, command);
         };
-        const sendGroupCommand = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithCommands> => {
+        const sendGroupMessage = async (context: GroupProtocolContext, message: string): Promise<GroupWithTimeline> => {
+            const command: GroupCommandPost = {
+                type: 'group-command-post',
+                protocol: 'group',
+                version: 1,
+                logicalTime: highestSeenLogicalTime(context.group.timeline) + 1,
+
+                post: {
+                    images: [],
+                    text: message,
+                    createdAt: Date.now(),
+                },
+            };
+            return appendGroupCommandToTimeline(context, command);
+        };
+        const sendGroupCommand = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithTimeline> => {
             const topic = calculateGroupTopic(context.group);
-            const random = await context.profile.random(32);
+            const random = await context.crypto.random(32);
             const encryptTimeline = (s: string): Uint8Array => {
                 const dataBytes = stringToUint8Array(s);
                 const secretBytes = hexToUint8Array(context.group.sharedSecret);
-                return context.profile.encrypt(dataBytes, secretBytes, random);
+                return context.crypto.encrypt(dataBytes, secretBytes, random);
             };
 
-            await updateTimeline(context.storage, context.profile.identity, context.profile.signDigest, topic, groupCommand, encryptTimeline);
+            await updateTimeline(context.storage, context.profile.identity, context.crypto.signDigest, topic, groupCommand, encryptTimeline);
             return {
                 ...context.group,
-                commands: [groupCommand, ...context.group.commands],
             };
         };
-        const addToGroupAndSendCommand = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithCommands> => {
+        const appendGroupCommandToTimeline = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithTimeline> => {
+            const ownerIdentity = context.profile.identity;
+            Debug.log('addGroupCommand', {ownerIdentity});
+            const chapter: PartialChapter<GroupCommand> = {
+                protocol: 'timeline',
+                version: 1,
+                timestamp: Date.now(),
+                author: ownerIdentity.address,
+                type: 'application/json',
+                content: groupCommand,
+                previous: undefined,
+            };
+            return {
+                ...context.group,
+                timeline: [chapter, ...context.group.timeline],
+            };
+        };
+        const addToGroupAndSendCommand = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithTimeline> => {
             const groupCommandAdd: GroupCommandAdd = {
                 type: 'group-command-add',
-                timestamp: highestSeenTimestamp(context.group.commands) + 1,
+                protocol: 'group',
+                version: 1,
+                logicalTime: highestSeenLogicalTime(context.group.timeline) + 1,
 
                 identity: {
                     address: invited.identity.address,
@@ -330,104 +325,126 @@ export const protocolTestCommandDefinition =
                 },
                 name: invited.name,
             };
-            const updatedGroup = await sendGroupCommand(context, groupCommandAdd);
+            const updatedGroup = await appendGroupCommandToTimeline(context, groupCommandAdd);
             return {
                 ...updatedGroup,
                 participants: [...updatedGroup.participants, invited.identity.publicKey as PublicKey],
             };
         };
-        const sendPrivateInvite = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithCommands> => {
-            await updatePrivateSharedTimeline(context.storage, context.profile.identity, context.profile, invited.identity, {
+        const uploadQueuedGroupCommands = async (context: GroupProtocolContext): Promise<GroupWithTimeline> => {
+            const topic = calculateGroupTopic(context.group);
+            const random = await context.crypto.random(32);
+            const encryptChapter = (c: PartialChapter<GroupCommand>): Uint8Array => {
+                const s = serialize(c);
+                const dataBytes = stringToUint8Array(s);
+                const secretBytes = hexToUint8Array(context.group.sharedSecret);
+                return context.crypto.encrypt(dataBytes, secretBytes, random);
+            };
+            const uploadedTimeline = await uploadTimeline(
+                context.group.timeline,
+                context.storage,
+                context.profile.identity.address as HexString,
+                topic,
+                encryptChapter,
+                context.crypto.signDigest,
+            );
+            return {
+                ...context.group,
+                timeline: uploadedTimeline,
+            };
+        };
+        const sendPrivateInvite = async (context: GroupProtocolContext, invited: PublicProfile): Promise<GroupWithTimeline> => {
+
+            await updatePrivateSharedTimeline(context.storage, context.profile.identity, context.crypto, invited.identity, {
                 type: 'invite-to-group',
                 group: {
                     ...context.group,
-                    commands: undefined,
+                    timeline: undefined,
                 },
             });
 
             return context.group;
         };
-        const receivePrivateInvite = async (context: GroupProtocolContext, senderPublicKey: PublicKey): Promise<GroupWithCommands> => {
-            const data = await readPrivateSharedTimeline<InviteToGroupCommand>(context.storage, senderPublicKey, context.profile);
+        const receivePrivateInvite = async (context: GroupProtocolContext, senderPublicKey: PublicKey): Promise<GroupWithTimeline> => {
+            const data = await readPrivateSharedTimeline<InviteToGroupCommand>(context.storage, senderPublicKey, context.crypto);
             if (data == null) {
                 return context.group;
             }
             const inviteCommand = data;
             return {
                 ...inviteCommand.group,
-                commands: [],
+                timeline: [],
             };
         };
-        const executeRemoteGroupCommand = (group: GroupWithCommands, command: GroupCommand): GroupWithCommands => {
-            switch (command.type) {
+        const executeRemoteGroupCommand = (group: GroupWithTimeline, command: PartialChapter<GroupCommand>): GroupWithTimeline => {
+            switch (command.content.type) {
                 case 'group-command-add': {
-                    if (group.participants.indexOf(command.identity.publicKey as PublicKey) !== -1) {
+                    if (group.participants.indexOf(command.content.identity.publicKey as PublicKey) !== -1) {
                         return {
                             ...group,
-                            commands: [command, ...group.commands],
+                            timeline: [command, ...group.timeline],
                         };
                     }
                     return {
                         ...group,
-                        commands: [command, ...group.commands],
-                        participants: [...group.participants, command.identity.publicKey as PublicKey],
+                        timeline: [command, ...group.timeline],
+                        participants: [...group.participants, command.content.identity.publicKey as PublicKey],
                     };
                 }
                 default: {
                     return {
                         ...group,
-                        commands: [command, ...group.commands],
+                        timeline: [command, ...group.timeline],
                     };
                 }
             }
         };
-        const receiveGroupCommands = async (context: GroupProtocolContext): Promise<GroupWithCommands> => {
-            return await receiveProfileGroupCommands(context.storage, context.profile, context.group);
+        const receiveGroupCommands = async (context: GroupProtocolContext): Promise<GroupWithTimeline> => {
+            return await receiveProfileGroupCommands(context.storage, context.profile, context.crypto, context.group);
         };
-        const receiveProfileGroupCommands = async (storage: ProtocolStorage, profile: ProfileWithCrypto, group: GroupWithCommands): Promise<GroupWithCommands> => {
-            const lastSeenTimestamp = highestSeenTimestamp(group.commands);
-            const highestRemoteTimestamp = highestSeenRemoteTimestamp(group.commands as GroupCommandWithSource[]);
-            const remoteCommands = await fetchGroupCommands(storage, group, highestRemoteTimestamp, profile);
+        const receiveProfileGroupCommands = async (storage: ProtocolStorage, profile: PublicProfile, crypto: Crypto, group: GroupWithTimeline): Promise<GroupWithTimeline> => {
+            const lastSeenLogicalTime = highestSeenLogicalTime(group.timeline);
+            const highestRemoteLogicalTime = highestSeenRemoteLogicalTime(group.timeline, profile.identity.address);
+            const remoteCommands = await fetchGroupCommands(storage, group, highestRemoteLogicalTime, crypto);
+            // Debug.log('receiveProfileGroupCommands', {groupTimeline: group.timeline, remoteCommands});
             const newCommands = remoteCommands
-                .filter(command => command.source !== profile.identity.publicKey as HexString)
-                .filter(command => command.timestamp > lastSeenTimestamp)
-                .sort((a, b) => a.timestamp - b.timestamp) // reverse order!
+                .filter(command => command.author !== profile.identity.address)
+                .filter(command => command.content.logicalTime > lastSeenLogicalTime)
+                .sort((a, b) => a.content.logicalTime - b.content.logicalTime) // reverse order!
             ;
             return newCommands.reduce((prev, curr) => executeRemoteGroupCommand(prev, curr), group);
         };
         const fetchGroupTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString, until: number, crypto: Crypto, secretBytes: Uint8Array) => {
             let reference = await readTimeline(storage, address, topic);
-            const commands: GroupCommand[] = [];
+            const timeline: Timeline<GroupCommand> = [];
             const decryptData = (data: Uint8Array): string => Uint8ArrayToString(crypto.decrypt(data, secretBytes));
             while (reference != null) {
                 const chapter = await readChapter<GroupCommand>(storage, reference, decryptData);
                 if (chapter == null) {
-                    return commands;
+                    return timeline;
                 }
                 const command = chapter.content;
-                if (command.timestamp <= until) {
-                    return commands;
+                if (command.logicalTime <= until) {
+                    return timeline;
                 }
-                commands.push(command);
+                timeline.push(chapter);
                 reference = chapter.previous;
             }
-            return commands;
+            return timeline;
         };
-        const fetchGroupCommands = async (storage: ProtocolStorage, group: Group, highestRemoteTimestamp: number, crypto: Crypto): Promise<GroupCommandWithSource[]> => {
+        const fetchGroupCommands = async (storage: ProtocolStorage, group: Group, highestRemoteLogicalTime: number, crypto: Crypto): Promise<Timeline<GroupCommand>> => {
             const topic = calculateGroupTopic(group);
             const secretBytes = hexToUint8Array(group.sharedSecret);
-            const commandLists: GroupCommandWithSource[][]  = [];
+            const commandLists: Timeline<GroupCommand>[]  = [];
             for (const participant of group.participants) {
                 const address = publicKeyToAddress(participant);
-                const participantCommands = await fetchGroupTimeline(storage, address, topic, highestRemoteTimestamp, crypto, secretBytes);
-                commandLists.push(participantCommands.map(command => ({
-                    ...command,
-                    source: participant,
-                })));
+                const participantTimeline = await fetchGroupTimeline(storage, address, topic, highestRemoteLogicalTime, crypto, secretBytes);
+                Debug.log('fetchGroupCommands', {participantTimeline, highestRemoteLogicalTime});
+                commandLists.push(participantTimeline);
             }
             const commands = commandLists
                 .reduce((prev, curr) => prev.concat(curr), [])
-                .sort((a, b) => b.timestamp - a.timestamp)
+                .sort((a, b) => b.content.logicalTime - a.content.logicalTime)
             ;
             return commands;
         };
@@ -450,10 +467,10 @@ export const protocolTestCommandDefinition =
         const areCommandsEqual = (commandsA: GroupCommand[], commandsB: GroupCommand[]): boolean => {
             return JSON.stringify(commandsA) === JSON.stringify(commandsB);
         };
-        const sortedProfileCommands = (profile: ProfileWithGroup, withSource: boolean = false) =>
-            profile.group.commands
-                .map(command => ({...command, source: withSource ? (command as GroupCommandWithSource).source : undefined}))
-                .sort((a, b) => b.timestamp - a.timestamp)
+        const sortedProfileCommands = (profile: ProfileWithGroup) =>
+            profile.group.timeline
+                .map(timeline => timeline.content)
+                .sort((a, b) => b.logicalTime - a.logicalTime)
         ;
         const assertProfileCommandsAreEqual = (groupState: GroupProtocolState): void | never => {
             for (let i = 1; i < groupState.profiles.length; i++) {
@@ -464,15 +481,15 @@ export const protocolTestCommandDefinition =
                 }
             }
         };
-        const assertCommandsAreOrdered = (commands: GroupCommand[]) => {
-            for (let i = 1; i < commands.length; i++) {
-                if (commands[i].timestamp > commands[i - 1].timestamp) {
-                    throwError(`assertCommandsAreOrdered: failed at i == ${i},\n\n${JSON.stringify(commands)}`);
+        const assertTimelineIsOrdered = (timeline: Timeline<GroupCommand>) => {
+            for (let i = 1; i < timeline.length; i++) {
+                if (timeline[i].content.logicalTime > timeline[i - 1].content.logicalTime) {
+                    throwError(`assertCommandsAreOrdered: failed at i == ${i},\n\n${JSON.stringify(timeline)}`);
                 }
             }
         };
         const assertGroupStateInvariants = (groupState: GroupProtocolState): GroupProtocolState | never => {
-            groupState.profiles.map(profile => assertCommandsAreOrdered(profile.group.commands));
+            groupState.profiles.map(profile => assertTimelineIsOrdered(profile.group.timeline));
             assertProfileGroupStatesAreEqual(groupState);
             assertProfileCommandsAreEqual(groupState);
             return groupState;
@@ -482,31 +499,10 @@ export const protocolTestCommandDefinition =
             return groupState;
         };
 
-        const makeStorage = async () => {
-            const swarmApiIdentity = await generateIdentity();
-            const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
-            const swarmGateway = process.env.SWARM_GATEWAY || '';
-            const swarmApi = SwarmHelpers.makeApi({user: '', topic: ''}, swarmApiSigner, swarmGateway);
-            const swarmStorage = new SwarmStorage(swarmApi);
-            const memoryStorage = new MemoryStorage();
-            const storage = swarmGateway !== ''
-                ? swarmStorage
-                : memoryStorage
-            ;
-            return storage;
-        };
-        const makeNullEncryption = () => ({
-            encrypt: (data: Uint8Array, secret: Uint8Array, random: Uint8Array) => data,
-            decrypt: (data: Uint8Array, secret: Uint8Array) => data,
-        });
-        const makeNaclEncryption = () => ({
-            encrypt: (data: Uint8Array, secret: Uint8Array, random: Uint8Array) => encryptWithNonce(data, secret, random),
-            decrypt: (data: Uint8Array, secret: Uint8Array) => decrypt(data, secret),
-        });
         const makeEncryption = makeNaclEncryption;
         const inputState: GroupProtocolState = {
             profiles: [aliceProfile, bobProfile, carolProfile],
-            storage: await makeStorage(),
+            storage: await makeStorage(generateIdentity),
             encryption: await makeEncryption(),
         };
         enum Profile {
@@ -515,29 +511,25 @@ export const protocolTestCommandDefinition =
             CAROL = 2,
         }
 
-        const groupToContext = (context: GroupProtocolContext, group: GroupWithCommands): GroupProtocolContext => ({
+        const groupToContext = (context: GroupProtocolContext, group: GroupWithTimeline): GroupProtocolContext => ({
             ...context,
             group,
         });
-        const composeGroupProtocolFunctions = async (context: GroupProtocolContext, functions: GroupProtocolFunction[]): Promise<GroupWithCommands> => {
+        const composeGroupProtocolFunctions = async (context: GroupProtocolContext, functions: GroupProtocolFunction[]): Promise<GroupWithTimeline> => {
             for (const f of functions) {
                 const group = await f(context);
                 context = groupToContext(context, group);
             }
             return context.group;
         };
-        interface Crypto extends Encryption {
-            signDigest: SwarmHelpers.FeedDigestSigner;
-            deriveSharedKey: (publicKey: HexString) => HexString;
-            random: (length: number) => Promise<Uint8Array>;
-        }
-        type ProfileWithCrypto = PublicProfile & Crypto;
         interface GroupProtocolContext {
             storage: ProtocolStorage;
-            profile: ProfileWithCrypto;
-            group: GroupWithCommands;
+            profile: PublicProfile;
+            crypto: Crypto;
+            group: GroupWithTimeline;
+            privateContexts: PrivateSharingContext[];
         }
-        type GroupProtocolFunction = (context: GroupProtocolContext) => GroupWithCommands | Promise<GroupWithCommands>;
+        type GroupProtocolFunction = (context: GroupProtocolContext) => GroupWithTimeline | Promise<GroupWithTimeline>;
         type GroupProtocolAction = [Profile, GroupProtocolFunction];
         const GroupProtocol = {
             create: (sharedSecret: HexString): GroupProtocolFunction => {
@@ -546,7 +538,7 @@ export const protocolTestCommandDefinition =
                         context => ({
                             sharedSecret,
                             participants: [],
-                            commands: [],
+                            timeline: [],
                         }),
                         context => addToGroupAndSendCommand(context, context.profile),
                     ]);
@@ -575,6 +567,15 @@ export const protocolTestCommandDefinition =
                     return receivePrivateInvite(context, sender.identity.publicKey as PublicKey);
                 };
             },
+            sync: (): GroupProtocolFunction => {
+                return async (initialContext) => {
+                    return composeGroupProtocolFunctions(initialContext, [
+                        context => uploadQueuedGroupCommands(context),
+                        context => receiveGroupCommands(context),
+                        // context => { Debug.log('GroupProtocol.sync', context.group.timeline); return context.group; },
+                    ]);
+                };
+            },
         };
 
         const composeGroupProtocolWithState = async (initialGroupState: GroupProtocolState, actions: GroupProtocolAction[]): Promise<GroupProtocolState> => {
@@ -582,8 +583,8 @@ export const protocolTestCommandDefinition =
             for (const action of actions) {
                 const p = action[0];
                 const f = action[1];
-                const profile = {
-                    ...state.profiles[p],
+                const profile = state.profiles[p];
+                const crypto = {
                     ...state.encryption,
                     signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, state.profiles[p].identity),
                     deriveSharedKey: (publicKey: HexString) => deriveSharedKey(state.profiles[p].identity, {publicKey, address: ''}),
@@ -592,7 +593,9 @@ export const protocolTestCommandDefinition =
                 const context: GroupProtocolContext = {
                     storage: state.storage,
                     profile,
+                    crypto,
                     group: profile.group,
+                    privateContexts: [],
                 };
                 const updatedGroup = await f(context);
                 const updatedProfile = {
@@ -613,45 +616,165 @@ export const protocolTestCommandDefinition =
             [Profile.ALICE, GroupProtocol.invite(inputState.profiles[Profile.BOB])],
             [Profile.BOB, GroupProtocol.receivePrivate(inputState.profiles[Profile.ALICE])],
             [Profile.ALICE, GroupProtocol.sendMessage('hello Bob')],
-            [Profile.BOB, GroupProtocol.receive()],
+            [Profile.ALICE, GroupProtocol.sync()],
+            [Profile.BOB, GroupProtocol.sync()],
             [Profile.BOB, GroupProtocol.sendMessage('hello Alice')],
-            [Profile.ALICE, GroupProtocol.receive()],
+            [Profile.ALICE, GroupProtocol.sync()],
             [Profile.ALICE, GroupProtocol.sendMessage('test')],
-            [Profile.BOB, GroupProtocol.receive()],
+            [Profile.BOB, GroupProtocol.sync()],
             [Profile.BOB, GroupProtocol.invite(inputState.profiles[Profile.CAROL])],
-            [Profile.ALICE, GroupProtocol.receive()],
+            [Profile.ALICE, GroupProtocol.sync()],
             [Profile.CAROL, GroupProtocol.receivePrivate(inputState.profiles[Profile.BOB])],
             [Profile.BOB, GroupProtocol.sendMessage('hello Carol')],
-            [Profile.ALICE, GroupProtocol.receive()],
-            [Profile.BOB, GroupProtocol.receive()],
-            [Profile.CAROL, GroupProtocol.receive()],
+            [Profile.ALICE, GroupProtocol.sync()],
+            [Profile.BOB, GroupProtocol.sync()],
+            [Profile.CAROL, GroupProtocol.sync()],
         ]);
 
         assertGroupStateInvariants(outputState);
 
-        const groupCommands = sortedProfileCommands(outputState.profiles[1], true);
-        const isGroupPost = (groupCommand: GroupCommandWithSource): groupCommand is GroupCommandPost & {source: HexString} => groupCommand.type === 'group-command-post';
-        const groupPosts = groupCommands.map(gcws => gcws as GroupCommandWithSource).filter(isGroupPost).map(value => ({...value.post, source: value.source}));
+        const groupCommands = sortedProfileCommands(outputState.profiles[1]);
+        const isGroupPost = (groupCommand: GroupCommand): groupCommand is GroupCommandPost & {source: HexString} => groupCommand.type === 'group-command-post';
+        const groupPosts = groupCommands.map(gcws => gcws as GroupCommand).filter(isGroupPost).map(value => ({...value.post, source: value.source}));
         output(groupPosts);
     })
-;
-/*
+    .
+    addCommand('privateSharing [randomSeed]', 'Test 1on1 private messaging', async (randomSeed?) => {
+        randomSeed = randomSeed ? randomSeed : randomNumbers[0];
+        const nextRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = async (length: number) => {
+            const randomString = nextRandom();
+            const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
+            return randomBytes;
+        };
+        const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
+        const generateRandomHex = async () => byteArrayToHex(await generateDeterministicRandom(32), false);
 
-Group
-- participants list
-- on participant remove -> new key? / later
-- flow:
-    1. Alice creates group
-        participantList = PublicKey(Alice)
-        groupSharedSecret = Random()
-        groupTopic = KDF(groupSharedSecret || participantList)
-    2. Alice invites Bob
-        aliceBobSharedSecret = ECDH(Alice, Bob)
-        topic = KDF(aliceBobSharedSecret)
-        postType = inviteToGroup(groupSharedSecret, groupTopic)
-    3. Alice posts in the group
-        participantList = SortByPublicKey(PublicKey(Alice), PublicKey(Bob))
-        topic = KDF(groupSharedSecret || participantList)
-        encryptedPost = Encrypt(groupSharedSecret, post)
-        share(topic, Encrypt(groupSharedSecret, Hash(encryptedPost)))
-*/
+        enum Profile {
+            ALICE = 0,
+            BOB = 1,
+        }
+        const aliceProfile: PrivateProfile = {
+            name: 'Alice',
+            image: {},
+            identity: await generateIdentity(),
+        };
+        const bobProfile: PrivateProfile = {
+            name: 'Bob',
+            image: {},
+            identity: await generateIdentity(),
+        };
+
+        type PrivateSharingFunction = (context: PrivateSharingContext) => Promise<PrivateSharingContext>;
+        type PrivateSharingAction = [number, PrivateSharingFunction];
+
+        interface PrivateSharingState {
+            contexts: PrivateSharingContext[];
+        }
+
+        const makeCrypto = (identity: PrivateIdentity): Crypto => ({
+            ...makeNaclEncryption(),
+            signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, identity),
+            deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+            random: (length: number) => generateDeterministicRandom(length),
+        });
+
+        const storage = await makeStorage(generateIdentity);
+        const makeContextFromProfiles = async (
+            profile: PrivateProfile,
+            contactIdentity: PublicIdentity,
+        ): Promise<PrivateSharingContext> => ({
+            profile,
+            contactIdentity,
+            localTimeline: [],
+            remoteTimeline: [],
+            sharedSecret: deriveSharedKey(profile.identity, contactIdentity),
+            storage,
+            crypto: makeCrypto(profile.identity),
+        });
+
+        const listPosts = (context: PrivateSharingContext): Post[] => {
+            return listTimelinePosts(context.localTimeline.concat(context.remoteTimeline));
+        };
+
+        const sharePost = (post: Post, id: HexString): PrivateSharingFunction => {
+            return async (context) => {
+                return privateSharePost(context, post, id);
+            };
+        };
+        const deletePost = (id: HexString): PrivateSharingFunction => {
+            return async (context) => {
+                return privateDeletePost(context, id);
+            };
+        };
+        const sync = (): PrivateSharingFunction => {
+            return async (context) => {
+                return privateSync(context);
+            };
+        };
+
+        const composeState = async (state: PrivateSharingState, actions: PrivateSharingAction[]): Promise<PrivateSharingState> => {
+            for (const action of actions) {
+                const p = action[0];
+                const f = action[1];
+                const context = state.contexts[p];
+                state.contexts[p] = await f(context);
+            }
+            return state;
+        };
+
+        const debugState = (state: PrivateSharingState) => {
+            const posts0 = listPosts(state.contexts[0]);
+            Debug.log({
+                localTimeline: state.contexts[0].localTimeline,
+                remoteTimeline: state.contexts[0].remoteTimeline,
+                posts: posts0,
+            });
+            const posts1 = listPosts(state.contexts[1]);
+            Debug.log({
+                localTimeline: state.contexts[1].localTimeline,
+                remoteTimeline: state.contexts[1].remoteTimeline,
+                posts: posts1,
+            });
+            return state;
+        };
+
+        const inputState: PrivateSharingState = {
+            contexts: [
+                await makeContextFromProfiles(aliceProfile, bobProfile.identity),
+                await makeContextFromProfiles(bobProfile, aliceProfile.identity),
+            ],
+        };
+
+        const makePost = (text: string): Post => ({
+            text,
+            images: [],
+            createdAt: Date.now(),
+        });
+
+        const makePosts = async (profile: Profile, numPosts: number): Promise<PrivateSharingAction[]> => {
+            const actions: PrivateSharingAction[] = [];
+            for (let i = 0; i < numPosts; i++) {
+                const id = await generateRandomHex();
+                const action: PrivateSharingAction = [profile, sharePost(makePost(`hello ${i}`), id)];
+                actions.push(action);
+            }
+            return actions;
+        };
+
+        const postToBeDeletedId = await generateRandomHex();
+        const outputState = await composeState(inputState, [
+            [Profile.ALICE, sharePost(makePost('hello Bob'), await generateRandomHex())],
+            [Profile.ALICE, sync()],
+            [Profile.BOB, sharePost(makePost('hello Alice'), postToBeDeletedId)],
+            [Profile.BOB, sync()],
+            [Profile.ALICE, sharePost(makePost('test'), await generateRandomHex())],
+            [Profile.ALICE, sync()],
+            [Profile.BOB, sync()],
+            [Profile.ALICE, deletePost(postToBeDeletedId)],
+            [Profile.ALICE, sync()],
+            [Profile.BOB, sync()],
+        ]);
+        debugState(outputState);
+    })
+;

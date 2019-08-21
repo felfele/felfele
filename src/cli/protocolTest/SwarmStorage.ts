@@ -1,9 +1,9 @@
 import { Debug } from '../../Debug';
 import { HexString } from '../../helpers/opaqueTypes';
-import { Storage, StorageFeeds } from './Storage';
+import { ProtocolStorage, ProtocolStorageFeeds } from '../../protocols/ProtocolStorage';
 import * as Swarm from '../../swarm/Swarm';
 
-export class SwarmStorageFeeds implements StorageFeeds {
+export class SwarmStorageFeeds implements ProtocolStorageFeeds {
     public constructor(readonly swarmFeedApi: Swarm.FeedApi) {}
 
     public write = async (address: HexString, topic: HexString, data: string, signFeedDigest: Swarm.FeedDigestSigner = this.swarmFeedApi.signFeedDigest) => {
@@ -30,7 +30,7 @@ export class SwarmStorageFeeds implements StorageFeeds {
     }
 }
 
-export class SwarmStorage implements Storage {
+export class SwarmStorage implements ProtocolStorage {
     public readonly feeds = new SwarmStorageFeeds(this.swarm.feed);
 
     public constructor(readonly swarm: Swarm.Api) {}
