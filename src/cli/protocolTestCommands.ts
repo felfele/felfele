@@ -7,10 +7,10 @@ import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { swarmConfig } from './swarmConfig';
 import { createInvitedContact, createCodeReceivedContact, advanceContactState, deriveSharedKey } from '../helpers/contactHelpers';
-import { HexString, BrandedType } from '../helpers/opaqueTypes';
+import { HexString } from '../helpers/opaqueTypes';
 import { SECOND } from '../DateUtils';
 import { aliceReadsBobsEncryptedPublicKey, createBobForContact, aliceGeneratesQRCode, bobSharesContactPublicKeyAndContactFeed, aliceReadsBobsContactPublicKeyAndSharesEncryptedPublicKey, bobReadsAlicesEncryptedPublicKeyAndSharesEncryptedPublicKey, createAliceForContact } from './protocolTest/inviteProtocol';
-import { MemoryStorageFeeds, MemoryStorage } from './protocolTest/MemoryStorage';
+import { MemoryStorageFeeds } from './protocolTest/MemoryStorage';
 import { ProtocolStorage } from '../protocols/ProtocolStorage';
 import {
     throwError,
@@ -26,13 +26,11 @@ import {
 } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, cryptoHash, GroupCommandAdd } from '../protocols/group';
-import { PublicIdentity, PrivateIdentity } from '../models/Identity';
+import { PublicIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
-import { SwarmStorage } from './protocolTest/SwarmStorage';
-import { encryptWithNonce, decrypt } from '../helpers/crypto';
-import { Post } from '../models/Post';
-import { Timeline, PartialChapter, ChapterReference, Chapter, isChapter, uploadTimeline, appendToTimeline, getNewestChapterId, fetchTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime, LogicalTime } from '../protocols/timeline';
-import { PrivateCommand, calculatePrivateTopic, PrivateSharingContext, PrivateCommandPost, uploadLocalPrivateCommands, downloadRemotePrivateCommands, PrivateCommandRemove, highestLogicalTime, listTimelinePosts, privateSharePost, privateDeletePost, privateSync } from '../protocols/privateSharing';
+import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime } from '../protocols/timeline';
+import { calculatePrivateTopic, PrivateSharingContext } from '../protocols/privateSharing';
+import { privateSharingTests } from '../protocols/privateSharingTest';
 
 export const protocolTestCommandDefinition =
     addCommand('invite', 'Test invite protocol', async () => {
@@ -114,7 +112,6 @@ export const protocolTestCommandDefinition =
             return randomBytes;
         };
         const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
-        const generateRandomSecret = () => generateDeterministicRandom(32);
 
         interface Group {
             name?: string;
@@ -250,21 +247,6 @@ export const protocolTestCommandDefinition =
             };
             const hash = await storage.write(encryptTimeline(serialize(chapter)));
             return storage.feeds.write(ownerIdentity.address as HexString, topic, hash, signFeed);
-        };
-        const sendGroupMessage2 = async (context: GroupProtocolContext, message: string): Promise<GroupWithTimeline> => {
-            const command: GroupCommandPost = {
-                type: 'group-command-post',
-                protocol: 'group',
-                version: 1,
-                logicalTime: highestSeenLogicalTime(context.group.timeline) + 1,
-
-                post: {
-                    images: [],
-                    text: message,
-                    createdAt: Date.now(),
-                },
-            };
-            return sendGroupCommand(context, command);
         };
         const sendGroupMessage = async (context: GroupProtocolContext, message: string): Promise<GroupWithTimeline> => {
             const command: GroupCommandPost = {
@@ -535,7 +517,7 @@ export const protocolTestCommandDefinition =
             create: (sharedSecret: HexString): GroupProtocolFunction => {
                 return async (initialContext) => {
                     return composeGroupProtocolFunctions(initialContext, [
-                        context => ({
+                        () => ({
                             sharedSecret,
                             participants: [],
                             timeline: [],
@@ -639,142 +621,17 @@ export const protocolTestCommandDefinition =
         output(groupPosts);
     })
     .
-    addCommand('privateSharing [randomSeed]', 'Test 1on1 private messaging', async (randomSeed?) => {
-        randomSeed = randomSeed ? randomSeed : randomNumbers[0];
-        const nextRandom = createDeterministicRandomGenerator(randomSeed);
-        const generateDeterministicRandom = async (length: number) => {
-            const randomString = nextRandom();
-            const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
-            return randomBytes;
-        };
-        const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
-        const generateRandomHex = async () => byteArrayToHex(await generateDeterministicRandom(32), false);
-
-        enum Profile {
-            ALICE = 0,
-            BOB = 1,
-        }
-        const aliceProfile: PrivateProfile = {
-            name: 'Alice',
-            image: {},
-            identity: await generateIdentity(),
-        };
-        const bobProfile: PrivateProfile = {
-            name: 'Bob',
-            image: {},
-            identity: await generateIdentity(),
-        };
-
-        type PrivateSharingFunction = (context: PrivateSharingContext) => Promise<PrivateSharingContext>;
-        type PrivateSharingAction = [number, PrivateSharingFunction];
-
-        interface PrivateSharingState {
-            contexts: PrivateSharingContext[];
-        }
-
-        const makeCrypto = (identity: PrivateIdentity): Crypto => ({
-            ...makeNaclEncryption(),
-            signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, identity),
-            deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
-            random: (length: number) => generateDeterministicRandom(length),
-        });
-
-        const storage = await makeStorage(generateIdentity);
-        const makeContextFromProfiles = async (
-            profile: PrivateProfile,
-            contactIdentity: PublicIdentity,
-        ): Promise<PrivateSharingContext> => ({
-            profile,
-            contactIdentity,
-            localTimeline: [],
-            remoteTimeline: [],
-            sharedSecret: deriveSharedKey(profile.identity, contactIdentity),
-            storage,
-            crypto: makeCrypto(profile.identity),
-        });
-
-        const listPosts = (context: PrivateSharingContext): Post[] => {
-            return listTimelinePosts(context.localTimeline.concat(context.remoteTimeline));
-        };
-
-        const sharePost = (post: Post, id: HexString): PrivateSharingFunction => {
-            return async (context) => {
-                return privateSharePost(context, post, id);
-            };
-        };
-        const deletePost = (id: HexString): PrivateSharingFunction => {
-            return async (context) => {
-                return privateDeletePost(context, id);
-            };
-        };
-        const sync = (): PrivateSharingFunction => {
-            return async (context) => {
-                return privateSync(context);
-            };
-        };
-
-        const composeState = async (state: PrivateSharingState, actions: PrivateSharingAction[]): Promise<PrivateSharingState> => {
-            for (const action of actions) {
-                const p = action[0];
-                const f = action[1];
-                const context = state.contexts[p];
-                state.contexts[p] = await f(context);
+    addCommand('privateSharing [name]', 'Test 1on1 private messaging', async (name?: string) => {
+        const allTests: any = privateSharingTests;
+        for (const test of Object.keys(allTests)) {
+            if (typeof name === 'string' && !test.startsWith(name)) {
+                continue;
             }
-            return state;
-        };
-
-        const debugState = (state: PrivateSharingState) => {
-            const posts0 = listPosts(state.contexts[0]);
-            Debug.log({
-                localTimeline: state.contexts[0].localTimeline,
-                remoteTimeline: state.contexts[0].remoteTimeline,
-                posts: posts0,
-            });
-            const posts1 = listPosts(state.contexts[1]);
-            Debug.log({
-                localTimeline: state.contexts[1].localTimeline,
-                remoteTimeline: state.contexts[1].remoteTimeline,
-                posts: posts1,
-            });
-            return state;
-        };
-
-        const inputState: PrivateSharingState = {
-            contexts: [
-                await makeContextFromProfiles(aliceProfile, bobProfile.identity),
-                await makeContextFromProfiles(bobProfile, aliceProfile.identity),
-            ],
-        };
-
-        const makePost = (text: string): Post => ({
-            text,
-            images: [],
-            createdAt: Date.now(),
-        });
-
-        const makePosts = async (profile: Profile, numPosts: number): Promise<PrivateSharingAction[]> => {
-            const actions: PrivateSharingAction[] = [];
-            for (let i = 0; i < numPosts; i++) {
-                const id = await generateRandomHex();
-                const action: PrivateSharingAction = [profile, sharePost(makePost(`hello ${i}`), id)];
-                actions.push(action);
+            output('Running test:', test);
+            await allTests[test]();
+            if (Debug.isDebugMode) {
+                output('Finished test:', test, '\n\n');
             }
-            return actions;
-        };
-
-        const postToBeDeletedId = await generateRandomHex();
-        const outputState = await composeState(inputState, [
-            [Profile.ALICE, sharePost(makePost('hello Bob'), await generateRandomHex())],
-            [Profile.ALICE, sync()],
-            [Profile.BOB, sharePost(makePost('hello Alice'), postToBeDeletedId)],
-            [Profile.BOB, sync()],
-            [Profile.ALICE, sharePost(makePost('test'), await generateRandomHex())],
-            [Profile.ALICE, sync()],
-            [Profile.BOB, sync()],
-            [Profile.ALICE, deletePost(postToBeDeletedId)],
-            [Profile.ALICE, sync()],
-            [Profile.BOB, sync()],
-        ]);
-        debugState(outputState);
+        }
     })
 ;

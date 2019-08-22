@@ -17,6 +17,7 @@ import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { protocolTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
 import { swarmHelperTests } from './swarmHelperTest';
+import { privateSharingTests } from '../protocols/privateSharingTest';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -50,7 +51,11 @@ const definitions =
                 ...apiTests,
                 ...syncTests,
                 ...swarmHelperTests,
+                ...privateSharingTests,
             };
+            if (process.env.SWARM_GATEWAY != null) {
+                output('Running with SWARM at', process.env.SWARM_GATEWAY);
+            }
             if (testName == null) {
                 for (const test of Object.keys(allTests)) {
                     output('Running test:', test);
