@@ -6,7 +6,7 @@ export type ChapterReference = BrandedType<HexString, 'ChapterReference'>;
 
 export type PartialChapter<T> = {
     protocol: 'timeline',
-    version: 1,
+    version: '1.0.0',
     timestamp: number,
     author: string,
     type: string,
@@ -100,7 +100,7 @@ export const uploadTimeline = async <T>(
 export const appendToTimeline = <T>(timeline: Timeline<T>, author: string, content: T): Timeline<T> => {
     const chapter: PartialChapter<T> = {
         protocol: 'timeline',
-        version: 1,
+        version: '1.0.0',
         timestamp: Date.now(),
         author,
         type: 'application/json',

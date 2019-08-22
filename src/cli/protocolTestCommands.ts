@@ -241,7 +241,7 @@ export const protocolTestCommandDefinition =
             const previous = await storage.feeds.read(ownerIdentity.address as HexString, topic) as ChapterReference | undefined;
             const chapter: PartialChapter<T> = {
                 protocol: 'timeline',
-                version: 1,
+                version: '1.0.0',
                 timestamp: Date.now(),
                 author: ownerIdentity.address,
                 type: 'application/json',
@@ -300,7 +300,7 @@ export const protocolTestCommandDefinition =
             Debug.log('addGroupCommand', {ownerIdentity});
             const chapter: PartialChapter<GroupCommand> = {
                 protocol: 'timeline',
-                version: 1,
+                version: '1.0.0',
                 timestamp: Date.now(),
                 author: ownerIdentity.address,
                 type: 'application/json',
