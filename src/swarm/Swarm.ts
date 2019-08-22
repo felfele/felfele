@@ -187,11 +187,20 @@ const fetchArrayBuffer = (url: string, timeout: number): Promise<Uint8Array> => 
     });
 };
 
+const nodeFetchArrayBuffer = async (url: string, timeout: number): Promise<Uint8Array> => {
+    const response = await safeFetchWithTimeout(url, undefined, timeout);
+    const arraybuffer = await response.arrayBuffer();
+    return new Uint8Array(arraybuffer);
+};
+
 const downloadUint8Array = async (hash: string, timeout: number, swarmGateway: string): Promise<Uint8Array> => {
     const url = swarmGateway + defaultUrlScheme + hash + '/';
     Debug.log('downloadUint8Array', 'url', url);
 
-    const response = await fetchArrayBuffer(url, timeout);
+    const response = Utils.isNodeJS()
+        ? await nodeFetchArrayBuffer(url, timeout)
+        : await fetchArrayBuffer(url, timeout)
+    ;
     Debug.log('downloadUint8Array', 'response.length', response.length);
     return response;
 };
@@ -275,6 +284,7 @@ export interface ReadableFeedApi {
     getUri: () => string;
 
     readonly address: FeedAddress;
+    readonly swarmGateway: string;
 }
 
 export const makeBzzFeedUrl = (address: FeedAddress): string => {
@@ -309,6 +319,7 @@ export const makeReadableFeedApi = (address: FeedAddress, swarmGateway: string =
     downloadFeed: async (feedUri: string, timeout: number = 0) => await downloadFeed(swarmGateway, feedUri, timeout),
     getUri: () => `bzz-feed:/?${calculateFeedAddressQueryString(address)}`,
     address,
+    swarmGateway,
 });
 
 export type FeedDigestSigner = (digest: number[]) => string | Promise<string>;

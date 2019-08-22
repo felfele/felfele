@@ -1,5 +1,5 @@
 import {
-    makeSwarmStorage,
+    makeSwarmPostStorage,
 } from '../swarm-social/swarmStorage';
 import * as Swarm from '../swarm/Swarm';
 import {
@@ -17,8 +17,8 @@ import {
     testSharePosts,
     assertPostCommandLogInvariants,
     assertPostCommandLogsAreEqual,
-    assertEquals,
 } from './apiTest';
+import { assertEquals } from '../helpers/assertEquals';
 import { Debug } from '../Debug';
 import {
     syncPostCommandLogWithStorage,
@@ -41,7 +41,7 @@ export const defaultSwarmApi = Swarm.makeApi(
 
 export const defaultSwarmFeedApi = defaultSwarmApi.feed;
 
-export const defaultStorage = makeSwarmStorage(defaultSwarmApi);
+export const defaultStorage = makeSwarmPostStorage(defaultSwarmApi);
 
 const testSharePostStorage = async (id: number, postCommandLog: PostCommandLog, source = 'storage', storage: PostCommandLogStorage = defaultStorage): Promise<PostCommandLog> => {
     const postCommandLogAfterShare = await testSharePost(id, postCommandLog, source);
