@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, FeedView, ViewFeed } from '../components/FeedView';
-import { AsyncActions, Actions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
 import { getFeedPosts, getYourPosts, getContactFeeds } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';

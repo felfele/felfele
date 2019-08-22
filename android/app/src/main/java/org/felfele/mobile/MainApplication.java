@@ -21,6 +21,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rngrp.RNGRPPackage;
+import com.alinz.parkerdan.shareextension.SharePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,21 +37,22 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new AsyncStoragePackage(),
-            new RNBackgroundFetchPackage(),
-            new ReactNativePushNotificationPackage(),
-            new RNDeviceInfo(),
-            new SplashScreenReactPackage(),
-            new ReactNativeRestartPackage(),
-            new ImageResizerPackage(),
-            new SvgPackage(),
-            new RNSecureRandomPackage(),
-            new RNFSPackage(),
-            new RNCameraPackage(),
-            new ImagePickerPackage(),
-            new VectorIconsPackage(),
-            new RNGRPPackage()
+        new MainReactPackage(),
+        new AsyncStoragePackage(),
+        new RNBackgroundFetchPackage(),
+        new ReactNativePushNotificationPackage(),
+        new RNDeviceInfo(),
+        new SplashScreenReactPackage(),
+        new ReactNativeRestartPackage(),
+        new ImageResizerPackage(),
+        new SvgPackage(),
+        new RNSecureRandomPackage(),
+        new RNFSPackage(),
+        new RNCameraPackage(),
+        new ImagePickerPackage(),
+        new VectorIconsPackage(),
+        new RNGRPPackage(),
+        new SharePackage()
       );
     }
   };

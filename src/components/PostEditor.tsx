@@ -26,7 +26,6 @@ import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
-import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
@@ -34,11 +33,12 @@ import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
 
 export interface StateProps {
-    navigation: TypedNavigation;
+    goBack: () => boolean;
     draft: Post | null;
     name: string;
     avatar: ImageData;
     gatewayAddress: string;
+    dismiss?: () => void;
 }
 
 export interface DispatchProps {
@@ -192,13 +192,13 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onDiscard = () => {
         this.props.onDeleteDraft();
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private onSave = () => {
         Debug.log(this.state.post);
         this.props.onSaveDraft(this.state.post);
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private showCancelConfirmation = async () => {
@@ -241,10 +241,10 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onCancelConfirmation = () => {
         Debug.log('Cancel');
-        if (this.state.post.text !== '' || this.state.post.images.length > 0) {
-            this.showCancelConfirmation();
+        if (this.props.dismiss || (this.state.post.text === '' && this.state.post.images.length === 0)) {
+            this.props.dismiss != null ? this.props.dismiss() : this.props.goBack();
         } else {
-            this.props.navigation.goBack();
+            this.showCancelConfirmation();
         }
     }
 
@@ -280,7 +280,7 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onPressSubmit = async () => {
         await this.sendUpdate();
-        this.props.navigation.goBack();
+        this.props.goBack();
     }
 
     private createPostFromState = async (): Promise<Post> => {

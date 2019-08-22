@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps } from '../components/FavoritesFeedView';
-import { AsyncActions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
 import { FavoritesFeedView } from '../components/FavoritesFeedView';
 import { getFavoriteFeedsPosts, getFavoriteFeeds } from '../selectors/selectors';

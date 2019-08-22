@@ -3,9 +3,7 @@ import {
     View,
     KeyboardAvoidingView,
     Text,
-    TouchableOpacity,
     StyleSheet,
-    SafeAreaView,
     ScrollView,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -17,6 +15,8 @@ import { TypedNavigation } from '../helpers/navigation';
 import { RowItem } from '../ui/buttons/RowButton';
 import * as Swarm from '../swarm/Swarm';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { safeFetch } from '../Network';
+import { Debug } from '../Debug';
 
 export interface StateProps {
     swarmGatewayAddress: string;
@@ -32,6 +32,18 @@ export type Props = StateProps & DispatchProps;
 export interface State {
 }
 
+const pingSwarm = async (props: Props) => {
+    try {
+        const url = props.swarmGatewayAddress + '/';
+        const result = await safeFetch(url);
+        const swarmApi = Swarm.makeBzzApi(props.swarmGatewayAddress);
+        const hash = await swarmApi.uploadString('hello');
+        Debug.log('SwarmSettings.pingSwarm', {result, hash});
+    } catch (e) {
+        Debug.log('SwarmSettings.pingSwarm', e);
+    }
+};
+
 export const SwarmSettings = (props: Props) => (
     <FragmentSafeAreaViewWithoutTabBar>
         <NavigationHeader
@@ -44,9 +56,8 @@ export const SwarmSettings = (props: Props) => (
                 <SimpleTextInput
                     style={styles.row}
                     defaultValue={props.swarmGatewayAddress}
-                    placeholder={'https://swarm-gateways.net'}
+                    placeholder={props.swarmGatewayAddress}
                     autoCapitalize='none'
-                    autoFocus={true}
                     autoCorrect={false}
                     selectTextOnFocus={true}
                     returnKeyType={'done'}
@@ -70,6 +81,25 @@ export const SwarmSettings = (props: Props) => (
                     }
                     title={`Use debug server: http://localhost:8500`}
                     onPress={() => props.onChangeSwarmGatewayAddress('http://localhost:8500')}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='server-network' />
+                    }
+                    title={`Use public network: ${Swarm.defaultPublicGateway}`}
+                    onPress={() => props.onChangeSwarmGatewayAddress(Swarm.defaultPublicGateway)}
+                    buttonStyle='none'
+                />
+
+                <View style={{paddingBottom: 20}} />
+
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='check-circle-outline' />
+                    }
+                    title={`Ping`}
+                    onPress={() => pingSwarm(props)}
                     buttonStyle='none'
                 />
 

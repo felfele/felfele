@@ -11,6 +11,7 @@ import { Utils } from '../Utils';
 export const ZERO_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export const defaultGateway = 'https://swarm.felfele.com';
+export const defaultPublicGateway = 'https://swarm-gateways.net';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz:/';
 export const defaultFeedPrefix = 'bzz-feed:/';

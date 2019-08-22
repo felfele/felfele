@@ -19,7 +19,7 @@ import {
     generateBackupRandomSecret,
 } from '../helpers/backup';
 import { DateUtils } from '../DateUtils';
-import { getSerializedAppState } from '../reducers';
+import { getSerializedAppState } from '../store';
 import { AppState } from '../reducers/AppState';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';

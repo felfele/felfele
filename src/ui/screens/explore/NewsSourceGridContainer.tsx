@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { StateProps, NewsSourceGridScreen, DispatchProps } from './NewsSourceGridScreen';
 import { AppState } from '../../../reducers/AppState';
 import { Feed } from '../../../models/Feed';
-import { AsyncActions } from '../../../actions/Actions';
+import { AsyncActions } from '../../../actions/asyncActions';
 import { TypedNavigation } from '../../../helpers/navigation';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
