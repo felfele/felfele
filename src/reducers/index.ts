@@ -54,12 +54,20 @@ const feedsReducer = (feeds: Feed[] = defaultFeeds, action: Actions): Feed[] => 
     switch (action.type) {
         case 'ADD-FEED': {
             const ind = feeds.findIndex(feed => feed != null && action.payload.feed.feedUrl === feed.feedUrl);
-            if (ind ===  -1) {
+            if (ind === -1) {
                 return [...feeds, {
                     ...action.payload.feed,
                     followed: true,
                 }];
+            } else if (feeds[ind].followed === false) {
+                return updateArrayItem(feeds, ind, feed => {
+                    return {
+                        ...feed,
+                        followed: true,
+                    };
+                });
             }
+
             return feeds;
         }
         case 'REMOVE-FEED': {

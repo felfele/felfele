@@ -15,7 +15,6 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
-import * as urlUtils from '../helpers/urlUtils';
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';

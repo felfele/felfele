@@ -11,6 +11,7 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
+import { isFelfeleResource } from '../helpers/urlUtils';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -49,8 +50,10 @@ export const FeedView = (props: Props) => {
         'FeedSettings',
         { feed: props.feed as unknown as LocalFeed },
     );
+
+    const isUrlFelfeleResource = isFelfeleResource(props.feed.feedUrl);
     const navigateToFeedInfo = () => props.navigation.navigate(
-        'FeedInfo', {
+        isUrlFelfeleResource ? 'FeedInfo' : 'WebFeedInfo', {
             feed: props.feed,
         }
     );
