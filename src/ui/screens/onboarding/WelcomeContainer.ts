@@ -6,6 +6,7 @@ import {
 } from './WelcomeScreen';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/asyncActions';
+import { Actions } from '../../../actions/Actions';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
 
@@ -23,6 +24,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
             await dispatch(AsyncActions.createUser(name, image));
+            dispatch(Actions.changeSettingShowDebugMenu(true));
             navigation.navigate('Loading', {});
         },
     };

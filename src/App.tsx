@@ -69,6 +69,7 @@ import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
 import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 import { FELFELE_APP_NAME } from './reducers/defaultData';
+import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -82,7 +83,7 @@ initializeNotifications();
 const favoriteTabScenes: NavigationRouteConfigMap = {
     FavoriteTab: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <FavoritesContainer navigation={navigation}/>
+            <PrivateChannelsContainer navigation={navigation}/>
         ),
     },
     Feed: {
@@ -241,7 +242,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
-                        name={'star'}
+                        name={'account-multiple'}
                         size={24}
                         color={tintColor}
                     />

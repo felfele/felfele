@@ -1,13 +1,14 @@
 import { PrivateSharingContext, privateSharePost, privateDeletePost, privateSync, listTimelinePosts } from '../protocols/privateSharing';
 import { Post } from '../models/Post';
 import { HexString } from '../helpers/opaqueTypes';
-import { createDeterministicRandomGenerator, randomNumbers, makeNaclEncryption, makeStorage, Crypto } from '../cli/protocolTest/protocolTestHelpers';
+import { randomNumbers, makeNaclEncryption, makeStorage, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { hexToByteArray, byteArrayToHex } from '../helpers/conversion';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { PrivateProfile } from '../models/Profile';
 import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { deriveSharedKey } from '../helpers/contactHelpers';
 import { Debug } from '../Debug';
+import { createDeterministicRandomGenerator } from '../helpers/unsecureRandom';
 
 export enum PrivateSharingProfile {
     ALICE = 0,
@@ -41,12 +42,7 @@ export interface PrivateSharingProtocolTester {
 }
 
 export const makePrivateSharingProtocolTester = async (randomSeed: string = randomNumbers[0]): Promise<PrivateSharingProtocolTester> => {
-    const nextRandom = createDeterministicRandomGenerator(randomSeed);
-    const generateDeterministicRandom = async (length: number) => {
-        const randomString = nextRandom();
-        const randomBytes = new Uint8Array(hexToByteArray(randomString)).slice(0, length);
-        return randomBytes;
-    };
+    const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
     const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
     const generateRandomHex = async () => byteArrayToHex(await generateDeterministicRandom(32), false);
 
