@@ -675,7 +675,7 @@ export const protocolTestCommandDefinition =
             const contextAfterPost = await privateSync(contextWithPost);
         })
         .
-        addCommand('list <identity-file> <contact-identity-file>', 'List private timeline', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
+        addCommand('listTimeline <identity-file> <contact-identity-file>', 'List private timeline', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
             const loadIdentityFile = (filename: string) => {
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
@@ -712,5 +712,48 @@ export const protocolTestCommandDefinition =
             const posts = listTimelinePosts(timeline);
             output(posts);
         })
+        .
+        addCommand('list <identity-file> <contact-identity-file>', 'List shared posts', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
+            const loadIdentityFile = (filename: string) => {
+                const data = fs.readFileSync(filename).toString();
+                return JSON.parse(data) as PrivateIdentity;
+            };
+            const generateDeterministicRandom = createDeterministicRandomGenerator();
+            const identity = loadIdentityFile(identityFile);
+            const contactIdentity = loadIdentityFile(contactIdentityFile);
+            const profile: PrivateProfile = {
+                name: 'test',
+                image: {},
+                identity,
+            };
+            const storage = await makeStorage(() => Promise.resolve(identity));
+            const signDigest = (digest: number[]) => SwarmHelpers.signDigest(digest, identity);
+            const crypto: Crypto = {
+                ...makeNaclEncryption(),
+                signDigest,
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+                random: (length: number) => generateDeterministicRandom(length),
+            };
+            const sharedSecret = deriveSharedKey(profile.identity, contactIdentity);
+            const context: PrivateSharingContext = {
+                profile,
+                contactIdentity,
+                localTimeline: [],
+                remoteTimeline: [],
+                sharedSecret,
+                storage,
+                crypto,
+            };
+
+            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
+            const contextBeforeSync = {
+                ...context,
+                localTimeline,
+            };
+            const contextAfterSync = await privateSync(contextBeforeSync);
+            const posts = listTimelinePosts(contextAfterSync.localTimeline.concat(contextAfterSync.remoteTimeline));
+            output(posts);
+        })
+
     )
 ;

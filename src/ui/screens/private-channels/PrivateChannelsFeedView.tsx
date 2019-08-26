@@ -47,6 +47,21 @@ export const PrivateChannelsFeedView = (props: Props) => {
                                 color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                             />,
                         }}
+                        rightButton1={{
+                            onPress: () => props.navigation.navigate('FeedInfo', {
+                                 feed: {
+                                     name: '',
+                                     url: '',
+                                     feedUrl: '',
+                                     favicon: '',
+                                 },
+                            }),
+                            label: <Icon
+                                name='account-plus'
+                                size={24}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                            />,
+                        }}
                     />,
                 placeholder: <PlaceholderCard
                                  boldText={PLACEHOLDER_TEXT_1}

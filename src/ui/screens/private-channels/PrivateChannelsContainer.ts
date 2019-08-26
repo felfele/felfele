@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/asyncActions';
-import { Feed } from '../../../models/Feed';
 import { getPrivateChannelFeedsPosts, getPrivateChannelFeeds } from '../../../selectors/selectors';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { StateProps, DispatchProps, PrivateChannelsFeedView } from './PrivateChannelsFeedView';

@@ -97,8 +97,8 @@ export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFe
     return rssPosts.filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds));
 });
 
-export const getPrivateChannelFeedsPosts = createSelector([ getLocalPosts, getPrivateChannelFeeds ], (rssPosts, privateChannelFeeds) => {
-    return rssPosts.filter(post => post != null && isPostFromPrivateChannelFeed(post, privateChannelFeeds));
+export const getPrivateChannelFeedsPosts = createSelector([ getRssPosts, getPrivateChannelFeeds ], (rssPosts, privateChannelFeeds) => {
+    return rssPosts.filter(post => isPostFromPrivateChannelFeed(post, privateChannelFeeds));
 });
 
 export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {
