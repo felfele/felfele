@@ -53,7 +53,7 @@ export const FeedView = (props: Props) => {
 
     const isUrlFelfeleResource = isFelfeleResource(props.feed.feedUrl);
     const navigateToFeedInfo = () => props.navigation.navigate(
-        isUrlFelfeleResource ? 'FeedInfo' : 'WebFeedInfo', {
+        isUrlFelfeleResource ? 'FeedInfo' : 'RSSFeedInfo', {
             feed: props.feed,
         }
     );
