@@ -12,6 +12,7 @@ export const ZERO_TOPIC = '0x000000000000000000000000000000000000000000000000000
 
 export const defaultGateway = 'https://swarm.felfele.com';
 export const defaultPublicGateway = 'https://swarm-gateways.net';
+export const defaultDebugGateway = 'http://localhost:8500';
 export const defaultUrlScheme = '/bzz-raw:/';
 export const defaultPrefix = 'bzz:/';
 export const defaultFeedPrefix = 'bzz-feed:/';

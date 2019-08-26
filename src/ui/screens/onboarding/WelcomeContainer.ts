@@ -9,6 +9,9 @@ import { AsyncActions } from '../../../actions/asyncActions';
 import { Actions } from '../../../actions/Actions';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
+import testIdentity from '../../../../testIdentity.json';
+import { PrivateIdentity } from '../../../models/Identity';
+import * as Swarm from '../../../swarm/Swarm';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -23,8 +26,10 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
         onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
-            await dispatch(AsyncActions.createUser(name, image));
             dispatch(Actions.changeSettingShowDebugMenu(true));
+            dispatch(Actions.changeSettingSwarmGatewayAddress(Swarm.defaultDebugGateway));
+            const identity = testIdentity as PrivateIdentity;
+            await dispatch(AsyncActions.createUser(name, image, identity));
             navigation.navigate('Loading', {});
         },
     };

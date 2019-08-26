@@ -44,6 +44,7 @@ import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelp
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
 import { privateSync, listTimelinePosts } from '../protocols/privateSharing';
+import { PrivateIdentity } from '../models/Identity';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -406,19 +407,22 @@ export const AsyncActions = {
             }
         };
     },
-    createUser: (name: string, image: ImageData): Thunk => {
+    createUser: (name: string, image: ImageData, identity?: PrivateIdentity): Thunk => {
         return async (dispatch) => {
             await dispatch(AsyncActions.chainActions([
                 AsyncActions.updateProfileName(name),
                 AsyncActions.updateProfileImage(image),
-                AsyncActions.createUserIdentity(),
+                AsyncActions.createUserIdentity(identity),
                 AsyncActions.createOwnFeed(),
             ]));
         };
     },
-    createUserIdentity: (): Thunk => {
+    createUserIdentity: (identity?: PrivateIdentity): Thunk => {
         return async (dispatch) => {
-            const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+            const privateIdentity = identity != null
+                ? identity
+                : await Swarm.generateSecureIdentity(generateSecureRandom)
+            ;
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },
