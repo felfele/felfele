@@ -6,6 +6,8 @@ import {
     GestureResponderEvent,
     StyleSheet,
     Dimensions,
+    StyleProp,
+    ImageStyle,
 } from 'react-native';
 import { Colors } from '../../styles';
 import { MediumText } from './text';
@@ -17,6 +19,7 @@ interface Props {
     title: string;
     onPress: (event: GestureResponderEvent) => void;
     image: ImageData;
+    imageStyle?: StyleProp<ImageStyle>;
     defaultImage?: BundledImage;
     size: number;
     modelHelper: ModelHelper;
@@ -36,10 +39,10 @@ export const GridCard = React.memo((props: Props) => (
             source={props.image}
             defaultImage={props.defaultImage}
             modelHelper={props.modelHelper}
-            style={{
+            style={[{
                 width: props.size,
                 height: props.size,
-            }}
+            }, props.imageStyle]}
             resizeMode='cover'
         />
         <View style={styles.feedCardTextContainer}>

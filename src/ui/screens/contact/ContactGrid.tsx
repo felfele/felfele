@@ -26,9 +26,24 @@ export interface StateProps {
     headerComponent?: React.ComponentType<any> | React.ReactElement<any> | null;
 }
 
+const calculateGridImageStyle = (itemDimension: number) => {
+    const margin = 12;
+    const width = itemDimension - margin * 2;
+    const height = width;
+    const borderRadius = width / 2;
+    return {
+        margin,
+        width,
+        height,
+        borderRadius,
+        backgroundColor: Colors.VERY_LIGHT_GRAY,
+    };
+};
+
 export class ContactGrid extends React.PureComponent<DispatchProps & StateProps & { children?: React.ReactNode}> {
     public render() {
         const itemDimension = getGridCardSize();
+        const imageStyle = calculateGridImageStyle(itemDimension);
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
         return (
             <View style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR, flex: 1 }}>
@@ -46,6 +61,7 @@ export class ContactGrid extends React.PureComponent<DispatchProps & StateProps 
                             <GridCard
                                 title={item.name}
                                 image={image}
+                                imageStyle={imageStyle}
                                 onPress={() => this.props.onPressFeed(item)}
                                 size={itemDimension}
                                 defaultImage={defaultImages.defaultUser}
