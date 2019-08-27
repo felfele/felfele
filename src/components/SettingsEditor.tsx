@@ -61,7 +61,7 @@ export const SettingsEditor = (props: Props) => {
                 { props.settings.showDebugMenu &&
                 <RowItem
                     icon={
-                        <Ionicons name='md-bug' size={24} color={ComponentColors.BUTTON_COLOR}/>
+                        <Ionicons name='md-bug' size={24} color={ComponentColors.TEXT_COLOR}/>
                     }
                     title='Debug menu'
                     buttonStyle='navigate'

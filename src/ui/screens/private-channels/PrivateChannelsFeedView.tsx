@@ -37,8 +37,8 @@ export const PrivateChannelsFeedView = (props: Props) => {
                         title='Private Channels'
                         leftButton={{
                             onPress: () => props.navigation.navigate(
-                                'FavoriteListViewerContainer', {
-                                    feeds: props.feeds,
+                                'PrivateChannelListContainer', {
+                                    contactFeeds: props.feeds,
                                 }
                             ),
                             label: <Icon

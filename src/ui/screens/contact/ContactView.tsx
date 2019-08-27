@@ -11,11 +11,14 @@ import { MutualContact, Contact } from '../../../models/Contact';
 import { UnknownContact } from '../../../helpers/contactHelpers';
 import { PublicProfile } from '../../../models/Profile';
 import { Colors } from '../../../styles';
+import { FeedHeader } from '../../../components/FeedHeader';
+import { ImageData } from '../../../models/ImageData';
 
 export interface DispatchProps {
     onConfirmContact: (contact: MutualContact) => void;
     onRemoveContact: (contact: Contact) => void;
     onRefreshPosts: (feeds: Feed[]) => void;
+    onSaveDraft: (draft: Post) => void;
 }
 
 export interface StateProps {
@@ -50,7 +53,7 @@ export const ContactView = (props: Props) => {
     const rightButton1 = mutualContact != null
         ? {
             onPress: () => props.navigation.navigate('ContactInfo', { publicKey: mutualContact.identity.publicKey }),
-            label: <Icon name='dots-vertical' color={Colors.WHITE} />,
+            label: <Icon name='information' color={Colors.WHITE} />,
         }
         : undefined
     ;
@@ -65,6 +68,12 @@ export const ContactView = (props: Props) => {
                     }}
                     rightButton1={rightButton1}
                     title={contactName}
+                />,
+                listHeader: <FeedHeader
+                    navigation={props.navigation}
+                    gatewayAddress={props.gatewayAddress}
+                    onSaveDraft={props.onSaveDraft}
+                    profileImage={props.profile.image}
                 />,
             }}
         </RefreshableFeed>

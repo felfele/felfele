@@ -2,7 +2,8 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed, RecentPostFeed } from '../social/api';
-import { Contact } from '../models/Contact';
+import { Contact, MutualContact } from '../models/Contact';
+import { ContactFeed } from '../models/ContactFeed';
 
 export interface Routes {
     App: {};
@@ -14,7 +15,7 @@ export interface Routes {
     Root: {};
     ProfileTab: {};
     PostTab: {};
-    FavoriteTab: {};
+    PrivateChannelTab: {};
     SettingsTab: {};
     AllFeedTab: {};
     BugReportView: {};
@@ -31,6 +32,9 @@ export interface Routes {
     };
     FavoriteListViewerContainer: {
         feeds: Feed[],
+    };
+    PrivateChannelListContainer: {
+        contactFeeds: ContactFeed[],
     };
     Feed: {
         feedUrl: string,

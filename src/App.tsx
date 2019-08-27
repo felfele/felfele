@@ -36,7 +36,6 @@ import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { defaultTextProps, ComponentColors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
-import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
@@ -51,7 +50,6 @@ import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContai
 import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
-import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
 import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
@@ -70,6 +68,7 @@ import { felfeleInitAppActions } from './store/felfeleInit';
 import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 import { FELFELE_APP_NAME } from './reducers/defaultData';
 import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
+import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -80,8 +79,8 @@ Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
 initializeNotifications();
 
-const favoriteTabScenes: NavigationRouteConfigMap = {
-    FavoriteTab: {
+const privateChannelTabScenes: NavigationRouteConfigMap = {
+    PrivateChannelTab: {
         screen: ({navigation}: NavigationScreenProps) => (
             <PrivateChannelsContainer navigation={navigation}/>
         ),
@@ -89,20 +88,23 @@ const favoriteTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
-    FavoriteListViewerContainer: {
-        screen: FavoriteListViewerContainer,
+    PrivateChannelListContainer: {
+        screen: PrivateChannelListContainer,
     },
-    FeedFromList: {
-        screen: SettingsFeedViewContainer,
+    ContactView: {
+        screen: ContactViewContainer,
+    },
+    ContactInfo: {
+        screen: ContactInfoContainer,
     },
 };
-const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
+const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'FavoriteTab',
+        initialRouteName: 'PrivateChannelTab',
     },
 );
 
@@ -237,8 +239,8 @@ const Root = createBottomTabNavigator(
                 ),
             },
         },
-        FavoriteTab: {
-            screen: FavoriteFeedNavigator,
+        PrivateChannelTab: {
+            screen: PrivateChannelNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
