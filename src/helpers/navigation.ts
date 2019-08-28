@@ -39,6 +39,9 @@ export interface Routes {
     FeedInfo: {
         feed: Feed;
     };
+    RSSFeedInfo: {
+        feed: Feed;
+    };
     FeedInfoDeepLink: {
         feedUrl: string;
     };

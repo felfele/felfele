@@ -18,6 +18,7 @@ export const Colors = {
     MEDIUM_GRAY: '#A4A4A4',
     GRAY: '#808080',
     DARK_GRAY: '#4A4A4A',
+    DARK_RED: '#D2001E',
     BRAND_PURPLE: '#6200EA',
     BRAND_PURPLE_LIGHT: '#BA76FA',
     BRAND_PURPLE_DARK: '#3700B4',
