@@ -22,6 +22,7 @@ export interface FeedSection {
 
 export interface StateProps {
     post: Post;
+    selectedFeeds: ContactFeed[];
     navigation: TypedNavigation;
     sections: FeedSection[];
     gatewayAddress: string;
@@ -77,7 +78,7 @@ export const ShareWithScreen = (props: DispatchProps & StateProps) => (
             gatewayAddress={props.gatewayAddress}
             onPressFeed={(feed) => props.onShareWithContact(props.post, feed)}
             isSelected={() => true}
-            selectedFeeds={[]}
+            selectedFeeds={props.selectedFeeds}
         />
     </FragmentSafeAreaViewWithoutTabBar>
 );

@@ -100,7 +100,6 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             // dispatch(AsyncActions.sharePost(post));
             Debug.log('onSharePost', post);
             ownProps.navigation.navigate('ShareWithContainer', {
-                contacts: [],
                 post,
             });
         },

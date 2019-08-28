@@ -1,8 +1,7 @@
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
-import { LocalFeed, RecentPostFeed } from '../social/api';
-import { Contact, MutualContact } from '../models/Contact';
+import { LocalFeed } from '../social/api';
 import { ContactFeed } from '../models/ContactFeed';
 import { Post } from '../models/Post';
 
@@ -87,7 +86,6 @@ export interface Routes {
         publicKey: string;
     };
     ShareWithContainer: {
-        contacts: MutualContact[];
         post: Post;
     };
 }

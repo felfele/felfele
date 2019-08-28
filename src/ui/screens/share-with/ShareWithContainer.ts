@@ -11,9 +11,11 @@ import { Post } from '../../../models/Post';
 import { Debug } from '../../../Debug';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
-    const selectedContacts = ownProps.navigation.getParam<'ShareWithContainer', 'contacts'>('contacts');
     const post = ownProps.navigation.getParam<'ShareWithContainer', 'post'>('post');
     const mutualContactFeeds = getContactFeeds(state);
+    const selectedFeeds = mutualContactFeeds.filter(feed => post.author != null && feed.feedUrl === post.author.uri);
+
+    Debug.log('ShareWithContainer.mapStateToProps', {post, mutualContactFeeds, selectedFeeds});
 
     const sections: FeedSection[] = [{
         data: sortFeedsByName(mutualContactFeeds),
@@ -22,6 +24,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     return {
         sections,
         post,
+        selectedFeeds,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };

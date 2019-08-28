@@ -48,6 +48,7 @@ export const NewsSourceGridScreen = (props: StateProps & DispatchProps) => {
                                 }}
                                 modelHelper={modelHelper}
                                 size={itemDimension}
+                                isSelected={false}
                             />
                         );
                     }}
