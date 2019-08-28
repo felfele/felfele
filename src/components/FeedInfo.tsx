@@ -316,8 +316,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     private onScanSuccess = async (data: any) => {
         try {
             Debug.log('FeedInfo.onScanSuccess', 'data', data);
-            const inviteLink = getInviteCodeFromInviteLink(data);
-            Debug.log('inviteLink', inviteLink);
             this.setState({
                 url: data,
             });
