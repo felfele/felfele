@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, ScrollView, Vibration } from 'react-native';
+import { StyleSheet, ScrollView, Vibration, Linking } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
@@ -49,6 +49,11 @@ export const SettingsEditor = (props: Props) => {
                     title='Send bug report'
                     buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('BugReportView', {})}
+                />
+                <RowItem
+                    title='Terms & Privacy Policy'
+                    buttonStyle='navigate'
+                    onPress={() => Linking.openURL('https://felfele.org/legal')}
                 />
                 <TouchableView
                     onLongPress={() => {
