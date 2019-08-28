@@ -15,7 +15,7 @@ import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { protocolTestCommandDefinition as protocolTestCommandDefinition } from './protocolTestCommands';
+import { protocolTestCommandDefinition as protocolCommandDefinition } from './protocolCommands';
 import { swarmHelperTests } from './swarmHelperTest';
 import { privateSharingTests } from '../protocols/privateSharingTest';
 
@@ -137,7 +137,7 @@ const definitions =
         output({data});
     })
     .
-    addCommand('protocolTest', 'Test protocols', protocolTestCommandDefinition)
+    addCommand('protocol', 'Test protocols', protocolCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);

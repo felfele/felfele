@@ -2,7 +2,7 @@ import { HexString } from '../helpers/opaqueTypes';
 import { hexToUint8Array, byteArrayToHex, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { cryptoHash } from './group';
 import { Post } from '../models/Post';
-import { Timeline, PartialChapter, uploadTimeline, getNewestChapterId, fetchTimeline, LogicalTime, appendToTimeline } from './timeline';
+import { Timeline, PartialChapter, uploadTimeline, getNewestChapterId, fetchTimeline, LogicalTime, appendToTimeline, ChapterReference } from './timeline';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { serialize, deserialize } from '../social/serialization';
 import { ProtocolStorage } from './ProtocolStorage';
@@ -37,7 +37,7 @@ interface Encryption {
     decrypt: (data: Uint8Array, key: Uint8Array) => Uint8Array;
 }
 
-interface Crypto extends Encryption {
+interface ProtocolCrypto extends Encryption {
     signDigest: SwarmHelpers.FeedDigestSigner;
     deriveSharedKey: (publicKey: HexString) => HexString;
     random: (length: number) => Promise<Uint8Array>;
@@ -49,7 +49,7 @@ export interface PrivateSharingContext {
     localTimeline: Timeline<PrivateCommand>;
     remoteTimeline: Timeline<PrivateCommand>;
     sharedSecret: HexString;
-    crypto: Crypto;
+    crypto: ProtocolCrypto;
     storage: ProtocolStorage;
 }
 
@@ -79,20 +79,50 @@ export const uploadLocalPrivateCommands = async (context: PrivateSharingContext)
     return uploadedTimeline;
 };
 
-export const downloadRemotePrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
-    const topic = calculatePrivateTopic(context.sharedSecret);
-    const newestChapterId = getNewestChapterId(context.remoteTimeline);
+const downloadPrivateCommands = async (
+    storage: ProtocolStorage,
+    crypto: ProtocolCrypto,
+    identity: PublicIdentity,
+    sharedSecret: HexString,
+    lastSeenReference?: ChapterReference | undefined,
+): Promise<Timeline<PrivateCommand>> => {
+    const topic = calculatePrivateTopic(sharedSecret);
     const decryptChapter = (dataBytes: Uint8Array): PartialChapter<PrivateCommand> => {
-        const secretBytes = hexToUint8Array(context.sharedSecret);
-        const decryptedBytes = context.crypto.decrypt(dataBytes, secretBytes);
+        const secretBytes = hexToUint8Array(sharedSecret);
+        const decryptedBytes = crypto.decrypt(dataBytes, secretBytes);
         const decryptedText = Uint8ArrayToString(decryptedBytes);
         return deserialize(decryptedText) as PartialChapter<PrivateCommand>;
     };
-    const remoteTimeline = await fetchTimeline(
-        context.storage,
-        context.contactIdentity.address as HexString,
+    const timeline = await fetchTimeline(
+        storage,
+        identity.address as HexString,
         topic,
         decryptChapter,
+        lastSeenReference,
+    );
+    return timeline;
+
+};
+
+export const downloadUploadedLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
+    const newestChapterId = getNewestChapterId(context.localTimeline);
+    const localTimeline = await downloadPrivateCommands(
+        context.storage,
+        context.crypto,
+        context.profile.identity,
+        context.sharedSecret,
+        newestChapterId,
+    );
+    return [...localTimeline, ...context.localTimeline];
+};
+
+export const downloadRemotePrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
+    const newestChapterId = getNewestChapterId(context.remoteTimeline);
+    const remoteTimeline = await downloadPrivateCommands(
+        context.storage,
+        context.crypto,
+        context.contactIdentity,
+        context.sharedSecret,
         newestChapterId,
     );
     return [...remoteTimeline, ...context.remoteTimeline];

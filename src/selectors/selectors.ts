@@ -3,7 +3,7 @@ import { AppState } from '../reducers/AppState';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { MutualContact, Contact } from '../models/Contact';
-import { makeBzzFeedUrlFromIdentity, makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
+import { makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 import { LocalFeed } from '../social/api';
 
@@ -18,6 +18,12 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
     return favoriteFeeds.find(feed => {
         return feed != null && post.author != null &&
             feed.feedUrl === post.author.uri;
+    }) != null;
+};
+
+const isPostFromPrivateChannelFeed = (post: Post, privateChannelFeeds: Feed[]): boolean => {
+    return privateChannelFeeds.find(feed => {
+        return post.author != null && feed.feedUrl === post.author.uri;
     }) != null;
 };
 
@@ -65,6 +71,11 @@ export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFee
     return rssPosts.filter(post => isPostFromFollowedFeed(post, followedFeeds.concat(contactFeeds)));
 });
 
+export const getPrivateChannelFeeds = createSelector([ getContacts ], (contacts) => {
+    const mutualContacts = contacts.filter(isMutualContact);
+    return mutualContacts.map(makeContactFeedFromMutualContact);
+});
+
 const postUpdateTime = (post: Post): number => {
     return post.updatedAt != null
         ? post.updatedAt
@@ -84,7 +95,10 @@ export const getAllPostsSorted = createSelector([ getFollowedNewsPosts, getLocal
 
 export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFeeds ], (rssPosts, favoriteFeeds) => {
     return rssPosts.filter(post => post != null && isPostFromFavoriteFeed(post, favoriteFeeds));
+});
 
+export const getPrivateChannelFeedsPosts = createSelector([ getRssPosts, getPrivateChannelFeeds ], (rssPosts, privateChannelFeeds) => {
+    return rssPosts.filter(post => isPostFromPrivateChannelFeed(post, privateChannelFeeds));
 });
 
 export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {

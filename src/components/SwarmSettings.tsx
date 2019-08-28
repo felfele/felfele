@@ -79,8 +79,8 @@ export const SwarmSettings = (props: Props) => (
                     icon={
                         <MaterialCommunityIcon name='server-network' />
                     }
-                    title={`Use debug server: http://localhost:8500`}
-                    onPress={() => props.onChangeSwarmGatewayAddress('http://localhost:8500')}
+                    title={`Use debug server: ${Swarm.defaultDebugGateway}`}
+                    onPress={() => props.onChangeSwarmGatewayAddress(Swarm.defaultDebugGateway)}
                     buttonStyle='none'
                 />
                 <RowItem

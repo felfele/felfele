@@ -17,7 +17,7 @@ import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
-import { createInvitedContact } from '../helpers/contactHelpers';
+import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
@@ -38,6 +38,13 @@ import { ContactFeed } from '../models/ContactFeed';
 import { Contact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
+import { PublicProfile, PrivateProfile } from '../models/Profile';
+import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
+import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
+import { HexString } from '../helpers/opaqueTypes';
+import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
+import { privateSync, listTimelinePosts } from '../protocols/privateSharing';
+import { PrivateIdentity } from '../models/Identity';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -116,6 +123,58 @@ export const AsyncActions = {
                 loadRSSPostsFromFeeds(feedsWithoutOnboarding),
             ]);
             const posts = mergeUpdatedPosts(allPosts[0].concat(allPosts[1]), previousPosts);
+            dispatch(Actions.updateRssPosts(posts));
+        };
+    },
+    downloadPrivatePostsFromContacts: (contactFeeds: ContactFeed[]): Thunk => {
+        return async (dispatch, getState) => {
+            const identity = getState().author.identity!;
+            const profile: PrivateProfile = {
+                name: getState().author.name,
+                image: getState().author.image,
+                identity,
+            };
+            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
+            const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+            const swarmApi = Swarm.makeApi(
+                feedAddress,
+                signDigest,
+                getState().settings.swarmGatewayAddress
+            );
+            const storage = new SwarmStorage(swarmApi);
+            const crypto: Crypto = {
+                ...makeNaclEncryption(),
+                signDigest,
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+                random: (length: number) => generateSecureRandom(length),
+            };
+            const previousPosts = getState().rssPosts;
+            const allPosts: Post[] = [];
+            for (const contactFeed of contactFeeds) {
+                if (contactFeed.contact != null) {
+                    const contact = contactFeed.contact;
+                    const context = await makePrivateSharingContextWithContact(
+                        profile,
+                        contact.identity,
+                        storage,
+                        crypto,
+                    );
+                    const updatedContext = await privateSync(context);
+                    const timelinePosts = listTimelinePosts(updatedContext.remoteTimeline);
+                    for (const post of timelinePosts) {
+                        const postWithAuthor = {
+                            ...post,
+                            author: {
+                                name: contact.name,
+                                uri: contactFeed.feedUrl,
+                                image: contact.image,
+                            },
+                        };
+                        allPosts.push(postWithAuthor);
+                    }
+                }
+            }
+            const posts = mergeUpdatedPosts(allPosts, previousPosts);
             dispatch(Actions.updateRssPosts(posts));
         };
     },
@@ -348,19 +407,22 @@ export const AsyncActions = {
             }
         };
     },
-    createUser: (name: string, image: ImageData): Thunk => {
+    createUser: (name: string, image: ImageData, identity?: PrivateIdentity): Thunk => {
         return async (dispatch) => {
             await dispatch(AsyncActions.chainActions([
                 AsyncActions.updateProfileName(name),
                 AsyncActions.updateProfileImage(image),
-                AsyncActions.createUserIdentity(),
+                AsyncActions.createUserIdentity(identity),
                 AsyncActions.createOwnFeed(),
             ]));
         };
     },
-    createUserIdentity: (): Thunk => {
+    createUserIdentity: (identity?: PrivateIdentity): Thunk => {
         return async (dispatch) => {
-            const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
+            const privateIdentity = identity != null
+                ? identity
+                : await Swarm.generateSecureIdentity(generateSecureRandom)
+            ;
             dispatch(InternalActions.updateAuthorIdentity(privateIdentity));
         };
     },

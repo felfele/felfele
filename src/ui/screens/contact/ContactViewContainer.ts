@@ -9,6 +9,7 @@ import { getFeedPosts } from '../../../selectors/selectors';
 import { AsyncActions } from '../../../actions/asyncActions';
 import { findContactByPublicKey, UnknownContact } from '../../../helpers/contactHelpers';
 import { Actions } from '../../../actions/Actions';
+import { Post } from '../../../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const publicKey = ownProps.navigation.getParam<'ContactView', 'publicKey'>('publicKey');
@@ -48,6 +49,9 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
         },
         onRefreshPosts: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
+        },
+        onSaveDraft: (draft: Post) => {
+            dispatch(Actions.addDraft(draft));
         },
     };
 };

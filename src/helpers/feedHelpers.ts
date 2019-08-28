@@ -74,7 +74,8 @@ export const sortFeedsByName = (feeds: Feed[]): Feed[] => {
 
 export const makeBzzFeedUrlFromIdentity = (identity: PublicIdentity): string => {
     const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
-    return Swarm.makeBzzFeedUrl(feedAddress);
+    const feedUrl = Swarm.makeBzzFeedUrl(feedAddress);
+    return feedUrl;
 };
 
 export const fetchRecentPostFeed = async (feedAddress: Swarm.FeedAddress, swarmGateway: string): Promise<RecentPostFeed | null> => {

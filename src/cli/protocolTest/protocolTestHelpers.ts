@@ -92,14 +92,6 @@ export const ecDeriveSharedKey = (privateKeyPair: ec.KeyPair, publicKeyPair: ec.
     return privateKeyPair.derive(publicKeyPair.getPublic()).toString(16);
 };
 
-export const createDeterministicRandomGenerator = (randomSeed: string): () => string => {
-    return () => {
-        const randomSeedBytes = hexToByteArray(randomSeed);
-        randomSeed = byteArrayToHex(keccak256.array(randomSeedBytes), false);
-        return randomSeed;
-    };
-};
-
 export const throwError = (msg: string): never => {
     throw new Error(msg);
 };
