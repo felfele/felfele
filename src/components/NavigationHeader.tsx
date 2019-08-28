@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     headerButtonText: {
         color: Colors.WHITE,
-        fontSize: 18,
+        fontSize: 14,
     },
     leftContainer: {
         flex: 1,

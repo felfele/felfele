@@ -46,6 +46,10 @@ const isMutualContact = (contact: Contact): contact is MutualContact => {
     return contact.type === 'mutual-contact';
 };
 
+export const getMutualContacts = createSelector([ getContacts ], (contacts) => {
+    return contacts.filter(isMutualContact);
+});
+
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
     const mutualContacts = contacts.filter(isMutualContact);
     return mutualContacts.map(makeContactFeedFromMutualContact);

@@ -69,6 +69,7 @@ import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer'
 import { FELFELE_APP_NAME } from './reducers/defaultData';
 import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
 import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
+import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -365,6 +366,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     ContactInfo: {
         screen: ContactInfoContainer,
+    },
+    ShareWithContainer: {
+        screen: ShareWithContainer,
     },
 };
 

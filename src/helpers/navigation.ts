@@ -4,6 +4,7 @@ import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed, RecentPostFeed } from '../social/api';
 import { Contact, MutualContact } from '../models/Contact';
 import { ContactFeed } from '../models/ContactFeed';
+import { Post } from '../models/Post';
 
 export interface Routes {
     App: {};
@@ -84,6 +85,10 @@ export interface Routes {
     };
     ContactInfo: {
         publicKey: string;
+    };
+    ShareWithContainer: {
+        contacts: MutualContact[];
+        post: Post;
     };
 }
 
