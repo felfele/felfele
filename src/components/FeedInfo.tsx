@@ -192,7 +192,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private async handleLink(link: string) {
-        Debug.log('FeedInfo.processLink', 'this.state', this.state);
+        Debug.log('FeedInfo.processLink', 'this.state', this.state, 'link', link);
         if (this.state.loading === true) {
             return;
         }
@@ -317,13 +317,11 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         try {
             Debug.log('FeedInfo.onScanSuccess', 'data', data);
             const inviteLink = getInviteCodeFromInviteLink(data);
-            const feedUrl = inviteLink != null
-                ? inviteLink
-                : data;
+            Debug.log('inviteLink', inviteLink);
             this.setState({
-                url: feedUrl,
+                url: data,
             });
-            await this.handleLink(feedUrl);
+            await this.handleLink(data);
         } catch (e) {
             Debug.log(e);
         }
