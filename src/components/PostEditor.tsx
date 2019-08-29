@@ -328,7 +328,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'camera'}
                     size={24}
-                    color={ComponentColors.BUTTON_COLOR}
+                    color={Colors.BLACK}
                 />
             </TouchableOpacity>
             <TouchableOpacity
@@ -338,7 +338,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'image-multiple'}
                     size={24}
-                    color={ComponentColors.BUTTON_COLOR}
+                    color={Colors.BLACK}
                 />
             </TouchableOpacity>
         </View>
