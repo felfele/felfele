@@ -59,7 +59,6 @@ export const GridCard = React.memo((props: Props) => (
         {props.isSelected &&
             <View style={styles.feedCardOverlay}>
                 <Icon name='check' color={Colors.WHITE} size={48} />
-                <MediumText style={styles.feedCardOverlayText}>Sent</MediumText>
             </View>
         }
     </TouchableView>

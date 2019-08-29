@@ -37,7 +37,7 @@ const calculateGridImageStyle = (itemDimension: number) => {
         width,
         height,
         borderRadius,
-        backgroundColor: Colors.VERY_LIGHT_GRAY,
+        backgroundColor: Colors.LIGHTER_GRAY,
     };
 };
 

@@ -13,7 +13,7 @@ export const Colors = {
     PINKISH_GRAY: '#BBBBBB',
     BROWNISH_GRAY: '#696969',
     LIGHT_GRAY: '#DDDDDD',
-    LIGHTER_GRAY: '#E6E6E6',
+    LIGHTER_GRAY: '#EEEEEE',
     VERY_LIGHT_GRAY: '#F8F8F8',
     MEDIUM_GRAY: '#A4A4A4',
     GRAY: '#808080',
