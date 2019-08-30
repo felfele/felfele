@@ -7,7 +7,6 @@ import ShareExtension from 'react-native-share-extension';
 
 import { TopLevelErrorBoundary } from '../components/TopLevelErrorBoundary';
 import { initStore } from '../store';
-import { SharePostEditorContainer } from './SharePostEditorContainer';
 import { Debug } from '../Debug';
 import { Actions } from '../actions/Actions';
 import { FELFELE_SHARE_EXTENSION_NAME } from '../reducers/defaultData';
@@ -40,8 +39,8 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
                     <PersistGate loading={null} persistor={this.state.persistor!}>
                         <ShareNavigator
                             screenProps={{
-                                images: this.state.images,
                                 text: this.state.text,
+                                images: this.state.images,
                                 goBack: () => {
                                     this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
                                     this.state.persistor!.flush().then(() => {
@@ -49,9 +48,7 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
                                     });
                                     return true;
                                 },
-                                dismiss: () => {
-                                    ShareExtension.close();
-                                },
+                                dismiss: () => ShareExtension.close(),
                             }}
                         />
                     </PersistGate>

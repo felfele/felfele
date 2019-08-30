@@ -14,7 +14,7 @@ import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
 import { ModelHelper } from '../../models/ModelHelper';
 import { ImageData, BundledImage } from '../../models/ImageData';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     title: string;

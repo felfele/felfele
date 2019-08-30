@@ -1,11 +1,13 @@
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 import { ShareWithContainer } from '../ui/screens/share-with/ShareWithContainer';
 import { SharePostEditorContainer } from './SharePostEditorContainer';
 
-export const ShareNavigator = createSwitchNavigator({
-    Post: SharePostEditorContainer,
-    ShareWith: ShareWithContainer,
+export const ShareNavigator = createStackNavigator({
+    SharePostEditorContainer: SharePostEditorContainer,
+    ShareWithContainer: ShareWithContainer,
 }, {
     initialRouteName: 'Post',
-    backBehavior: 'initialRoute',
+    navigationOptions: {
+        header: null,
+    },
 });

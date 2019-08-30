@@ -2,19 +2,18 @@ import { connect } from 'react-redux';
 
 import { AppState } from '../reducers/AppState';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
-// import { mapDispatchToProps } from '../containers/PostEditorContainer';
 import { Post } from '../models/Post';
-import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { TypedNavigation } from '../helpers/navigation';
-import { Actions } from '../actions/Actions';
 
 interface OwnProps {
-    images: ImageData[];
-    text: string;
+    screenProps: {
+        images: ImageData[];
+        text: string;
+        goBack: () => boolean;
+        dismiss: () => void;
+    };
     navigation: TypedNavigation;
-    goBack: () => boolean;
-    dismiss: () => void;
 }
 
 const mapStateToProps = (
@@ -23,36 +22,30 @@ const mapStateToProps = (
 ): StateProps => {
     const draft: Post = {
         createdAt: Date.now(),
-        images: ownProps.images,
-        text: ownProps.text,
+        images: ownProps.screenProps.images,
+        text: ownProps.screenProps.text,
     };
-    Debug.log('SharePostEditorContainer.mapStateToProps', ownProps);
     return {
         name: state.author.name,
         avatar: state.author.image,
-        goBack: ownProps.goBack,
+        goBack: ownProps.screenProps.goBack,
         draft: draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        dismiss: ownProps.dismiss,
+        dismiss: ownProps.screenProps.dismiss,
    };
 };
 
-export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
+export const mapDispatchToProps = (dispatch: any, ownProps: OwnProps): DispatchProps => {
     return {
         onPost: (post: Post) => {
-             const selectedFeeds = ownProps.navigation.getParam<'Post', 'selectedFeeds'>('selectedFeeds');
-             Debug.log('PostEditorContainer.mapDispatchToProps', {selectedFeeds});
-             // dispatch(AsyncActions.createPost(post));
-             ownProps.navigation.navigate('ShareWithContainer', {
-                 post,
-                 selectedFeeds,
-             });
+            ownProps.navigation.navigate('ShareWithContainer', {
+                post,
+                selectedFeeds: [],
+            });
         },
         onSaveDraft: (draft: Post) => {
-            dispatch(Actions.addDraft(draft));
         },
         onDeleteDraft: () => {
-            dispatch(Actions.removeDraft());
         },
     };
  };
