@@ -71,6 +71,7 @@ export class AllFeedScreen extends React.Component<Props> {
                                     onSaveDraft={this.props.onSaveDraft}
                                     profileImage={this.props.profileImage}
                                     gatewayAddress={this.props.gatewayAddress}
+                                    selectedFeeds={[]}
                                 />,
                 }}
             </RefreshableFeed>

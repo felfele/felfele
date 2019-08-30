@@ -17,10 +17,11 @@ import { WideButton } from '../../buttons/WideButton';
 import { Colors, ComponentColors } from '../../../styles';
 import { highestSeenLogicalTime } from '../../../protocols/timeline';
 import { Debug } from '../../../Debug';
+import { Feed } from '../../../models/Feed';
 
 export interface DispatchProps {
     onDoneSharing: () => void;
-    onShareWithContact: (post: Post, contactFeed: ContactFeed) => void;
+    onShareWithContact: (post: Post, feed: Feed) => void;
 }
 
 export interface FeedSection {
@@ -30,7 +31,7 @@ export interface FeedSection {
 
 export interface StateProps {
     post: Post;
-    selectedFeeds: ContactFeed[];
+    selectedFeeds: Feed[];
     navigation: TypedNavigation;
     sections: FeedSection[];
     gatewayAddress: string;
@@ -38,11 +39,11 @@ export interface StateProps {
 }
 
 interface ShareWithScreenState {
-    selectedFeeds: ContactFeed[];
+    selectedFeeds: Feed[];
 }
 
 const ShareButton = (props: {
-    selectedFeeds: ContactFeed[],
+    selectedFeeds: Feed[],
     onPress: () => void,
 }) => (
     <View>
@@ -98,9 +99,9 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
         );
     }
 
-    private isSelected = (feed: ContactFeed) => this.state.selectedFeeds.find(selectedFeed => feed.feedUrl === selectedFeed.feedUrl) != null;
+    private isSelected = (feed: Feed) => this.state.selectedFeeds.find(selectedFeed => feed.feedUrl === selectedFeed.feedUrl) != null;
 
-    private onPressFeed = (feed: ContactFeed) => {
+    private onPressFeed = (feed: Feed) => {
         const index = this.state.selectedFeeds.findIndex(selectedFeed => feed.feedUrl === selectedFeed.feedUrl);
         if (index === -1) {
             this.setState({

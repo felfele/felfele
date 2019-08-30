@@ -11,7 +11,9 @@ export interface Routes {
     Onboarding: {};
     ProfileOnboarding: {};
     Welcome: {};
-    Post: {};
+    Post: {
+        selectedFeeds: Feed[],
+    };
     Root: {};
     ProfileTab: {};
     PostTab: {};
@@ -87,6 +89,7 @@ export interface Routes {
     };
     ShareWithContainer: {
         post: Post;
+        selectedFeeds: Feed[];
     };
 }
 

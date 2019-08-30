@@ -13,6 +13,7 @@ import { Actions } from '../actions/Actions';
 import { FELFELE_SHARE_EXTENSION_NAME } from '../reducers/defaultData';
 import { Image } from 'react-native';
 import { ImageData } from '../models/ImageData';
+import { ShareNavigator } from './ShareNavigator';
 
 interface ShareState {
     store: any;
@@ -37,18 +38,20 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
             <TopLevelErrorBoundary>
                 <Provider store={this.state.store!}>
                     <PersistGate loading={null} persistor={this.state.persistor!}>
-                        <SharePostEditorContainer
-                            images={this.state.images}
-                            text={this.state.text}
-                            goBack={() => {
-                                this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
-                                this.state.persistor!.flush().then(() => {
+                        <ShareNavigator
+                            screenProps={{
+                                images: this.state.images,
+                                text: this.state.text,
+                                goBack: () => {
+                                    this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
+                                    this.state.persistor!.flush().then(() => {
+                                        ShareExtension.close();
+                                    });
+                                    return true;
+                                },
+                                dismiss: () => {
                                     ShareExtension.close();
-                                });
-                                return true;
-                            }}
-                            dismiss={() => {
-                                ShareExtension.close();
+                                },
                             }}
                         />
                     </PersistGate>

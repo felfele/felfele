@@ -280,7 +280,6 @@ export class PostEditor extends React.Component<Props, State> {
 
     private onPressSubmit = async () => {
         await this.sendUpdate();
-        this.props.goBack();
     }
 
     private createPostFromState = async (): Promise<Post> => {

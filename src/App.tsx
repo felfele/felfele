@@ -272,7 +272,9 @@ const Root = createBottomTabNavigator(
                     </View>
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
-                    navigation.navigate('Post', {});
+                    navigation.navigate('Post', {
+                        selectedFeeds: [],
+                    });
                 },
                 tabBarTestID: 'TabBarPostButton',
             },
