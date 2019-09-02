@@ -18,6 +18,7 @@ export const felfeleInitAppActions = (store: Store<AppState, Actions>) => {
             isSyncing: false,
         }));
     }
+    store.dispatch(Actions.removeUnconfirmedContacts());
     store.dispatch(Actions.updateAppLastEditing(FELFELE_APP_NAME));
     // @ts-ignore
     store.dispatch(AsyncActions.cleanUploadingPostState());

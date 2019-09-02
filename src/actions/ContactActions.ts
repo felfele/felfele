@@ -13,4 +13,6 @@ export const ContactActions = {
         createAction(ActionTypes.REMOVE_CONTACT, { contact }),
     deleteAllContacts: () =>
         createAction(ActionTypes.DELETE_ALL_CONTACTS, {}),
+    removeUnconfirmedContacts: () =>
+        createAction(ActionTypes.REMOVE_UNCONFIRMED_CONTACTS),
 };

@@ -16,7 +16,7 @@ interface Props {
     rightButton: ButtonProps;
 }
 
-interface ButtonProps {
+export interface ButtonProps {
     label?: string;
     icon?: React.ReactNode;
     onPress?: (event?: GestureResponderEvent) => void;

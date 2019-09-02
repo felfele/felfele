@@ -4,30 +4,19 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 import { NavigationHeader } from '../../../components/NavigationHeader';
-import { Contact, MutualContact } from '../../../models/Contact';
-import { TypedNavigation } from '../../../helpers/navigation';
-import { WideButton } from '../../buttons/WideButton';
+import { Contact } from '../../../models/Contact';
 import { ImageDataView } from '../../../components/ImageDataView';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { defaultImages } from '../../../defaultImages';
-import { Colors } from '../../../styles';
-import { UnknownContact } from '../../../helpers/contactHelpers';
+import { Colors, ComponentColors } from '../../../styles';
 import * as AreYouSureDialog from '../../../components/AreYouSureDialog';
-
-export interface StateProps {
-    contact: Contact | UnknownContact;
-    navigation: TypedNavigation;
-    gatewayAddress: string;
-}
-
-export interface DispatchProps {
-    onConfirmContact: (contact: MutualContact) => void;
-    onRemoveContact: (contact: Contact) => void;
-}
+import { TwoButton } from '../../buttons/TwoButton';
+import { StateProps, DispatchProps } from './ContactInfo';
+import { TypedNavigation } from '../../../helpers/navigation';
 
 export type Props = StateProps & DispatchProps;
 
-export const ContactInfo = (props: Props) => {
+export const ContactConfirm = (props: Props) => {
     const mutualContact = props.contact != null && props.contact.type === 'mutual-contact'
         ? props.contact
         : undefined
@@ -42,6 +31,14 @@ export const ContactInfo = (props: Props) => {
             <NavigationHeader
                 title={contactName}
                 navigation={props.navigation}
+                leftButton={{
+                    onPress: () => props.navigation.goBack(),
+                    label: <Icon
+                                name={'close'}
+                                size={20}
+                                color={ComponentColors.NAVIGATION_BUTTON_COLOR}
+                            />,
+                }}
             />
             { mutualContact != null &&
                 <View>
@@ -53,12 +50,20 @@ export const ContactInfo = (props: Props) => {
                             modelHelper={modelHelper}
                         />
                     </View>
-                    <WideButton
-                        label={'Delete'}
-                        style={{marginTop: 20}}
-                        icon={<Icon name='delete' color={Colors.DARK_RED} size={24}/>}
-                        onPress={() => removeContact(props.onRemoveContact, mutualContact, props.navigation)}
-                        fontStyle={{ color: Colors.DARK_RED }}
+                    <TwoButton
+                        leftButton={{
+                            label: 'Cancel',
+                            style: { marginTop: 20, backgroundColor: ComponentColors.SECONDARY_RECT_BUTTON_COLOR },
+                            icon: <Icon name='close' color={Colors.BLACK} size={24}/>,
+                            onPress: () => removeContact(props.onRemoveContact, mutualContact, props.navigation),
+                            fontStyle: { color: Colors.BLACK },
+                        }}
+                        rightButton={{
+                            label: 'Create contact',
+                            style: { marginTop: 20 },
+                            icon: <Icon name='check' color={Colors.BRAND_PURPLE} size={24}/>,
+                            onPress: () => props.onConfirmContact(mutualContact),
+                        }}
                     />
                 </View>
             }
