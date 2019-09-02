@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { ContactFeed } from '../../../models/ContactFeed';
@@ -18,6 +18,8 @@ import { Colors, ComponentColors } from '../../../styles';
 import { highestSeenLogicalTime } from '../../../protocols/timeline';
 import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
+import { RegularText, MediumText } from '../../misc/text';
+import { TouchableView } from '../../../components/TouchableView';
 
 export interface DispatchProps {
     onDoneSharing: () => void;
@@ -40,33 +42,63 @@ export interface StateProps {
 
 interface ShareWithScreenState {
     selectedFeeds: Feed[];
+    isSending: boolean;
 }
 
-const ShareButton = (props: {
+const ShareButtonContainer = (props: {
     selectedFeeds: Feed[],
     onPress: () => void,
-}) => (
-    <View>
-    { props.selectedFeeds.length > 0 &&
-        <WideButton
-            style={{
-                position: 'absolute',
-                margin: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-            }}
-            label='Share now'
-            icon={<Icon name='send' size={20} color={ComponentColors.BUTTON_COLOR} />}
-            onPress={props.onPress}
-        />
-    }
-    </View>
-);
+    isSending: boolean,
+}) => {
+    const icon = props.isSending
+        ? <ActivityIndicator size='small' color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
+        : <Icon name='send' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
+    ;
+    const numSelected = props.selectedFeeds.length;
+    return (
+        <View>
+        { props.selectedFeeds.length > 0 &&
+            <View
+                style={{
+                    position: 'absolute',
+                    margin: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    height: 50,
+                    flexDirection: 'row',
+                    backgroundColor: Colors.WHITE,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
+                <RegularText style={{marginLeft: 10, fontSize: 14}}>{numSelected} selected</RegularText>
+                <TouchableView
+                    style={{
+                        margin: 10,
+                        backgroundColor: Colors.BRAND_PURPLE,
+                        borderRadius: 3,
+                        flexDirection: 'row',
+                        width: 115,
+                        height: 30,
+                        alignItems: 'center',
+                        paddingHorizontal: 10,
+                    }}
+                    onPress={props.onPress}
+                >
+                    {icon}
+                    <MediumText style={{ color: Colors.WHITE, paddingLeft: 5}}>Share now</MediumText>
+                </TouchableView>
+            </View>
+        }
+        </View>
+    );
+};
 
 export class ShareWithScreen extends React.Component<DispatchProps & StateProps, ShareWithScreenState> {
     public state = {
         selectedFeeds: this.props.selectedFeeds,
+        isSending: false,
     };
 
     public render() {
@@ -91,9 +123,10 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
                     onPressFeed={this.onPressFeed}
                     isSelected={this.isSelected}
                 />
-                <ShareButton
+                <ShareButtonContainer
                     selectedFeeds={this.state.selectedFeeds}
                     onPress={this.onShareAll}
+                    isSending={false}
                 />
             </FragmentSafeAreaViewForTabBar>
         );
@@ -115,7 +148,10 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
         }
     }
 
-    private onShareAll = () => {
+    private onShareAll = async () => {
+        await this.setState({
+            isSending: true,
+        });
         this.state.selectedFeeds.map(feed => this.props.onShareWithContact(this.props.post, feed));
         this.props.onDoneSharing();
     }
