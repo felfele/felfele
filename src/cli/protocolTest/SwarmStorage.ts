@@ -3,22 +3,31 @@ import { HexString } from '../../helpers/opaqueTypes';
 import { ProtocolStorage, ProtocolStorageFeeds } from '../../protocols/ProtocolStorage';
 import * as Swarm from '../../swarm/Swarm';
 
+const addPrefixToTopic = (topic: HexString): HexString => {
+    return topic.startsWith('0x')
+        ? topic
+        : ('0x' + topic) as HexString
+    ;
+};
+
 export class SwarmStorageFeeds implements ProtocolStorageFeeds {
     public constructor(readonly swarmFeedApi: Swarm.FeedApi) {}
 
     public write = async (address: HexString, topic: HexString, data: string, signFeedDigest: Swarm.FeedDigestSigner = this.swarmFeedApi.signFeedDigest) => {
+        const prefixedTopic = addPrefixToTopic(topic);
         const feedAddress: Swarm.FeedAddress = {
             user: address,
-            topic,
+            topic: prefixedTopic,
         };
         const feed = Swarm.makeFeedApi(feedAddress, signFeedDigest, this.swarmFeedApi.swarmGateway);
         await feed.update(data);
     }
 
     public read = async (address: HexString, topic: HexString) => {
+        const prefixedTopic = addPrefixToTopic(topic);
         const feedAddress: Swarm.FeedAddress = {
             user: address,
-            topic,
+            topic: prefixedTopic,
         };
         const feed = Swarm.makeReadableFeedApi(feedAddress, this.swarmFeedApi.swarmGateway);
         try {

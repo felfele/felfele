@@ -42,7 +42,7 @@ import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto, makeStorage } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
-import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands } from '../protocols/privateSharing';
+import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
 import { byteArrayToString, byteArrayToHex } from '../helpers/conversion';
 
@@ -128,6 +128,7 @@ export const AsyncActions = {
     },
     downloadPrivatePostsFromContacts: (contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('downloadPrivatePostsFromContacts', {contactFeeds});
             const identity = getState().author.identity!;
             const profile: PrivateProfile = {
                 name: getState().author.name,
@@ -153,6 +154,8 @@ export const AsyncActions = {
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
                     const contact = contactFeed.contact;
+                    const sharedKey = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
+                    const topic = calculatePrivateTopic(sharedKey);
                     const context = await makePrivateSharingContextWithContact(
                         profile,
                         contact.identity,
@@ -169,6 +172,7 @@ export const AsyncActions = {
                                 uri: contactFeed.feedUrl,
                                 image: contact.image,
                             },
+                            topic,
                         };
                         allPosts.push(postWithAuthor);
                     }
@@ -215,14 +219,18 @@ export const AsyncActions = {
     shareWithContact: (post: Post, contact: MutualContact): Thunk => {
         return async (dispatch, getState) => {
             const { metadata, author } = getState();
+            const identity = author.identity!;
+
+            const sharedKey = deriveSharedKey(identity, contact.identity);
+            const topic = calculatePrivateTopic(sharedKey);
             if (post._id == null) {
                 post._id = metadata.highestSeenPostId + 1;
                 post.author = author;
                 dispatch(InternalActions.addPost(post));
                 dispatch(InternalActions.increaseHighestSeenPostId());
             }
+            post.topic = topic;
 
-            const identity = author.identity!;
             const profile: PrivateProfile = {
                 name: author.name,
                 image: author.image,

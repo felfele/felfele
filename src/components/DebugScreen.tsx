@@ -82,7 +82,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
@@ -90,7 +90,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete feeds'
                     onPress={async () => await onDeleteFeeds(props)}
@@ -98,7 +98,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete all posts'
                     onPress={async () => await onDeletePosts(props)}
@@ -106,15 +106,15 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='account-multiple' />
                     }
-                    title='Follow debug feeds'
+                    title='Setup debug contacts'
                     onPress={async () => await onLoadFeeds(props)}
                     buttonStyle='none'
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='file-document-box-multiple-outline' />
                     }
                     title='Generate 100 posts'
                     onPress={async () => await onGeneratePosts(props)}

@@ -5,11 +5,17 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { Feed } from '../../../models/Feed';
 import { Contact, MutualContact } from '../../../models/Contact';
 import { Debug } from '../../../Debug';
-import { getFeedPosts } from '../../../selectors/selectors';
+import { getPrivateChannelPosts } from '../../../selectors/selectors';
 import { AsyncActions } from '../../../actions/asyncActions';
-import { findContactByPublicKey, UnknownContact } from '../../../helpers/contactHelpers';
+import { findContactByPublicKey, UnknownContact, deriveSharedKey } from '../../../helpers/contactHelpers';
 import { Actions } from '../../../actions/Actions';
 import { Post } from '../../../models/Post';
+import { calculatePrivateTopic } from '../../../protocols/privateSharing';
+
+const getContactPosts = (state: AppState, contact: MutualContact) => {
+    const topic = calculatePrivateTopic(deriveSharedKey(state.author.identity!, contact.identity));
+    return getPrivateChannelPosts(state, topic);
+};
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const publicKey = ownProps.navigation.getParam<'ContactView', 'publicKey'>('publicKey');
@@ -18,7 +24,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     const contact = findContactByPublicKey(publicKey, state.contacts) || unknownContact;
     const posts = contact.type !== 'mutual-contact'
         ? []
-        : getFeedPosts(state, feed.feedUrl)
+        : getContactPosts(state, contact)
     ;
     const profile = {
         name: state.author.name,
@@ -48,7 +54,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             ownProps.navigation.popToTop();
         },
         onRefreshPosts: (feeds: Feed[]) => {
-            dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
+            dispatch(AsyncActions.downloadPrivatePostsFromContacts(feeds));
         },
         onSaveDraft: (draft: Post) => {
             dispatch(Actions.addDraft(draft));
