@@ -91,6 +91,7 @@ export interface Routes {
     };
     ContactSuccess: {
         contact: MutualContact;
+        isReceiver: boolean;
     };
 }
 

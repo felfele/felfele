@@ -13,17 +13,30 @@ import * as Swarm from '../../../swarm/Swarm';
 import { fetchRecentPostFeed } from '../../../helpers/feedHelpers';
 // @ts-ignore
 import Balloon from '../../../../images/balloon.svg';
-import { NavigationActions } from 'react-navigation';
 
 export interface StateProps {
     contact: MutualContact;
     navigation: TypedNavigation;
     gatewayAddress: string;
+    isReceiver: boolean;
 }
 
 export type Props = StateProps;
 
 export const ContactSuccess = (props: Props) => {
+    const leftButton = props.isReceiver
+        ? {
+            label: 'Go back',
+            style: { marginTop: 20 },
+            icon: <Icon name='arrow-left' color={Colors.BRAND_PURPLE} size={24}/>,
+            onPress: () => props.navigation.popToTop(),
+        }
+        : {
+            label: 'Show your contact info',
+            style: { marginTop: 20 },
+            icon: <Icon name='account-circle' color={Colors.BRAND_PURPLE} size={24}/>,
+            onPress: () => props.navigation.popToTop(),
+        };
     return (
         <FragmentSafeAreaViewWithoutTabBar>
             <NavigationHeader
@@ -47,12 +60,7 @@ export const ContactSuccess = (props: Props) => {
                     <Balloon width={36} height={58}/>
                 </IllustrationWithExplanation>
                 <TwoButton
-                    leftButton={{
-                        label: 'Show your contact info',
-                        style: { marginTop: 20 },
-                        icon: <Icon name='account-circle' color={Colors.BRAND_PURPLE} size={24}/>,
-                        onPress: () => props.navigation.replace('Root', {}, NavigationActions.navigate({ routeName: 'ProfileTab' })),
-                    }}
+                    leftButton={leftButton}
                     rightButton={{
                         label: 'Go to channel',
                         style: { marginTop: 20 },

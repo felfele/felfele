@@ -22,7 +22,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: {navigation: TypedNavigatio
     return {
         onConfirmContact: (contact: MutualContact) => {
             dispatch(Actions.confirmContact(contact));
-            ownProps.navigation.navigate('ContactSuccess', { contact: contact });
+            ownProps.navigation.navigate('ContactSuccess', { contact: contact, isReceiver: true });
         },
         onRemoveContact: (contact: Contact) => {
             dispatch(Actions.removeContact(contact));

@@ -126,7 +126,10 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
         this.props.onContactStateChanged(this.props.contact, contact);
         if (contact.type === 'mutual-contact') {
             this.props.onReachingMutualContactState(contact);
-            this.props.navigation.navigate('ContactSuccess', { contact });
+            this.props.navigation.navigate('ContactSuccess', {
+                contact,
+                isReceiver: false,
+            });
         }
     }
 }
