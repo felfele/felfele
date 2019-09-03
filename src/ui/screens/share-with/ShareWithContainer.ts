@@ -42,8 +42,7 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             const contactFeed = feed as ContactFeed;
             if (contactFeed.contact != null) {
                 Debug.log('ShareWithContainer.mapDispatchToProps.onShareWithContact', {post, feed});
-                // TODO
-                // dispatch(AsyncActions.shareWithContact(post, feed.contact));
+                dispatch(AsyncActions.shareWithContact(post, contactFeed.contact));
                 dispatch(AsyncActions.downloadPrivatePostsFromContacts([feed]));
             }
         },

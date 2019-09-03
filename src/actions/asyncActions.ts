@@ -19,8 +19,7 @@ import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
-// @ts-ignore
-import { generateSecureRandom } from 'react-native-securerandom';
+import { generateSecureRandom } from '../helpers/secureRandom';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
 import {
@@ -35,16 +34,17 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact } from '../models/Contact';
+import { Contact, MutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { PublicProfile, PrivateProfile } from '../models/Profile';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
-import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
+import { makeNaclEncryption, Crypto, makeStorage } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
-import { privateSync, listTimelinePosts } from '../protocols/privateSharing';
+import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
+import { byteArrayToString, byteArrayToHex } from '../helpers/conversion';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -210,6 +210,53 @@ export const AsyncActions = {
                 dispatch(AsyncActions.syncLocalFeed(localFeed));
             }
             dispatch(Actions.deletePost(post));
+        };
+    },
+    shareWithContact: (post: Post, contact: MutualContact): Thunk => {
+        return async (dispatch, getState) => {
+            const { metadata, author } = getState();
+            if (post._id == null) {
+                post._id = metadata.highestSeenPostId + 1;
+                post.author = author;
+                dispatch(InternalActions.addPost(post));
+                dispatch(InternalActions.increaseHighestSeenPostId());
+            }
+
+            const identity = author.identity!;
+            const profile: PrivateProfile = {
+                name: author.name,
+                image: author.image,
+                identity,
+            };
+            const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+            const swarmApi = Swarm.makeApi({user: '', topic: ''}, signDigest, getState().settings.swarmGatewayAddress);
+            const storage = new SwarmStorage(swarmApi);
+            const crypto: Crypto = {
+                ...makeNaclEncryption(),
+                signDigest,
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+                random: (length: number) => generateSecureRandom(length),
+            };
+            const sharedSecret = deriveSharedKey(profile.identity, contact.identity);
+            const context: PrivateSharingContext = {
+                profile,
+                contactIdentity: contact.identity,
+                localTimeline: [],
+                remoteTimeline: [],
+                sharedSecret,
+                storage,
+                crypto,
+            };
+
+            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
+            const contextBeforePost = {
+                ...context,
+                localTimeline,
+            };
+            const postId = byteArrayToHex(await crypto.random(32), false);
+            const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
+            Debug.log('shareWithContact', {contextWithPost, postId});
+            const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
         };
     },
     sharePost: (post: Post): Thunk => {

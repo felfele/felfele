@@ -29,7 +29,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(Actions.changeSettingShowDebugMenu(true));
             dispatch(Actions.changeSettingSwarmGatewayAddress(Swarm.defaultDebugGateway));
             const identity = testIdentity as PrivateIdentity;
-            await dispatch(AsyncActions.createUser(name, image, identity));
+            await dispatch(AsyncActions.createUser('TestUser', image, identity));
             navigation.navigate('Loading', {});
         },
     };
