@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
@@ -13,10 +13,12 @@ import * as AreYouSureDialog from '../../../components/AreYouSureDialog';
 import { TwoButton } from '../../buttons/TwoButton';
 import { StateProps, DispatchProps } from './ContactInfo';
 import { TypedNavigation } from '../../../helpers/navigation';
+import { RegularText } from '../../misc/text';
 
 export type Props = StateProps & DispatchProps;
 
 export const ContactConfirm = (props: Props) => {
+    const imageWidth = Dimensions.get('window').width * 0.65;
     const mutualContact = props.contact != null && props.contact.type === 'mutual-contact'
         ? props.contact
         : undefined
@@ -46,10 +48,17 @@ export const ContactConfirm = (props: Props) => {
                         <ImageDataView
                             source={mutualContact.image}
                             defaultImage={defaultImages.defaultUser}
-                            style={styles.profileImage}
+                            style={[styles.profileImage, {
+                                width: imageWidth,
+                                height: imageWidth,
+                                borderRadius: imageWidth / 2,
+                            }]}
                             modelHelper={modelHelper}
                         />
                     </View>
+                    <RegularText style={{ textAlign: 'center', color: Colors.BROWNISH_GRAY }}>
+                        {'Hello there!'}
+                    </RegularText>
                     <TwoButton
                         leftButton={{
                             label: 'Cancel',
@@ -65,6 +74,9 @@ export const ContactConfirm = (props: Props) => {
                             onPress: () => props.onConfirmContact(mutualContact),
                         }}
                     />
+                    <RegularText style={{ textAlign: 'center', color: Colors.BROWNISH_GRAY }}>
+                        {'Creating a contact will open a private channel between the two of you.'}
+                    </RegularText>
                 </View>
             }
         </FragmentSafeAreaViewWithoutTabBar>
@@ -92,9 +104,6 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     profileImage: {
-        borderRadius : 72.5,
-        width: 145,
-        height: 145,
         marginVertical: 10,
     },
 });
