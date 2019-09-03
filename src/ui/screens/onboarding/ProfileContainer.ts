@@ -5,7 +5,7 @@ import { StateProps, DispatchProps, ProfileScreen } from './ProfileScreen';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { Feed } from '../../../models/Feed';
-import { InvitedContact, Contact } from '../../../models/Contact';
+import { InvitedContact, Contact, MutualContact } from '../../../models/Contact';
 
 export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -30,6 +30,7 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onChangeQRCode: () => {},
         onAddFeed: (feed: Feed) => {},
         onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => {},
+        onReachingMutualContactState: (contact: MutualContact) => {},
     };
 };
 
