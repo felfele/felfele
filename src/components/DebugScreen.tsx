@@ -24,6 +24,7 @@ import contactIdentity1 from '../../testdata/contactIdentity1.json';
 import contactIdentity2 from '../../testdata/contactIdentity2.json';
 import contactIdentity3 from '../../testdata/contactIdentity3.json';
 import contactIdentity4 from '../../testdata/contactIdentity4.json';
+import { MutualContact } from '../models/Contact';
 
 export interface StateProps {
     appState: AppState;
@@ -39,6 +40,7 @@ export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRefreshFeeds: (feeds: Feed[]) => void;
     onAddPost: (post: Post) => void;
+    onAddContact: (contact: MutualContact) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -254,15 +256,14 @@ const onLogAppStateVersion = async () => {
 };
 
 const onSetupContacts = async (props: Props) => {
-    const identities = [
+    const contactIdentities = [
             contactIdentity1,
             contactIdentity2,
             contactIdentity3,
             contactIdentity4,
         ]
-        .concat(debugIdentities)
     ;
-    const feeds = identities.map((identity, index) => {
+    const feeds = debugIdentities.map((identity, index) => {
         const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
         const feed: Feed = {
             name: `Feed ${index}`,
@@ -274,6 +275,18 @@ const onSetupContacts = async (props: Props) => {
         return feed;
     });
     props.onRefreshFeeds(feeds);
+
+    contactIdentities.map((identity, index) => {
+        const contact: MutualContact = {
+            type: 'mutual-contact',
+            name: `Contact${index + 1}`,
+            identity,
+            image: {},
+            confirmed: true,
+        };
+        props.onAddContact(contact);
+    });
+
     Debug.log('onSetupContacts', 'finished');
 };
 
