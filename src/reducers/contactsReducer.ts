@@ -84,9 +84,9 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
             }
         }
         case 'REMOVE-UNCONFIRMED-CONTACTS': {
-            return contacts.filter(contact =>
-                !(contact.type === 'mutual-contact' && contact.confirmed)
-            );
+            const isMutualUnconfirmed = (contact: Contact) =>
+                contact.type === 'mutual-contact' && contact.confirmed === false;
+            return contacts.filter(contact => !isMutualUnconfirmed(contact));
         }
     }
     return contacts;
