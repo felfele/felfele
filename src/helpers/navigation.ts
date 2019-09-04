@@ -92,6 +92,7 @@ export interface Routes {
     ShareWithContainer: {
         post: Post;
         selectedFeeds: Feed[];
+        onDoneSharing?: () => void;
     };
     ContactConfirm: {
         publicKey: string;

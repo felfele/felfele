@@ -12,6 +12,7 @@ interface OwnProps {
         text: string;
         goBack: () => boolean;
         dismiss: () => void;
+        onDoneSharing: () => void;
     };
     navigation: TypedNavigation;
 }
@@ -41,6 +42,7 @@ export const mapDispatchToProps = (dispatch: any, ownProps: OwnProps): DispatchP
             ownProps.navigation.navigate('ShareWithContainer', {
                 post,
                 selectedFeeds: [],
+                onDoneSharing: ownProps.screenProps.onDoneSharing,
             });
         },
         onSaveDraft: (draft: Post) => {

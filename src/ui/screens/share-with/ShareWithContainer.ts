@@ -34,7 +34,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     };
 };
 
-export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
+const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onShareWithContact: (post: Post, feed: Feed) => {
             const contactFeed = feed as ContactFeed;
@@ -45,6 +45,10 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             }
         },
         onDoneSharing: () => {
+            const onDoneSharing = ownProps.navigation.getParam<'ShareWithContainer', 'onDoneSharing'>('onDoneSharing');
+            if (onDoneSharing != null) {
+                onDoneSharing();
+            }
             ownProps.navigation.popToTop();
         },
     };

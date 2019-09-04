@@ -42,13 +42,11 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
                                 text: this.state.text,
                                 images: this.state.images,
                                 goBack: () => {
-                                    this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
-                                    this.state.persistor!.flush().then(() => {
-                                        ShareExtension.close();
-                                    });
+                                    this.onDoneSharing();
                                     return true;
                                 },
                                 dismiss: () => ShareExtension.close(),
+                                onDoneSharing: this.onDoneSharing,
                             }}
                         />
                     </PersistGate>
@@ -86,5 +84,12 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
         } catch (e) {
             Debug.log('error getting share data', e);
         }
+    }
+
+    private onDoneSharing = () => {
+        this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
+        this.state.persistor!.flush().then(() => {
+            ShareExtension.close();
+        });
     }
 }
