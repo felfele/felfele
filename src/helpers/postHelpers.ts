@@ -2,6 +2,7 @@ import { Post, PostReferences } from '../models/Post';
 import { Author } from '../models/Author';
 import { HtmlMetaData } from './htmlMetaData';
 import { ImageData } from '../models/ImageData';
+import { HexString } from './opaqueTypes';
 
 export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[] => {
     const uniqueAuthors = new Map<string, Author>();
@@ -70,4 +71,43 @@ export const isChildrenPostUploading = (post: Post, localPosts: Post[]): boolean
         }
     }
     return false;
+};
+
+export const copyPostWithReferences = (post: Post, author: Author, id: number | string, topic: HexString | undefined): Post => {
+    return {
+        ...post,
+        _id: id,
+        author,
+        topic,
+        updatedAt: Date.now(),
+        references: {
+            parent: post.link ? post.link : '',
+            original: post.references != null
+                ? post.references.original
+                : post.link != null
+                    ? post.link
+                    : ''
+            ,
+            originalAuthor: post.references != null
+                ? post.references.originalAuthor
+                : post.author != null
+                    ? post.author
+                    : {
+                        name: '',
+                        uri: '',
+                        image: {},
+                    }
+            ,
+        },
+    };
+};
+
+export const copyPostPrivately = (post: Post, author: Author, id: number | string, topic: HexString): Post => {
+    return {
+        ...post,
+        _id: id,
+        author,
+        topic,
+        references: undefined,
+    };
 };

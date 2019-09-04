@@ -16,7 +16,7 @@ import {
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts } from '../helpers/postHelpers';
+import { mergeUpdatedPosts, copyPostWithReferences, copyPostPrivately } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { generateSecureRandom } from '../helpers/secureRandom';
@@ -37,14 +37,14 @@ import { ContactFeed } from '../models/ContactFeed';
 import { Contact, MutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
-import { PublicProfile, PrivateProfile } from '../models/Profile';
+import { PrivateProfile } from '../models/Profile';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
-import { makeNaclEncryption, Crypto, makeStorage } from '../cli/protocolTest/protocolTestHelpers';
+import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
 import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
-import { byteArrayToString, byteArrayToHex } from '../helpers/conversion';
+import { byteArrayToHex } from '../helpers/conversion';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -216,20 +216,20 @@ export const AsyncActions = {
             dispatch(Actions.deletePost(post));
         };
     },
-    shareWithContact: (post: Post, contact: MutualContact): Thunk => {
+    shareWithContact: (originalPost: Post, contact: MutualContact): Thunk => {
         return async (dispatch, getState) => {
-            const { metadata, author } = getState();
+            const { author } = getState();
             const identity = author.identity!;
-
+            const postId = byteArrayToHex(await generateSecureRandom(32), false);
             const sharedKey = deriveSharedKey(identity, contact.identity);
             const topic = calculatePrivateTopic(sharedKey);
-            if (post._id == null) {
-                post._id = metadata.highestSeenPostId + 1;
-                post.author = author;
-                dispatch(InternalActions.addPost(post));
-                dispatch(InternalActions.increaseHighestSeenPostId());
-            }
-            post.topic = topic;
+
+            const post = originalPost._id == null || originalPost.topic != null
+                ? copyPostPrivately(originalPost, author, postId, topic)
+                : copyPostWithReferences(originalPost, author, postId, topic)
+            ;
+
+            dispatch(InternalActions.addPost(post));
 
             const profile: PrivateProfile = {
                 name: author.name,
@@ -261,7 +261,6 @@ export const AsyncActions = {
                 ...context,
                 localTimeline,
             };
-            const postId = byteArrayToHex(await crypto.random(32), false);
             const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
             Debug.log('shareWithContact', {contextWithPost, postId});
             const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
@@ -286,31 +285,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const { metadata, author } = getState();
             const id = metadata.highestSeenPostId + 1;
-            const newPost: Post = {
-                ...post,
-                _id: id,
-                author,
-                updatedAt: Date.now(),
-                references: {
-                    parent: post.link ? post.link : '',
-                    original: post.references != null
-                        ? post.references.original
-                        : post.link != null
-                            ? post.link
-                            : ''
-                    ,
-                    originalAuthor: post.references != null
-                        ? post.references.originalAuthor
-                        : post.author != null
-                            ? post.author
-                            : {
-                                name: '',
-                                uri: '',
-                                image: {},
-                            }
-                    ,
-                },
-            };
+            const newPost = copyPostWithReferences(post, author, id, undefined);
 
             dispatch(InternalActions.addPost(newPost));
             dispatch(InternalActions.increaseHighestSeenPostId());
