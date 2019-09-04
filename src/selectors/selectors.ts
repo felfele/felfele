@@ -53,7 +53,7 @@ const getSelectedTopicPosts = (state: AppState, topic: HexString) => {
         .concat(
             state.localPosts.filter(post => post.topic === topic)
         )
-        .sort((a, b) => b.createdAt - a.createdAt)
+        .sort(postTimeCompare)
     ;
 };
 
