@@ -62,7 +62,7 @@ export const ContactConfirm = (props: Props) => {
                     <TwoButton
                         leftButton={{
                             label: 'Cancel',
-                            style: { marginTop: 20, backgroundColor: ComponentColors.SECONDARY_RECT_BUTTON_COLOR },
+                            style: { marginTop: 20, backgroundColor: ComponentColors.SECONDARY_RECTANGULAR_BUTTON_COLOR },
                             icon: <Icon name='close' color={Colors.BLACK} size={24}/>,
                             onPress: () => removeContact(props.onRemoveContact, mutualContact, props.navigation),
                             fontStyle: { color: Colors.BLACK },

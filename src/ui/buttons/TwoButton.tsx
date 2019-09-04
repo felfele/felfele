@@ -8,7 +8,7 @@ import {
     ViewStyle,
     TextStyle,
 } from 'react-native';
-import { Colors } from '../../styles';
+import { Colors, ComponentColors } from '../../styles';
 import { MediumText } from '../misc/text';
 
 interface Props {
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: Colors.WHITE,
+        backgroundColor: ComponentColors.PRIMARY_RECTANGULAR_BUTTON_COLOR,
         margin: 10,
         height: 70,
         alignItems: 'center',
