@@ -1,33 +1,58 @@
 import { connect } from 'react-redux';
 
 import { AppState } from '../reducers/AppState';
-import { StateProps, PostEditor } from '../components/PostEditor';
-import { mapDispatchToProps } from '../containers/PostEditorContainer';
+import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
-import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
-import { Image } from 'react-native';
+import { TypedNavigation } from '../helpers/navigation';
+
+interface OwnProps {
+    screenProps: {
+        images: ImageData[];
+        text: string;
+        goBack: () => boolean;
+        dismiss: () => void;
+        onDoneSharing: () => void;
+    };
+    navigation: TypedNavigation;
+}
 
 const mapStateToProps = (
     state: AppState,
-    ownProps: { images: ImageData[], text: string, goBack: () => boolean, dismiss: () => void }
+    ownProps: OwnProps,
 ): StateProps => {
     const draft: Post = {
         createdAt: Date.now(),
-        images: ownProps.images,
-        text: ownProps.text,
+        images: ownProps.screenProps.images,
+        text: ownProps.screenProps.text,
     };
     return {
         name: state.author.name,
         avatar: state.author.image,
-        goBack: ownProps.goBack,
+        goBack: ownProps.screenProps.goBack,
         draft: draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        dismiss: ownProps.dismiss,
+        dismiss: ownProps.screenProps.dismiss,
    };
 };
 
+export const mapDispatchToProps = (dispatch: any, ownProps: OwnProps): DispatchProps => {
+    return {
+        onPost: (post: Post) => {
+            ownProps.navigation.navigate('ShareWithContainer', {
+                post,
+                selectedFeeds: [],
+                onDoneSharing: ownProps.screenProps.onDoneSharing,
+            });
+        },
+        onSaveDraft: (draft: Post) => {
+        },
+        onDeleteDraft: () => {
+        },
+    };
+ };
+
 export const SharePostEditorContainer = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(PostEditor);

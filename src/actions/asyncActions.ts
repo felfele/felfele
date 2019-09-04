@@ -16,11 +16,10 @@ import {
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts } from '../helpers/postHelpers';
+import { mergeUpdatedPosts, copyPostWithReferences, copyPostPrivately } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
-// @ts-ignore
-import { generateSecureRandom } from 'react-native-securerandom';
+import { generateSecureRandom } from '../helpers/secureRandom';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
 import {
@@ -35,16 +34,17 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact } from '../models/Contact';
+import { Contact, MutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
-import { PublicProfile, PrivateProfile } from '../models/Profile';
+import { PrivateProfile } from '../models/Profile';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
-import { privateSync, listTimelinePosts } from '../protocols/privateSharing';
+import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
+import { byteArrayToHex } from '../helpers/conversion';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -128,6 +128,7 @@ export const AsyncActions = {
     },
     downloadPrivatePostsFromContacts: (contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('downloadPrivatePostsFromContacts', {contactFeeds});
             const identity = getState().author.identity!;
             const profile: PrivateProfile = {
                 name: getState().author.name,
@@ -153,6 +154,8 @@ export const AsyncActions = {
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
                     const contact = contactFeed.contact;
+                    const sharedKey = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
+                    const topic = calculatePrivateTopic(sharedKey);
                     const context = await makePrivateSharingContextWithContact(
                         profile,
                         contact.identity,
@@ -169,6 +172,7 @@ export const AsyncActions = {
                                 uri: contactFeed.feedUrl,
                                 image: contact.image,
                             },
+                            topic,
                         };
                         allPosts.push(postWithAuthor);
                     }
@@ -212,6 +216,56 @@ export const AsyncActions = {
             dispatch(Actions.deletePost(post));
         };
     },
+    shareWithContact: (originalPost: Post, contact: MutualContact): Thunk => {
+        return async (dispatch, getState) => {
+            const { author } = getState();
+            const identity = author.identity!;
+            const postId = byteArrayToHex(await generateSecureRandom(32), false);
+            const sharedKey = deriveSharedKey(identity, contact.identity);
+            const topic = calculatePrivateTopic(sharedKey);
+
+            const post = originalPost._id == null || originalPost.topic != null
+                ? copyPostPrivately(originalPost, author, postId, topic)
+                : copyPostWithReferences(originalPost, author, postId, topic)
+            ;
+
+            dispatch(InternalActions.addPost(post));
+
+            const profile: PrivateProfile = {
+                name: author.name,
+                image: author.image,
+                identity,
+            };
+            const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+            const swarmApi = Swarm.makeApi({user: '', topic: ''}, signDigest, getState().settings.swarmGatewayAddress);
+            const storage = new SwarmStorage(swarmApi);
+            const crypto: Crypto = {
+                ...makeNaclEncryption(),
+                signDigest,
+                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+                random: (length: number) => generateSecureRandom(length),
+            };
+            const sharedSecret = deriveSharedKey(profile.identity, contact.identity);
+            const context: PrivateSharingContext = {
+                profile,
+                contactIdentity: contact.identity,
+                localTimeline: [],
+                remoteTimeline: [],
+                sharedSecret,
+                storage,
+                crypto,
+            };
+
+            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
+            const contextBeforePost = {
+                ...context,
+                localTimeline,
+            };
+            const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
+            Debug.log('shareWithContact', {contextWithPost, postId});
+            const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
+        };
+    },
     sharePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
             Debug.log('sharePost', 'post', post);
@@ -231,31 +285,7 @@ export const AsyncActions = {
         return async (dispatch, getState) => {
             const { metadata, author } = getState();
             const id = metadata.highestSeenPostId + 1;
-            const newPost: Post = {
-                ...post,
-                _id: id,
-                author,
-                updatedAt: Date.now(),
-                references: {
-                    parent: post.link ? post.link : '',
-                    original: post.references != null
-                        ? post.references.original
-                        : post.link != null
-                            ? post.link
-                            : ''
-                    ,
-                    originalAuthor: post.references != null
-                        ? post.references.originalAuthor
-                        : post.author != null
-                            ? post.author
-                            : {
-                                name: '',
-                                uri: '',
-                                image: {},
-                            }
-                    ,
-                },
-            };
+            const newPost = copyPostWithReferences(post, author, id, undefined);
 
             dispatch(InternalActions.addPost(newPost));
             dispatch(InternalActions.increaseHighestSeenPostId());

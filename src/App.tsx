@@ -68,6 +68,7 @@ import { ContactInfoContainer, ContactConfirmContainer } from './ui/screens/cont
 import { FELFELE_APP_NAME } from './reducers/defaultData';
 import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
 import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
+import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
 import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
 
 YellowBox.ignoreWarnings([
@@ -272,7 +273,9 @@ const Root = createBottomTabNavigator(
                     </View>
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
-                    navigation.navigate('Post', {});
+                    navigation.navigate('Post', {
+                        selectedFeeds: [],
+                    });
                 },
                 tabBarTestID: 'TabBarPostButton',
             },
@@ -369,6 +372,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     ContactSuccess: {
         screen: ContactSuccessContainer,
+    },
+    ShareWithContainer: {
+        screen: ShareWithContainer,
     },
 };
 

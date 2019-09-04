@@ -7,6 +7,7 @@ import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { emptyPostCommandLog } from '../social/api';
+import { MutualContact } from '../models/Contact';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
    return {
@@ -45,6 +46,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onAddPost: (post: Post) => {
             dispatch(AsyncActions.createPost(post));
+        },
+        onAddContact: (contact: MutualContact) => {
+            dispatch(AsyncActions.addContact(contact));
         },
    };
 };

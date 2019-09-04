@@ -4,7 +4,6 @@ import {
     TouchableOpacity,
     Platform,
     Alert,
-    AlertIOS,
     KeyboardAvoidingView,
     StyleSheet,
     ActivityIndicator,
@@ -31,6 +30,8 @@ import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
 import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
+import { TypedNavigation } from '../helpers/navigation';
+import { NavigationEvents } from 'react-navigation';
 
 export interface StateProps {
     goBack: () => boolean;
@@ -51,7 +52,6 @@ type Props = StateProps & DispatchProps;
 
 interface State {
     post: Post;
-    isSending: boolean;
 }
 
 export class PostEditor extends React.Component<Props, State> {
@@ -63,24 +63,23 @@ export class PostEditor extends React.Component<Props, State> {
         super(props);
         this.state = {
             post: this.getPostFromDraft(this.props.draft),
-            isSending: false,
         };
         this.modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
     }
 
     public render() {
         const isPostEmpty = this.isPostEmpty();
-        const isSendEnabled = !isPostEmpty && !this.state.isSending;
+        const isSendEnabled = !isPostEmpty;
         const sendIconColor = isSendEnabled ? ComponentColors.NAVIGATION_BUTTON_COLOR : ComponentColors.HEADER_COLOR;
-        const sendIcon = this.state.isSending
-            ? <ActivityIndicator size='small' color={ComponentColors.NAVIGATION_BUTTON_COLOR} />
-            : <Icon name='send' size={20} color={sendIconColor} />
-        ;
+        const sendIcon = <Icon name='send' size={20} color={sendIconColor} />;
         const sendButtonOnPress = isSendEnabled ? this.onPressSubmit : () => {};
         const windowWidth = Dimensions.get('window').width;
 
         return (
             <FragmentSafeAreaViewWithoutTabBar>
+                <NavigationEvents
+                    onWillFocus={this.onWilFocus}
+                />
                 <NavigationHeader
                     leftButton={{
                         onPress: this.onCancelConfirmation,
@@ -210,20 +209,11 @@ export class PostEditor extends React.Component<Props, State> {
             { text: 'Cancel', onPress: () => this.focusTextInput(), style: 'cancel' },
         ];
 
-        if (Platform.OS === 'ios') {
-            AlertIOS.alert(
-                'Save this post as a draft?',
-                undefined,
-                options,
-            );
-        }
-        else {
-            Alert.alert('Save this post as a draft?',
-                undefined,
-                options,
-                { cancelable: true },
-            );
-        }
+        Alert.alert('Save this post as a draft?',
+            undefined,
+            options,
+            { cancelable: true },
+        );
     }
 
     private waitUntilKeyboardDisappears = async () => {
@@ -278,9 +268,12 @@ export class PostEditor extends React.Component<Props, State> {
         }
     }
 
+    private onWilFocus = () => {
+        this.focusTextInput();
+    }
+
     private onPressSubmit = async () => {
         await this.sendUpdate();
-        this.props.goBack();
     }
 
     private createPostFromState = async (): Promise<Post> => {
@@ -309,9 +302,6 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private sendUpdate = async () => {
-        this.setState({
-            isSending: true,
-        });
         const post = await this.createPostFromState();
         this.props.onPost(post);
     }
@@ -328,7 +318,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'camera'}
                     size={24}
-                    color={ComponentColors.BUTTON_COLOR}
+                    color={Colors.BLACK}
                 />
             </TouchableOpacity>
             <TouchableOpacity
@@ -338,7 +328,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
                 <Icon
                     name={'image-multiple'}
                     size={24}
-                    color={ComponentColors.BUTTON_COLOR}
+                    color={Colors.BLACK}
                 />
             </TouchableOpacity>
         </View>
@@ -353,7 +343,7 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 18,
         margin: 10,
         textAlignVertical: 'top',
     },

@@ -56,7 +56,7 @@ export interface PrivateSharingContext {
 export const calculatePrivateTopic = (sharedKey: HexString): HexString => {
     const sharedKeyBytes = hexToUint8Array(sharedKey);
     const topicBytes = cryptoHash(sharedKeyBytes);
-    return byteArrayToHex(topicBytes);
+    return byteArrayToHex(topicBytes, false);
 };
 
 export const uploadLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {

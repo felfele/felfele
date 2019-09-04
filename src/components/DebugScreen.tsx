@@ -16,10 +16,15 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
-
-import debugIdentities from '../../debugIdentities.json';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
+
+import debugIdentities from '../../testdata/debugIdentities.json';
+import contactIdentity1 from '../../testdata/contactIdentity1.json';
+import contactIdentity2 from '../../testdata/contactIdentity2.json';
+import contactIdentity3 from '../../testdata/contactIdentity3.json';
+import contactIdentity4 from '../../testdata/contactIdentity4.json';
+import { MutualContact } from '../models/Contact';
 
 export interface StateProps {
     appState: AppState;
@@ -35,6 +40,7 @@ export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRefreshFeeds: (feeds: Feed[]) => void;
     onAddPost: (post: Post) => void;
+    onAddContact: (contact: MutualContact) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -82,7 +88,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
@@ -90,7 +96,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete feeds'
                     onPress={async () => await onDeleteFeeds(props)}
@@ -98,7 +104,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete all posts'
                     onPress={async () => await onDeletePosts(props)}
@@ -106,15 +112,15 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='account-multiple' />
                     }
-                    title='Follow debug feeds'
-                    onPress={async () => await onLoadFeeds(props)}
+                    title='Setup debug contacts'
+                    onPress={async () => await onSetupContacts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='file-document-box-multiple-outline' />
                     }
                     title='Generate 100 posts'
                     onPress={async () => await onGeneratePosts(props)}
@@ -249,7 +255,14 @@ const onLogAppStateVersion = async () => {
     Debug.log('onLogAppStateVersion', appState._persist);
 };
 
-const onLoadFeeds = async (props: Props) => {
+const onSetupContacts = async (props: Props) => {
+    const contactIdentities = [
+            contactIdentity1,
+            contactIdentity2,
+            contactIdentity3,
+            contactIdentity4,
+        ]
+    ;
     const feeds = debugIdentities.map((identity, index) => {
         const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
         const feed: Feed = {
@@ -262,7 +275,19 @@ const onLoadFeeds = async (props: Props) => {
         return feed;
     });
     props.onRefreshFeeds(feeds);
-    Debug.log('onLoadFeeds', 'finished');
+
+    contactIdentities.map((identity, index) => {
+        const contact: MutualContact = {
+            type: 'mutual-contact',
+            name: `Contact${index + 1}`,
+            identity,
+            image: {},
+            confirmed: true,
+        };
+        props.onAddContact(contact);
+    });
+
+    Debug.log('onSetupContacts', 'finished');
 };
 
 const onGeneratePosts = async (props: Props) => {

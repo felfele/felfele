@@ -37,6 +37,7 @@ export const YourFeedView = (props: Props) => {
                                 onSaveDraft={props.onSaveDraft}
                                 profileImage={props.profileImage}
                                 gatewayAddress={props.gatewayAddress}
+                                selectedFeeds={[]}
                             />,
             }}
         </RefreshableFeed>

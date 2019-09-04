@@ -14,6 +14,7 @@ import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
 import { ModelHelper } from '../../models/ModelHelper';
 import { ImageData, BundledImage } from '../../models/ImageData';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     title: string;
@@ -23,6 +24,7 @@ interface Props {
     defaultImage?: BundledImage;
     size: number;
     modelHelper: ModelHelper;
+    isSelected: boolean;
 }
 
 export const GRID_SPACING = 10;
@@ -54,6 +56,11 @@ export const GridCard = React.memo((props: Props) => (
                 {props.title}
             </MediumText>
         </View>
+        {props.isSelected &&
+            <View style={styles.feedCardOverlay}>
+                <Icon name='check' color={Colors.WHITE} size={48} />
+            </View>
+        }
     </TouchableView>
 ));
 
@@ -66,6 +73,22 @@ const styles = StyleSheet.create({
     },
     feedCard: {
         backgroundColor: Colors.WHITE,
+    },
+    feedCardOverlay: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 100,
+        backgroundColor: 'rgba(98, 0, 234, 0.5)',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    feedCardOverlayText: {
+        color: Colors.WHITE,
+        fontSize: 14,
     },
     feedCardText: {
         color: Colors.DARK_GRAY,

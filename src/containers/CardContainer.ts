@@ -6,9 +6,10 @@ import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/asyncActions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
+import { getAllFeeds, getContactFeeds, getMutualContacts } from '../selectors/selectors';
 import { ContactFeed } from '../models/ContactFeed';
 import { isChildrenPostUploading } from '../helpers/postHelpers';
+import { Debug } from '../Debug';
 
 interface OwnProps {
     isSelected: boolean;
@@ -90,13 +91,18 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     };
 };
 
-const mapDispatchToProps = (dispatch: any): DispatchProps => {
+const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onDeletePost: (post: Post) => {
             dispatch(AsyncActions.removePost(post));
         },
         onSharePost: (post: Post) => {
-            dispatch(AsyncActions.sharePost(post));
+            // dispatch(AsyncActions.sharePost(post));
+            Debug.log('onSharePost', post);
+            ownProps.navigation.navigate('ShareWithContainer', {
+                post,
+                selectedFeeds: [],
+            });
         },
         onDownloadFeedPosts: (feed: Feed) => {
             dispatch(AsyncActions.downloadPostsFromFeeds([feed]));

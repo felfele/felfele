@@ -6,6 +6,7 @@ import { MutualContact, Contact } from '../models/Contact';
 import { makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 import { LocalFeed } from '../social/api';
+import { HexString } from '../helpers/opaqueTypes';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -23,7 +24,9 @@ const isPostFromFavoriteFeed = (post: Post, favoriteFeeds: Feed[]): boolean => {
 
 const isPostFromPrivateChannelFeed = (post: Post, privateChannelFeeds: Feed[]): boolean => {
     return privateChannelFeeds.find(feed => {
-        return post.author != null && feed.feedUrl === post.author.uri;
+        return post.author != null
+        && post.topic != null
+        && feed.feedUrl === post.author.uri;
     }) != null;
 };
 
@@ -42,9 +45,29 @@ const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
         });
 };
 
+const getSelectedTopicPosts = (state: AppState, topic: HexString) => {
+    return state.rssPosts
+        .filter(post => {
+            return post != null && post.author != null && post.topic === topic;
+        })
+        .concat(
+            state.localPosts.filter(post => post.topic === topic)
+        )
+        .sort(postTimeCompare)
+    ;
+};
+
+const isMutualContact = (contact: Contact): contact is MutualContact => {
+    return contact.type === 'mutual-contact';
+};
+
 const isConfirmedContact = (contact: Contact): contact is MutualContact => {
     return contact.type === 'mutual-contact' && contact.confirmed;
 };
+
+export const getMutualContacts = createSelector([ getContacts ], (contacts) => {
+    return contacts.filter(isMutualContact);
+});
 
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
     const mutualContacts = contacts.filter(isConfirmedContact);
@@ -102,6 +125,10 @@ export const getPrivateChannelFeedsPosts = createSelector([ getRssPosts, getPriv
 });
 
 export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {
+    return posts;
+});
+
+export const getPrivateChannelPosts = createSelector([ getSelectedTopicPosts ], (posts) => {
     return posts;
 });
 

@@ -24,6 +24,7 @@ export interface StateProps {
     sections: FeedSection[];
     gatewayAddress: string;
     headerComponent?: React.ComponentType<any> | React.ReactElement<any> | null;
+    isSelected?: (contactFeed: ContactFeed) => boolean;
 }
 
 const calculateGridImageStyle = (itemDimension: number) => {
@@ -36,7 +37,7 @@ const calculateGridImageStyle = (itemDimension: number) => {
         width,
         height,
         borderRadius,
-        backgroundColor: Colors.VERY_LIGHT_GRAY,
+        backgroundColor: Colors.LIGHTER_GRAY,
     };
 };
 
@@ -66,6 +67,10 @@ export class ContactGrid extends React.PureComponent<DispatchProps & StateProps 
                                 size={itemDimension}
                                 defaultImage={defaultImages.defaultUser}
                                 modelHelper={modelHelper}
+                                isSelected={this.props.isSelected
+                                    ? this.props.isSelected(item)
+                                    : false
+                                }
                             />
                         );
                     }}

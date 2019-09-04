@@ -61,6 +61,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 size={itemDimension}
                                 defaultImage={defaultImages.defaultUser}
                                 modelHelper={modelHelper}
+                                isSelected={false}
                             />
                         );
                     }}

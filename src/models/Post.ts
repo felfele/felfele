@@ -1,6 +1,7 @@
 import { Model } from './Model';
 import { ImageData } from './ImageData';
 import { Author } from './Author';
+import { HexString } from '../helpers/opaqueTypes';
 
 interface Location {
     latitude: number;
@@ -30,4 +31,5 @@ export interface Post extends PublicPost {
     updatedAt?: number;
     liked?: boolean;
     isUploading?: boolean;
+    topic?: HexString;
 }
