@@ -34,14 +34,12 @@ import { LocalFeed } from '../social/api';
 import { showShareFeedDialog, showShareContactDialog } from '../helpers/shareDialogs';
 import { TwoButton } from '../ui/buttons/TwoButton';
 import { ImageDataView } from '../components/ImageDataView';
-import { InvitedContact, Contact } from '../models/Contact';
+import { InvitedContact, Contact, MutualContact } from '../models/Contact';
 import { Debug } from '../Debug';
 import { TouchableView } from './TouchableView';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import { advanceContactState } from '../helpers/contactHelpers';
 import { SECOND } from '../DateUtils';
-import * as Swarm from '../swarm/Swarm';
-import { fetchRecentPostFeed } from '../helpers/feedHelpers';
 import { getInviteLink, getFollowLink } from '../helpers/deepLinking';
 import { PublicProfile } from '../models/Profile';
 
@@ -54,6 +52,7 @@ export interface DispatchProps {
     onChangeQRCode: () => void;
     onAddFeed: (feed: Feed) => void;
     onContactStateChange: (contact: InvitedContact, updatedContact: Contact) => void;
+    onReachingMutualContactState: (contact: MutualContact) => void;
 }
 
 export interface StateProps {
@@ -94,6 +93,7 @@ interface ContactStateChangeListenerProps {
     navigation: TypedNavigation;
 
     onContactStateChanged: (invitedContact: InvitedContact, updatedContact: Contact) => void;
+    onReachingMutualContactState: (contact: MutualContact) => void;
     onAddFeed: (feed: Feed) => void;
 }
 
@@ -125,14 +125,11 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
         Debug.log('ContactStateChangeListener.componentDidMount', contact);
         this.props.onContactStateChanged(this.props.contact, contact);
         if (contact.type === 'mutual-contact') {
-            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
-            const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
-            if (feed != null && feed.feedUrl !== '') {
-                this.props.navigation.navigate('ContactView', {
-                    publicKey: contact.identity.publicKey,
-                    feed,
-                });
-            }
+            this.props.onReachingMutualContactState(contact);
+            this.props.navigation.navigate('ContactSuccess', {
+                contact,
+                isReceiver: false,
+            });
         }
     }
 }
@@ -159,6 +156,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     profile={props.profile}
                     swarmGateway={props.gatewayAddress}
                     onContactStateChanged={props.onContactStateChange}
+                    onReachingMutualContactState={props.onReachingMutualContactState}
                     onAddFeed={props.onAddFeed}
                     navigation={props.navigation}
                 />
