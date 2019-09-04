@@ -14,7 +14,6 @@ import {
     View,
     AppState,
     AppStateStatus,
-    Image,
 } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -65,11 +64,12 @@ import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
-import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
+import { ContactInfoContainer, ContactConfirmContainer } from './ui/screens/contact/ContactInfoContainer';
 import { FELFELE_APP_NAME } from './reducers/defaultData';
 import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
 import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
 import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
+import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -99,6 +99,7 @@ const privateChannelTabScenes: NavigationRouteConfigMap = {
         screen: ContactInfoContainer,
     },
 };
+
 const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
     {
         mode: 'card',
@@ -366,8 +367,11 @@ const Scenes: NavigationRouteConfigMap = {
     ContactView: {
         screen: ContactViewContainer,
     },
-    ContactInfo: {
-        screen: ContactInfoContainer,
+    ContactConfirm: {
+        screen: ContactConfirmContainer,
+    },
+    ContactSuccess: {
+        screen: ContactSuccessContainer,
     },
     ShareWithContainer: {
         screen: ShareWithContainer,

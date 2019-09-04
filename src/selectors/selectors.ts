@@ -61,12 +61,16 @@ const isMutualContact = (contact: Contact): contact is MutualContact => {
     return contact.type === 'mutual-contact';
 };
 
+const isConfirmedContact = (contact: Contact): contact is MutualContact => {
+    return contact.type === 'mutual-contact' && contact.confirmed;
+};
+
 export const getMutualContacts = createSelector([ getContacts ], (contacts) => {
     return contacts.filter(isMutualContact);
 });
 
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
-    const mutualContacts = contacts.filter(isMutualContact);
+    const mutualContacts = contacts.filter(isConfirmedContact);
     return mutualContacts.map(makeContactFeedFromMutualContact);
 });
 
@@ -91,7 +95,7 @@ export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFee
 });
 
 export const getPrivateChannelFeeds = createSelector([ getContacts ], (contacts) => {
-    const mutualContacts = contacts.filter(isMutualContact);
+    const mutualContacts = contacts.filter(isConfirmedContact);
     return mutualContacts.map(makeContactFeedFromMutualContact);
 });
 

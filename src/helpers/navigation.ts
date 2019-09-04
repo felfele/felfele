@@ -2,8 +2,10 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed } from '../social/api';
-import { ContactFeed } from '../models/ContactFeed';
 import { Post } from '../models/Post';
+import { MutualContact } from '../models/Contact';
+import { ContactFeed } from '../models/ContactFeed';
+import { NavigationNavigateAction } from 'react-navigation';
 
 export interface Routes {
     App: {};
@@ -91,11 +93,19 @@ export interface Routes {
         post: Post;
         selectedFeeds: Feed[];
     };
+    ContactConfirm: {
+        publicKey: string;
+    };
+    ContactSuccess: {
+        contact: MutualContact;
+        isReceiver: boolean;
+    };
 }
 
 export interface TypedNavigation {
     goBack: <K extends keyof Routes>(routeKey?: K | null) => boolean;
     navigate: <K extends keyof Routes>(routeKey: K, params: Routes[K]) => boolean;
+    replace: <K extends keyof Routes>(routeKey: K, params: Routes[K], action?: NavigationNavigateAction) => boolean;
     pop: (n?: number, params?: { immediate?: boolean }) => boolean;
     popToTop: () => void;
     getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => Routes[K][P];

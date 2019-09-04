@@ -192,7 +192,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     }
 
     private async handleLink(link: string) {
-        Debug.log('FeedInfo.processLink', 'this.state', this.state);
+        Debug.log('FeedInfo.processLink', 'this.state', this.state, 'link', link);
         if (this.state.loading === true) {
             return;
         }
@@ -257,10 +257,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
             const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
             if (feed != null && feed.feedUrl !== '') {
-                this.props.navigation.navigate('ContactView', {
-                    publicKey: contact.identity.publicKey,
-                    feed,
-                });
+                this.props.navigation.replace('ContactConfirm', { publicKey: contact.identity.publicKey });
             }
         } else {
             this.onFailedFeedLoad();
@@ -316,14 +313,10 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
     private onScanSuccess = async (data: any) => {
         try {
             Debug.log('FeedInfo.onScanSuccess', 'data', data);
-            const inviteLink = getInviteCodeFromInviteLink(data);
-            const feedUrl = inviteLink != null
-                ? inviteLink
-                : data;
             this.setState({
-                url: feedUrl,
+                url: data,
             });
-            await this.handleLink(feedUrl);
+            await this.handleLink(data);
         } catch (e) {
             Debug.log(e);
         }

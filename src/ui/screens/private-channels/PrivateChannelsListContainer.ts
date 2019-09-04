@@ -9,11 +9,15 @@ import { ContactFeed } from '../../../models/ContactFeed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     const contactFeeds = ownProps.navigation.getParam<'PrivateChannelListContainer', 'contactFeeds'>('contactFeeds');
+    const sortedContactFeeds = sortFeedsByName(contactFeeds);
 
-    const sections: FeedSection[] = [{
-        title: 'Private channels',
-        data: sortFeedsByName(contactFeeds),
-    }];
+    const sections: FeedSection[] = sortedContactFeeds.length === 0
+        ? []
+        : [{
+            title: 'Private channels',
+            data: sortedContactFeeds,
+        }]
+    ;
 
     return {
         sections,

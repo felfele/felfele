@@ -1,30 +1,20 @@
 import * as React from 'react';
 import {
-    GestureResponderEvent,
     TouchableWithoutFeedback,
     StyleSheet,
     View,
-    Text,
-    StyleProp,
-    ViewStyle,
 } from 'react-native';
 import { Colors } from '../../styles';
 import { MediumText } from '../misc/text';
+import { ButtonProps } from './TwoButton';
 
-export interface Props {
-    label?: string;
-    icon?: React.ReactNode;
-    onPress?: (event?: GestureResponderEvent) => void;
-    style?: StyleProp<ViewStyle>;
-}
-
-export const WideButton = (props: Props) => {
+export const WideButton = (props: ButtonProps) => {
     return (
         <TouchableWithoutFeedback onPress={props.onPress}>
             <View style={[styles.mainContainer, props.style]}>
                 <View style={styles.container}>
                     <View style={styles.icon}>{props.icon}</View>
-                    <MediumText style={styles.label}>{props.label}</MediumText>
+                    <MediumText style={[styles.label, props.fontStyle]}>{props.label}</MediumText>
                 </View>
             </View>
         </TouchableWithoutFeedback>

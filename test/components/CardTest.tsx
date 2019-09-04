@@ -16,6 +16,7 @@ jest.mock('../../src/ui/misc/Carousel');
 const mockNavigation: TypedNavigation = {
     goBack: (routeKey?: string | null) => true,
     navigate: (routeKey: any, params: any) => true,
+    replace: (routeKey: any, params: any, actions?: any) => true,
     pop: (n?: number, params?: { immediate?: boolean }) => true,
     popToTop: () => {},
     getParam: (param: any) => param.name,
