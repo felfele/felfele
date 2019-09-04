@@ -21,8 +21,6 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     ;
     const contactFeedsWithoutPostAuthor = mutualContactFeeds.filter(feed => feed.feedUrl !== postAuthorUri);
 
-    Debug.log('ShareWithContainer.mapStateToProps', {post, mutualContactFeeds, selectedFeeds, contactFeedsWithoutPostAuthor});
-
     const sections: FeedSection[] = [{
         data: sortFeedsByName(contactFeedsWithoutPostAuthor),
     }];

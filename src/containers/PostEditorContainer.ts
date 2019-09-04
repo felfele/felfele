@@ -24,8 +24,6 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
    return {
        onPost: (post: Post) => {
             const selectedFeeds = ownProps.navigation.getParam<'Post', 'selectedFeeds'>('selectedFeeds');
-            Debug.log('PostEditorContainer.mapDispatchToProps', {selectedFeeds});
-            // dispatch(AsyncActions.createPost(post));
             ownProps.navigation.navigate('ShareWithContainer', {
                 post,
                 selectedFeeds,
