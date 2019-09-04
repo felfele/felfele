@@ -1,7 +1,11 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 source="src/cli.ts"
 target="build/dist/src/cli/cli.js"
 
-npm run --silent tsc
+if [ "$1" = "--no-recompile" ]; then
+    shift
+else
+    npm run --silent tsc
+fi
 node "$target" "$@"

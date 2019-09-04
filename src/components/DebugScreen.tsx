@@ -16,10 +16,14 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
-
-import debugIdentities from '../../debugIdentities.json';
 import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
+
+import debugIdentities from '../../testdata/debugIdentities.json';
+import contactIdentity1 from '../../testdata/contactIdentity1.json';
+import contactIdentity2 from '../../testdata/contactIdentity2.json';
+import contactIdentity3 from '../../testdata/contactIdentity3.json';
+import contactIdentity4 from '../../testdata/contactIdentity4.json';
 
 export interface StateProps {
     appState: AppState;
@@ -109,7 +113,7 @@ export const DebugScreen = (props: Props) => (
                         <MaterialCommunityIcon name='account-multiple' />
                     }
                     title='Setup debug contacts'
-                    onPress={async () => await onLoadFeeds(props)}
+                    onPress={async () => await onSetupContacts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -249,8 +253,16 @@ const onLogAppStateVersion = async () => {
     Debug.log('onLogAppStateVersion', appState._persist);
 };
 
-const onLoadFeeds = async (props: Props) => {
-    const feeds = debugIdentities.map((identity, index) => {
+const onSetupContacts = async (props: Props) => {
+    const identities = [
+            contactIdentity1,
+            contactIdentity2,
+            contactIdentity3,
+            contactIdentity4,
+        ]
+        .concat(debugIdentities)
+    ;
+    const feeds = identities.map((identity, index) => {
         const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
         const feed: Feed = {
             name: `Feed ${index}`,
@@ -262,7 +274,7 @@ const onLoadFeeds = async (props: Props) => {
         return feed;
     });
     props.onRefreshFeeds(feeds);
-    Debug.log('onLoadFeeds', 'finished');
+    Debug.log('onSetupContacts', 'finished');
 };
 
 const onGeneratePosts = async (props: Props) => {

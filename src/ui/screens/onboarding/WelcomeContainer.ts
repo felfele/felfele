@@ -9,7 +9,7 @@ import { AsyncActions } from '../../../actions/asyncActions';
 import { Actions } from '../../../actions/Actions';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
-import testIdentity from '../../../../testIdentity.json';
+import testIdentity from '../../../../testdata/testIdentity.json';
 import { PrivateIdentity } from '../../../models/Identity';
 import * as Swarm from '../../../swarm/Swarm';
 

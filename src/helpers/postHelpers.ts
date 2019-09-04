@@ -108,6 +108,8 @@ export const copyPostPrivately = (post: Post, author: Author, id: number | strin
         _id: id,
         author,
         topic,
+        createdAt: Date.now(),
+        updatedAt: undefined,
         references: undefined,
     };
 };
