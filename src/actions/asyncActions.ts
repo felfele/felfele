@@ -309,7 +309,7 @@ export const AsyncActions = {
                     commands: [],
                 },
                 isSyncing: false,
-                autoShare: true,
+                autoShare: false,
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
             dispatch(AsyncActions.syncLocalFeed(ownFeed));
