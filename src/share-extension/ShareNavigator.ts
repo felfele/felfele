@@ -6,7 +6,7 @@ export const ShareNavigator = createStackNavigator({
     SharePostEditorContainer: SharePostEditorContainer,
     ShareWithContainer: ShareWithContainer,
 }, {
-    initialRouteName: 'Post',
+    initialRouteName: 'SharePostEditorContainer',
     navigationOptions: {
         header: null,
     },
