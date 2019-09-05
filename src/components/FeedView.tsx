@@ -12,6 +12,7 @@ import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
 import { isFelfeleResource } from '../helpers/urlUtils';
+import { WideButton } from '../ui/buttons/WideButton';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -59,6 +60,15 @@ export const FeedView = (props: Props) => {
         ...props,
         feeds: [props.feed],
     };
+    const listHeader = props.feed.isLocalFeed || isOnboardingFeed
+        ? undefined
+        : props.feed.followed !== true
+            ? <WideButton
+                label='Follow this channel'
+                icon={icon('link', ComponentColors.BUTTON_COLOR)}
+            />
+            : undefined
+    ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...refreshableFeedProps}>
             {{
@@ -71,6 +81,7 @@ export const FeedView = (props: Props) => {
                     rightButton1={rightButton1}
                     title={props.feed.name}
                 />,
+                listHeader,
             }}
         </RefreshableFeed>
     );
