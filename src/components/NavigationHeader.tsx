@@ -75,13 +75,11 @@ export const NavigationHeader = (props: Props) => (
                     testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
                 />}
             {props.rightButton2 &&
-                <View style={{paddingRight: 10}}>
-                    <RightButton
-                        onPress={props.rightButton2.onPress}
-                        label={props.rightButton2.label}
-                        testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
-                    />
-                </View>
+                <RightButton
+                    onPress={props.rightButton2.onPress}
+                    label={props.rightButton2.label}
+                    testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
+                />
             }
         </View>
     </View>
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        paddingRight: 10,
     },
     titleText: {
         fontSize: 15,
