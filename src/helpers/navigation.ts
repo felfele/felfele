@@ -21,7 +21,7 @@ export interface Routes {
     PostTab: {};
     PrivateChannelTab: {};
     SettingsTab: {};
-    AllFeedTab: {};
+    PublicChannelTab: {};
     BugReportView: {};
     SwarmSettingsContainer: {};
     FilterListEditorContainer: {};

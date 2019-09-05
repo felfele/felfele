@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { RefreshableFeed } from './RefreshableFeed';
-import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
-import { NavigationHeader } from './NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ComponentColors } from '../styles';
-import { ImageData } from '../models/ImageData';
-import { FeedHeader } from './FeedHeader';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import SplashScreen from 'react-native-splash-screen';
-import { TypedNavigation } from '../helpers/navigation';
+
+import { RefreshableFeed } from '../../../components/RefreshableFeed';
+import { Feed } from '../../../models/Feed';
+import { Post } from '../../../models/Post';
+import { NavigationHeader } from '../../../components/NavigationHeader';
+import { ComponentColors } from '../../../styles';
+import { ImageData } from '../../../models/ImageData';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
+import { TypedNavigation } from '../../../helpers/navigation';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -26,7 +26,7 @@ export interface StateProps {
 
 type Props = StateProps & DispatchProps;
 
-export class AllFeedScreen extends React.Component<Props> {
+export class PublicChannelsScreen extends React.Component<Props> {
     private ref?: RefreshableFeed = undefined;
     public render() {
         const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
@@ -38,7 +38,7 @@ export class AllFeedScreen extends React.Component<Props> {
                 {{
                     navigationHeader:
                         <NavigationHeader
-                            title='Home'
+                            title='Public channels'
                             leftButton={{
                                 onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
                                     showExplore: true,
@@ -59,20 +59,13 @@ export class AllFeedScreen extends React.Component<Props> {
                                      },
                                 }),
                                 label: <Icon
-                                    name='account-plus'
+                                    name='plus-box'
                                     size={24}
                                     color={ComponentColors.NAVIGATION_BUTTON_COLOR}
                                 />,
                             }}
                             onPressTitle={this.ref && this.ref.scrollToTop}
                         />,
-                    listHeader: <FeedHeader
-                                    navigation={this.props.navigation}
-                                    onSaveDraft={this.props.onSaveDraft}
-                                    profileImage={this.props.profileImage}
-                                    gatewayAddress={this.props.gatewayAddress}
-                                    selectedFeeds={[]}
-                                />,
                 }}
             </RefreshableFeed>
         );
