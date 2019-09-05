@@ -40,7 +40,7 @@ export class PublicChannelsScreen extends React.Component<Props> {
                         <NavigationHeader
                             title='Public channels'
                             leftButton={{
-                                onPress: () => this.props.navigation.navigate('FeedListViewerContainer', {
+                                onPress: () => this.props.navigation.navigate('PublicChannelsListContainer', {
                                     showExplore: true,
                                 }),
                                 label: <Icon

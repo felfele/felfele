@@ -30,7 +30,7 @@ export interface Routes {
     BackupRestore: {};
     LogViewer: {};
     Debug: {};
-    FeedListViewerContainer: {
+    PublicChannelsListContainer: {
         showExplore: boolean,
         feeds?: Feed[],
     };

@@ -41,7 +41,6 @@ import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
-import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportViewWithTabBar } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
@@ -71,6 +70,7 @@ import { PrivateChannelListContainer} from './ui/screens/private-channels/Privat
 import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
 import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
 import { PublicChannelsContainer } from './ui/screens/public-channels/PublicChannelsContainer';
+import { PublicChannelsListContainer } from './ui/screens/public-channels/PublicChannelsListContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -148,8 +148,8 @@ const publicChannelTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
-    FeedListViewerContainer: {
-        screen: FeedListViewerContainer,
+    PublicChannelsListContainer: {
+        screen: PublicChannelsListContainer,
     },
     CategoriesContainer: {
         screen: CategoriesContainer,

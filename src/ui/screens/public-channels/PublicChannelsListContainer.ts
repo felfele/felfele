@@ -1,13 +1,13 @@
 import { connect } from 'react-redux';
 
-import { AppState } from '../reducers/AppState';
-import { StateProps, DispatchProps, FeedListEditor, FeedSection } from '../components/FeedListEditor';
-import { Feed } from '../models/Feed';
-import { getFollowedFeeds, getKnownFeeds, getContactFeeds } from '../selectors/selectors';
-import { TypedNavigation } from '../helpers/navigation';
-import { sortFeedsByName } from '../helpers/feedHelpers';
-import { Debug } from '../Debug';
-import { ContactFeed } from '../models/ContactFeed';
+import { AppState } from '../../../reducers/AppState';
+import { StateProps, DispatchProps, PublicChannelsListView, FeedSection } from './PublicChannelsListView';
+import { Feed } from '../../../models/Feed';
+import { getFollowedFeeds, getKnownFeeds, getContactFeeds } from '../../../selectors/selectors';
+import { TypedNavigation } from '../../../helpers/navigation';
+import { sortFeedsByName } from '../../../helpers/feedHelpers';
+import { Debug } from '../../../Debug';
+import { ContactFeed } from '../../../models/ContactFeed';
 
 const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
     if (feeds.length > 0) {
@@ -20,8 +20,8 @@ const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
 };
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
-    const navParamFeeds = ownProps.navigation.getParam<'FeedListViewerContainer', 'feeds'>('feeds');
-    const navParamShowExplore = ownProps.navigation.getParam<'FeedListViewerContainer', 'showExplore'>('showExplore');
+    const navParamFeeds = ownProps.navigation.getParam<'PublicChannelsListContainer', 'feeds'>('feeds');
+    const navParamShowExplore = ownProps.navigation.getParam<'PublicChannelsListContainer', 'showExplore'>('showExplore');
     const ownFeeds = navParamFeeds
         ? []
         : state.ownFeeds
@@ -34,16 +34,9 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         ? []
         : getKnownFeeds(state)
     );
-    const contactFeeds = sortFeedsByName(navParamFeeds
-        ? []
-        : getContactFeeds(state)
-    );
-
-    Debug.log('FeedListViewerContainer.mapStateToProps', contactFeeds);
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
-        addSection('Your contacts', contactFeeds),
-        addSection('Channels you follow', followedFeeds),
+        addSection('Public channels you follow', followedFeeds),
         addSection('Your channels', ownFeeds),
         addSection('Other channels', knownFeeds),
     );
@@ -52,7 +45,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'All channels',
+        title: 'All public channels',
         showExplore: navParamShowExplore,
     };
 };
@@ -77,4 +70,4 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
     };
 };
 
-export const FeedListViewerContainer = connect(mapStateToProps, mapDispatchToProps)(FeedListEditor);
+export const PublicChannelsListContainer = connect(mapStateToProps, mapDispatchToProps)(PublicChannelsListView);
