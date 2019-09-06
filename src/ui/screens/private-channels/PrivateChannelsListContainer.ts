@@ -16,6 +16,9 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         : [{
             title: 'Private channels',
             data: sortedContactFeeds,
+        }, {
+            title: 'Your own channel',
+            data: state.ownFeeds,
         }]
     ;
 
@@ -33,6 +36,11 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
                 ownProps.navigation.navigate('ContactView', {
                     publicKey: feed.contact!.identity.publicKey,
                     feed,
+                });
+            } else {
+                ownProps.navigation.navigate('Feed', {
+                    feedUrl: feed.feedUrl,
+                    name: feed.name,
                 });
             }
         },

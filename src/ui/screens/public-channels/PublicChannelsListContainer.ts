@@ -22,10 +22,6 @@ const addSection = (title: string, feeds: Feed[]): FeedSection[] => {
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
     const navParamFeeds = ownProps.navigation.getParam<'PublicChannelsListContainer', 'feeds'>('feeds');
     const navParamShowExplore = ownProps.navigation.getParam<'PublicChannelsListContainer', 'showExplore'>('showExplore');
-    const ownFeeds = navParamFeeds
-        ? []
-        : state.ownFeeds
-    ;
     const followedFeeds = sortFeedsByName(navParamFeeds
         ? navParamFeeds
         : getFollowedFeeds(state)
@@ -37,7 +33,6 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
     const sections: FeedSection[] = ([] as FeedSection[]).concat(
         addSection('Public channels you follow', followedFeeds),
-        addSection('Your channels', ownFeeds),
         addSection('Other channels', knownFeeds),
     );
 

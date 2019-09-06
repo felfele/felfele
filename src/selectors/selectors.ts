@@ -113,7 +113,7 @@ const postTimeCompare = (a: Post, b: Post): number => {
 };
 
 export const getAllPostsSorted = createSelector([ getFollowedNewsPosts, getLocalPosts ], (followedNewsPosts, ownPosts) => {
-    return followedNewsPosts.concat(ownPosts).sort(postTimeCompare);
+    return followedNewsPosts.sort(postTimeCompare);
 });
 
 export const getFavoriteFeedsPosts = createSelector([ getRssPosts, getFavoriteFeeds ], (rssPosts, favoriteFeeds) => {
