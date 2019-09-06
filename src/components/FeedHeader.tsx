@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     },
     cameraIconContainer: {
         paddingHorizontal: 10,
+        paddingRight: 15,
     },
     headerTextContainer: {
         flex: 1,
