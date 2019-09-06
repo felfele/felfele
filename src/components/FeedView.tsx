@@ -66,6 +66,7 @@ export const FeedView = (props: Props) => {
             ? <WideButton
                 label='Follow this channel'
                 icon={icon('link', ComponentColors.BUTTON_COLOR)}
+                onPress={() => props.onFollowFeed(props.feed)}
             />
             : undefined
     ;
