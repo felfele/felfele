@@ -23,7 +23,7 @@ import { TouchableView } from '../../../components/TouchableView';
 
 export interface DispatchProps {
     onDoneSharing: () => void;
-    onShareWithContact: (post: Post, feed: Feed) => void;
+    onShareWithContacts: (post: Post, feed: Feed[]) => void;
 }
 
 export interface FeedSection {
@@ -152,7 +152,7 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
         await this.setState({
             isSending: true,
         });
-        this.state.selectedFeeds.map(feed => this.props.onShareWithContact(this.props.post, feed));
+        this.props.onShareWithContacts(this.props.post, this.state.selectedFeeds);
         this.props.onDoneSharing();
     }
 }

@@ -13,6 +13,7 @@ import {
 } from '../social/api';
 import { PrivateIdentity } from '../models/Identity';
 import { ContactActions } from './ContactActions';
+import { HexString } from '../helpers/opaqueTypes';
 
 export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;
 
@@ -89,4 +90,6 @@ export const Actions = {
         createAction(ActionTypes.UPDATE_APP_LAST_EDITING, { appName }),
     removeAllFeeds: () =>
         createAction(ActionTypes.REMOVE_ALL_FEEDS),
+    addPrivatePost: (topic: HexString, post: Post) =>
+        createAction(ActionTypes.ADD_PRIVATE_POST, { topic, post }),
 };

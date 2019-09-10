@@ -27,7 +27,7 @@ import { ModelHelper } from '../models/ModelHelper';
 import { TouchableViewDefaultHitSlop } from './TouchableView';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { convertPostToParentPost, convertHtmlMetaDataToPost } from '../helpers/postHelpers';
+import { convertPostToParentPost, convertHtmlMetaDataToPost, createPostWithLinkMetaData } from '../helpers/postHelpers';
 import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
@@ -276,33 +276,8 @@ export class PostEditor extends React.Component<Props, State> {
         await this.sendUpdate();
     }
 
-    private createPostFromState = async (): Promise<Post> => {
-        const httpLink = getHttpLinkFromText(this.state.post.text);
-
-        if (httpLink != null) {
-            const url = httpLink;
-            const htmlMetaData = await fetchHtmlMetaData(url);
-            const post = convertPostToParentPost(convertHtmlMetaDataToPost({
-                ...htmlMetaData,
-                description: '',
-            }));
-            return {
-                ...post,
-                createdAt: this.state.post.createdAt,
-                updatedAt: this.state.post.createdAt,
-            };
-        } else {
-            const markdownText = markdownEscape(this.state.post.text);
-            const post = {
-                ...this.state.post,
-                text: markdownText,
-            };
-            return post;
-        }
-    }
-
     private sendUpdate = async () => {
-        const post = await this.createPostFromState();
+        const post = await createPostWithLinkMetaData(this.state.post);
         this.props.onPost(post);
     }
 }

@@ -8,6 +8,16 @@ import { serialize, deserialize } from '../social/serialization';
 import { ProtocolStorage } from './ProtocolStorage';
 import { PublicProfile } from '../models/Profile';
 import { PublicIdentity } from '../models/Identity';
+import { MutualContact } from '../models/Contact';
+import { Author } from '../models/Author';
+import { copyPostPrivately, copyPostWithReferences } from '../helpers/postHelpers';
+import { Debug } from '../Debug';
+
+export interface PrivateChannel {
+    topic: HexString;
+    unsyncedCommands: PrivateCommand[];
+    lastSeenChapterId: HexString | undefined;
+}
 
 interface PrivateCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description
@@ -220,4 +230,42 @@ export const privateSync = async (context: PrivateSharingContext): Promise<Priva
         localTimeline: uploadedLocalTimeline,
         remoteTimeline: downloadedRemoteTimeline,
     };
+};
+
+export const privateSharePostWithContact = async (
+    originalPost: Post,
+    contact: MutualContact,
+    author: Author,
+    profile: PublicProfile,
+    storage: ProtocolStorage,
+    crypto: ProtocolCrypto,
+    postId: HexString,
+): Promise<Post> => {
+    const sharedSecret = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
+    const topic = calculatePrivateTopic(sharedSecret);
+
+    const post = originalPost._id == null || originalPost.topic != null
+        ? copyPostPrivately(originalPost, author, postId, topic)
+        : copyPostWithReferences(originalPost, author, postId, topic)
+    ;
+
+    const context: PrivateSharingContext = {
+        profile,
+        contactIdentity: contact.identity,
+        localTimeline: [],
+        remoteTimeline: [],
+        sharedSecret,
+        storage,
+        crypto,
+    };
+
+    const localTimeline = await downloadUploadedLocalPrivateCommands(context);
+    const contextBeforePost = {
+        ...context,
+        localTimeline,
+    };
+    const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
+    Debug.log('shareWithContact', {contextWithPost, originalPost, post, postId});
+    const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
+    return post;
 };

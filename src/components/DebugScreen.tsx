@@ -25,6 +25,9 @@ import contactIdentity2 from '../../testdata/contactIdentity2.json';
 import contactIdentity3 from '../../testdata/contactIdentity3.json';
 import contactIdentity4 from '../../testdata/contactIdentity4.json';
 import { MutualContact } from '../models/Contact';
+import { HexString } from '../helpers/opaqueTypes';
+import { deriveSharedKey } from '../helpers/contactHelpers';
+import { calculatePrivateTopic } from '../protocols/privateSharing';
 
 export interface StateProps {
     appState: AppState;
@@ -41,6 +44,7 @@ export interface DispatchProps {
     onRefreshFeeds: (feeds: Feed[]) => void;
     onAddPost: (post: Post) => void;
     onAddContact: (contact: MutualContact) => void;
+    onAddPrivatePost: (topic: HexString, post: Post) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -136,10 +140,10 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-person' />
+                        <MaterialCommunityIcon name='message-text-outline' />
                     }
-                    title='Generate new identity'
-                    onPress={async () => await onGenerateNewIdentity(props)}
+                    title='Create private post'
+                    onPress={async () => await onCreatePrivatePost(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -195,7 +199,7 @@ const onAppStateReset = async (props: Props) => {
     Debug.log('onAppStateReset: ', confirmed);
     if (confirmed) {
         props.onAppStateReset();
-        await Utils.waitMillisec(3 * 1000);
+        await Utils.waitMillisec(1000);
         restartApp();
     }
 };
@@ -241,12 +245,6 @@ const onCreateIdentity = async (props: Props) => {
         await Utils.waitMillisec(3 * 1000);
         restartApp();
     }
-};
-
-const onGenerateNewIdentity = async (props: Props) => {
-    const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
-    // tslint:disable-next-line:no-console
-    console.log(privateIdentity);
 };
 
 const onLogAppStateVersion = async () => {
@@ -303,4 +301,17 @@ const onGeneratePosts = async (props: Props) => {
         props.onAddPost(post);
         await Utils.waitUntil(postTime + 1);
     }
+};
+
+const onCreatePrivatePost = (props: Props) => {
+    const sharedKey = deriveSharedKey(props.appState.author.identity!, contactIdentity1);
+    const topic = calculatePrivateTopic(sharedKey);
+    const postTime = Date.now();
+    const post: Post = {
+        text: `Post ${postTime}`,
+        images: [],
+        createdAt: postTime,
+        author: props.appState.author,
+    };
+    props.onAddPrivatePost(topic, post);
 };

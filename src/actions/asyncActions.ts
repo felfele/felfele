@@ -16,7 +16,7 @@ import {
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts, copyPostWithReferences, copyPostPrivately } from '../helpers/postHelpers';
+import { mergeUpdatedPosts, copyPostWithReferences, copyPostPrivately, createPostWithLinkMetaData } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { generateSecureRandom } from '../helpers/secureRandom';
@@ -37,14 +37,17 @@ import { ContactFeed } from '../models/ContactFeed';
 import { Contact, MutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
-import { PrivateProfile } from '../models/Profile';
+import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
-import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic } from '../protocols/privateSharing';
-import { PrivateIdentity } from '../models/Identity';
+import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic, privateSharePostWithContact } from '../protocols/privateSharing';
+import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { byteArrayToHex } from '../helpers/conversion';
+import { cryptoHash } from '../helpers/crypto';
+import { Author } from '../models/Author';
+import { ProtocolStorage } from '../protocols/ProtocolStorage';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -149,8 +152,6 @@ export const AsyncActions = {
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateSecureRandom(length),
             };
-            const previousPosts = getState().rssPosts;
-            const allPosts: Post[] = [];
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
                     const contact = contactFeed.contact;
@@ -174,12 +175,10 @@ export const AsyncActions = {
                             },
                             topic,
                         };
-                        allPosts.push(postWithAuthor);
+                        dispatch(Actions.addPrivatePost(topic, postWithAuthor));
                     }
                 }
             }
-            const posts = mergeUpdatedPosts(allPosts, previousPosts);
-            dispatch(Actions.updateRssPosts(posts));
         };
     },
     createPost: (post: Post): Thunk => {
@@ -216,20 +215,17 @@ export const AsyncActions = {
             dispatch(Actions.deletePost(post));
         };
     },
-    shareWithContact: (originalPost: Post, contact: MutualContact): Thunk => {
+    shareWithContactFeeds: (originalPost: Post, contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
+            Debug.log('shareWithContactFeeds', originalPost);
             const { author } = getState();
             const identity = author.identity!;
-            const postId = byteArrayToHex(await generateSecureRandom(32), false);
-            const sharedKey = deriveSharedKey(identity, contact.identity);
-            const topic = calculatePrivateTopic(sharedKey);
-
-            const post = originalPost._id == null || originalPost.topic != null
-                ? copyPostPrivately(originalPost, author, postId, topic)
-                : copyPostWithReferences(originalPost, author, postId, topic)
-            ;
-
-            dispatch(InternalActions.addPost(post));
+            const postWithLinkMetaData = await createPostWithLinkMetaData(originalPost);
+            const postWithoutId = {
+                ...postWithLinkMetaData,
+                author,
+            };
+            const postId = byteArrayToHex(cryptoHash(JSON.stringify(postWithoutId)), false);
 
             const profile: PrivateProfile = {
                 name: author.name,
@@ -245,25 +241,20 @@ export const AsyncActions = {
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateSecureRandom(length),
             };
-            const sharedSecret = deriveSharedKey(profile.identity, contact.identity);
-            const context: PrivateSharingContext = {
-                profile,
-                contactIdentity: contact.identity,
-                localTimeline: [],
-                remoteTimeline: [],
-                sharedSecret,
-                storage,
-                crypto,
-            };
-
-            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
-            const contextBeforePost = {
-                ...context,
-                localTimeline,
-            };
-            const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
-            Debug.log('shareWithContact', {contextWithPost, postId});
-            const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
+            for (const contactFeed of contactFeeds) {
+                if (contactFeed.contact != null) {
+                    const post = await privateSharePostWithContact(
+                        postWithLinkMetaData,
+                        contactFeed.contact,
+                        author,
+                        profile,
+                        storage,
+                        crypto,
+                        postId,
+                    );
+                    dispatch(Actions.addPrivatePost(post.topic!, post));
+                }
+            }
         };
     },
     sharePost: (post: Post): Thunk => {

@@ -120,4 +120,5 @@ export const defaultState: AppState = {
     metadata: defaultMetadata,
     contacts: [],
     lastEditingApp: null,
+    privatePosts: {},
 };

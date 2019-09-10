@@ -1,8 +1,10 @@
 import { Post, PostReferences } from '../models/Post';
 import { Author } from '../models/Author';
-import { HtmlMetaData } from './htmlMetaData';
+import { HtmlMetaData, fetchHtmlMetaData } from './htmlMetaData';
 import { ImageData } from '../models/ImageData';
 import { HexString } from './opaqueTypes';
+import { getHttpLinkFromText } from './urlUtils';
+import { markdownEscape } from '../markdown';
 
 export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[] => {
     const uniqueAuthors = new Map<string, Author>();
@@ -19,6 +21,31 @@ export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[
     const startId = Date.now();
     const posts = sortedPosts.map((post, index) => ({...post, _id: post._id ? post._id : startId + index}));
     return posts;
+};
+
+export const createPostWithLinkMetaData = async (originalPost: Post): Promise<Post> => {
+    const httpLink = getHttpLinkFromText(originalPost.text);
+
+    if (httpLink != null) {
+        const url = httpLink;
+        const htmlMetaData = await fetchHtmlMetaData(url);
+        const post = convertPostToParentPost(convertHtmlMetaDataToPost({
+            ...htmlMetaData,
+            description: '',
+        }));
+        return {
+            ...post,
+            createdAt: originalPost.createdAt,
+            updatedAt: originalPost.createdAt,
+        };
+    } else {
+        const markdownText = markdownEscape(originalPost.text);
+        const post = {
+            ...originalPost,
+            text: markdownText,
+        };
+        return post;
+    }
 };
 
 export const convertHtmlMetaDataToPost = (htmlMetaData: HtmlMetaData): Post => {

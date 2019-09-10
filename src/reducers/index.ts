@@ -26,6 +26,7 @@ import {
 import { AppState } from './AppState';
 import { contactsReducer } from './contactsReducer';
 import { ActionTypes } from '../actions/ActionTypes';
+import { PostListDict } from './version5';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
     switch (action.type) {
@@ -351,6 +352,24 @@ export const lastEditingAppReducer = (lastEditingApp: string | null = null, acti
     }
 };
 
+const privatePostsReducer = (privatePosts: PostListDict = {}, action: Actions): PostListDict => {
+    switch (action.type) {
+        case ActionTypes.ADD_PRIVATE_POST: {
+            const postList = action.payload.topic in privatePosts
+                ? [action.payload.post, ...privatePosts[action.payload.topic]]
+                : [action.payload.post]
+            ;
+            return {
+                ...privatePosts,
+                [action.payload.topic]: postList,
+            };
+        }
+        default: {
+            return privatePosts;
+        }
+    }
+};
+
 export const combinedReducers = combineReducers<AppState>({
     contentFilters: contentFiltersReducer,
     feeds: feedsReducer,
@@ -364,4 +383,5 @@ export const combinedReducers = combineReducers<AppState>({
     metadata: metadataReducer,
     contacts: contactsReducer,
     lastEditingApp: lastEditingAppReducer,
+    privatePosts: privatePostsReducer,
 });

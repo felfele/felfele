@@ -8,6 +8,7 @@ import { Feed } from '../models/Feed';
 import { Post } from '../models/Post';
 import { emptyPostCommandLog } from '../social/api';
 import { MutualContact } from '../models/Contact';
+import { HexString } from '../helpers/opaqueTypes';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
    return {
@@ -49,6 +50,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onAddContact: (contact: MutualContact) => {
             dispatch(AsyncActions.addContact(contact));
+        },
+        onAddPrivatePost: (topic: HexString, post: Post) => {
+            dispatch(Actions.addPrivatePost(topic, post));
         },
    };
 };

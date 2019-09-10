@@ -1,13 +1,13 @@
 import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/asyncActions';
-import { getPrivateChannelFeedsPosts, getPrivateChannelFeeds } from '../../../selectors/selectors';
+import { getPrivateChannelFeedsPosts, getPrivateChannelFeeds, getAllPrivateChannelPosts } from '../../../selectors/selectors';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { StateProps, DispatchProps, PrivateChannelsFeedView } from './PrivateChannelsFeedView';
 import { ContactFeed } from '../../../models/ContactFeed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const posts = getPrivateChannelFeedsPosts(state);
+    const posts = getAllPrivateChannelPosts(state);
     const privateChannelFeeds = getPrivateChannelFeeds(state);
 
     return {

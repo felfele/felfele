@@ -46,13 +46,12 @@ const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
 };
 
 const getSelectedTopicPosts = (state: AppState, topic: HexString) => {
+    const privatePosts = state.privatePosts[topic] || [];
     return state.rssPosts
         .filter(post => {
             return post != null && post.author != null && post.topic === topic;
         })
-        .concat(
-            state.localPosts.filter(post => post.topic === topic)
-        )
+        .concat(privatePosts)
         .sort(postTimeCompare)
     ;
 };
@@ -124,6 +123,10 @@ export const getPrivateChannelFeedsPosts = createSelector([ getRssPosts, getPriv
     return rssPosts.filter(post => isPostFromPrivateChannelFeed(post, privateChannelFeeds));
 });
 
+export const getAllPrivateChannelPosts = (state: AppState) => {
+    return Object.entries(state.privatePosts).reduce<Post[]>((prev, curr) => prev.concat(curr[1]), []);
+};
+
 export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {
     return posts;
 });
@@ -133,6 +136,5 @@ export const getPrivateChannelPosts = createSelector([ getSelectedTopicPosts ], 
 });
 
 export const getYourPosts = createSelector([ getLocalPosts, getProfile ], (posts, author) => {
-    // TODO cleanup author
     return posts.filter(post => post.author && post.author.name === author.name);
 });
