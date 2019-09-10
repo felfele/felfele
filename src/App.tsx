@@ -7,6 +7,7 @@ import {
     NavigationScreenProps,
 } from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
     Platform,
@@ -19,11 +20,12 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
 import { setCustomText } from 'react-native-global-props';
+// @ts-ignore
+import { BottomTabBar } from 'react-navigation-tabs';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
 import { EditFeedContainer as FeedInfoContainer, RSSFeedInfoContainer } from './containers/FeedInfoContainer';
-import { AllFeedContainer } from './containers/AllFeedContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
@@ -39,7 +41,6 @@ import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
-import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportViewWithTabBar } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
@@ -54,8 +55,6 @@ import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
-// @ts-ignore
-import { BottomTabBar } from 'react-navigation-tabs';
 import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
@@ -70,6 +69,8 @@ import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateC
 import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
 import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
 import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
+import { PublicChannelsContainer } from './ui/screens/public-channels/PublicChannelsContainer';
+import { PublicChannelsListContainer } from './ui/screens/public-channels/PublicChannelsListContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -136,10 +137,10 @@ const ProfileNavigator = createStackNavigator(yourTabScenes,
     },
 );
 
-const allFeedTabScenes: NavigationRouteConfigMap = {
-    AllFeed: {
+const publicChannelTabScenes: NavigationRouteConfigMap = {
+    PublicChannelTab: {
         screen: ({navigation}: NavigationScreenProps) => (
-            <AllFeedContainer
+            <PublicChannelsContainer
                 navigation={navigation}
             />
         ),
@@ -147,8 +148,8 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     Feed: {
         screen: FeedContainer,
     },
-    FeedListViewerContainer: {
-        screen: FeedListViewerContainer,
+    PublicChannelsListContainer: {
+        screen: PublicChannelsListContainer,
     },
     CategoriesContainer: {
         screen: CategoriesContainer,
@@ -170,13 +171,13 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     },
 };
 
-const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
+const PublicChannelNavigator = createStackNavigator(publicChannelTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'AllFeed',
+        initialRouteName: 'PublicChannelTab',
     },
 );
 
@@ -229,12 +230,12 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 
 const Root = createBottomTabNavigator(
     {
-        AllFeedTab: {
-            screen: AllFeedNavigator,
+        PublicChannelTab: {
+            screen: PublicChannelNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'home'}
+                    <MaterialCommunityIcon
+                        name={'earth'}
                         size={24}
                         color={tintColor}
                     />

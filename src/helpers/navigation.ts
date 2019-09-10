@@ -21,7 +21,7 @@ export interface Routes {
     PostTab: {};
     PrivateChannelTab: {};
     SettingsTab: {};
-    AllFeedTab: {};
+    PublicChannelTab: {};
     BugReportView: {};
     SwarmSettingsContainer: {};
     FilterListEditorContainer: {};
@@ -30,7 +30,7 @@ export interface Routes {
     BackupRestore: {};
     LogViewer: {};
     Debug: {};
-    FeedListViewerContainer: {
+    PublicChannelsListContainer: {
         showExplore: boolean,
         feeds?: Feed[],
     };

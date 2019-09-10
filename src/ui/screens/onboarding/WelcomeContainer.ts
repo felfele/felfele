@@ -12,6 +12,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import testIdentity from '../../../../testdata/testIdentity.json';
 import { PrivateIdentity } from '../../../models/Identity';
 import * as Swarm from '../../../swarm/Swarm';
+import { getDefaultUserImage } from '../../../defaultUserImage';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -29,7 +30,8 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(Actions.changeSettingShowDebugMenu(true));
             dispatch(Actions.changeSettingSwarmGatewayAddress(Swarm.defaultDebugGateway));
             const identity = testIdentity as PrivateIdentity;
-            await dispatch(AsyncActions.createUser('TestUser', image, identity));
+            const defaultImage = await getDefaultUserImage();
+            await dispatch(AsyncActions.createUser('TestUser', defaultImage, identity));
             navigation.navigate('Loading', {});
         },
     };
