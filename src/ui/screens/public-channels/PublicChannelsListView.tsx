@@ -1,21 +1,21 @@
 import * as React from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import { Feed } from '../models/Feed';
-import { Colors, ComponentColors } from '../styles';
-import { NavigationHeader } from './NavigationHeader';
 import { SuperGridSectionList } from 'react-native-super-grid';
-import { GridCard, getGridCardSize } from '../ui/misc/GridCard';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { MediumText } from '../ui/misc/text';
-import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
-import { defaultImages } from '../defaultImages';
-import { TypedNavigation } from '../helpers/navigation';
-import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
-import { TwoButton } from '../ui/buttons/TwoButton';
-import { getFeedImage } from '../helpers/feedHelpers';
-import { ContactFeed } from '../models/ContactFeed';
+
+import { Feed } from '../../../models/Feed';
+import { Colors, ComponentColors } from '../../../styles';
+import { NavigationHeader } from '../../../components/NavigationHeader';
+import { GridCard, getGridCardSize } from '../../../ui/misc/GridCard';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
+import { MediumText } from '../../../ui/misc/text';
+import { TabBarPlaceholder } from '../../../ui/misc/TabBarPlaceholder';
+import { defaultImages } from '../../../defaultImages';
+import { TypedNavigation } from '../../../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../../ui/misc/FragmentSafeAreaView';
+import { TwoButton } from '../../../ui/buttons/TwoButton';
+import { getFeedImage } from '../../../helpers/feedHelpers';
+import { ContactFeed } from '../../../models/ContactFeed';
 
 export interface DispatchProps {
     onPressFeed: (feed: ContactFeed) => void;
@@ -61,6 +61,7 @@ export class FeedGrid extends React.PureComponent<DispatchProps & StateProps & {
                                 size={itemDimension}
                                 defaultImage={defaultImages.defaultUser}
                                 modelHelper={modelHelper}
+                                isSelected={false}
                             />
                         );
                     }}
@@ -81,7 +82,7 @@ const ActionButtons = (openExplore: () => void, openAddChannel: () => void) => (
     <TwoButton
         leftButton={{
             label: 'Add channel',
-            icon: <Icon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+            icon: <Icon name='plus-box' size={24} color={Colors.BRAND_PURPLE} />,
             onPress: openAddChannel,
         }}
         rightButton={{
@@ -92,7 +93,7 @@ const ActionButtons = (openExplore: () => void, openAddChannel: () => void) => (
     />
 );
 
-export class FeedListEditor extends React.PureComponent<DispatchProps & StateProps> {
+export class PublicChannelsListView extends React.PureComponent<DispatchProps & StateProps> {
     public render() {
         return (
             <FragmentSafeAreaViewWithoutTabBar>
@@ -106,6 +107,10 @@ export class FeedListEditor extends React.PureComponent<DispatchProps & StatePro
                     <NavigationHeader
                         navigation={this.props.navigation}
                         title={this.props.title}
+                        rightButton1={{
+                            label: <Icon name='plus-box' size={24} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />,
+                            onPress: this.onAddFeed,
+                        }}
                     />
                 </FeedGrid>
             </FragmentSafeAreaViewWithoutTabBar>

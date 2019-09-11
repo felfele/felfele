@@ -7,12 +7,12 @@ import ShareExtension from 'react-native-share-extension';
 
 import { TopLevelErrorBoundary } from '../components/TopLevelErrorBoundary';
 import { initStore } from '../store';
-import { SharePostEditorContainer } from './SharePostEditorContainer';
 import { Debug } from '../Debug';
 import { Actions } from '../actions/Actions';
 import { FELFELE_SHARE_EXTENSION_NAME } from '../reducers/defaultData';
 import { Image } from 'react-native';
 import { ImageData } from '../models/ImageData';
+import { ShareNavigator } from './ShareNavigator';
 
 interface ShareState {
     store: any;
@@ -37,18 +37,16 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
             <TopLevelErrorBoundary>
                 <Provider store={this.state.store!}>
                     <PersistGate loading={null} persistor={this.state.persistor!}>
-                        <SharePostEditorContainer
-                            images={this.state.images}
-                            text={this.state.text}
-                            goBack={() => {
-                                this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
-                                this.state.persistor!.flush().then(() => {
-                                    ShareExtension.close();
-                                });
-                                return true;
-                            }}
-                            dismiss={() => {
-                                ShareExtension.close();
+                        <ShareNavigator
+                            screenProps={{
+                                text: this.state.text,
+                                images: this.state.images,
+                                goBack: () => {
+                                    this.onDoneSharing();
+                                    return true;
+                                },
+                                dismiss: () => ShareExtension.close(),
+                                onDoneSharing: this.onDoneSharing,
                             }}
                         />
                     </PersistGate>
@@ -86,5 +84,12 @@ export default class FelfeleShareExtension extends React.Component<{}, ShareStat
         } catch (e) {
             Debug.log('error getting share data', e);
         }
+    }
+
+    private onDoneSharing = () => {
+        this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_SHARE_EXTENSION_NAME));
+        this.state.persistor!.flush().then(() => {
+            ShareExtension.close();
+        });
     }
 }

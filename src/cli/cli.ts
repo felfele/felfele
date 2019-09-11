@@ -18,6 +18,7 @@ import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { protocolTestCommandDefinition as protocolCommandDefinition } from './protocolCommands';
 import { swarmHelperTests } from './swarmHelperTest';
 import { privateSharingTests } from '../protocols/privateSharingTest';
+import { benchmarkCommandDefinition } from './benchmarkCommands';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -138,6 +139,8 @@ const definitions =
     })
     .
     addCommand('protocol', 'Test protocols', protocolCommandDefinition)
+    .
+    addCommand('benchmark', 'Measure the time a function takes', benchmarkCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);

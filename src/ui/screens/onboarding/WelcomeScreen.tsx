@@ -28,7 +28,7 @@ export interface StateProps {
 
 type Props = DispatchProps & StateProps;
 
-const WEBSITE_URL = 'https://felfele.com';
+const TERMS_URL = 'https://felfele.org/legal';
 
 export class WelcomeScreen extends React.PureComponent<Props> {
     public componentDidMount() {
@@ -41,8 +41,8 @@ export class WelcomeScreen extends React.PureComponent<Props> {
             <Page
                 backgroundColor={Colors.BRAND_PURPLE}
                 leftButton={{
-                    label: 'MORE ABOUT FELFELE',
-                    onPress: () => Linking.openURL(WEBSITE_URL),
+                    label: 'READ OUR TERMS',
+                    onPress: () => Linking.openURL(TERMS_URL),
                     alignItems: 'center',
                 }}
                 rightButton={{
@@ -63,14 +63,14 @@ export class WelcomeScreen extends React.PureComponent<Props> {
                                 height: 150,
                             }}
                         />
-                        <BoldText style={[ styles.text, { fontSize: 18 } ]}>
-                            Welcome to Felfele
+                        <BoldText style={[ styles.text, { fontSize: 18, paddingBottom: 20 } ]}>
+                            Socialize without compromise
                         </BoldText>
                         <MediumText style={[ styles.text, { fontSize: 14 } ]}>
-                            Felfele lets you share posts with whoever you want but without Big Brother watching you.
+                            Follow channels you love and share content privately with people that matter.
                         </MediumText>
-                        <RegularText style={[ styles.text, { fontSize: 14 } ]}>
-                            We are a non-profit organization building products to help people take back the control of their personal data and privacy.
+                        <RegularText style={[ styles.text, { fontSize: 14, opacity: 0.8 } ]}>
+                            Felfele is designed to never collect or store any sensitive information. Your content cannot be accessed by us or other third parties because it is always end-to-end encrypted.
                         </RegularText>
                     </View>
                 </TouchableWithoutFeedback>

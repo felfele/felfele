@@ -2,6 +2,7 @@ import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
 import { LocalFeed } from '../social/api';
+import { Post } from '../models/Post';
 import { MutualContact } from '../models/Contact';
 import { ContactFeed } from '../models/ContactFeed';
 import { NavigationNavigateAction } from 'react-navigation';
@@ -12,13 +13,15 @@ export interface Routes {
     Onboarding: {};
     ProfileOnboarding: {};
     Welcome: {};
-    Post: {};
+    Post: {
+        selectedFeeds: Feed[],
+    };
     Root: {};
     ProfileTab: {};
     PostTab: {};
     PrivateChannelTab: {};
     SettingsTab: {};
-    AllFeedTab: {};
+    PublicChannelTab: {};
     BugReportView: {};
     SwarmSettingsContainer: {};
     FilterListEditorContainer: {};
@@ -27,7 +30,7 @@ export interface Routes {
     BackupRestore: {};
     LogViewer: {};
     Debug: {};
-    FeedListViewerContainer: {
+    PublicChannelsListContainer: {
         showExplore: boolean,
         feeds?: Feed[],
     };
@@ -85,6 +88,11 @@ export interface Routes {
     };
     ContactInfo: {
         publicKey: string;
+    };
+    ShareWithContainer: {
+        post: Post;
+        selectedFeeds: Feed[];
+        onDoneSharing?: () => void;
     };
     ContactConfirm: {
         publicKey: string;

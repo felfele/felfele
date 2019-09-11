@@ -44,6 +44,7 @@
 		9A7D87B8218D043D0046F42B /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D879B218CD6550046F42B /* libRNCamera.a */; };
 		9A8C5D062188B2D10011F13D /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D032188B2930011F13D /* libRNRandomBytes.a */; };
 		9AE6B77922565DAB00BF8A2C /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE6B74D22565D8A00BF8A2C /* libRCTPushNotification.a */; };
+		9AF95B692319792D0091785E /* defaultuser.png in Resources */ = {isa = PBXBuildFile; fileRef = 13BFD6C7C7C84BBCB4A49D83 /* defaultuser.png */; };
 		9AFF87DB1F448F8A0033DA0B /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFF87DA1F448F700033DA0B /* libRCTCameraRoll.a */; };
 		9BF45D292BE0486F8A177E21 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2F3D42F657F549E5B24AE8F0 /* Feather.ttf */; };
 		A454E228D66E459EB8D295C0 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4C9AD2E716C4473C83B4451E /* Octicons.ttf */; };
@@ -1765,6 +1766,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9AF95B692319792D0091785E /* defaultuser.png in Resources */,
 				BC781DAF22DC9F5E008293D4 /* Roboto-Bold.ttf in Resources */,
 				BC781DB022DC9F5E008293D4 /* Roboto-Medium.ttf in Resources */,
 				BC781DB122DC9F5E008293D4 /* Roboto-Regular.ttf in Resources */,

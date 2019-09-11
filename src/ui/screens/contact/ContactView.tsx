@@ -73,6 +73,7 @@ export const ContactView = (props: Props) => {
                     gatewayAddress={props.gatewayAddress}
                     onSaveDraft={props.onSaveDraft}
                     profileImage={props.profile.image}
+                    selectedFeeds={[props.feed]}
                 />,
             }}
         </RefreshableFeed>

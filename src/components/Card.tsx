@@ -30,6 +30,7 @@ import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { ContactFeed } from '../models/ContactFeed';
+import { MutualContact } from '../models/Contact';
 
 export interface AuthorFeed extends ContactFeed {
     isKnownFeed: boolean;
