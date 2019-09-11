@@ -21,6 +21,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: ContactFeed[]) => {
+            dispatch(AsyncActions.advanceContacts());
             dispatch(AsyncActions.downloadPrivatePostsFromContacts(feeds));
         },
     };

@@ -41,7 +41,6 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onConfirmContact: (contact: MutualContact) => {
-            dispatch(Actions.confirmContact(contact));
         },
         onRemoveContact: (contact: Contact) => {
             dispatch(Actions.removeContact(contact));

@@ -146,7 +146,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
         ? () => props.invitedContact && showShareContactDialog(props.invitedContact)
         : () => showShareFeedDialog(props.ownFeed)
     ;
-    Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
+   // Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>

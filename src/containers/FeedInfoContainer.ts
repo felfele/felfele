@@ -5,7 +5,7 @@ import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 import { TypedNavigation } from '../helpers/navigation';
-import { Contact } from '../models/Contact';
+import { Contact, NonMutualContact } from '../models/Contact';
 import { RSSFeedInfo } from '../ui/screens/RSSFeedInfo';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
@@ -56,6 +56,9 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         },
         onAddContact: (contact: Contact) => {
             dispatch(AsyncActions.addContact(contact));
+        },
+        onAdvanceContactState: (updatedContact: NonMutualContact, contact: Contact) => {
+            dispatch(Actions.updateContactState(updatedContact, contact));
         },
     };
 };

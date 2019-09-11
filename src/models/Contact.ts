@@ -33,7 +33,6 @@ export interface MutualContact {
     name: string;
     image: ImageData;
     identity: PublicIdentity;
-    confirmed: boolean;
 }
 
 export type NonMutualContact = InvitedContact | AcceptedContact | CodeReceivedContact;

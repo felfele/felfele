@@ -34,7 +34,7 @@ import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import { SECOND } from '../DateUtils';
 import { fetchFeedFromUrl, fetchRecentPostFeed, isContactFeed } from '../helpers/feedHelpers';
 import { InviteCode } from '../models/InviteCode';
-import { Contact } from '../models/Contact';
+import { Contact, NonMutualContact } from '../models/Contact';
 import { PublicProfile } from '../models/Profile';
 import { getFelfeleLinkFromClipboardData } from '../helpers/feedInfoHelper';
 
@@ -56,6 +56,7 @@ export interface DispatchProps {
     onUnfollowFeed: (feed: Feed) => void;
 
     onAddContact: (contact: Contact) => void;
+    onAdvanceContactState: (updatedContact: NonMutualContact, contact: Contact) => void;
 }
 
 export interface StateProps {
@@ -250,17 +251,17 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             generateSecureRandom
         );
         const invitedContact = await createCodeReceivedContact(inviteCode.randomSeed, inviteCode.contactPublicKey, swarmContactHelper);
-        const contact = await advanceContactState(invitedContact, swarmContactHelper, 300 * SECOND);
+        const contact = await advanceContactState(invitedContact, swarmContactHelper, 20 * SECOND);
+        this.props.onAddContact(contact);
         Debug.log('tryGetFeedUrlFromFollowLink', contact);
         if (contact.type === 'mutual-contact') {
-            this.props.onAddContact(contact);
             const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(contact.identity);
             const feed = await fetchRecentPostFeed(feedAddress, this.props.swarmGateway);
             if (feed != null && feed.feedUrl !== '') {
                 this.props.navigation.replace('ContactConfirm', { publicKey: contact.identity.publicKey });
             }
         } else {
-            this.onFailedFeedLoad();
+            this.onInviteContactFailed();
         }
     }
 
@@ -294,12 +295,33 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         );
     }
 
+    private onInviteContactFailed = () => {
+        const options: any[] = [
+            { text: 'Ok', onPress: () => this.props.navigation.goBack(), style: 'cancel' },
+        ];
+
+        const title = 'Your contact is pending confirmation.';
+
+        const message = 'Your private channel will be available when your contact opens the app.';
+
+        Alert.alert(
+            title,
+            message,
+            options,
+            { cancelable: true },
+        );
+
+        this.setState({
+            loading: false,
+        });
+    }
     private onFailedFeedLoad = () => {
         const options: any[] = [
             { text: 'Cancel', onPress: () => Debug.log('Cancel Pressed'), style: 'cancel' },
         ];
 
-        Alert.alert('Failed to load channel!',
+        Alert.alert(
+            'Failed to load channel!',
             undefined,
             options,
             { cancelable: true },
@@ -307,7 +329,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
 
         this.setState({
             loading: false,
-    });
+        });
     }
 
     private onScanSuccess = async (data: any) => {

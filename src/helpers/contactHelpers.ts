@@ -242,7 +242,6 @@ const advanceAcceptedContactState = async (
         name: contactMessage.name,
         image: contactMessage.image,
         identity: remoteIdentity,
-        confirmed: false,
     };
 
     return mutualContact;

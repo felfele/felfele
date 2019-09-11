@@ -12,7 +12,6 @@ import { UnknownContact } from '../../../helpers/contactHelpers';
 import { PublicProfile } from '../../../models/Profile';
 import { Colors } from '../../../styles';
 import { FeedHeader } from '../../../components/FeedHeader';
-import { ImageData } from '../../../models/ImageData';
 
 export interface DispatchProps {
     onConfirmContact: (contact: MutualContact) => void;

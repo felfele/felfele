@@ -31,7 +31,6 @@ import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, hi
 import { calculatePrivateTopic, PrivateSharingContext, privateSharePost, privateSync, downloadUploadedLocalPrivateCommands, listTimelinePosts } from '../protocols/privateSharing';
 import { privateSharingTests } from '../protocols/privateSharingTest';
 import fs from 'fs';
-import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
 import { makePost } from '../protocols/privateSharingTestHelpers';
 
 export const protocolTestCommandDefinition =

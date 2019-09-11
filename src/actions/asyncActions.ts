@@ -17,8 +17,8 @@ import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { mergeUpdatedPosts } from '../helpers/postHelpers';
-import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
-import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
+import { createInvitedContact, deriveSharedKey, advanceContactState, ContactHelper } from '../helpers/contactHelpers';
+import { createSwarmContactRandomHelper, createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 import { Debug } from '../Debug';
@@ -35,7 +35,7 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact } from '../models/Contact';
+import { Contact, InvitedContact, NonMutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { PublicProfile, PrivateProfile } from '../models/Profile';
@@ -45,6 +45,9 @@ import { HexString } from '../helpers/opaqueTypes';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
 import { privateSync, listTimelinePosts } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
+import { SECOND } from '../DateUtils';
+import { getNonMutualContacts } from '../selectors/selectors';
+import { Author } from '../models/Author';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -467,6 +470,39 @@ export const AsyncActions = {
             dispatch(Actions.addContact(invitedContact));
         };
     },
+    advanceContacts: (): Thunk => {
+        return async (dispatch, getState) => {
+            const contactHelper = getSwarmContactHelper(getState());
+            const contacts = getNonMutualContacts(getState());
+            for (const contact of contacts) {
+                dispatch(AsyncActions.advanceContact(contact, contactHelper));
+            }
+        };
+    },
+    advanceContact: (contact: NonMutualContact, contactHelper?: ContactHelper): Thunk => {
+        return async (dispatch, getState) => {
+            const swarmContactHelper = contactHelper != null ? contactHelper : getSwarmContactHelper(getState());
+            const updatedContact = await advanceContactState(contact, swarmContactHelper, 20 * SECOND);
+            dispatch(Actions.updateContactState(contact, updatedContact));
+        };
+    },
+};
+
+const getSwarmContactHelper = (state: AppState): ContactHelper => {
+    const swarmGateway = state.settings.swarmGatewayAddress;
+    const author = state.author;
+    const profile = {
+        name: author.name,
+        image: author.image,
+        identity: author.identity!,
+    };
+    const contactHelper = createSwarmContactHelper(
+        profile,
+        swarmGateway,
+        generateSecureRandom,
+    );
+
+    return contactHelper;
 };
 
 const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): ImageData[] => {

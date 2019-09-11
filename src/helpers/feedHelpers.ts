@@ -47,7 +47,6 @@ export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualConta
             type: 'mutual-contact',
             name: feed.name,
             image: feed.authorImage,
-            confirmed: false,
             identity,
         };
     } catch (e) {
