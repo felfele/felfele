@@ -54,7 +54,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             ownProps.navigation.popToTop();
         },
         onRefreshPosts: (feeds: Feed[]) => {
-            dispatch(AsyncActions.downloadPrivatePostsFromContacts(feeds));
+            dispatch(AsyncActions.syncPrivatePostsWithContacts(feeds));
         },
         onSaveDraft: (draft: Post) => {
             dispatch(Actions.addDraft(draft));

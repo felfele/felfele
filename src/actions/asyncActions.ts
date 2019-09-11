@@ -16,7 +16,7 @@ import {
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts, copyPostWithReferences, copyPostPrivately, createPostWithLinkMetaData } from '../helpers/postHelpers';
+import { mergeUpdatedPosts, copyPostWithReferences, createPostWithLinkMetaData } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { generateSecureRandom } from '../helpers/secureRandom';
@@ -34,21 +34,17 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact, MutualContact } from '../models/Contact';
+import { Contact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
-import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
-import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
-import { privateSync, listTimelinePosts, PrivateSharingContext, privateSharePost, downloadUploadedLocalPrivateCommands, uploadLocalPrivateCommands, calculatePrivateTopic, privateSharePostWithContact } from '../protocols/privateSharing';
-import { PrivateIdentity, PublicIdentity } from '../models/Identity';
+import { calculatePrivateTopic } from '../protocols/privateSharing';
+import { PrivateIdentity } from '../models/Identity';
 import { byteArrayToHex } from '../helpers/conversion';
 import { cryptoHash } from '../helpers/crypto';
-import { Author } from '../models/Author';
-import { ProtocolStorage } from '../protocols/ProtocolStorage';
-import { syncPrivateChannelWithContact, applyPrivateChannelUpdate } from '../protocols/privateChannel';
+import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost } from '../protocols/privateChannel';
 import { makePostId } from '../protocols/privateSharingTestHelpers';
 
 export const AsyncActions = {
@@ -131,15 +127,10 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    downloadPrivatePostsFromContacts: (contactFeeds: ContactFeed[]): Thunk => {
+    syncPrivatePostsWithContacts: (contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
             Debug.log('downloadPrivatePostsFromContacts', {contactFeeds});
             const identity = getState().author.identity!;
-            const profile: PrivateProfile = {
-                name: getState().author.name,
-                image: getState().author.image,
-                identity,
-            };
             const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
             const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
             const swarmApi = Swarm.makeApi(
@@ -242,35 +233,23 @@ export const AsyncActions = {
                 author,
             };
             const postId = byteArrayToHex(cryptoHash(JSON.stringify(postWithoutId)), false);
-
-            const profile: PrivateProfile = {
-                name: author.name,
-                image: author.image,
-                identity,
-            };
-            const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
-            const swarmApi = Swarm.makeApi({user: '', topic: ''}, signDigest, getState().settings.swarmGatewayAddress);
-            const storage = new SwarmStorage(swarmApi);
-            const crypto: Crypto = {
-                ...makeNaclEncryption(),
-                signDigest,
-                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
-                random: (length: number) => generateSecureRandom(length),
-            };
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
-                    const post = await privateSharePostWithContact(
-                        postWithLinkMetaData,
-                        contactFeed.contact,
+                    const privateChannel = contactFeed.contact.privateChannel;
+                    const sharedSecret = deriveSharedKey(identity, contactFeed.contact.identity);
+                    const topic = calculatePrivateTopic(sharedSecret);
+                    const post = {
+                        ...postWithLinkMetaData,
+                        topic,
                         author,
-                        profile,
-                        storage,
-                        crypto,
-                        postId,
-                    );
+                        _id: postId,
+                    };
+                    const privateChannelWithPost = privateChannelAddPost(privateChannel, post);
                     dispatch(Actions.addPrivatePost(post.topic, post));
+                    dispatch(Actions.updateContactPrivateChannel(contactFeed.contact, privateChannelWithPost));
                 }
             }
+            dispatch(AsyncActions.syncPrivatePostsWithContacts(contactFeeds));
         };
     },
     sharePost: (post: Post): Thunk => {
