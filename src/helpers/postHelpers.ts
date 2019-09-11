@@ -1,4 +1,4 @@
-import { Post, PostReferences } from '../models/Post';
+import { Post, PostReferences, PrivatePost } from '../models/Post';
 import { Author } from '../models/Author';
 import { HtmlMetaData, fetchHtmlMetaData } from './htmlMetaData';
 import { ImageData } from '../models/ImageData';
@@ -129,7 +129,7 @@ export const copyPostWithReferences = (post: Post, author: Author, id: number | 
     };
 };
 
-export const copyPostPrivately = (post: Post, author: Author, id: number | string, topic: HexString): Post => {
+export const copyPostPrivately = (post: Post, author: Author, id: HexString, topic: HexString): PrivatePost => {
     return {
         ...post,
         _id: id,

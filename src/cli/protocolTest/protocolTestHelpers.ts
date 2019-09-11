@@ -8,6 +8,8 @@ import * as crypto from '../../helpers/crypto';
 import { SwarmStorage } from './SwarmStorage';
 import { MemoryStorage } from './MemoryStorage';
 import * as SwarmHelpers from '../../swarm/Swarm';
+import { ProtocolStorage } from '../../protocols/ProtocolStorage';
+import { deriveSharedKey } from '../../helpers/contactHelpers';
 
 export type PublicKey = BrandedType<HexString, 'PublicKey'>;
 export type Address = BrandedType<HexString, 'Address'>;
@@ -117,7 +119,7 @@ export const makeNaclEncryption = (): Encryption => ({
     decrypt: (data: Uint8Array, secret: Uint8Array) => crypto.decrypt(data, secret),
 });
 
-export const makeStorage = async (generateIdentity: () => Promise<PrivateIdentity>) => {
+export const makeStorage = async (generateIdentity: () => Promise<PrivateIdentity>): Promise<ProtocolStorage> => {
     const swarmApiIdentity = await generateIdentity();
     const swarmApiSigner = (digest: number[]) => SwarmHelpers.signDigest(digest, swarmApiIdentity);
     const swarmGateway = process.env.SWARM_GATEWAY || '';
@@ -130,3 +132,10 @@ export const makeStorage = async (generateIdentity: () => Promise<PrivateIdentit
     ;
     return storage;
 };
+
+export const makeCrypto = (identity: PrivateIdentity, generateRandom: (length: number) => Promise<Uint8Array>): Crypto => ({
+    ...makeNaclEncryption(),
+    signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, identity),
+    deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
+    random: (length: number) => generateRandom(length),
+});

@@ -1,6 +1,6 @@
 import { addCommand } from './cliParser';
-import { generateUnsecureRandom, createDeterministicRandomGenerator } from '../helpers/unsecureRandom';
-import { output } from './cliHelpers';
+import { generateUnsecureRandom, createDeterministicRandomGenerator, createAsyncDeterministicRandomGenerator } from '../helpers/unsecureRandom';
+import { output, jsonPrettyPrint } from './cliHelpers';
 import { byteArrayToHex, hexToByteArray, stripHexPrefix, hexToUint8Array, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { Debug } from '../Debug';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
@@ -24,7 +24,7 @@ import {
     Crypto,
 } from './protocolTest/protocolTestHelpers';
 import { PrivateProfile, PublicProfile } from '../models/Profile';
-import { GroupCommand, GroupCommandPost, cryptoHash, GroupCommandAdd } from '../protocols/group';
+import { GroupCommand, GroupCommandPost, GroupCommandAdd } from '../protocols/group';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
 import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime, fetchTimeline } from '../protocols/timeline';
@@ -33,6 +33,7 @@ import { privateSharingTests } from '../protocols/privateSharingTest';
 import fs from 'fs';
 import { makePrivateSharingContextWithContact } from '../protocols/privateSharingHelpers';
 import { makePost } from '../protocols/privateSharingTestHelpers';
+import { cryptoHash } from '../helpers/crypto';
 
 export const protocolTestCommandDefinition =
     addCommand('invite', 'Test invite protocol', async () => {
@@ -65,7 +66,7 @@ export const protocolTestCommandDefinition =
     .
     addCommand('swarmInvite [randomSeed]', 'Test invite protocol on Swarm', async (randomSeed?: string) => {
         randomSeed = randomSeed ? randomSeed : randomNumbers[0];
-        const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = createAsyncDeterministicRandomGenerator(randomSeed);
         const aliceIdentity = await SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
         const aliceProfile = {
             name: 'Alice',
@@ -101,7 +102,7 @@ export const protocolTestCommandDefinition =
     .
     addCommand('privateGroup [randomSeed]', 'Test group private messaging', async (randomSeed?) => {
         randomSeed = randomSeed ? randomSeed : randomNumbers[0];
-        const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
+        const generateDeterministicRandom = createAsyncDeterministicRandomGenerator(randomSeed);
         const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
 
         interface Group {
@@ -150,7 +151,7 @@ export const protocolTestCommandDefinition =
         const calculateGroupTopic = (group: Group): HexString => {
             const secretWithoutPrefix = stripHexPrefix(group.sharedSecret);
             const bytes = hexToUint8Array(secretWithoutPrefix);
-            const topicBytes = cryptoHash([bytes]);
+            const topicBytes = cryptoHash(bytes);
             return byteArrayToHex(topicBytes);
         };
 
@@ -306,11 +307,11 @@ export const protocolTestCommandDefinition =
         };
         const uploadQueuedGroupCommands = async (context: GroupProtocolContext): Promise<GroupWithTimeline> => {
             const topic = calculateGroupTopic(context.group);
-            const random = await context.crypto.random(32);
-            const encryptChapter = (c: PartialChapter<GroupCommand>): Uint8Array => {
+            const encryptChapter = async (c: PartialChapter<GroupCommand>): Promise<Uint8Array> => {
                 const s = serialize(c);
                 const dataBytes = stringToUint8Array(s);
                 const secretBytes = hexToUint8Array(context.group.sharedSecret);
+                const random = await context.crypto.random(32);
                 return context.crypto.encrypt(dataBytes, secretBytes, random);
             };
             const uploadedTimeline = await uploadTimeline(
@@ -632,7 +633,7 @@ export const protocolTestCommandDefinition =
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
             };
-            const generateDeterministicRandom = createDeterministicRandomGenerator();
+            const generateDeterministicRandom = createAsyncDeterministicRandomGenerator();
             const identity = loadIdentityFile(identityFile);
             const contactIdentity = loadIdentityFile(contactIdentityFile);
             const profile: PrivateProfile = {
@@ -665,12 +666,21 @@ export const protocolTestCommandDefinition =
                 localTimeline,
             };
 
-            const post = makePost(markdown);
             const postId = optionalPostId != null
                 ? optionalPostId as HexString
                 : byteArrayToHex(await generateUnsecureRandom(32))
             ;
-            const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
+            const topic = calculatePrivateTopic(sharedSecret);
+            const post = {
+                ...makePost(markdown),
+                topic,
+                author: {
+                    name: profile.name,
+                    uri: '',
+                    image: profile.image,
+                },
+            };
+            const contextWithPost = await privateSharePost(contextBeforePost, post);
 
             const contextAfterPost = await privateSync(contextWithPost);
         })
@@ -680,7 +690,7 @@ export const protocolTestCommandDefinition =
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
             };
-            const generateDeterministicRandom = createDeterministicRandomGenerator();
+            const generateDeterministicRandom = createAsyncDeterministicRandomGenerator();
             const identity = loadIdentityFile(identityFile);
             const contactIdentity = loadIdentityFile(contactIdentityFile);
             const profile: PrivateProfile = {
@@ -708,9 +718,7 @@ export const protocolTestCommandDefinition =
             };
 
             const timeline = await downloadUploadedLocalPrivateCommands(context);
-            output(timeline);
-            const posts = listTimelinePosts(timeline);
-            output(posts);
+            output(jsonPrettyPrint(timeline));
         })
         .
         addCommand('list <identity-file> <contact-identity-file>', 'List shared posts', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
@@ -718,7 +726,7 @@ export const protocolTestCommandDefinition =
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
             };
-            const generateDeterministicRandom = createDeterministicRandomGenerator();
+            const generateDeterministicRandom = createAsyncDeterministicRandomGenerator();
             const identity = loadIdentityFile(identityFile);
             const contactIdentity = loadIdentityFile(contactIdentityFile);
             const profile: PrivateProfile = {

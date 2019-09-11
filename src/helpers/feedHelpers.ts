@@ -49,6 +49,10 @@ export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualConta
             image: feed.authorImage,
             confirmed: false,
             identity,
+            privateChannel: {
+                unsyncedCommands: [],
+                peerLastSeenChapterId: undefined,
+            },
         };
     } catch (e) {
         return undefined;

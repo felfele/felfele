@@ -1,6 +1,7 @@
 import { createAction } from './actionHelpers';
 import { Contact, NonMutualContact, MutualContact } from '../models/Contact';
 import { ActionTypes } from './ActionTypes';
+import { PrivateChannel } from '../protocols/privateChannel';
 
 export const ContactActions = {
     addContact: (contact: Contact) =>
@@ -15,4 +16,6 @@ export const ContactActions = {
         createAction(ActionTypes.DELETE_ALL_CONTACTS, {}),
     removeUnconfirmedContacts: () =>
         createAction(ActionTypes.REMOVE_UNCONFIRMED_CONTACTS),
+    updateContactPrivateChannel: (contact: MutualContact, privateChannel: PrivateChannel) =>
+        createAction(ActionTypes.UPDATE_CONTACT_PRIVATE_CHANNEL, { contact, privateChannel }),
 };

@@ -243,6 +243,10 @@ const advanceAcceptedContactState = async (
         image: contactMessage.image,
         identity: remoteIdentity,
         confirmed: false,
+        privateChannel: {
+            unsyncedCommands: [],
+            peerLastSeenChapterId: undefined,
+        },
     };
 
     return mutualContact;

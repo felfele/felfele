@@ -88,6 +88,20 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
                 contact.type === 'mutual-contact' && contact.confirmed === false;
             return contacts.filter(contact => !isMutualUnconfirmed(contact));
         }
+        case 'UPDATE-CONTACT-PRIVATE-CHANNEL': {
+            const index = contacts.findIndex(contact =>
+                contact.type === 'mutual-contact' &&
+                contact.identity.publicKey === action.payload.contact.identity.publicKey
+            );
+            if (index === -1) {
+                return contacts;
+            }
+            const updatedContact = {
+                ...contacts[index],
+                privateChannel: action.payload.privateChannel,
+            };
+            return replaceItemInArray(contacts, updatedContact, index);
+        }
     }
     return contacts;
 };

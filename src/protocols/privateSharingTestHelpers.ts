@@ -1,7 +1,7 @@
-import { PrivateSharingContext, privateSharePost, privateDeletePost, privateSync, listTimelinePosts } from '../protocols/privateSharing';
-import { Post } from '../models/Post';
+import { PrivateSharingContext, privateSharePost, privateDeletePost, privateSync, listTimelinePosts, calculatePrivateTopic } from '../protocols/privateSharing';
+import { Post, PublicPost } from '../models/Post';
 import { HexString } from '../helpers/opaqueTypes';
-import { randomNumbers, makeNaclEncryption, makeStorage, Crypto } from '../cli/protocolTest/protocolTestHelpers';
+import { randomNumbers, makeNaclEncryption, makeStorage, Crypto, makeCrypto } from '../cli/protocolTest/protocolTestHelpers';
 import { hexToByteArray, byteArrayToHex } from '../helpers/conversion';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { PrivateProfile } from '../models/Profile';
@@ -9,6 +9,8 @@ import { PrivateIdentity, PublicIdentity } from '../models/Identity';
 import { deriveSharedKey } from '../helpers/contactHelpers';
 import { Debug } from '../Debug';
 import { createDeterministicRandomGenerator } from '../helpers/unsecureRandom';
+import { cryptoHash } from '../helpers/crypto';
+import { serialize } from '../social/serialization';
 
 export enum PrivateSharingProfile {
     ALICE = 0,
@@ -22,29 +24,43 @@ export interface PrivateSharingState {
     contexts: [PrivateSharingContext, PrivateSharingContext];
 }
 
-export const makePost = (text: string): Post => ({
-    text,
-    images: [],
-    createdAt: Date.now(),
-});
+export const makePostId = (post: Post): HexString => {
+    const postJSON = serialize(post);
+    return byteArrayToHex(cryptoHash(postJSON), false);
+};
+
+export const makePost = (text: string, createdAt: number = Date.now()): Post & { _id: HexString } => {
+    const post = {
+        text,
+        images: [],
+        createdAt,
+    };
+    const id = makePostId(post);
+    return {
+        ...post,
+        _id: id,
+    };
+};
 
 export interface PrivateSharingProtocolTester {
     ALICE: PrivateSharingProfile.ALICE;
     BOB: PrivateSharingProfile.BOB;
-    sharePost: (text: string, id?: HexString | undefined) => PrivateSharingFunction;
+    sharePostText: (text: string) => PrivateSharingFunction;
+    sharePost: (post: Post & { _id: HexString }) => PrivateSharingFunction;
     deletePost: (id: HexString) => PrivateSharingFunction;
     sync: () => PrivateSharingFunction;
     listPosts: (context: PrivateSharingContext) => Post[];
     makePosts: (profile: PrivateSharingProfile, numPosts: number) => Promise<PrivateSharingAction[]>;
     execute: (actions: PrivateSharingAction[]) => Promise<PrivateSharingState>;
-    generateRandomHex: () => Promise<HexString>;
+    generateRandomHex: () => HexString;
     debugState: (state: PrivateSharingState) => void;
 }
 
 export const makePrivateSharingProtocolTester = async (randomSeed: string = randomNumbers[0]): Promise<PrivateSharingProtocolTester> => {
     const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
-    const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateDeterministicRandom);
-    const generateRandomHex = async () => byteArrayToHex(await generateDeterministicRandom(32), false);
+    const generateAsyncDeterministicRandom = (length: number) => Promise.resolve(generateDeterministicRandom(length));
+    const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateAsyncDeterministicRandom);
+    const generateRandomHex = () => byteArrayToHex(generateDeterministicRandom(32), false);
 
     const aliceProfile: PrivateProfile = {
         name: 'Alice',
@@ -57,13 +73,6 @@ export const makePrivateSharingProtocolTester = async (randomSeed: string = rand
         identity: await generateIdentity(),
     };
 
-    const makeCrypto = (identity: PrivateIdentity): Crypto => ({
-        ...makeNaclEncryption(),
-        signDigest: (digest: number[]) => SwarmHelpers.signDigest(digest, identity),
-        deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
-        random: (length: number) => generateDeterministicRandom(length),
-    });
-
     const storage = await makeStorage(generateIdentity);
     const makeContextFromProfiles = async (
         profile: PrivateProfile,
@@ -75,7 +84,7 @@ export const makePrivateSharingProtocolTester = async (randomSeed: string = rand
         remoteTimeline: [],
         sharedSecret: deriveSharedKey(profile.identity, contactIdentity),
         storage,
-        crypto: makeCrypto(profile.identity),
+        crypto: makeCrypto(profile.identity, generateAsyncDeterministicRandom),
     });
 
     const composeState = async (state: PrivateSharingState, actions: PrivateSharingAction[]): Promise<PrivateSharingState> => {
@@ -111,10 +120,19 @@ export const makePrivateSharingProtocolTester = async (randomSeed: string = rand
         ],
     };
 
-    const sharePost = (post: Post, id: HexString | undefined): PrivateSharingFunction => {
+    const sharePost = (post: Post & { _id: HexString }): PrivateSharingFunction => {
         return async (context) => {
-            id = id || await generateRandomHex();
-            return privateSharePost(context, post, id);
+            const topic = calculatePrivateTopic(context.sharedSecret);
+            const author = {
+                name: context.profile.name,
+                uri: '',
+                image: context.profile.image,
+            };
+            return privateSharePost(context, {
+                ...post,
+                topic,
+                author,
+            });
         };
     };
 
@@ -125,8 +143,11 @@ export const makePrivateSharingProtocolTester = async (randomSeed: string = rand
     return {
         ALICE: PrivateSharingProfile.ALICE,
         BOB: PrivateSharingProfile.BOB,
-        sharePost: (text: string, id: HexString | undefined) => {
-            return sharePost(makePost(text), id);
+        sharePostText: (text: string) => {
+            return sharePost(makePost(text));
+        },
+        sharePost: (post: Post & { _id: HexString }) => {
+            return sharePost(post);
         },
         deletePost: (id: HexString): PrivateSharingFunction => {
             return async (context) => {
@@ -142,8 +163,7 @@ export const makePrivateSharingProtocolTester = async (randomSeed: string = rand
         makePosts: async (profile: PrivateSharingProfile, numPosts: number): Promise<PrivateSharingAction[]> => {
             const actions: PrivateSharingAction[] = [];
             for (let i = 0; i < numPosts; i++) {
-                const id = await generateRandomHex();
-                const action: PrivateSharingAction = [profile, sharePost(makePost(`hello ${i}`), id)];
+                const action: PrivateSharingAction = [profile, sharePost(makePost(`hello ${i}`))];
                 actions.push(action);
             }
             return actions;

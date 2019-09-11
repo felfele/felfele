@@ -32,12 +32,12 @@ const getReverseUnsyncedChapters = <T>(timeline: Timeline<T>): Timeline<T> => {
     return unsyncedChapters.reverse();
 };
 
-const uploadChapter = async <T>(
+export const uploadChapter = async <T>(
     storage: ProtocolStorage,
     chapter: PartialChapter<T>,
-    encode: (c: PartialChapter<T>) => Uint8Array
+    encode: (c: PartialChapter<T>) => Promise<Uint8Array>
 ): Promise<Chapter<T>> => {
-    const encodedData = encode(chapter);
+    const encodedData = await encode(chapter);
     const hash = await storage.write(encodedData);
     return {
         ...chapter,
@@ -71,14 +71,15 @@ export const uploadTimeline = async <T>(
     storage: ProtocolStorage,
     address: HexString,
     topic: HexString,
-    encodeChapter: (c: PartialChapter<T>) => Uint8Array,
+    encodeChapter: (c: PartialChapter<T>) => Promise<Uint8Array>,
     signDigest: (digest: number[]) => string | Promise<string>,
+    previousReference?: ChapterReference | undefined,
 ): Promise<Timeline<T>> => {
     const reverseUnsyncedChapters = getReverseUnsyncedChapters(timeline);
     const previouslySyncedChapters = timeline.slice(reverseUnsyncedChapters.length);
 
     const syncedChapters: Timeline<T> = [];
-    let previous = findPreviousReference(previouslySyncedChapters, address);
+    let previous = previousReference || findPreviousReference(previouslySyncedChapters, address);
     for (const chapter of reverseUnsyncedChapters) {
         const chapterWithPrevious = {
             ...chapter,
@@ -97,6 +98,16 @@ export const uploadTimeline = async <T>(
     return [...syncedChapters, ...previouslySyncedChapters];
 };
 
+export const makePartialChapter = <T>(author: string, content: T, timestamp: number = Date.now(), previous?: ChapterReference | undefined): PartialChapter<T> => ({
+    protocol: 'timeline',
+    version: '1.0.0',
+    timestamp,
+    author,
+    type: 'application/json',
+    content,
+    previous,
+});
+
 export const appendToTimeline = <T>(timeline: Timeline<T>, author: string, content: T): Timeline<T> => {
     const chapter: PartialChapter<T> = {
         protocol: 'timeline',
@@ -110,7 +121,7 @@ export const appendToTimeline = <T>(timeline: Timeline<T>, author: string, conte
     return [chapter, ...timeline];
 };
 
-const readTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
+export const readTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
     const hash = await storage.feeds.read(address, topic);
     Debug.log('readTimeline', {hash});
     return hash as ChapterReference | undefined;

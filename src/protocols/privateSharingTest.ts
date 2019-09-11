@@ -1,4 +1,4 @@
-import { makePrivateSharingProtocolTester, PrivateSharingAction } from './privateSharingTestHelpers';
+import { makePrivateSharingProtocolTester, PrivateSharingAction, makePost } from './privateSharingTestHelpers';
 import { assertEquals } from '../helpers/assertEquals';
 import { HexString } from '../helpers/opaqueTypes';
 
@@ -7,7 +7,7 @@ const areJSONEqual = <T>(a: T, b: T) => JSON.stringify(a) === JSON.stringify(b);
 const testPrivateSharingBasicSyncing = async () => {
     const tester = await makePrivateSharingProtocolTester();
     const actions: PrivateSharingAction[] = [
-        [tester.ALICE, tester.sharePost('hello Bob')],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
         [tester.ALICE, tester.sync()],
         [tester.BOB, tester.sync()],
     ];
@@ -23,7 +23,7 @@ const testPrivateSharingBasicSyncing = async () => {
 const testPrivateSharingSyncingBeforePost = async () => {
     const tester = await makePrivateSharingProtocolTester();
     const actions: PrivateSharingAction[] = [
-        [tester.ALICE, tester.sharePost('hello Bob')],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
         [tester.BOB, tester.sync()],
         [tester.ALICE, tester.sync()],
     ];
@@ -39,9 +39,9 @@ const testPrivateSharingSyncingBeforePost = async () => {
 const testPrivateSharingBothSidesPostAndSync = async () => {
     const tester = await makePrivateSharingProtocolTester();
     const actions: PrivateSharingAction[] = [
-        [tester.ALICE, tester.sharePost('hello Bob')],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
         [tester.ALICE, tester.sync()],
-        [tester.BOB, tester.sharePost('hello Alice')],
+        [tester.BOB, tester.sharePostText('hello Alice')],
         [tester.BOB, tester.sync()],
         [tester.ALICE, tester.sync()],
     ];
@@ -56,13 +56,13 @@ const testPrivateSharingBothSidesPostAndSync = async () => {
 
 const testPrivateSharingRemovePostBeforeSyncing = async () => {
     const tester = await makePrivateSharingProtocolTester();
-    const postToBeDeletedId = 'cbdda25238b087fc48079b40c92b1f8de12344887c97f0b28696542321da5501' as HexString;
+    const post = makePost('test');
     const actions: PrivateSharingAction[] = [
-        [tester.BOB, tester.sharePost('hello Alice')],
+        [tester.BOB, tester.sharePostText('hello Alice')],
         [tester.BOB, tester.sync()],
-        [tester.ALICE, tester.sharePost('hello Bob')],
-        [tester.ALICE, tester.sharePost('test', postToBeDeletedId)],
-        [tester.ALICE, tester.deletePost(postToBeDeletedId)],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
+        [tester.ALICE, tester.sharePost(post)],
+        [tester.ALICE, tester.deletePost(post._id)],
         [tester.ALICE, tester.sync()],
         [tester.BOB, tester.sync()],
 
@@ -78,17 +78,17 @@ const testPrivateSharingRemovePostBeforeSyncing = async () => {
 
 const testPrivateSharingRemovePostAfterSyncing = async () => {
     const tester = await makePrivateSharingProtocolTester();
-    const postToBeDeletedId = 'cbdda25238b087fc48079b40c92b1f8de12344887c97f0b28696542321da5501' as HexString;
+    const post = makePost('test');
     const actions: PrivateSharingAction[] = [
-        [tester.ALICE, tester.sharePost('hello Bob')],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
         [tester.ALICE, tester.sync()],
-        [tester.BOB, tester.sharePost('hello Alice')],
+        [tester.BOB, tester.sharePostText('hello Alice')],
         [tester.BOB, tester.sync()],
         [tester.ALICE, tester.sync()],
-        [tester.ALICE, tester.sharePost('test', postToBeDeletedId)],
+        [tester.ALICE, tester.sharePost(post)],
         [tester.ALICE, tester.sync()],
         [tester.BOB, tester.sync()],
-        [tester.ALICE, tester.deletePost(postToBeDeletedId)],
+        [tester.ALICE, tester.deletePost(post._id)],
         [tester.ALICE, tester.sync()],
         [tester.BOB, tester.sync()],
 
@@ -104,17 +104,17 @@ const testPrivateSharingRemovePostAfterSyncing = async () => {
 
 const testPrivateSharingRemoveOthersPost = async () => {
     const tester = await makePrivateSharingProtocolTester();
-    const postToBeDeletedId = 'cbdda25238b087fc48079b40c92b1f8de12344887c97f0b28696542321da5501' as HexString;
+    const post = makePost('test');
     const actions: PrivateSharingAction[] = [
-        [tester.ALICE, tester.sharePost('hello Bob')],
+        [tester.ALICE, tester.sharePostText('hello Bob')],
         [tester.ALICE, tester.sync()],
-        [tester.BOB, tester.sharePost('hello Alice')],
+        [tester.BOB, tester.sharePostText('hello Alice')],
         [tester.BOB, tester.sync()],
         [tester.ALICE, tester.sync()],
-        [tester.ALICE, tester.sharePost('test', postToBeDeletedId)],
+        [tester.ALICE, tester.sharePost(post)],
         [tester.ALICE, tester.sync()],
         [tester.BOB, tester.sync()],
-        [tester.BOB, tester.deletePost(postToBeDeletedId)],
+        [tester.BOB, tester.deletePost(post._id)],
         [tester.BOB, tester.sync()],
         [tester.ALICE, tester.sync()],
     ];

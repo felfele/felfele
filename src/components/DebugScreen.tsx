@@ -17,7 +17,7 @@ import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
 import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import { Post, PrivatePost } from '../models/Post';
 
 import debugIdentities from '../../testdata/debugIdentities.json';
 import contactIdentity1 from '../../testdata/contactIdentity1.json';
@@ -28,6 +28,7 @@ import { MutualContact } from '../models/Contact';
 import { HexString } from '../helpers/opaqueTypes';
 import { deriveSharedKey } from '../helpers/contactHelpers';
 import { calculatePrivateTopic } from '../protocols/privateSharing';
+import { byteArrayToHex } from '../helpers/conversion';
 
 export interface StateProps {
     appState: AppState;
@@ -44,7 +45,7 @@ export interface DispatchProps {
     onRefreshFeeds: (feeds: Feed[]) => void;
     onAddPost: (post: Post) => void;
     onAddContact: (contact: MutualContact) => void;
-    onAddPrivatePost: (topic: HexString, post: Post) => void;
+    onAddPrivatePost: (topic: HexString, post: PrivatePost) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -281,6 +282,10 @@ const onSetupContacts = async (props: Props) => {
             identity,
             image: {},
             confirmed: true,
+            privateChannel: {
+                unsyncedCommands: [],
+                peerLastSeenChapterId: undefined,
+            },
         };
         props.onAddContact(contact);
     });
@@ -307,11 +312,14 @@ const onCreatePrivatePost = (props: Props) => {
     const sharedKey = deriveSharedKey(props.appState.author.identity!, contactIdentity1);
     const topic = calculatePrivateTopic(sharedKey);
     const postTime = Date.now();
-    const post: Post = {
+    const id = byteArrayToHex(generateSecureRandom(32), false);
+    const post: PrivatePost = {
         text: `Post ${postTime}`,
         images: [],
         createdAt: postTime,
         author: props.appState.author,
+        topic,
+        _id: id,
     };
     props.onAddPrivatePost(topic, post);
 };

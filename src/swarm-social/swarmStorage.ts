@@ -242,12 +242,12 @@ const uploadImages = async (
     imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
-    const updateImages: ImageData[] = [];
+    const uploadedImages: ImageData[] = [];
     for (const image of images) {
         const updateImage = await uploadImage(swarm, image, imageResizer, getLocalPath);
-        updateImages.push(updateImage);
+        uploadedImages.push(updateImage);
     }
-    return updateImages;
+    return uploadedImages;
 };
 
 const uploadAuthor = async (

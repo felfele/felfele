@@ -1,9 +1,8 @@
 import { HexString } from '../helpers/opaqueTypes';
 import { hexToUint8Array, byteArrayToHex, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
-import { cryptoHash } from './group';
-import { Post } from '../models/Post';
-import { Timeline, PartialChapter, uploadTimeline, getNewestChapterId, fetchTimeline, LogicalTime, appendToTimeline, ChapterReference } from './timeline';
-import * as SwarmHelpers from '../swarm/Swarm';
+import { cryptoHash } from '../helpers/crypto';
+import { Post, PrivatePost } from '../models/Post';
+import { Timeline, PartialChapter, uploadTimeline, getNewestChapterId, fetchTimeline, LogicalTime, appendToTimeline, ChapterReference, readTimeline, makePartialChapter, uploadChapter } from './timeline';
 import { serialize, deserialize } from '../social/serialization';
 import { ProtocolStorage } from './ProtocolStorage';
 import { PublicProfile } from '../models/Profile';
@@ -12,46 +11,30 @@ import { MutualContact } from '../models/Contact';
 import { Author } from '../models/Author';
 import { copyPostPrivately, copyPostWithReferences } from '../helpers/postHelpers';
 import { Debug } from '../Debug';
-
-export interface PrivateChannel {
-    topic: HexString;
-    unsyncedCommands: PrivateCommand[];
-    lastSeenChapterId: HexString | undefined;
-}
+import { ProtocolCrypto } from './ProtocolCrypto';
+import { makePostId } from './privateSharingTestHelpers';
 
 interface PrivateCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description
-    logicalTime: number;
-    id: HexString;
     version: 1;
 }
 
 export interface PrivateCommandPost extends PrivateCommandBase {
     type: 'post';
-    post: Post;
+    post: PrivatePost;
     version: 1;
 }
 
 export interface PrivateCommandRemove extends PrivateCommandBase {
     type: 'remove';
     version: 1;
+    id: HexString;
 }
 
 export type PrivateCommand =
     | PrivateCommandPost
     | PrivateCommandRemove
 ;
-
-interface Encryption {
-    encrypt: (data: Uint8Array, key: Uint8Array, random: Uint8Array) => Uint8Array;
-    decrypt: (data: Uint8Array, key: Uint8Array) => Uint8Array;
-}
-
-interface ProtocolCrypto extends Encryption {
-    signDigest: SwarmHelpers.FeedDigestSigner;
-    deriveSharedKey: (publicKey: HexString) => HexString;
-    random: (length: number) => Promise<Uint8Array>;
-}
 
 export interface PrivateSharingContext {
     profile: PublicProfile;
@@ -71,11 +54,11 @@ export const calculatePrivateTopic = (sharedKey: HexString): HexString => {
 
 export const uploadLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
     const topic = calculatePrivateTopic(context.sharedSecret);
-    const random = await context.crypto.random(32);
-    const encryptChapter = (c: PartialChapter<PrivateCommand>): Uint8Array => {
+    const encryptChapter = async (c: PartialChapter<PrivateCommand>): Promise<Uint8Array> => {
         const s = serialize(c);
         const dataBytes = stringToUint8Array(s);
         const secretBytes = hexToUint8Array(context.sharedSecret);
+        const random = await context.crypto.random(32);
         return context.crypto.encrypt(dataBytes, secretBytes, random);
     };
     const uploadedTimeline = await uploadTimeline(
@@ -138,60 +121,43 @@ export const downloadRemotePrivateCommands = async (context: PrivateSharingConte
     return [...remoteTimeline, ...context.remoteTimeline];
 };
 
-const firstLogicalTime = <T extends LogicalTime>(timeline: Timeline<T>, defaultTime = 0) => {
-    return timeline.length > 0
-        ? timeline[0].content.logicalTime
-        : defaultTime
-    ;
-};
-
-export const highestLogicalTime = (context: PrivateSharingContext) => {
-    return Math.max(
-        firstLogicalTime(context.localTimeline),
-        firstLogicalTime(context.remoteTimeline),
-    );
-};
-
 export const listTimelinePosts = (timeline: Timeline<PrivateCommand>): Post[] => {
-    const logicalTimeCompare = <T extends LogicalTime>(a: PartialChapter<T>, b: PartialChapter<T>) => a.content.logicalTime - b.content.logicalTime;
     const timestampCompare = <T>(a: PartialChapter<T>, b: PartialChapter<T>) => a.timestamp - b.timestamp;
     const authorCompare = <T>(a: PartialChapter<T>, b: PartialChapter<T>) => a.author.localeCompare(b.author);
     const isPrivatePost = (command: PrivateCommand): command is PrivateCommandPost => command.type === 'post';
     const skipSet = new Set<string>();
     const posts = timeline
-        .sort((a, b) => timestampCompare(b, a) || authorCompare(b, a) || logicalTimeCompare(b, a))
+        .sort((a, b) => timestampCompare(b, a) || authorCompare(b, a))
         .filter(chapter => {
             if (chapter.content.type === 'remove') {
                 skipSet.add(chapter.content.id);
                 return false;
             }
-            if (chapter.content.type === 'post'
-                && skipSet.has(chapter.content.id)
-            ) {
-                return false;
+            if (chapter.content.type === 'post') {
+                const id = makePostId(chapter.content.post);
+                if (skipSet.has(id)) {
+                    return false;
+                }
+                skipSet.add(id);
             }
-            skipSet.add(chapter.content.id);
             return true;
         })
         .map(chapter => chapter.content)
         .filter(isPrivatePost)
         .map(command => ({
             ...command.post,
-            _id: command.id,
+            _id: command.post._id || makePostId(command.post),
         }))
     ;
     return posts;
 };
 
-export const privateSharePost = async (context: PrivateSharingContext, post: Post, id: HexString): Promise<PrivateSharingContext> => {
-    const logicalTime = highestLogicalTime(context) + 1;
+export const privateSharePost = async (context: PrivateSharingContext, post: PrivatePost): Promise<PrivateSharingContext> => {
     const command: PrivateCommandPost = {
         protocol: 'private',
         version: 1,
         type: 'post',
-        id,
         post,
-        logicalTime,
     };
     return {
         ...context,
@@ -204,13 +170,11 @@ export const privateSharePost = async (context: PrivateSharingContext, post: Pos
 };
 
 export const privateDeletePost = async (context: PrivateSharingContext, id: HexString): Promise<PrivateSharingContext> => {
-    const logicalTime = highestLogicalTime(context) + 1;
     const command: PrivateCommandRemove = {
         protocol: 'private',
         version: 1,
         type: 'remove',
         id,
-        logicalTime,
     };
     return {
         ...context,
@@ -240,13 +204,18 @@ export const privateSharePostWithContact = async (
     storage: ProtocolStorage,
     crypto: ProtocolCrypto,
     postId: HexString,
-): Promise<Post> => {
+): Promise<PrivatePost> => {
     const sharedSecret = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
     const topic = calculatePrivateTopic(sharedSecret);
 
     const post = originalPost._id == null || originalPost.topic != null
         ? copyPostPrivately(originalPost, author, postId, topic)
-        : copyPostWithReferences(originalPost, author, postId, topic)
+        : {
+            ...copyPostWithReferences(originalPost, author, postId, topic),
+            topic,
+            author,
+            _id: postId,
+        }
     ;
 
     const context: PrivateSharingContext = {
@@ -264,7 +233,7 @@ export const privateSharePostWithContact = async (
         ...context,
         localTimeline,
     };
-    const contextWithPost = await privateSharePost(contextBeforePost, post, postId);
+    const contextWithPost = await privateSharePost(contextBeforePost, post);
     Debug.log('shareWithContact', {contextWithPost, originalPost, post, postId});
     const updatedLocalTimeline = await uploadLocalPrivateCommands(contextWithPost);
     return post;

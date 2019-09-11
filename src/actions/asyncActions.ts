@@ -48,6 +48,8 @@ import { byteArrayToHex } from '../helpers/conversion';
 import { cryptoHash } from '../helpers/crypto';
 import { Author } from '../models/Author';
 import { ProtocolStorage } from '../protocols/ProtocolStorage';
+import { syncPrivateChannelWithContact, applyPrivateChannelUpdate } from '../protocols/privateChannel';
+import { makePostId } from '../protocols/privateSharingTestHelpers';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -152,33 +154,47 @@ export const AsyncActions = {
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateSecureRandom(length),
             };
+            const actions = [];
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
                     const contact = contactFeed.contact;
-                    const sharedKey = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
-                    const topic = calculatePrivateTopic(sharedKey);
-                    const context = await makePrivateSharingContextWithContact(
-                        profile,
-                        contact.identity,
+                    const privateChannelUpdate = await syncPrivateChannelWithContact(
+                        contact,
+                        identity.publicKey as HexString,
                         storage,
                         crypto,
                     );
-                    const updatedContext = await privateSync(context);
-                    const timelinePosts = listTimelinePosts(updatedContext.remoteTimeline);
-                    for (const post of timelinePosts) {
-                        const postWithAuthor = {
-                            ...post,
-                            author: {
-                                name: contact.name,
-                                uri: contactFeed.feedUrl,
-                                image: contact.image,
-                            },
-                            topic,
-                        };
-                        dispatch(Actions.addPrivatePost(topic, postWithAuthor));
-                    }
+                    const topic = privateChannelUpdate.topic;
+                    const author = {
+                        name: contact.name,
+                        image: contact.image,
+                        uri: contactFeed.feedUrl,
+                    };
+                    const updatedPrivateChannel = applyPrivateChannelUpdate(
+                        privateChannelUpdate,
+                        (command) => {
+                            switch (command.type) {
+                                case 'post': {
+                                    const post = {
+                                        ...command.post,
+                                        topic,
+                                        author,
+                                        _id: command.post._id || makePostId(command.post),
+                                    };
+                                    actions.push(Actions.addPrivatePost(topic, post));
+                                    return;
+                                }
+                                case 'remove': {
+                                    actions.push(Actions.removePrivatePost(topic, command.id));
+                                    return;
+                                }
+                            }
+                        },
+                    );
+                    actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
                 }
             }
+            actions.map(action => dispatch(action));
         };
     },
     createPost: (post: Post): Thunk => {
@@ -252,7 +268,7 @@ export const AsyncActions = {
                         crypto,
                         postId,
                     );
-                    dispatch(Actions.addPrivatePost(post.topic!, post));
+                    dispatch(Actions.addPrivatePost(post.topic, post));
                 }
             }
         };

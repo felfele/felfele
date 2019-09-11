@@ -28,6 +28,10 @@ const testMutualContact: MutualContact = {
     image: {},
     identity: testIdentity,
     confirmed: true,
+    privateChannel: {
+        unsyncedCommands: [],
+        peerLastSeenChapterId: undefined,
+    },
 };
 
 const testInvitedContact: InvitedContact = {

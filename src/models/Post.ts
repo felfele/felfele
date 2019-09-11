@@ -25,11 +25,14 @@ export interface PublicPost extends Model {
 
 export interface Post extends PublicPost {
     link?: string;
-    location?: Location;
-    deleted?: boolean;
     author?: Author;
     updatedAt?: number;
-    liked?: boolean;
     isUploading?: boolean;
     topic?: HexString;
+}
+
+export interface PrivatePost extends Post {
+    author: Author;
+    topic: HexString;
+    _id: HexString;
 }
