@@ -45,7 +45,7 @@ export const privateChannelAddPost = (privateChannel: PrivateChannel, post: Priv
     return privateChannelAppendCommand(privateChannel, command);
 };
 
-export const privateChannelDeletePost = (privateChannel: PrivateChannel, id: HexString): PrivateChannel => {
+export const privateChannelRemovePost = (privateChannel: PrivateChannel, id: HexString): PrivateChannel => {
     const command: PrivateCommandRemove = {
         type: 'remove',
         version: 1,

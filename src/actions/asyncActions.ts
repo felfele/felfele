@@ -44,7 +44,7 @@ import { calculatePrivateTopic } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
 import { byteArrayToHex } from '../helpers/conversion';
 import { cryptoHash } from '../helpers/crypto';
-import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost } from '../protocols/privateChannel';
+import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
 import { makePostId } from '../protocols/privateSharingTestHelpers';
 
 export const AsyncActions = {
@@ -227,17 +227,23 @@ export const AsyncActions = {
     },
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
-            const ownFeeds = getState().ownFeeds;
-            if (post.link != null && ownFeeds.length > 0) {
-                const localFeed = ownFeeds[0];
-                const updatedPostCommandLog = removePost(post, '', localFeed.postCommandLog);
-                dispatch(Actions.updateOwnFeed({
-                    ...localFeed,
-                    postCommandLog: updatedPostCommandLog,
-                }));
-                dispatch(AsyncActions.syncLocalFeed(localFeed));
-            }
             dispatch(Actions.deletePost(post));
+            if (post.topic != null && typeof(post._id) === 'string') {
+                Debug.log('removePost', {post});
+                const postId = post._id as HexString;
+                dispatch(Actions.removePrivatePost(post.topic, postId));
+                for (const contact of getState().contacts) {
+                    if (contact.type === 'mutual-contact') {
+                        const topic = calculatePrivateTopic(deriveSharedKey(getState().author.identity!, contact.identity));
+                        if (topic === post.topic) {
+                            const updatedPrivateChannel = privateChannelRemovePost(contact.privateChannel, postId);
+                            dispatch(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
+                            dispatch(AsyncActions.syncPrivatePostsWithContacts([contact]));
+                            return;
+                        }
+                    }
+                }
+            }
         };
     },
     shareWithContactFeeds: (originalPost: Post, contactFeeds: ContactFeed[]): Thunk => {
