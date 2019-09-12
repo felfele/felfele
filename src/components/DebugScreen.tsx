@@ -29,6 +29,7 @@ import { HexString } from '../helpers/opaqueTypes';
 import { deriveSharedKey } from '../helpers/contactHelpers';
 import { calculatePrivateTopic } from '../protocols/privateSharing';
 import { byteArrayToHex } from '../helpers/conversion';
+import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 
 export interface StateProps {
     appState: AppState;
@@ -282,10 +283,7 @@ const onSetupContacts = async (props: Props) => {
             identity,
             image: {},
             confirmed: true,
-            privateChannel: {
-                unsyncedCommands: [],
-                peerLastSeenChapterId: undefined,
-            },
+            privateChannel: makeEmptyPrivateChannel(),
         };
         props.onAddContact(contact);
     });

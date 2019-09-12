@@ -7,14 +7,17 @@ import { serialize, deserialize } from '../social/serialization';
 import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { PrivatePost } from '../models/Post';
+import { Debug } from '../Debug';
 
 export interface PrivateChannel {
     unsyncedCommands: PrivateCommand[];
+    lastSyncedChapterId: ChapterReference | undefined;
     peerLastSeenChapterId: ChapterReference | undefined;
 }
 
 export const makeEmptyPrivateChannel = (): PrivateChannel => ({
     unsyncedCommands: [],
+    lastSyncedChapterId: undefined,
     peerLastSeenChapterId: undefined,
 });
 
@@ -54,6 +57,7 @@ export const privateChannelDeletePost = (privateChannel: PrivateChannel, id: Hex
 
 export const uploadUnsyncedTimeline = async (
     unsyncedTimeline: Timeline<PrivateCommand>,
+    lastSyncedChapterId: ChapterReference | undefined,
     address: HexString,
     topic: HexString,
     sharedSecret: HexString,
@@ -72,21 +76,21 @@ export const uploadUnsyncedTimeline = async (
         return [];
     }
 
-    const previous = await readTimeline(
-        storage,
-        address,
-        topic,
-    );
-    const syncedTimeline = await uploadTimeline(
-        unsyncedTimeline,
-        storage,
-        address,
-        topic,
-        encryptChapter,
-        crypto.signDigest,
-        previous,
-    );
-    return syncedTimeline;
+    try {
+        const syncedTimeline = await uploadTimeline(
+            unsyncedTimeline,
+            storage,
+            address,
+            topic,
+            encryptChapter,
+            crypto.signDigest,
+            lastSyncedChapterId,
+        );
+        return syncedTimeline;
+    } catch (e) {
+        Debug.log('uploadUnsyncedTimeline error', {e});
+        return [];
+    }
 };
 
 export const fetchPeerTimeline = async (
@@ -104,8 +108,12 @@ export const fetchPeerTimeline = async (
         return deserialize(decryptedText) as PartialChapter<PrivateCommand>;
     };
 
-    const peerTimeline = await fetchTimeline(storage, address, topic, decryptChapter, peerLastSeenChapterId);
-    return peerTimeline;
+    try {
+        const peerTimeline = await fetchTimeline(storage, address, topic, decryptChapter, peerLastSeenChapterId);
+        return peerTimeline;
+    } catch (e) {
+        return [];
+    }
 };
 
 export const syncPrivateChannelWithContact = async (
@@ -121,8 +129,9 @@ export const syncPrivateChannelWithContact = async (
         makePartialChapter(address, command, Date.now())
     );
 
-    const syncedCommands = await uploadUnsyncedTimeline(
+    const syncedTimeline = await uploadUnsyncedTimeline(
         unsyncedTimeline,
+        privateChannel.lastSyncedChapterId,
         address,
         topic,
         sharedSecret,
@@ -142,7 +151,7 @@ export const syncPrivateChannelWithContact = async (
     return {
         topic,
         privateChannel: contact.privateChannel,
-        syncedLocalTimeline: syncedCommands,
+        syncedLocalTimeline: syncedTimeline,
         peerTimeline,
     };
 };
@@ -152,15 +161,28 @@ export const applyPrivateChannelUpdate = (
     executeRemoteCommand?: (command: PrivateCommand) => void,
     executeLocalCommand?: (command: PrivateCommand) => void,
 ): PrivateChannel => {
+    Debug.log('applyPrivateChannelUpdate', update);
     if (executeLocalCommand != null) {
         update.syncedLocalTimeline.map(chapter => executeLocalCommand(chapter.content));
     }
     if (executeRemoteCommand != null) {
         update.peerTimeline.map(chapter => executeRemoteCommand(chapter.content));
     }
-    const peerLastSeenChapterId = getNewestChapterId(update.peerTimeline);
+    const peerLastSeenChapterId = update.peerTimeline.length !== 0
+        ? getNewestChapterId(update.peerTimeline)
+        : update.privateChannel.peerLastSeenChapterId
+    ;
+    const lastSyncedChapterId = update.syncedLocalTimeline.length !== 0
+        ? getNewestChapterId(update.syncedLocalTimeline)
+        : update.privateChannel.lastSyncedChapterId
+    ;
+    const unsyncedCommands = update.syncedLocalTimeline.length !== 0
+        ? []
+        : update.privateChannel.unsyncedCommands
+    ;
     return {
         peerLastSeenChapterId,
-        unsyncedCommands: [],
+        lastSyncedChapterId,
+        unsyncedCommands,
     };
 };

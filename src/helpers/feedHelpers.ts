@@ -11,6 +11,7 @@ import { PublicIdentity } from '../models/Identity';
 import { ContactFeed } from '../models/ContactFeed';
 import { MutualContact } from '../models/Contact';
 import { publicKeyToIdentity } from './contactHelpers';
+import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 
 export const isRecentPostFeed = (feed: Feed): feed is RecentPostFeed => {
     return (feed as RecentPostFeed).authorImage != null;
@@ -49,10 +50,7 @@ export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualConta
             image: feed.authorImage,
             confirmed: false,
             identity,
-            privateChannel: {
-                unsyncedCommands: [],
-                peerLastSeenChapterId: undefined,
-            },
+            privateChannel: makeEmptyPrivateChannel(),
         };
     } catch (e) {
         return undefined;

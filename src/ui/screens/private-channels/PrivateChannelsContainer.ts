@@ -21,7 +21,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         onRefreshPosts: (feeds: ContactFeed[]) => {
-            dispatch(AsyncActions.syncPrivatePostsWithContacts(feeds));
+            dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(feeds));
         },
     };
 };

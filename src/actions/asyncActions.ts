@@ -32,9 +32,9 @@ import {
 } from '../social/api';
 import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
-import { isContactFeed, makeContactFromRecentPostFeed } from '../helpers/feedHelpers';
+import { isContactFeed, makeContactFromRecentPostFeed, makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact } from '../models/Contact';
+import { Contact, MutualContact } from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
@@ -127,9 +127,30 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    syncPrivatePostsWithContacts: (contactFeeds: ContactFeed[]): Thunk => {
+    syncPrivatePostsWithContactFeeds: (contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
-            Debug.log('downloadPrivatePostsFromContacts', {contactFeeds});
+            // contactFeeds are usually coming from cached FeedViews
+            // so they may contain stale information about the contacts
+            // therefore here we need to reselect them from the app state
+            const contacts: MutualContact[] = [];
+            for (const contactFeed of contactFeeds) {
+                if (contactFeed.contact != null) {
+                    const publicKey = contactFeed.contact.identity.publicKey;
+                    const updatedContact = getState().contacts.find(
+                        contact => contact.type === 'mutual-contact' &&
+                        contact.identity.publicKey === publicKey
+                    ) as MutualContact | undefined;
+                    if (updatedContact != null) {
+                        contacts.push(updatedContact);
+                    }
+                }
+            }
+            dispatch(AsyncActions.syncPrivatePostsWithContacts(contacts));
+        };
+    },
+    syncPrivatePostsWithContacts: (contacts: MutualContact[]): Thunk => {
+        return async (dispatch, getState) => {
+            Debug.log('syncPrivatePostsWithContacts', {contacts});
             const identity = getState().author.identity!;
             const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
             const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
@@ -146,44 +167,41 @@ export const AsyncActions = {
                 random: (length: number) => generateSecureRandom(length),
             };
             const actions = [];
-            for (const contactFeed of contactFeeds) {
-                if (contactFeed.contact != null) {
-                    const contact = contactFeed.contact;
-                    const privateChannelUpdate = await syncPrivateChannelWithContact(
-                        contact,
-                        identity.publicKey as HexString,
-                        storage,
-                        crypto,
-                    );
-                    const topic = privateChannelUpdate.topic;
-                    const author = {
-                        name: contact.name,
-                        image: contact.image,
-                        uri: contactFeed.feedUrl,
-                    };
-                    const updatedPrivateChannel = applyPrivateChannelUpdate(
-                        privateChannelUpdate,
-                        (command) => {
-                            switch (command.type) {
-                                case 'post': {
-                                    const post = {
-                                        ...command.post,
-                                        topic,
-                                        author,
-                                        _id: command.post._id || makePostId(command.post),
-                                    };
-                                    actions.push(Actions.addPrivatePost(topic, post));
-                                    return;
-                                }
-                                case 'remove': {
-                                    actions.push(Actions.removePrivatePost(topic, command.id));
-                                    return;
-                                }
+            for (const contact of contacts) {
+                const privateChannelUpdate = await syncPrivateChannelWithContact(
+                    contact,
+                    identity.address as HexString,
+                    storage,
+                    crypto,
+                );
+                const topic = privateChannelUpdate.topic;
+                const author = {
+                    name: contact.name,
+                    image: contact.image,
+                    uri: makeBzzFeedUrlFromIdentity(contact.identity),
+                };
+                const updatedPrivateChannel = applyPrivateChannelUpdate(
+                    privateChannelUpdate,
+                    (command) => {
+                        switch (command.type) {
+                            case 'post': {
+                                const post = {
+                                    ...command.post,
+                                    topic,
+                                    author,
+                                    _id: command.post._id || makePostId(command.post),
+                                };
+                                actions.push(Actions.addPrivatePost(topic, post));
+                                return;
                             }
-                        },
-                    );
-                    actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
-                }
+                            case 'remove': {
+                                actions.push(Actions.removePrivatePost(topic, command.id));
+                                return;
+                            }
+                        }
+                    },
+                );
+                actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
             }
             actions.map(action => dispatch(action));
         };
@@ -249,7 +267,7 @@ export const AsyncActions = {
                     dispatch(Actions.updateContactPrivateChannel(contactFeed.contact, privateChannelWithPost));
                 }
             }
-            dispatch(AsyncActions.syncPrivatePostsWithContacts(contactFeeds));
+            dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(contactFeeds));
         };
     },
     sharePost: (post: Post): Thunk => {

@@ -7,6 +7,7 @@ import { keccak256 } from 'js-sha3';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { serialize } from '../social/serialization';
+import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 
 export interface UnknownContact {
     type: 'unknown-contact';
@@ -243,10 +244,7 @@ const advanceAcceptedContactState = async (
         image: contactMessage.image,
         identity: remoteIdentity,
         confirmed: false,
-        privateChannel: {
-            unsyncedCommands: [],
-            peerLastSeenChapterId: undefined,
-        },
+        privateChannel: makeEmptyPrivateChannel(),
     };
 
     return mutualContact;

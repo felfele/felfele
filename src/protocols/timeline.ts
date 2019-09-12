@@ -80,6 +80,7 @@ export const uploadTimeline = async <T>(
 
     const syncedChapters: Timeline<T> = [];
     let previous = previousReference || findPreviousReference(previouslySyncedChapters, address);
+    Debug.log('uploadTimeline', {timeline, reverseUnsyncedChapters, previous});
     for (const chapter of reverseUnsyncedChapters) {
         const chapterWithPrevious = {
             ...chapter,

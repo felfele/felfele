@@ -34,7 +34,7 @@ export class SwarmStorageFeeds implements ProtocolStorageFeeds {
             const data = await feed.download(0);
             return data;
         } catch (e) {
-            return undefined;
+            throw new Error(`cannot read data from feed: ${feedAddress.user} ${feedAddress.topic}`);
         }
     }
 }

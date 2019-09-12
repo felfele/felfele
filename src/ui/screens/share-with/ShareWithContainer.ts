@@ -40,7 +40,6 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             const isContactFeed = (feed: Feed): feed is ContactFeed => (feed as ContactFeed).contact != null;
             const contactFeeds = feeds.filter(isContactFeed);
             dispatch(AsyncActions.shareWithContactFeeds(post, contactFeeds));
-            dispatch(AsyncActions.syncPrivatePostsWithContacts(contactFeeds));
         },
         onDoneSharing: () => {
             const onDoneSharing = ownProps.navigation.getParam<'ShareWithContainer', 'onDoneSharing'>('onDoneSharing');

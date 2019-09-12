@@ -54,7 +54,6 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             feed.contact != null
                 ? ownProps.navigation.navigate('ContactView', {
                     publicKey: feed.contact.identity.publicKey,
-                    feed: feed,
                 })
                 : ownProps.navigation.navigate('FeedFromList', {
                     feedUrl: feed.feedUrl,
