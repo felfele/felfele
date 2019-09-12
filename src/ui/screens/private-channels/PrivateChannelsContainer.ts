@@ -1,18 +1,22 @@
 import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
 import { AsyncActions } from '../../../actions/asyncActions';
-import { getPrivateChannelFeedsPosts, getPrivateChannelFeeds, getAllPrivateChannelPosts } from '../../../selectors/selectors';
+import { getPrivateChannelFeeds, getAllPrivateChannelPosts } from '../../../selectors/selectors';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { StateProps, DispatchProps, PrivateChannelsFeedView } from './PrivateChannelsFeedView';
 import { ContactFeed } from '../../../models/ContactFeed';
+import { Post } from '../../../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const posts = getAllPrivateChannelPosts(state);
+    const allPosts = getAllPrivateChannelPosts(state);
+    const ownPublicKey = state.author.identity!.publicKey;
+    const isOwnPost = (post: Post) => post.author != null && post.author.identity != null && post.author.identity.publicKey === ownPublicKey;
+    const posts = allPosts.filter(post => !isOwnPost(post));
     const privateChannelFeeds = getPrivateChannelFeeds(state);
 
     return {
         navigation: ownProps.navigation,
-        posts: posts,
+        posts,
         feeds: privateChannelFeeds,
         gatewayAddress: state.settings.swarmGatewayAddress,
     };
