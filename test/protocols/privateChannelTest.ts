@@ -1,5 +1,5 @@
 import { MutualContact } from '../../src/models/Contact';
-import { syncPrivateChannelWithContact, privateChannelAddPost } from '../../src/protocols/privateChannel';
+import { syncPrivateChannelWithContact, privateChannelAddPost, makeEmptyPrivateChannel } from '../../src/protocols/privateChannel';
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { makeStorage, makeCrypto } from '../../src/cli/protocolTest/protocolTestHelpers';
 import { createAsyncDeterministicRandomGenerator } from '../../src/helpers/unsecureRandom';
@@ -21,10 +21,7 @@ const testMutualContact: MutualContact = {
     image: {},
     identity: testContactIdentity,
     confirmed: true,
-    privateChannel: {
-        unsyncedCommands: [],
-        peerLastSeenChapterId: undefined,
-    },
+    privateChannel: makeEmptyPrivateChannel(),
 };
 
 describe('uploadUnsyncedCommands', () => {

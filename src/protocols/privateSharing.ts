@@ -1,7 +1,7 @@
 import { HexString } from '../helpers/opaqueTypes';
 import { hexToUint8Array, byteArrayToHex, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { cryptoHash } from '../helpers/crypto';
-import { Post, PrivatePost } from '../models/Post';
+import { Post, PrivatePost, PostWithId } from '../models/Post';
 import { Timeline, PartialChapter, uploadTimeline, getNewestChapterId, fetchTimeline, LogicalTime, appendToTimeline, ChapterReference, readTimeline, makePartialChapter, uploadChapter } from './timeline';
 import { serialize, deserialize } from '../social/serialization';
 import { ProtocolStorage } from './ProtocolStorage';
@@ -20,7 +20,7 @@ interface PrivateCommandBase {
 
 export interface PrivateCommandPost extends PrivateCommandBase {
     type: 'post';
-    post: PrivatePost;
+    post: PostWithId;
     version: 1;
 }
 

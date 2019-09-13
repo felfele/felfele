@@ -1,7 +1,7 @@
 import { PostListDict } from '../../src/reducers/version5';
 import { PrivatePostActions } from '../../src/actions/PrivatePostActions';
 import { HexString } from '../../src/helpers/opaqueTypes';
-import { PrivatePost } from '../../src/models/Post';
+import { PrivatePost, Post } from '../../src/models/Post';
 import { privatePostsReducer } from '../../src/reducers/privatePostsReducer';
 
 describe('privatePostsReducer', () => {

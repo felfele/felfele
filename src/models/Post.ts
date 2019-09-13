@@ -3,11 +3,6 @@ import { ImageData } from './ImageData';
 import { Author } from './Author';
 import { HexString } from '../helpers/opaqueTypes';
 
-interface Location {
-    latitude: number;
-    longitude: number;
-}
-
 type PostLink = string;
 
 export interface PostReferences {
@@ -31,8 +26,11 @@ export interface Post extends PublicPost {
     topic?: HexString;
 }
 
-export interface PrivatePost extends Post {
+export interface PostWithId extends Post {
+    _id: HexString;
+}
+
+export interface PrivatePost extends PostWithId {
     author: Author;
     topic: HexString;
-    _id: HexString;
 }

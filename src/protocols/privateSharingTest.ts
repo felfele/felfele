@@ -1,7 +1,8 @@
 import { makePrivateSharingProtocolTester, PrivateSharingAction, makePost } from './privateSharingTestHelpers';
 import { assertEquals } from '../helpers/assertEquals';
+import deepEqual from 'deep-equal';
 
-const areJSONEqual = <T>(a: T, b: T) => JSON.stringify(a) === JSON.stringify(b);
+const areJSONEqual = <T>(a: T, b: T) => deepEqual(a, b);
 
 const testPrivateSharingBasicSyncing = async () => {
     const tester = await makePrivateSharingProtocolTester();

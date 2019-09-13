@@ -6,7 +6,7 @@ import { HexString } from '../helpers/opaqueTypes';
 import { serialize, deserialize } from '../social/serialization';
 import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { ProtocolCrypto } from './ProtocolCrypto';
-import { PrivatePost } from '../models/Post';
+import { PrivatePost, PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
 
 export interface PrivateChannel {
@@ -35,7 +35,7 @@ const privateChannelAppendCommand = (privateChannel: PrivateChannel, command: Pr
     };
 };
 
-export const privateChannelAddPost = (privateChannel: PrivateChannel, post: PrivatePost): PrivateChannel => {
+export const privateChannelAddPost = (privateChannel: PrivateChannel, post: PostWithId): PrivateChannel => {
     const command: PrivateCommandPost = {
         type: 'post',
         version: 1,
