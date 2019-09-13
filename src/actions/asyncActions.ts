@@ -16,7 +16,7 @@ import {
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts, copyPostWithReferences, createPostWithLinkMetaData } from '../helpers/postHelpers';
+import { mergeUpdatedPosts, copyPostWithReferences, createPostWithLinkMetaData, makePostId } from '../helpers/postHelpers';
 import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
 import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
 import { generateSecureRandom } from '../helpers/secureRandom';
@@ -45,7 +45,6 @@ import { PrivateIdentity } from '../models/Identity';
 import { byteArrayToHex } from '../helpers/conversion';
 import { cryptoHash } from '../helpers/crypto';
 import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
-import { makePostId } from '../protocols/privateSharingTestHelpers';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {

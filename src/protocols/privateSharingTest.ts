@@ -1,6 +1,5 @@
 import { makePrivateSharingProtocolTester, PrivateSharingAction, makePost } from './privateSharingTestHelpers';
 import { assertEquals } from '../helpers/assertEquals';
-import { HexString } from '../helpers/opaqueTypes';
 
 const areJSONEqual = <T>(a: T, b: T) => JSON.stringify(a) === JSON.stringify(b);
 

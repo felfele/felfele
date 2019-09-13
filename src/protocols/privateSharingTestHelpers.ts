@@ -11,6 +11,7 @@ import { Debug } from '../Debug';
 import { createDeterministicRandomGenerator } from '../helpers/unsecureRandom';
 import { cryptoHash } from '../helpers/crypto';
 import { serialize } from '../social/serialization';
+import { makePostId } from '../helpers/postHelpers';
 
 export enum PrivateSharingProfile {
     ALICE = 0,
@@ -23,11 +24,6 @@ export type PrivateSharingAction = [PrivateSharingProfile, PrivateSharingFunctio
 export interface PrivateSharingState {
     contexts: [PrivateSharingContext, PrivateSharingContext];
 }
-
-export const makePostId = (post: Post): HexString => {
-    const postJSON = serialize(post);
-    return byteArrayToHex(cryptoHash(postJSON), false);
-};
 
 export const makePost = (text: string, createdAt: number = Date.now()): Post & { _id: HexString } => {
     const post = {

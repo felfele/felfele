@@ -9,10 +9,9 @@ import { PublicProfile } from '../models/Profile';
 import { PublicIdentity } from '../models/Identity';
 import { MutualContact } from '../models/Contact';
 import { Author } from '../models/Author';
-import { copyPostPrivately, copyPostWithReferences } from '../helpers/postHelpers';
+import { copyPostPrivately, copyPostWithReferences, makePostId } from '../helpers/postHelpers';
 import { Debug } from '../Debug';
 import { ProtocolCrypto } from './ProtocolCrypto';
-import { makePostId } from './privateSharingTestHelpers';
 
 interface PrivateCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description
