@@ -6,6 +6,8 @@ import { Post } from '../models/Post';
 import { MutualContact } from '../models/Contact';
 import { ContactFeed } from '../models/ContactFeed';
 import { NavigationNavigateAction } from 'react-navigation';
+import { InviteCode } from '../models/InviteCode';
+import { ContactHelper } from './contactHelpers';
 
 export interface Routes {
     App: {};
@@ -46,6 +48,9 @@ export interface Routes {
     };
     FeedInfo: {
         feed: Feed;
+    };
+    RSSFeedLoader: {
+        feedUrl: string;
     };
     RSSFeedInfo: {
         feed: Feed;
@@ -94,8 +99,12 @@ export interface Routes {
         selectedFeeds: Feed[];
         onDoneSharing?: () => void;
     };
+    ContactLoader: {
+        inviteCode: InviteCode;
+        contactHelper: ContactHelper;
+    };
     ContactConfirm: {
-        publicKey: string;
+        inviteCode: InviteCode;
     };
     ContactSuccess: {
         contact: MutualContact;

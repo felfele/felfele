@@ -44,12 +44,13 @@ const urlSafeBase64Decode = (data: string) => {
     return new Uint8Array(base64ab.decode(unsafeBase64));
 };
 
-export const getInviteLink = (contact: InvitedContact): string => {
+export const getInviteLink = (contact: InvitedContact, profileName: string): string => {
     const randomSeedBytes = hexToUint8Array(contact.randomSeed);
     const contactPulicKeyBytes = hexToUint8Array(contact.contactIdentity.publicKey);
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
     const base64ContactPublicKey = urlSafeBase64Encode(contactPulicKeyBytes);
-    return getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
+    const inviteLinkWithoutUsername = getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
+    return `${inviteLinkWithoutUsername}/?name=${profileName}`;
 };
 
 export const getInviteLinkWithBase64Params = (base64RandomSeed: string, base64ContactPublicKey: string) => {
@@ -60,6 +61,7 @@ export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | un
     if (!inviteLink.startsWith(`${BASE_URL}${INVITE}`)) {
         return undefined;
     }
+    const profileName = inviteLink.split('?name=')[1];
     const strippedLink = inviteLink.replace(`${BASE_URL}${INVITE}`, '');
     try {
         const [base64RandomSeed, base64ContactPublicKey] = strippedLink.split(SEPARATOR);
@@ -68,6 +70,7 @@ export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | un
         return {
             randomSeed,
             contactPublicKey,
+            profileName,
         };
     } catch (e) {
         return undefined;

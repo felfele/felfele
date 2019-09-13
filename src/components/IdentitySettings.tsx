@@ -72,11 +72,11 @@ const VIEW_POSTS_LABEL = 'View all your posts';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
-const generateInviteQRCodeValue = (invitedContact?: InvitedContact): string | undefined => {
+const generateInviteQRCodeValue = (profileName: string, invitedContact?: InvitedContact): string | undefined => {
     if (invitedContact == null) {
         return undefined;
     }
-    return getInviteLink(invitedContact);
+    return getInviteLink(invitedContact, profileName);
 };
 
 const generateFollowRCodeValue = (feed?: Feed): string | undefined => {
@@ -136,17 +136,17 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
 
 export const IdentitySettings = (props: DispatchProps & StateProps) => {
     const qrCodeValue = props.showInviteCode
-        ? generateInviteQRCodeValue(props.invitedContact)
+        ? generateInviteQRCodeValue(props.profile.name, props.invitedContact)
         : generateFollowRCodeValue(props.ownFeed)
     ;
     if (props.showInviteCode && qrCodeValue == null) {
         props.onChangeQRCode();
     }
     const onPressShare = props.showInviteCode
-        ? () => props.invitedContact && showShareContactDialog(props.invitedContact)
+        ? () => props.invitedContact && showShareContactDialog(props.invitedContact, props.profile.name)
         : () => showShareFeedDialog(props.ownFeed)
     ;
-   // Debug.log('IdentitySettings', {qrCodeValue, invitedContact: props.invitedContact});
+
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <SafeAreaView style={styles.safeAreaContainer}>

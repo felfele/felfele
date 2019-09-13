@@ -33,8 +33,3 @@ export const ContactInfoContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(ContactInfo);
-
-export const ContactConfirmContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(ContactConfirm);

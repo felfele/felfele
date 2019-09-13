@@ -5,8 +5,7 @@ import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
 import { TypedNavigation } from '../helpers/navigation';
-import { Contact, NonMutualContact } from '../models/Contact';
-import { RSSFeedInfo } from '../ui/screens/RSSFeedInfo';
+import { RSSFeedInfo } from '../ui/screens/rss-feed/RSSFeedInfo';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     // this is needed because initally we receive the feed as a navigation param, and when we follow it,
@@ -42,10 +41,6 @@ const getFeedToOpen = (feeds: Feed[], navigation: TypedNavigation) => {
 
 export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
-        onAddFeed: (feed: Feed) => {
-            dispatch(AsyncActions.addFeed(feed));
-            dispatch(AsyncActions.downloadPostsFromFeeds([feed]));
-        },
         onRemoveFeed: (feed: Feed) => {
             dispatch(Actions.removeFeed(feed));
             dispatch(AsyncActions.downloadFollowedFeedPosts());
@@ -53,12 +48,6 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         },
         onUnfollowFeed: (feed: Feed) => {
             dispatch(Actions.unfollowFeed(feed));
-        },
-        onAddContact: (contact: Contact) => {
-            dispatch(AsyncActions.addContact(contact));
-        },
-        onAdvanceContactState: (updatedContact: NonMutualContact, contact: Contact) => {
-            dispatch(Actions.updateContactState(updatedContact, contact));
         },
     };
 };

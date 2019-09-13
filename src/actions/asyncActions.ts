@@ -22,6 +22,7 @@ import {
     deriveSharedKey,
     advanceContactState,
     ContactHelper,
+    createCodeReceivedContact,
 } from '../helpers/contactHelpers';
 import {
     createSwarmContactRandomHelper,
@@ -73,6 +74,7 @@ import { PrivateIdentity } from '../models/Identity';
 import { SECOND } from '../DateUtils';
 import { getNonMutualContacts } from '../selectors/selectors';
 import { byteArrayToHex } from '../helpers/conversion';
+import { InviteCode } from '../models/InviteCode';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {

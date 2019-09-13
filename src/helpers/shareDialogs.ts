@@ -24,9 +24,9 @@ ${followLink}`;
     await Share.share(content, options);
 };
 
-export const showShareContactDialog = async (contact: InvitedContact) => {
+export const showShareContactDialog = async (contact: InvitedContact, profileName: string) => {
     const title = 'Send an invite';
-    const inviteLink = getInviteLink(contact);
+    const inviteLink = getInviteLink(contact, profileName);
     const message = `Contact me on Felfele by opening this link:
 ${inviteLink}`;
 

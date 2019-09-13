@@ -5,19 +5,19 @@ import {
     Dimensions,
 } from 'react-native';
 
-import { Feed } from '../../models/Feed';
-import { ComponentColors, Colors } from '../../styles';
-import { NavigationHeader } from '../../components/NavigationHeader';
+import { Feed } from '../../../models/Feed';
+import { ComponentColors, Colors } from '../../../styles';
+import { NavigationHeader } from '../../../components/NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import * as AreYouSureDialog from '../../components/AreYouSureDialog';
-import { TypedNavigation } from '../../helpers/navigation';
-import { FragmentSafeAreaViewWithoutTabBar } from '../misc/FragmentSafeAreaView';
-import { TwoButton } from '../buttons/TwoButton';
-import { RegularText } from '../misc/text';
-import { showShareFeedDialog } from '../../helpers/shareDialogs';
-import { ImageDataView } from '../../components/ImageDataView';
-import { getFeedImage } from '../../helpers/feedHelpers';
-import { ReactNativeModelHelper } from '../../models/ReactNativeModelHelper';
+import * as AreYouSureDialog from '../../../components/AreYouSureDialog';
+import { TypedNavigation } from '../../../helpers/navigation';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
+import { TwoButton } from '../../buttons/TwoButton';
+import { RegularText } from '../../misc/text';
+import { showShareFeedDialog } from '../../../helpers/shareDialogs';
+import { ImageDataView } from '../../../components/ImageDataView';
+import { getFeedImage } from '../../../helpers/feedHelpers';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
