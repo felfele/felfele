@@ -2,7 +2,6 @@ import { Feed } from '../models/Feed';
 import { AppState } from '../reducers/AppState';
 import { Actions, InternalActions } from './Actions';
 import { migrateAppStateToCurrentVersion } from '../store';
-
 import * as Swarm from '../swarm/Swarm';
 import { RSSPostManager } from '../RSSPostManager';
 import {
@@ -25,7 +24,6 @@ import { Utils } from '../Utils';
 import {
     LocalFeed,
     shareNewPost,
-    removePost,
     mergePostCommandLogs,
     getPreviousCommandEpochFromLog,
     RecentPostFeed,
@@ -42,8 +40,6 @@ import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelp
 import { HexString } from '../helpers/opaqueTypes';
 import { calculatePrivateTopic } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
-import { byteArrayToHex } from '../helpers/conversion';
-import { cryptoHash } from '../helpers/crypto';
 import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
 
 export const AsyncActions = {
@@ -255,7 +251,7 @@ export const AsyncActions = {
                 ...postWithLinkMetaData,
                 author,
             };
-            const postId = byteArrayToHex(cryptoHash(JSON.stringify(postWithoutId)), false);
+            const postId = makePostId(postWithoutId);
             for (const contactFeed of contactFeeds) {
                 if (contactFeed.contact != null) {
                     const privateChannel = contactFeed.contact.privateChannel;
