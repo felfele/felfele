@@ -55,7 +55,6 @@ import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
-import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
 import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
 import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
@@ -73,6 +72,7 @@ import { PublicChannelsContainer } from './ui/screens/public-channels/PublicChan
 import { PublicChannelsListContainer } from './ui/screens/public-channels/PublicChannelsListContainer';
 import { ContactConfirmContainer } from './ui/screens/contact/ContactConfirmContainer';
 import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContainer';
+import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -346,12 +346,11 @@ const Scenes: NavigationRouteConfigMap = {
     FeedInfo: {
         screen: FeedInfoContainer,
     },
+    FeedLinkReader: {
+        screen: FeedLinkReaderContainer,
+    },
     RSSFeedInfo: {
         screen: RSSFeedInfoContainer,
-    },
-    FeedInfoDeepLink: {
-        screen: FeedInfoFollowLinkContainer,
-        path: 'follow/:feedUrl',
     },
     FeedInfoInviteLink: {
         screen: FeedInfoInviteLinkContainer,

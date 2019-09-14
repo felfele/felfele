@@ -49,14 +49,13 @@ export interface Routes {
     FeedInfo: {
         feed: Feed;
     };
+    FeedLinkReader: {
+    };
     RSSFeedLoader: {
         feedUrl: string;
     };
     RSSFeedInfo: {
         feed: Feed;
-    };
-    FeedInfoDeepLink: {
-        feedUrl: string;
     };
     FeedInfoInviteLink: {
         randomSeed: string;
@@ -73,7 +72,6 @@ export interface Routes {
         name: string,
     };
     CategoriesContainer: {
-
     };
     SubCategoriesContainer: {
         title: string,

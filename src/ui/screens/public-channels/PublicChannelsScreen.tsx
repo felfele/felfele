@@ -50,14 +50,7 @@ export class PublicChannelsScreen extends React.Component<Props> {
                                 />,
                             }}
                             rightButton1={{
-                                onPress: () => this.props.navigation.navigate('FeedInfo', {
-                                     feed: {
-                                         name: '',
-                                         url: '',
-                                         feedUrl: '',
-                                         favicon: '',
-                                     },
-                                }),
+                                onPress: () => this.props.navigation.navigate('FeedLinkReader', {}),
                                 label: <Icon
                                     name='plus-box'
                                     size={24}

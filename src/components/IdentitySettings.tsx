@@ -237,14 +237,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                         rightButton={{
                             label: 'Add channel',
                             icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
-                            onPress: () => props.navigation.navigate('FeedInfo', {
-                                feed: {
-                                    name: '',
-                                    url: '',
-                                    feedUrl: '',
-                                    favicon: '',
-                                },
-                           }),
+                            onPress: () => props.navigation.navigate('FeedLinkReader', {}),
                         }}
                     />
                 </ScrollView>

@@ -4,12 +4,8 @@ import {
     StyleSheet,
     View,
     Dimensions,
-    Clipboard,
-    RegisteredStyle,
-    ViewStyle,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { Feed } from '../models/Feed';
 import { SimpleTextInput } from './SimpleTextInput';
@@ -23,9 +19,7 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { WideButton } from '../ui/buttons/WideButton';
 import { RegularText } from '../ui/misc/text';
 import { showShareFeedDialog } from '../helpers/shareDialogs';
-import { getInviteCodeFromInviteLink } from '../helpers/deepLinking';
 import { PublicProfile } from '../models/Profile';
-import { getFelfeleLinkFromClipboardData } from '../helpers/feedInfoHelper';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -34,8 +28,6 @@ const QRCameraHeight = QRCameraWidth;
 
 interface FeedInfoState {
     url: string;
-    showQRCamera: boolean;
-    activityText: string;
 }
 
 export interface DispatchProps {
@@ -56,8 +48,6 @@ type Props = DispatchProps & StateProps;
 export class FeedInfo extends React.Component<Props, FeedInfoState> {
     public state: FeedInfoState = {
         url: '',
-        showQRCamera: false,
-        activityText: '',
     };
 
     constructor(props: Props) {
@@ -65,15 +55,7 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         this.state.url = this.props.feed.feedUrl;
     }
 
-    public async componentDidMount() {
-        await this.addFelfeleFeedsFromClipboard();
-        this.setState({
-            showQRCamera: true,
-        });
-    }
-
     public render() {
-        const isExistingFeed = this.props.feed.feedUrl.length > 0;
         const isFollowed = this.props.feed.followed;
 
         const icon = (name: string, size: number = 20) => <Icon name={name} size={size} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
@@ -82,19 +64,17 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             onPress,
         });
 
-        const rightButton1 = isExistingFeed
-            ? isFollowed
-                ? button('link-off', this.onUnfollowFeed)
-                : this.props.isKnownFeed
-                    ? button('delete', this.onDelete)
-                    : undefined
-            : undefined
+        const rightButton1 = isFollowed
+            ? button('link-off', this.onUnfollowFeed)
+            : this.props.isKnownFeed
+                ? button('delete', this.onDelete)
+                : undefined
         ;
 
         return (
             <FragmentSafeAreaViewWithoutTabBar>
                 <NavigationHeader
-                    title={isExistingFeed ? this.props.feed.name : 'Add channel'}
+                    title={this.props.feed.name}
                     leftButton={{
                         label: icon('close', 24),
                         onPress: () => this.props.navigation.goBack(null),
@@ -107,43 +87,16 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                         defaultValue={this.state.url}
                         style={styles.linkInput}
                         onChangeText={(text) => this.setState({ url: text })}
-                        placeholder='Scan QR code or paste link here'
-                        placeholderTextColor={Colors.MEDIUM_GRAY}
                         autoCapitalize='none'
                         autoFocus={false}
                         autoCorrect={false}
-                        editable={!isExistingFeed}
+                        editable={false}
                         returnKeyType='done'
-                        onSubmitEditing={async () => await this.handleLink(this.state.url)}
-                        onEndEditing={() => {}}
                     />
-                    {this.props.feed.feedUrl.length > 0
-                        ? <this.ExistingItemView />
-                        : <this.NewItemView showQRCamera={this.state.showQRCamera} />
-                    }
+                    <this.ExistingItemView />
                 </View>
             </FragmentSafeAreaViewWithoutTabBar>
         );
-    }
-
-    private NewItemView = (props: { showQRCamera: boolean }) => {
-        if (props.showQRCamera) {
-            return (
-                <View>
-                    <View style={styles.qrCameraContainer}>
-                        <QRCodeScanner
-                            onRead={async (event) => await this.onScanSuccess(event.data)}
-                            containerStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
-                            cameraStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
-                            fadeIn={false}
-                            cameraProps={{ratio: '1:1'}}
-                        />
-                    </View>
-                </View>
-            );
-        } else {
-            return null;
-        }
     }
 
     private ExistingItemView = () => {
@@ -169,29 +122,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         );
     }
 
-    private handleLink(link: string) {
-        Debug.log('FeedInfo.processLink', 'this.state', this.state, 'link', link);
-        const inviteCode = getInviteCodeFromInviteLink(link);
-        if (inviteCode != null) {
-            this.props.navigation.replace('ContactConfirm', { inviteCode });
-            return;
-        }
-        this.props.navigation.replace('RSSFeedLoader', { feedUrl: link });
-    }
-
-    private addFelfeleFeedsFromClipboard = async () => {
-        const isExistingFeed = this.props.feed.feedUrl.length > 0;
-        const data = await Clipboard.getString();
-        const link = getFelfeleLinkFromClipboardData(data);
-        if (!isExistingFeed && link != null) {
-            this.setState({
-                url: link,
-            });
-            Clipboard.setString('');
-            await this.handleLink(link);
-        }
-    }
-
     private onUnfollowFeed = () => {
         unfollowFeed(this.props.feed, this.props.onUnfollowFeed);
     }
@@ -207,18 +137,6 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
             options,
             { cancelable: true },
         );
-    }
-
-    private onScanSuccess = async (data: any) => {
-        try {
-            Debug.log('FeedInfo.onScanSuccess', 'data', data);
-            this.setState({
-                url: data,
-            });
-            await this.handleLink(data);
-        } catch (e) {
-            Debug.log(e);
-        }
     }
 }
 

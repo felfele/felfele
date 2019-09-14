@@ -10,7 +10,7 @@ import { Debug } from '../Debug';
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const base64RandomSeed = ownProps.navigation.getParam<'FeedInfoInviteLink', 'randomSeed'>('randomSeed');
     const base64ContactPublicKey = ownProps.navigation.getParam<'FeedInfoInviteLink', 'contactPublicKey'>('contactPublicKey');
-    Debug.log('FeedInfoDeepLinkContainer.mapStateToProps', {base64RandomSeed, base64ContactPublicKey});
+    Debug.log('FeedInfoInviteLinkContainer.mapStateToProps', {base64RandomSeed, base64ContactPublicKey});
     const link = getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
     Clipboard.setString(link);
 

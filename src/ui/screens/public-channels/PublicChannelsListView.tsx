@@ -118,13 +118,7 @@ export class PublicChannelsListView extends React.PureComponent<DispatchProps & 
     }
 
     private onAddFeed = () => {
-        const feed: Feed = {
-            favicon: '',
-            feedUrl: '',
-            name: '',
-            url: '',
-        };
-        this.props.navigation.navigate('FeedInfo', { feed: feed });
+        this.props.navigation.navigate('FeedLinkReader', {});
     }
 }
 
