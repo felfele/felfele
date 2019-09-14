@@ -138,16 +138,6 @@ const definitions =
         output({data});
     })
     .
-    addCommand('fetchTest', 'Fetch test', async () => {
-        const feedAddress: Swarm.FeedAddress = {
-            user: '0xfa988765c1792f81f804f73c86046f44ca582298',
-            topic: '0x9b59b894a1870232da714e0c6dc6199b15881c9b1bae303b8e2bbe190f4b642a',
-        };
-        const feedApi = Swarm.makeReadableApi(feedAddress, swarmConfig.gatewayAddress);
-        const data = await feedApi.feed.download(10 * 1000);
-        output({data});
-    })
-    .
     addCommand('protocol', 'Test protocols', protocolCommandDefinition)
     .
     addCommand('benchmark', 'Measure the time a function takes', benchmarkCommandDefinition)
