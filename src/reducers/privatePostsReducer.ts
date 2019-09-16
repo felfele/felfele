@@ -1,4 +1,4 @@
-import { PostListDict } from './version5';
+import { PostListDict } from './version4';
 import { Actions } from '../actions/Actions';
 import { ActionTypes } from '../actions/ActionTypes';
 import { removeFromArray } from '../helpers/immutable';
