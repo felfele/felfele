@@ -1,7 +1,7 @@
 import { PublicIdentity, PrivateIdentity } from './Identity';
 import { ImageData } from './ImageData';
 import { HexString } from '../helpers/opaqueTypes';
-import { PrivateChannel } from '../protocols/privateChannel';
+import { PrivateChannelSyncData } from '../protocols/privateChannel';
 
 // Alice invites Bob with a QR code:
 // Alice: InvitedContact -> AcceptedContact -> MutualContact
@@ -35,7 +35,7 @@ export interface MutualContact {
     image: ImageData;
     identity: PublicIdentity;
     confirmed: boolean;
-    privateChannel: PrivateChannel;
+    privateChannel: PrivateChannelSyncData;
 }
 
 export type NonMutualContact = InvitedContact | AcceptedContact | CodeReceivedContact;

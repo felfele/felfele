@@ -13,33 +13,33 @@ import { copyPostPrivately, copyPostWithReferences, makePostId } from '../helper
 import { Debug } from '../Debug';
 import { ProtocolCrypto } from './ProtocolCrypto';
 
-interface PrivateCommandBase {
+interface PrivateChannelCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description
     version: 1;
 }
 
-export interface PrivateCommandPost extends PrivateCommandBase {
+export interface PrivateChannelCommandPost extends PrivateChannelCommandBase {
     type: 'post';
     post: PostWithId;
     version: 1;
 }
 
-export interface PrivateCommandRemove extends PrivateCommandBase {
+export interface PrivateChannelCommandRemove extends PrivateChannelCommandBase {
     type: 'remove';
     version: 1;
     id: HexString;
 }
 
-export type PrivateCommand =
-    | PrivateCommandPost
-    | PrivateCommandRemove
+export type PrivateChannelCommand =
+    | PrivateChannelCommandPost
+    | PrivateChannelCommandRemove
 ;
 
 export interface PrivateSharingContext {
     profile: PublicProfile;
     contactIdentity: PublicIdentity;
-    localTimeline: Timeline<PrivateCommand>;
-    remoteTimeline: Timeline<PrivateCommand>;
+    localTimeline: Timeline<PrivateChannelCommand>;
+    remoteTimeline: Timeline<PrivateChannelCommand>;
     sharedSecret: HexString;
     crypto: ProtocolCrypto;
     storage: ProtocolStorage;
@@ -51,9 +51,9 @@ export const calculatePrivateTopic = (sharedKey: HexString): HexString => {
     return byteArrayToHex(topicBytes, false);
 };
 
-export const uploadLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
+export const uploadLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateChannelCommand>> => {
     const topic = calculatePrivateTopic(context.sharedSecret);
-    const encryptChapter = async (c: PartialChapter<PrivateCommand>): Promise<Uint8Array> => {
+    const encryptChapter = async (c: PartialChapter<PrivateChannelCommand>): Promise<Uint8Array> => {
         const s = serialize(c);
         const dataBytes = stringToUint8Array(s);
         const secretBytes = hexToUint8Array(context.sharedSecret);
@@ -77,13 +77,13 @@ const downloadPrivateCommands = async (
     identity: PublicIdentity,
     sharedSecret: HexString,
     lastSeenReference?: ChapterReference | undefined,
-): Promise<Timeline<PrivateCommand>> => {
+): Promise<Timeline<PrivateChannelCommand>> => {
     const topic = calculatePrivateTopic(sharedSecret);
-    const decryptChapter = (dataBytes: Uint8Array): PartialChapter<PrivateCommand> => {
+    const decryptChapter = (dataBytes: Uint8Array): PartialChapter<PrivateChannelCommand> => {
         const secretBytes = hexToUint8Array(sharedSecret);
         const decryptedBytes = crypto.decrypt(dataBytes, secretBytes);
         const decryptedText = Uint8ArrayToString(decryptedBytes);
-        return deserialize(decryptedText) as PartialChapter<PrivateCommand>;
+        return deserialize(decryptedText) as PartialChapter<PrivateChannelCommand>;
     };
     const timeline = await fetchTimeline(
         storage,
@@ -96,7 +96,7 @@ const downloadPrivateCommands = async (
 
 };
 
-export const downloadUploadedLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
+export const downloadUploadedLocalPrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateChannelCommand>> => {
     const newestChapterId = getNewestChapterId(context.localTimeline);
     const localTimeline = await downloadPrivateCommands(
         context.storage,
@@ -108,7 +108,7 @@ export const downloadUploadedLocalPrivateCommands = async (context: PrivateShari
     return [...localTimeline, ...context.localTimeline];
 };
 
-export const downloadRemotePrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateCommand>> => {
+export const downloadRemotePrivateCommands = async (context: PrivateSharingContext): Promise<Timeline<PrivateChannelCommand>> => {
     const newestChapterId = getNewestChapterId(context.remoteTimeline);
     const remoteTimeline = await downloadPrivateCommands(
         context.storage,
@@ -120,10 +120,10 @@ export const downloadRemotePrivateCommands = async (context: PrivateSharingConte
     return [...remoteTimeline, ...context.remoteTimeline];
 };
 
-export const listTimelinePosts = (timeline: Timeline<PrivateCommand>): Post[] => {
+export const listTimelinePosts = (timeline: Timeline<PrivateChannelCommand>): Post[] => {
     const timestampCompare = <T>(a: PartialChapter<T>, b: PartialChapter<T>) => a.timestamp - b.timestamp;
     const authorCompare = <T>(a: PartialChapter<T>, b: PartialChapter<T>) => a.author.localeCompare(b.author);
-    const isPrivatePost = (command: PrivateCommand): command is PrivateCommandPost => command.type === 'post';
+    const isPrivatePost = (command: PrivateChannelCommand): command is PrivateChannelCommandPost => command.type === 'post';
     const skipSet = new Set<string>();
     const posts = timeline
         .sort((a, b) => timestampCompare(b, a) || authorCompare(b, a))
@@ -152,7 +152,7 @@ export const listTimelinePosts = (timeline: Timeline<PrivateCommand>): Post[] =>
 };
 
 export const privateSharePost = async (context: PrivateSharingContext, post: PrivatePost): Promise<PrivateSharingContext> => {
-    const command: PrivateCommandPost = {
+    const command: PrivateChannelCommandPost = {
         protocol: 'private',
         version: 1,
         type: 'post',
@@ -169,7 +169,7 @@ export const privateSharePost = async (context: PrivateSharingContext, post: Pri
 };
 
 export const privateDeletePost = async (context: PrivateSharingContext, id: HexString): Promise<PrivateSharingContext> => {
-    const command: PrivateCommandRemove = {
+    const command: PrivateChannelCommandRemove = {
         protocol: 'private',
         version: 1,
         type: 'remove',

@@ -3,7 +3,7 @@ import { contactsReducer } from '../../src/reducers/contactsReducer';
 import { ContactActions } from '../../src/actions/ContactActions';
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { PublicIdentity } from '../../src/models/Identity';
-import { PrivateChannel, makeEmptyPrivateChannel } from '../../src/protocols/privateChannel';
+import { PrivateChannelSyncData, makeEmptyPrivateChannel } from '../../src/protocols/privateChannel';
 import { ChapterReference } from '../../src/protocols/timeline';
 
 const testRandomSeed = '9932c9eb82bfc80dace2d511b03ec391a1ea0d984f91a78ea3be13a0493d1803' as HexString;
@@ -158,7 +158,7 @@ test('remove unconfirmed contacts should remove unconfirmed contacts', () => {
 
 test('update contact private channel should update contact if found', () => {
     const mutualContact = testMutualContact;
-    const updatedPrivateChannel: PrivateChannel = {
+    const updatedPrivateChannel: PrivateChannelSyncData = {
         unsyncedCommands: [],
         peerLastSeenChapterId: '' as ChapterReference,
         lastSyncedChapterId: undefined,
