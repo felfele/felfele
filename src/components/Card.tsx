@@ -114,7 +114,6 @@ const CardBody = (props: {
             ? authorFeed.contact != null
                 ? () => props.navigation.navigate('ContactView', {
                     publicKey: authorFeed.contact!.identity.publicKey,
-                    feed: authorFeed,
                 })
                 : () => props.navigation.navigate('Feed', {
                     feedUrl: authorFeed.feedUrl,

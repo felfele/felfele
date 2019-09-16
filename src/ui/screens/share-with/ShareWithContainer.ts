@@ -36,13 +36,10 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
 const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
-        onShareWithContact: (post: Post, feed: Feed) => {
-            const contactFeed = feed as ContactFeed;
-            if (contactFeed.contact != null) {
-                Debug.log('ShareWithContainer.mapDispatchToProps.onShareWithContact', {post, feed});
-                dispatch(AsyncActions.shareWithContact(post, contactFeed.contact));
-                dispatch(AsyncActions.downloadPrivatePostsFromContacts([feed]));
-            }
+        onShareWithContacts: (post: Post, feeds: Feed[]) => {
+            const isContactFeed = (feed: Feed): feed is ContactFeed => (feed as ContactFeed).contact != null;
+            const contactFeeds = feeds.filter(isContactFeed);
+            dispatch(AsyncActions.shareWithContactFeeds(post, contactFeeds));
         },
         onDoneSharing: () => {
             const onDoneSharing = ownProps.navigation.getParam<'ShareWithContainer', 'onDoneSharing'>('onDoneSharing');

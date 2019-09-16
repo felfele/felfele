@@ -5,7 +5,7 @@ import { Feed } from '../models/Feed';
 import { ContentFilter } from '../models/ContentFilter';
 import { AppState } from '../reducers/AppState';
 import { RSSPostManager } from '../RSSPostManager';
-import { Post } from '../models/Post';
+import { Post, PrivatePost } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import {
     LocalFeed,
@@ -13,6 +13,8 @@ import {
 } from '../social/api';
 import { PrivateIdentity } from '../models/Identity';
 import { ContactActions } from './ContactActions';
+import { HexString } from '../helpers/opaqueTypes';
+import { PrivatePostActions } from './PrivatePostActions';
 
 export type Actions = ActionsUnion<typeof Actions & typeof InternalActions>;
 
@@ -41,6 +43,7 @@ export const InternalActions = {
 
 export const Actions = {
     ...ContactActions,
+    ...PrivatePostActions,
     addContentFilter: (text: string, createdAt: number, validUntil: number) =>
         createAction(ActionTypes.ADD_CONTENT_FILTER, { text, createdAt, validUntil }),
     removeContentFilter: (filter: ContentFilter) =>

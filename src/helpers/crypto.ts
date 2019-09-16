@@ -1,5 +1,5 @@
 import nacl from 'ecma-nacl';
-import { keccak256 } from 'js-sha3';
+import { keccak256, Message } from 'js-sha3';
 
 export const ENCRYPTED_HEADER_LENGTH_IN_BYTES = 40;
 export const ENCRYPTED_HEX_HEADER_LENGTH = 2 * ENCRYPTED_HEADER_LENGTH_IN_BYTES;
@@ -22,4 +22,8 @@ export const decrypt = (encryptedData: Uint8Array, secret: Uint8Array | number[]
     const secretUint8Array = new Uint8Array(keccak256.array(secret));
     const decryptedData = nacl.secret_box.formatWN.open(encryptedData, secretUint8Array);
     return decryptedData;
+};
+
+export const cryptoHash = (message: Message): Uint8Array => {
+    return new Uint8Array(keccak256.array(message));
 };

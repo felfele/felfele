@@ -84,7 +84,6 @@ export interface Routes {
     YourTab: {};
     ContactView: {
         publicKey: string;
-        feed: Feed;
     };
     ContactInfo: {
         publicKey: string;

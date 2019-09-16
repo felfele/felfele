@@ -5,9 +5,10 @@ import { StateProps, DispatchProps, DebugScreen } from '../components/DebugScree
 import { TypedNavigation } from '../helpers/navigation';
 import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import { Post, PrivatePost } from '../models/Post';
 import { emptyPostCommandLog } from '../social/api';
 import { MutualContact } from '../models/Contact';
+import { HexString } from '../helpers/opaqueTypes';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
    return {
@@ -49,6 +50,9 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         },
         onAddContact: (contact: MutualContact) => {
             dispatch(AsyncActions.addContact(contact));
+        },
+        onAddPrivatePost: (topic: HexString, post: PrivatePost) => {
+            dispatch(Actions.addPrivatePost(topic, post));
         },
    };
 };

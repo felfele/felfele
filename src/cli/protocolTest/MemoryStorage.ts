@@ -1,8 +1,8 @@
 import { Debug } from '../../Debug';
-import { cryptoHash } from '../../protocols/group';
 import { byteArrayToHex, stripHexPrefix } from '../../helpers/conversion';
 import { HexString } from '../../helpers/opaqueTypes';
 import { ProtocolStorage, ProtocolStorageFeeds } from '../../protocols/ProtocolStorage';
+import { cryptoHash } from '../../helpers/crypto';
 
 export class MemoryStorageFeeds implements ProtocolStorageFeeds {
     private feeds: {[name: string]: string} = {};
@@ -30,7 +30,7 @@ export class MemoryStorage implements ProtocolStorage {
     private store: {[hash: string]: Uint8Array} = {};
 
     public write = async (data: Uint8Array): Promise<HexString> => {
-        const hash = byteArrayToHex(cryptoHash([data]), false);
+        const hash = byteArrayToHex(cryptoHash(data), false);
         this.store[hash] = data;
         Debug.log('Swarm.write', {hash});
         return hash;

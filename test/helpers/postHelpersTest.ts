@@ -1,4 +1,4 @@
-import { mergeUpdatedPosts, isChildrenPostUploading } from '../../src/helpers/postHelpers';
+import { mergeUpdatedPosts, isChildrenPostUploading, makePostId } from '../../src/helpers/postHelpers';
 import { Post } from '../../src/models/Post';
 import { Author } from '../../src/models/Author';
 
@@ -221,4 +221,67 @@ test('is post uploading but children post not uploading', () => {
     const isUploading = isChildrenPostUploading(post, localPosts);
 
     expect(isUploading).toBeFalsy();
+});
+
+describe('post id generation', () => {
+    it('generates an id', () => {
+        const post: Post = {
+            images: [],
+            text: '',
+            createdAt: 1,
+        };
+
+        const id = makePostId(post);
+
+        expect(id).toBe('ffde563b8a0ac491f63aeb07ea0655c3f5362630d5c7189996d06ba15a8e0466');
+    });
+    it('generates the same id with other properties', () => {
+        const authorA: Author = {
+            name: 'A',
+            uri: 'A',
+            image: {},
+        };
+        const link = 'post1';
+        const post: Post = {
+            images: [],
+            text: '',
+            createdAt: 1,
+            link,
+            author: authorA,
+            isUploading: true,
+        };
+
+        const id = makePostId(post);
+
+        expect(id).toBe('ffde563b8a0ac491f63aeb07ea0655c3f5362630d5c7189996d06ba15a8e0466');
+    });
+    it('generates id with image', () => {
+        const image = {
+            uri: 'uri',
+        };
+        const post: Post = {
+            images: [image],
+            text: '',
+            createdAt: 1,
+        };
+
+        const id = makePostId(post);
+
+        expect(id).toBe('d0be44a943cd3938ceb2745db02791aff59cce0526d3388a679858c4f57813ab');
+    });
+    it('generates the same id with image localPath', () => {
+        const image = {
+            uri: 'uri',
+            localPath: 'localPath',
+        };
+        const post: Post = {
+            images: [image],
+            text: '',
+            createdAt: 1,
+        };
+
+        const id = makePostId(post);
+
+        expect(id).toBe('d0be44a943cd3938ceb2745db02791aff59cce0526d3388a679858c4f57813ab');
+    });
 });
