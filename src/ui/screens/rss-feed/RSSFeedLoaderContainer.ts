@@ -9,9 +9,8 @@ import { Debug } from '../../../Debug';
 import { AsyncActions } from '../../../actions/asyncActions';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const inviteCode = ownProps.navigation.getParam<'ContactLoader', 'inviteCode'>('inviteCode');
     return {
-        title: inviteCode.profileName,
+        title: 'Add channel',
         navigation: ownProps.navigation,
     };
 };

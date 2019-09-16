@@ -73,6 +73,7 @@ import { PublicChannelsListContainer } from './ui/screens/public-channels/Public
 import { ContactConfirmContainer } from './ui/screens/contact/ContactConfirmContainer';
 import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContainer';
 import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
+import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -348,6 +349,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     FeedLinkReader: {
         screen: FeedLinkReaderContainer,
+    },
+    RSSFeedLoader: {
+        screen: RSSFeedLoaderContainer,
     },
     RSSFeedInfo: {
         screen: RSSFeedInfoContainer,
