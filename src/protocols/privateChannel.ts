@@ -55,7 +55,7 @@ export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData,
     return privateChannelAppendCommand(privateChannel, command);
 };
 
-export const uploadUnsyncedTimeline = async (
+const uploadUnsyncedTimeline = async (
     unsyncedTimeline: Timeline<PrivateChannelCommand>,
     lastSyncedChapterId: ChapterReference | undefined,
     address: HexString,
@@ -93,7 +93,7 @@ export const uploadUnsyncedTimeline = async (
     }
 };
 
-export const fetchPeerTimeline = async (
+const fetchPeerTimeline = async (
     peerLastSeenChapterId: ChapterReference | undefined,
     address: HexString,
     topic: HexString,
