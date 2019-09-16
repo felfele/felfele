@@ -105,7 +105,7 @@ const postUpdateTime = (post: Post): number => {
         ;
 };
 
-const postTimeCompare = (a: Post, b: Post): number => {
+export const postTimeCompare = (a: Post, b: Post): number => {
     const aUpdateTime = postUpdateTime(a);
     const bUpdateTime = postUpdateTime(b);
     return bUpdateTime - aUpdateTime;
