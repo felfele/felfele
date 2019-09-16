@@ -57,9 +57,14 @@ export interface Routes {
     RSSFeedInfo: {
         feed: Feed;
     };
-    FeedInfoInviteLink: {
+    InviteLink: {
         randomSeed: string;
         contactPublicKey: string;
+    };
+    InviteLinkWithProfileName: {
+        randomSeed: string;
+        contactPublicKey: string;
+        profileName: string;
     };
     EditFilter: {
         filter: ContentFilter,

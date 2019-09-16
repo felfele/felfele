@@ -28,17 +28,17 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             if (updatedContact.type === 'mutual-contact') {
                 ownProps.navigation.navigate('ContactSuccess', { contact: updatedContact, isReceiver: true });
             } else {
-                onInviteContactFailed(ownProps.navigation);
+                onInviteContactFailed(ownProps.navigation, inviteCode.profileName);
             }
         },
     };
 };
 
-const onInviteContactFailed = (navigation: TypedNavigation) => {
+const onInviteContactFailed = (navigation: TypedNavigation, profileName?: string) => {
     const options: any[] = [
         { text: 'Ok', onPress: () => navigation.popToTop(), style: 'cancel' },
     ];
-    const title = 'Your contact is pending confirmation.';
+    const title = `Your contact ${profileName != null ? `with ${profileName} ` : ''}is pending confirmation.`;
     const message = 'Your private channel will be available when your contact opens the app.';
 
     Alert.alert(

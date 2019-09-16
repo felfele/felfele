@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-import { Feed } from '../../../models/Feed';
 import { SimpleTextInput } from '../../../components/SimpleTextInput';
 import { Debug } from '../../../Debug';
 import { ComponentColors, Colors, defaultMediumFont } from '../../../styles';

@@ -56,7 +56,7 @@ import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
 import { BASE_URL } from './helpers/deepLinking';
-import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { InviteLinkContainer } from './ui/screens/contact/InviteLinkContainer';
 import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
 import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
@@ -356,9 +356,13 @@ const Scenes: NavigationRouteConfigMap = {
     RSSFeedInfo: {
         screen: RSSFeedInfoContainer,
     },
-    FeedInfoInviteLink: {
-        screen: FeedInfoInviteLinkContainer,
+    InviteLink: {
+        screen: InviteLinkContainer,
         path: 'invite/:randomSeed/:contactPublicKey',
+    },
+    InviteLinkWithProfileName: {
+        screen: InviteLinkContainer,
+        path: 'invite/:randomSeed/:contactPublicKey/:profileName',
     },
     ContactView: {
         screen: ContactViewContainer,
