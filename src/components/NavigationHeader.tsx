@@ -3,7 +3,7 @@ import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
-import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { TouchableView, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
 
@@ -100,7 +100,7 @@ const RightButton = (props: { onPress?: () => void, label?: string | React.React
             onPress={props.onPress}
             testID={props.testID}
             style={styles.rightButtonContainer}
-            hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
+            hitSlop={{...TOUCHABLE_VIEW_DEFAULT_HIT_SLOP, left: 10}}
         >
             <ButtonLabel label={props.label} />
         </TouchableView>
