@@ -38,7 +38,7 @@ import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
-import { calculatePrivateTopic, PrivateCommand } from '../protocols/privateSharing';
+import { calculatePrivateTopic, PrivateChannelCommand } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
 import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
 import { uploadImage as swarmStorageUploadImage } from '../swarm-social/swarmStorage';
@@ -188,7 +188,7 @@ export const AsyncActions = {
                 };
                 const updatedPrivateChannel = applyPrivateChannelUpdate(
                     privateChannelUpdate,
-                    (command: PrivateCommand) => {
+                    (command: PrivateChannelCommand) => {
                         switch (command.type) {
                             case 'post': {
                                 const post = {
@@ -206,7 +206,7 @@ export const AsyncActions = {
                             }
                         }
                     },
-                    (command: PrivateCommand) => {
+                    (command: PrivateChannelCommand) => {
                         switch (command.type) {
                             case 'post': {
                                 actions.push(Actions.updatePrivatePostImages(topic, command.post._id, command.post.images));

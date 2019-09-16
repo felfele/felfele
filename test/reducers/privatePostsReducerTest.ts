@@ -1,4 +1,4 @@
-import { PostListDict } from '../../src/reducers/version5';
+import { PostListDict } from '../../src/reducers/version4';
 import { PrivatePostActions } from '../../src/actions/PrivatePostActions';
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { PrivatePost, Post } from '../../src/models/Post';

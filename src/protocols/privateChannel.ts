@@ -1,4 +1,4 @@
-import { PrivateCommand, calculatePrivateTopic, PrivateCommandPost, PrivateCommandRemove } from './privateSharing';
+import { PrivateChannelCommand, calculatePrivateTopic, PrivateChannelCommandPost, PrivateChannelCommandRemove } from './privateSharing';
 import { ChapterReference, Timeline, PartialChapter, readTimeline, makePartialChapter, fetchTimeline, getNewestChapterId, uploadTimeline } from './timeline';
 import { MutualContact } from '../models/Contact';
 import { ProtocolStorage } from './ProtocolStorage';
@@ -10,13 +10,13 @@ import { PrivatePost, PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 
-export interface PrivateChannel {
-    unsyncedCommands: PrivateCommand[];
+export interface PrivateChannelSyncData {
+    unsyncedCommands: PrivateChannelCommand[];
     lastSyncedChapterId: ChapterReference | undefined;
     peerLastSeenChapterId: ChapterReference | undefined;
 }
 
-export const makeEmptyPrivateChannel = (): PrivateChannel => ({
+export const makeEmptyPrivateChannel = (): PrivateChannelSyncData => ({
     unsyncedCommands: [],
     lastSyncedChapterId: undefined,
     peerLastSeenChapterId: undefined,
@@ -24,20 +24,20 @@ export const makeEmptyPrivateChannel = (): PrivateChannel => ({
 
 interface PrivateChannelUpdate {
     topic: HexString;
-    privateChannel: PrivateChannel;
-    syncedLocalTimeline: Timeline<PrivateCommand>;
-    peerTimeline: Timeline<PrivateCommand>;
+    privateChannel: PrivateChannelSyncData;
+    syncedLocalTimeline: Timeline<PrivateChannelCommand>;
+    peerTimeline: Timeline<PrivateChannelCommand>;
 }
 
-const privateChannelAppendCommand = (privateChannel: PrivateChannel, command: PrivateCommand): PrivateChannel => {
+const privateChannelAppendCommand = (privateChannel: PrivateChannelSyncData, command: PrivateChannelCommand): PrivateChannelSyncData => {
     return {
         ...privateChannel,
         unsyncedCommands: [command, ...privateChannel.unsyncedCommands],
     };
 };
 
-export const privateChannelAddPost = (privateChannel: PrivateChannel, post: PostWithId): PrivateChannel => {
-    const command: PrivateCommandPost = {
+export const privateChannelAddPost = (privateChannel: PrivateChannelSyncData, post: PostWithId): PrivateChannelSyncData => {
+    const command: PrivateChannelCommandPost = {
         type: 'post',
         version: 1,
         protocol: 'private',
@@ -46,8 +46,8 @@ export const privateChannelAddPost = (privateChannel: PrivateChannel, post: Post
     return privateChannelAppendCommand(privateChannel, command);
 };
 
-export const privateChannelRemovePost = (privateChannel: PrivateChannel, id: HexString): PrivateChannel => {
-    const command: PrivateCommandRemove = {
+export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData, id: HexString): PrivateChannelSyncData => {
+    const command: PrivateChannelCommandRemove = {
         type: 'remove',
         version: 1,
         protocol: 'private',
@@ -78,8 +78,8 @@ const uploadAddPostImages = async (
     };
 };
 
-export const uploadUnsyncedTimeline = async (
-    unsyncedTimeline: Timeline<PrivateCommand>,
+const uploadUnsyncedTimeline = async (
+    unsyncedTimeline: Timeline<PrivateChannelCommand>,
     lastSyncedChapterId: ChapterReference | undefined,
     address: HexString,
     topic: HexString,
@@ -87,8 +87,8 @@ export const uploadUnsyncedTimeline = async (
     storage: ProtocolStorage,
     crypto: ProtocolCrypto,
     uploadImage: (image: ImageData) => Promise<ImageData>,
-): Promise<Timeline<PrivateCommand>> => {
-    const encryptChapter = async (c: PartialChapter<PrivateCommand>): Promise<Uint8Array> => {
+): Promise<Timeline<PrivateChannelCommand>> => {
+    const encryptChapter = async (c: PartialChapter<PrivateChannelCommand>): Promise<Uint8Array> => {
         const s = serialize(c);
         const dataBytes = stringToUint8Array(s);
         const secretBytes = hexToUint8Array(sharedSecret);
@@ -100,7 +100,7 @@ export const uploadUnsyncedTimeline = async (
         return [];
     }
 
-    const imageSyncedTimeline: Timeline<PrivateCommand> = [];
+    const imageSyncedTimeline: Timeline<PrivateChannelCommand> = [];
     for (const chapter of unsyncedTimeline) {
         const imageSyncedChapter = chapter.content.type === 'post'
             ? {
@@ -129,19 +129,19 @@ export const uploadUnsyncedTimeline = async (
     return syncedTimeline;
 };
 
-export const fetchPeerTimeline = async (
+const fetchPeerTimeline = async (
     peerLastSeenChapterId: ChapterReference | undefined,
     address: HexString,
     topic: HexString,
     sharedSecret: HexString,
     storage: ProtocolStorage,
     crypto: ProtocolCrypto,
-): Promise<Timeline<PrivateCommand>> => {
-    const decryptChapter = (dataBytes: Uint8Array): PartialChapter<PrivateCommand> => {
+): Promise<Timeline<PrivateChannelCommand>> => {
+    const decryptChapter = (dataBytes: Uint8Array): PartialChapter<PrivateChannelCommand> => {
         const secretBytes = hexToUint8Array(sharedSecret);
         const decryptedBytes = crypto.decrypt(dataBytes, secretBytes);
         const decryptedText = Uint8ArrayToString(decryptedBytes);
-        return deserialize(decryptedText) as PartialChapter<PrivateCommand>;
+        return deserialize(decryptedText) as PartialChapter<PrivateChannelCommand>;
     };
 
     const peerTimeline = await fetchTimeline(storage, address, topic, decryptChapter, peerLastSeenChapterId);
@@ -203,9 +203,9 @@ export const syncPrivateChannelWithContact = async (
 
 export const applyPrivateChannelUpdate = (
     update: PrivateChannelUpdate,
-    executeRemoteCommand?: (command: PrivateCommand) => void,
-    executeLocalCommand?: (command: PrivateCommand) => void,
-): PrivateChannel => {
+    executeRemoteCommand?: (command: PrivateChannelCommand) => void,
+    executeLocalCommand?: (command: PrivateChannelCommand) => void,
+): PrivateChannelSyncData => {
     Debug.log('applyPrivateChannelUpdate', update);
     if (executeLocalCommand != null) {
         update.syncedLocalTimeline.map(chapter => executeLocalCommand(chapter.content));

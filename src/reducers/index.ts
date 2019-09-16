@@ -26,7 +26,7 @@ import {
 import { AppState } from './AppState';
 import { contactsReducer } from './contactsReducer';
 import { ActionTypes } from '../actions/ActionTypes';
-import { PostListDict } from './version5';
+import { PostListDict } from './version4';
 import { privatePostsReducer } from './privatePostsReducer';
 
 const contentFiltersReducer = (contentFilters: ContentFilter[] = [], action: Actions): ContentFilter[] => {
