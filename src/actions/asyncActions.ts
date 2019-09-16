@@ -38,9 +38,10 @@ import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
-import { calculatePrivateTopic } from '../protocols/privateSharing';
+import { calculatePrivateTopic, PrivateCommand } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
 import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
+import { uploadImage as swarmStorageUploadImage } from '../swarm-social/swarmStorage';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -161,6 +162,14 @@ export const AsyncActions = {
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateSecureRandom(length),
             };
+            const modelHelper = new ReactNativeModelHelper(getState().settings.swarmGatewayAddress);
+            const imageResizer = {
+                resizeImage: resizeImageIfNeeded,
+                resizeImageForPlaceholder,
+            };
+            const uploadImage = (image: ImageData) => {
+                return swarmStorageUploadImage(swarmApi.bzz, image, imageResizer, modelHelper.getLocalPath);
+            };
             const actions = [];
             for (const contact of contacts) {
                 const privateChannelUpdate = await syncPrivateChannelWithContact(
@@ -168,7 +177,9 @@ export const AsyncActions = {
                     identity.address as HexString,
                     storage,
                     crypto,
+                    uploadImage,
                 );
+                Debug.log('syncPrivatePostsWithContacts', {privateChannelUpdate});
                 const topic = privateChannelUpdate.topic;
                 const author = {
                     name: contact.name,
@@ -177,7 +188,7 @@ export const AsyncActions = {
                 };
                 const updatedPrivateChannel = applyPrivateChannelUpdate(
                     privateChannelUpdate,
-                    (command) => {
+                    (command: PrivateCommand) => {
                         switch (command.type) {
                             case 'post': {
                                 const post = {
@@ -195,6 +206,14 @@ export const AsyncActions = {
                             }
                         }
                     },
+                    (command: PrivateCommand) => {
+                        switch (command.type) {
+                            case 'post': {
+                                actions.push(Actions.updatePrivatePostImages(topic, command.post._id, command.post.images));
+                                return;
+                            }
+                        }
+                    }
                 );
                 actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
             }

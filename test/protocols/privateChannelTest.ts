@@ -4,6 +4,7 @@ import { HexString } from '../../src/helpers/opaqueTypes';
 import { makeStorage, makeCrypto } from '../../src/cli/protocolTest/protocolTestHelpers';
 import { createAsyncDeterministicRandomGenerator } from '../../src/helpers/unsecureRandom';
 import { makePost } from '../../src/protocols/privateSharingTestHelpers';
+import { ImageData } from '../../src/models/ImageData';
 
 const testContactIdentity = {
     publicKey: '0x04d878f63e880d40ab684797469d38f7006c773a507624e4ec7a0cbf473bd52b4949a65ba56330a07647e0f0a2f7dd1d13cbe05c76206d532888f55fa79c51c41a',
@@ -24,6 +25,8 @@ const testMutualContact: MutualContact = {
     privateChannel: makeEmptyPrivateChannel(),
 };
 
+const uploadImage = (image: ImageData): Promise<ImageData> => Promise.resolve(image);
+
 describe('uploadUnsyncedCommands', () => {
 });
 
@@ -40,6 +43,7 @@ describe('syncing', () => {
             address,
             storage,
             crypto,
+            uploadImage
         );
 
         expect(update.peerTimeline.length).toBe(0);
@@ -62,6 +66,7 @@ describe('syncing', () => {
             address,
             storage,
             crypto,
+            uploadImage
         );
 
         expect(update.peerTimeline.length).toBe(0);
