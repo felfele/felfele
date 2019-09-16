@@ -1,4 +1,14 @@
-## v1.0.4 (2019-07-09)
+## v1.0.6 (2019-09-04) App Store release
+
+This release adds the following new features and fixes:
+
+- Feature: New Terms & Privacy Policy (https://github.com/felfele/felfele/pull/469)
+- Feature: You can share private, encrypted posts with your contacts. You can even share posts with multiple contacts at once. (https://github.com/felfele/felfele/pull/472)
+- Feature: You can share posts in Felfele from other apps (https://github.com/felfele/felfele/pull/433)
+- Feature: New private channels tab instead of Favorites (https://github.com/felfele/felfele/pull/464)
+- Feature: New contact flow with many bugfixes (https://github.com/felfele/felfele/pull/473)
+
+## v1.0.5 (2019-07-09)
 
 This release adds the following new features and fixes:
 
