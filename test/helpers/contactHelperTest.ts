@@ -189,7 +189,6 @@ test('successful accepted contact to mutual contact', async () => {
     if (mutualContact.type === 'mutual-contact') {
         expect(mutualContact.identity).toEqual(testRemoteIdentity);
         expect(mutualContact.name).toEqual(testRemoteProfileData.name);
-        expect(mutualContact.confirmed).toBeFalsy();
     }
 });
 

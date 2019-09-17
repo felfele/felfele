@@ -282,7 +282,6 @@ const onSetupContacts = async (props: Props) => {
             name: `Contact${index + 1}`,
             identity,
             image: {},
-            confirmed: true,
             privateChannel: makeEmptyPrivateChannel(),
         };
         props.onAddContact(contact);

@@ -21,7 +21,6 @@ const testMutualContact: MutualContact = {
     name: '',
     image: {},
     identity: testContactIdentity,
-    confirmed: true,
     privateChannel: makeEmptyPrivateChannel(),
 };
 

@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { AppState } from '../reducers/AppState';
 import { Post } from '../models/Post';
 import { Feed } from '../models/Feed';
-import { MutualContact, Contact } from '../models/Contact';
+import { MutualContact, Contact, InvitedContact, NonMutualContact } from '../models/Contact';
 import { makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 import { LocalFeed } from '../social/api';
@@ -45,6 +45,18 @@ const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
         });
 };
 
+const isMutualContact = (contact: Contact): contact is MutualContact => {
+    return contact.type === 'mutual-contact';
+};
+
+const isNonMutualContact = (contact: Contact): contact is NonMutualContact => {
+    return contact.type !== 'mutual-contact';
+};
+
+export const getNonMutualContacts = createSelector([ getContacts ], (contacts) => {
+    return contacts.filter(isNonMutualContact);
+});
+
 const getSelectedTopicPosts = (state: AppState, topic: HexString) => {
     const privatePosts = state.privatePosts[topic] || [];
     return state.rssPosts
@@ -56,20 +68,8 @@ const getSelectedTopicPosts = (state: AppState, topic: HexString) => {
     ;
 };
 
-const isMutualContact = (contact: Contact): contact is MutualContact => {
-    return contact.type === 'mutual-contact';
-};
-
-const isConfirmedContact = (contact: Contact): contact is MutualContact => {
-    return contact.type === 'mutual-contact' && contact.confirmed;
-};
-
-export const getMutualContacts = createSelector([ getContacts ], (contacts) => {
-    return contacts.filter(isMutualContact);
-});
-
 export const getContactFeeds = createSelector([ getContacts ], (contacts) => {
-    const mutualContacts = contacts.filter(isConfirmedContact);
+    const mutualContacts = contacts.filter(isMutualContact);
     return mutualContacts.map(makeContactFeedFromMutualContact);
 });
 
@@ -94,7 +94,7 @@ export const getFollowedNewsPosts = createSelector([ getRssPosts, getFollowedFee
 });
 
 export const getPrivateChannelFeeds = createSelector([ getContacts ], (contacts) => {
-    const mutualContacts = contacts.filter(isConfirmedContact);
+    const mutualContacts = contacts.filter(isMutualContact);
     return mutualContacts.map(makeContactFeedFromMutualContact);
 });
 

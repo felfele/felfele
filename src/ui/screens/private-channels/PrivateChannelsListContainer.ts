@@ -44,13 +44,7 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             }
         },
         onAddChannel: () => {
-            const feed: Feed = {
-                favicon: '',
-                feedUrl: '',
-                name: '',
-                url: '',
-            };
-            ownProps.navigation.navigate('FeedInfo', { feed: feed });
+            ownProps.navigation.navigate('FeedLinkReader', {});
         },
     };
 };

@@ -21,7 +21,6 @@ const mapStateToProps = (state: AppState, ownProps: {navigation: TypedNavigation
 const mapDispatchToProps = (dispatch: any, ownProps: {navigation: TypedNavigation}): DispatchProps => {
     return {
         onConfirmContact: (contact: MutualContact) => {
-            dispatch(Actions.confirmContact(contact));
             ownProps.navigation.navigate('ContactSuccess', { contact: contact, isReceiver: true });
         },
         onRemoveContact: (contact: Contact) => {
@@ -34,8 +33,3 @@ export const ContactInfoContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(ContactInfo);
-
-export const ContactConfirmContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(ContactConfirm);

@@ -6,7 +6,7 @@ import { Feed } from '../models/Feed';
 import { AsyncActions } from '../actions/asyncActions';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
-import { getAllFeeds, getContactFeeds, getMutualContacts } from '../selectors/selectors';
+import { getAllFeeds, getContactFeeds } from '../selectors/selectors';
 import { ContactFeed } from '../models/ContactFeed';
 import { isChildrenPostUploading } from '../helpers/postHelpers';
 import { Debug } from '../Debug';

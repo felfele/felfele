@@ -34,7 +34,6 @@ export interface MutualContact {
     name: string;
     image: ImageData;
     identity: PublicIdentity;
-    confirmed: boolean;
     privateChannel: PrivateChannelSyncData;
 }
 
