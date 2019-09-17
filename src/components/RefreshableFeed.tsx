@@ -79,7 +79,7 @@ export class RefreshableFeed extends React.PureComponent<Props, RefreshableFeedS
                             modelHelper={this.props.modelHelper}
                         />
                     )}
-                    keyExtractor={(item) => '' + (item.link || '') + item._id}
+                    keyExtractor={(item) => '' + (item.link || '') + '/' + item._id + '/' + (item.topic || '')}
                     extraData={this.state}
                     refreshControl={
                         <RefreshControl

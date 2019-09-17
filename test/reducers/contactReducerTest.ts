@@ -3,6 +3,8 @@ import { contactsReducer } from '../../src/reducers/contactsReducer';
 import { ContactActions } from '../../src/actions/ContactActions';
 import { HexString } from '../../src/helpers/opaqueTypes';
 import { PublicIdentity } from '../../src/models/Identity';
+import { PrivateChannelSyncData, makeEmptyPrivateChannel } from '../../src/protocols/privateChannel';
+import { ChapterReference } from '../../src/protocols/timeline';
 
 const testRandomSeed = '9932c9eb82bfc80dace2d511b03ec391a1ea0d984f91a78ea3be13a0493d1803' as HexString;
 
@@ -27,6 +29,7 @@ const testMutualContact: MutualContact = {
     name: 'name',
     image: {},
     identity: testIdentity,
+    privateChannel: makeEmptyPrivateChannel(),
 };
 
 const testInvitedContact: InvitedContact = {
@@ -130,4 +133,22 @@ test('remove should not remove if found by key but different types', () => {
     const result = contactsReducer(contacts, action);
 
     expect(result).toEqual(contacts);
+});
+
+test('update contact private channel should update contact if found', () => {
+    const mutualContact = testMutualContact;
+    const updatedPrivateChannel: PrivateChannelSyncData = {
+        unsyncedCommands: [],
+        peerLastSeenChapterId: '' as ChapterReference,
+        lastSyncedChapterId: undefined,
+    };
+    const updatedContact = {
+        ...mutualContact,
+        privateChannel: updatedPrivateChannel,
+    };
+    const contacts = [mutualContact];
+    const action = ContactActions.updateContactPrivateChannel(mutualContact, updatedPrivateChannel);
+    const result = contactsReducer(contacts, action);
+
+    expect(result).toEqual([updatedContact]);
 });

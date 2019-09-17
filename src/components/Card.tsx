@@ -12,7 +12,7 @@ import {
     Alert,
     TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableView, TouchableViewProps, TouchableViewDefaultHitSlop } from './TouchableView';
+import { TouchableView, TouchableViewProps, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { DateUtils } from '../DateUtils';
 import * as urlUtils from '../helpers/urlUtils';
 import { ImageDataView } from './ImageDataView';
@@ -114,7 +114,6 @@ const CardBody = (props: {
             ? authorFeed.contact != null
                 ? () => props.navigation.navigate('ContactView', {
                     publicKey: authorFeed.contact!.identity.publicKey,
-                    feed: authorFeed,
                 })
                 : () => props.navigation.navigate('Feed', {
                     feedUrl: authorFeed.feedUrl,
@@ -234,7 +233,7 @@ const isPostShareable = (post: Post, author: Author): boolean => {
 };
 
 const ACTION_BUTTON_HIT_SLOP = {
-    ...TouchableViewDefaultHitSlop,
+    ...TOUCHABLE_VIEW_DEFAULT_HIT_SLOP,
     right: 10,
     left: 10,
 };

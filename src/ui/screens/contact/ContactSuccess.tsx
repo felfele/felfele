@@ -70,7 +70,6 @@ export const ContactSuccess = (props: Props) => {
                             const feed = await fetchRecentPostFeed(feedAddress, props.gatewayAddress);
                             if (feed != null && feed.feedUrl !== '') {
                                 props.navigation.replace('ContactView', {
-                                    feed,
                                     publicKey: props.contact.identity.publicKey,
                                 });
                             } else {

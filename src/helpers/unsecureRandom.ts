@@ -27,13 +27,18 @@ export const generateUnsecureRandom = async (lengthInBytes: number): Promise<Uin
     return generateUnsecureRandomUint8Array(lengthInBytes);
 };
 
-export const createDeterministicRandomGenerator = (randomSeed: string = ''): (length: number) => Promise<Uint8Array> => {
+export const createAsyncDeterministicRandomGenerator = (randomSeed: string = ''): (length: number) => Promise<Uint8Array> => {
+    const createRandom = createDeterministicRandomGenerator(randomSeed);
+    return (l: number) => Promise.resolve(createRandom(l));
+};
+
+export const createDeterministicRandomGenerator = (randomSeed: string = ''): (length: number) => Uint8Array => {
     const nextRandomBlock = (): string => {
         const randomSeedBytes = hexToByteArray(randomSeed);
         randomSeed = byteArrayToHex(keccak256.array(randomSeedBytes), false);
         return randomSeed;
     };
-    const createRandom = async (length: number) => {
+    const createRandom = (length: number) => {
         let randomHex = '';
         while (randomHex.length < length * 2) {
             const randomBlock = nextRandomBlock();

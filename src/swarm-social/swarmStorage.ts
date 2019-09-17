@@ -207,7 +207,7 @@ const makeSwarmFile = (nameWithoutExtension: string, localPath: string): Swarm.F
     };
 };
 
-const uploadImage = async (
+export const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
     imageResizer: ImageResizer,
@@ -229,7 +229,6 @@ const uploadImage = async (
         const uri = manifestUri + '/' + resizedImageFile.name;
         return {
             ...image,
-            localPath: undefined,
             uri,
         };
     }
@@ -242,12 +241,12 @@ const uploadImages = async (
     imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
-    const updateImages: ImageData[] = [];
+    const uploadedImages: ImageData[] = [];
     for (const image of images) {
         const updateImage = await uploadImage(swarm, image, imageResizer, getLocalPath);
-        updateImages.push(updateImage);
+        uploadedImages.push(updateImage);
     }
-    return updateImages;
+    return uploadedImages;
 };
 
 const uploadAuthor = async (
