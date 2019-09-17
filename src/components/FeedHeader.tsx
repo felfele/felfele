@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
-import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { TouchableView, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
@@ -65,7 +65,7 @@ export class FeedHeader extends React.PureComponent<Props> {
                     }
                     style={styles.headerTextContainer}
                     hitSlop={{
-                        ...TouchableViewDefaultHitSlop,
+                        ...TOUCHABLE_VIEW_DEFAULT_HIT_SLOP,
                         left: 0,
                     }}
                     testID='FeedHeader/TouchableHeaderText'

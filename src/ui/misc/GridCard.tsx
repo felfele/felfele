@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TouchableView } from '../../components/TouchableView';
+import { TouchableView, ZERO_HIT_SLOP } from '../../components/TouchableView';
 import {
     Image,
     View,
@@ -36,7 +36,7 @@ export const getGridCardSize = () => {
 };
 
 export const GridCard = React.memo((props: Props) => (
-    <TouchableView style={styles.feedCard} onPress={props.onPress}>
+    <TouchableView style={styles.feedCard} onPress={props.onPress} hitSlop={ZERO_HIT_SLOP}>
         <ImageDataView
             source={props.image}
             defaultImage={props.defaultImage}
