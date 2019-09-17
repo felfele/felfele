@@ -66,9 +66,7 @@ export interface StateProps {
 
 const NAME_LABEL = 'NAME';
 const NAME_PLACEHOLDER = DEFAULT_AUTHOR_NAME;
-const SCREEN_TITLE = 'Profile';
-const ACTIVITY_LABEL = 'ACTIVITY';
-const VIEW_POSTS_LABEL = 'View all your posts';
+const SCREEN_TITLE = 'Contact';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
@@ -163,18 +161,6 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             }
             <KeyboardAvoidingView style={styles.mainContainer}>
                 <NavigationHeader
-                    rightButton1={
-                        props.ownFeed != null
-                            ? {
-                                label: <MaterialCommunityIcon
-                                    name={'share'}
-                                    size={20}
-                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                                />,
-                                onPress: async () => showShareFeedDialog(props.ownFeed),
-                            }
-                            : undefined
-                    }
                     title={SCREEN_TITLE}
                 />
                 <ScrollView
@@ -224,13 +210,13 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                     </TouchableView>
                     <TwoButton
                         leftButton={{
-                            label: 'Share',
+                            label: 'Share link',
                             icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
                             onPress: onPressShare,
                         }}
                         rightButton={{
-                            label: 'Add channel',
-                            icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+                            label: 'Scan a QR code',
+                            icon: <MaterialCommunityIcon name='crop-free' size={24} color={Colors.BRAND_PURPLE} />,
                             onPress: () => props.navigation.navigate('FeedLinkReader', {}),
                         }}
                     />

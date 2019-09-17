@@ -279,7 +279,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
-                        name={'account'}
+                        name={'account-circle'}
                         size={24}
                         color={tintColor}
                     />
