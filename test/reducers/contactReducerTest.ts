@@ -29,7 +29,6 @@ const testMutualContact: MutualContact = {
     name: 'name',
     image: {},
     identity: testIdentity,
-    confirmed: true,
     privateChannel: makeEmptyPrivateChannel(),
 };
 
@@ -134,26 +133,6 @@ test('remove should not remove if found by key but different types', () => {
     const result = contactsReducer(contacts, action);
 
     expect(result).toEqual(contacts);
-});
-
-test('remove unconfirmed contacts should not remove confirmed contacts', () => {
-    const contacts = [testMutualContact, testInvitedContact, testAcceptedContact];
-    const action = ContactActions.removeUnconfirmedContacts();
-    const result = contactsReducer(contacts, action);
-
-    expect(result).toEqual(contacts);
-});
-
-test('remove unconfirmed contacts should remove unconfirmed contacts', () => {
-    const mutualContact = {
-        ...testMutualContact,
-        confirmed: false,
-    };
-    const contacts = [mutualContact];
-    const action = ContactActions.removeUnconfirmedContacts();
-    const result = contactsReducer(contacts, action);
-
-    expect(result).toEqual([]);
 });
 
 test('update contact private channel should update contact if found', () => {

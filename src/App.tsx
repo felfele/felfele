@@ -55,15 +55,14 @@ import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
-import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
-import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { InviteLinkContainer } from './ui/screens/contact/InviteLinkContainer';
 import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
 import { Persistor } from 'redux-persist';
 import { Actions } from './actions/Actions';
 import { restartApp } from './helpers/restart';
 import { felfeleInitAppActions } from './store/felfeleInit';
-import { ContactInfoContainer, ContactConfirmContainer } from './ui/screens/contact/ContactInfoContainer';
+import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
 import { FELFELE_APP_NAME } from './reducers/defaultData';
 import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
 import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
@@ -71,6 +70,10 @@ import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
 import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
 import { PublicChannelsContainer } from './ui/screens/public-channels/PublicChannelsContainer';
 import { PublicChannelsListContainer } from './ui/screens/public-channels/PublicChannelsListContainer';
+import { ContactConfirmContainer } from './ui/screens/contact/ContactConfirmContainer';
+import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContainer';
+import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
+import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -83,9 +86,7 @@ initializeNotifications();
 
 const privateChannelTabScenes: NavigationRouteConfigMap = {
     PrivateChannelTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <PrivateChannelsContainer navigation={navigation}/>
-        ),
+        screen: PrivateChannelsContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -116,9 +117,7 @@ const yourTabScenes: NavigationRouteConfigMap = {
         screen: IdentitySettingsContainer,
     },
     YourTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <YourFeedContainer navigation={navigation}/>
-        ),
+        screen: YourFeedContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -139,11 +138,7 @@ const ProfileNavigator = createStackNavigator(yourTabScenes,
 
 const publicChannelTabScenes: NavigationRouteConfigMap = {
     PublicChannelTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <PublicChannelsContainer
-                navigation={navigation}
-            />
-        ),
+        screen: PublicChannelsContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -183,9 +178,7 @@ const PublicChannelNavigator = createStackNavigator(publicChannelTabScenes,
 
 const settingsTabScenes: NavigationRouteConfigMap = {
     SettingsTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <SettingsEditorContainer navigation={navigation} />
-        ),
+        screen: SettingsEditorContainer,
     },
     Debug: {
         screen: DebugScreenContainer,
@@ -354,22 +347,31 @@ const Scenes: NavigationRouteConfigMap = {
     FeedInfo: {
         screen: FeedInfoContainer,
     },
+    FeedLinkReader: {
+        screen: FeedLinkReaderContainer,
+    },
+    RSSFeedLoader: {
+        screen: RSSFeedLoaderContainer,
+    },
     RSSFeedInfo: {
         screen: RSSFeedInfoContainer,
     },
-    FeedInfoDeepLink: {
-        screen: FeedInfoFollowLinkContainer,
-        path: 'follow/:feedUrl',
-    },
-    FeedInfoInviteLink: {
-        screen: FeedInfoInviteLinkContainer,
+    InviteLink: {
+        screen: InviteLinkContainer,
         path: 'invite/:randomSeed/:contactPublicKey',
+    },
+    InviteLinkWithProfileName: {
+        screen: InviteLinkContainer,
+        path: 'invite/:randomSeed/:contactPublicKey/:profileName',
     },
     ContactView: {
         screen: ContactViewContainer,
     },
     ContactConfirm: {
         screen: ContactConfirmContainer,
+    },
+    ContactLoader: {
+        screen: ContactLoaderContainer,
     },
     ContactSuccess: {
         screen: ContactSuccessContainer,

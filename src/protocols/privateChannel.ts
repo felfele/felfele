@@ -8,6 +8,7 @@ import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString } from '../help
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { PrivatePost, PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
+import { ImageData } from '../models/ImageData';
 
 export interface PrivateChannelSyncData {
     unsyncedCommands: PrivateChannelCommand[];
@@ -55,6 +56,28 @@ export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData,
     return privateChannelAppendCommand(privateChannel, command);
 };
 
+const uploadImages = async (
+    images: ImageData[],
+    uploadImage: (image: ImageData) => Promise<ImageData>,
+): Promise<ImageData[]> => {
+    const uploadedImages = [];
+    for (const image of images) {
+        const uploadedImage = await uploadImage(image);
+        uploadedImages.push(uploadedImage);
+    }
+    return uploadedImages;
+};
+
+const uploadAddPostImages = async (
+    post: PostWithId,
+    uploadImage: (image: ImageData) => Promise<ImageData>,
+): Promise<PostWithId> => {
+    return {
+        ...post,
+        images: await uploadImages(post.images, uploadImage),
+    };
+};
+
 const uploadUnsyncedTimeline = async (
     unsyncedTimeline: Timeline<PrivateChannelCommand>,
     lastSyncedChapterId: ChapterReference | undefined,
@@ -63,6 +86,7 @@ const uploadUnsyncedTimeline = async (
     sharedSecret: HexString,
     storage: ProtocolStorage,
     crypto: ProtocolCrypto,
+    uploadImage: (image: ImageData) => Promise<ImageData>,
 ): Promise<Timeline<PrivateChannelCommand>> => {
     const encryptChapter = async (c: PartialChapter<PrivateChannelCommand>): Promise<Uint8Array> => {
         const s = serialize(c);
@@ -76,21 +100,33 @@ const uploadUnsyncedTimeline = async (
         return [];
     }
 
-    try {
-        const syncedTimeline = await uploadTimeline(
-            unsyncedTimeline,
-            storage,
-            address,
-            topic,
-            encryptChapter,
-            crypto.signDigest,
-            lastSyncedChapterId,
-        );
-        return syncedTimeline;
-    } catch (e) {
-        Debug.log('uploadUnsyncedTimeline error', {e});
-        return [];
+    const imageSyncedTimeline: Timeline<PrivateChannelCommand> = [];
+    for (const chapter of unsyncedTimeline) {
+        const imageSyncedChapter = chapter.content.type === 'post'
+            ? {
+                ...chapter,
+                content: {
+                    ...chapter.content,
+                    post: await uploadAddPostImages(chapter.content.post, uploadImage),
+                },
+            }
+            : chapter
+        ;
+        imageSyncedTimeline.push(imageSyncedChapter);
     }
+
+    Debug.log('uploadUnsyncedTimeline', {imageSyncedTimeline});
+
+    const syncedTimeline = await uploadTimeline(
+        imageSyncedTimeline,
+        storage,
+        address,
+        topic,
+        encryptChapter,
+        crypto.signDigest,
+        lastSyncedChapterId,
+    );
+    return syncedTimeline;
 };
 
 const fetchPeerTimeline = async (
@@ -108,12 +144,8 @@ const fetchPeerTimeline = async (
         return deserialize(decryptedText) as PartialChapter<PrivateChannelCommand>;
     };
 
-    try {
-        const peerTimeline = await fetchTimeline(storage, address, topic, decryptChapter, peerLastSeenChapterId);
-        return peerTimeline;
-    } catch (e) {
-        return [];
-    }
+    const peerTimeline = await fetchTimeline(storage, address, topic, decryptChapter, peerLastSeenChapterId);
+    return peerTimeline;
 };
 
 export const syncPrivateChannelWithContact = async (
@@ -121,39 +153,52 @@ export const syncPrivateChannelWithContact = async (
     address: HexString,
     storage: ProtocolStorage,
     crypto: ProtocolCrypto,
+    uploadImage: (image: ImageData) => Promise<ImageData>,
 ): Promise<PrivateChannelUpdate> => {
     const sharedSecret = crypto.deriveSharedKey(contact.identity.publicKey as HexString);
     const topic = calculatePrivateTopic(sharedSecret);
     const privateChannel = contact.privateChannel;
-    const unsyncedTimeline = privateChannel.unsyncedCommands.map(command =>
-        makePartialChapter(address, command, Date.now())
-    );
 
-    const syncedTimeline = await uploadUnsyncedTimeline(
-        unsyncedTimeline,
-        privateChannel.lastSyncedChapterId,
-        address,
-        topic,
-        sharedSecret,
-        storage,
-        crypto,
-    );
+    try {
+        const unsyncedTimeline = privateChannel.unsyncedCommands.map(command =>
+            makePartialChapter(address, command, Date.now())
+        );
 
-    const peerTimeline = await fetchPeerTimeline(
-        privateChannel.peerLastSeenChapterId,
-        contact.identity.address as HexString,
-        topic,
-        sharedSecret,
-        storage,
-        crypto,
-    );
+        const syncedTimeline = await uploadUnsyncedTimeline(
+            unsyncedTimeline,
+            privateChannel.lastSyncedChapterId,
+            address,
+            topic,
+            sharedSecret,
+            storage,
+            crypto,
+            uploadImage,
+        );
 
-    return {
-        topic,
-        privateChannel: contact.privateChannel,
-        syncedLocalTimeline: syncedTimeline,
-        peerTimeline,
-    };
+        const peerTimeline = await fetchPeerTimeline(
+            privateChannel.peerLastSeenChapterId,
+            contact.identity.address as HexString,
+            topic,
+            sharedSecret,
+            storage,
+            crypto,
+        );
+
+        return {
+            topic,
+            privateChannel: contact.privateChannel,
+            syncedLocalTimeline: syncedTimeline,
+            peerTimeline,
+        };
+    } catch (e) {
+        Debug.log('syncPrivateChannelWithContact', {e});
+        return {
+            topic,
+            privateChannel: contact.privateChannel,
+            syncedLocalTimeline: [],
+            peerTimeline: [],
+        };
+    }
 };
 
 export const applyPrivateChannelUpdate = (

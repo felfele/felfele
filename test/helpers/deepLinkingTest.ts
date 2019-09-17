@@ -23,7 +23,7 @@ test('invite link encoding and decoding', () => {
         contactIdentity,
         createdAt: 0,
     };
-    const inviteLink = getInviteLink(invitedContact);
+    const inviteLink = getInviteLink(invitedContact, 'testName');
     const inviteCode = getInviteCodeFromInviteLink(inviteLink);
 
     expect(inviteCode).not.toBeUndefined();

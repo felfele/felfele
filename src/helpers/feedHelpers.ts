@@ -48,7 +48,6 @@ export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualConta
             type: 'mutual-contact',
             name: feed.name,
             image: feed.authorImage,
-            confirmed: false,
             identity,
             privateChannel: makeEmptyPrivateChannel(),
         };
@@ -107,6 +106,20 @@ export const fetchFeedFromUrl = async (url: string, swarmGateway: string): Promi
             Debug.log('fetchFeedFromUrl', 'feed', feed);
             return feed;
         }
+    } catch (e) {
+        Debug.log(e);
+        return null;
+    }
+};
+
+export const fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
+    try {
+        Debug.log('fetchRSSFeedFromUrl', 'url', url);
+        const canonicalUrl = urlUtils.getCanonicalUrl(url);
+        Debug.log('fetchRSSFeedFromUrl', 'canonicalUrl', canonicalUrl);
+        const feed = await RSSFeedManager.fetchFeedFromUrl(canonicalUrl);
+        Debug.log('fetchRSSFeedFromUrl', 'feed', feed);
+        return feed;
     } catch (e) {
         Debug.log(e);
         return null;

@@ -48,14 +48,7 @@ export const PrivateChannelsFeedView = (props: Props) => {
                             />,
                         }}
                         rightButton1={{
-                            onPress: () => props.navigation.navigate('FeedInfo', {
-                                 feed: {
-                                     name: '',
-                                     url: '',
-                                     feedUrl: '',
-                                     favicon: '',
-                                 },
-                            }),
+                            onPress: () => props.navigation.navigate('FeedLinkReader', {}),
                             label: <Icon
                                 name='account-plus'
                                 size={24}

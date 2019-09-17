@@ -48,7 +48,6 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(Actions.updateContactState(contact, updatedContact));
         },
         onReachingMutualContactState: (contact: MutualContact) => {
-            dispatch(Actions.confirmContact(contact));
         },
     };
 };

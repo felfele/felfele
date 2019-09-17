@@ -24,7 +24,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
-import { TouchableViewDefaultHitSlop } from './TouchableView';
+import { TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { convertPostToParentPost, convertHtmlMetaDataToPost, createPostWithLinkMetaData } from '../helpers/postHelpers';
@@ -288,7 +288,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
         >
             <TouchableOpacity
                 onPress={props.onPressCamera}
-                hitSlop={TouchableViewDefaultHitSlop}
+                hitSlop={TOUCHABLE_VIEW_DEFAULT_HIT_SLOP}
             >
                 <Icon
                     name={'camera'}
@@ -298,7 +298,7 @@ const PhotoWidget = React.memo((props: { onPressCamera: () => void, onPressInser
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={props.onPressInsert}
-                hitSlop={TouchableViewDefaultHitSlop}
+                hitSlop={TOUCHABLE_VIEW_DEFAULT_HIT_SLOP}
             >
                 <Icon
                     name={'image-multiple'}

@@ -14,13 +14,7 @@ export interface StateProps extends ImageProps {
     background?: boolean;
 }
 
-export interface DispatchProps {
-}
-
-export type Props = StateProps & DispatchProps & Partial<ChildrenProps>;
-
-export interface State {
-}
+export type Props = StateProps & Partial<ChildrenProps>;
 
 export const ImageDataView = (props: Props) => {
     const source = getImageSource(props.source, props.modelHelper, props.defaultImage);
@@ -61,6 +55,3 @@ export const ImageDataView = (props: Props) => {
     }
 
 };
-
-const styles = StyleSheet.create({
-});

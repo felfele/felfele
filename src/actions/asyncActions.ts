@@ -11,14 +11,29 @@ import {
     loadRecentPostFeeds,
     getPostsFromRecentPostFeeds,
     SwarmHelpers,
-    RecentPostFeedUpdate} from '../swarm-social/swarmStorage';
+    RecentPostFeedUpdate,
+} from '../swarm-social/swarmStorage';
 import { resizeImageIfNeeded, resizeImageForPlaceholder } from '../ImageUtils';
 import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
-import { mergeUpdatedPosts, copyPostWithReferences, createPostWithLinkMetaData, makePostId } from '../helpers/postHelpers';
-import { createInvitedContact, deriveSharedKey } from '../helpers/contactHelpers';
-import { createSwarmContactRandomHelper } from '../helpers/swarmContactHelpers';
-import { generateSecureRandom } from '../helpers/secureRandom';
+import {
+    createInvitedContact,
+    deriveSharedKey,
+    advanceContactState,
+    ContactHelper,
+} from '../helpers/contactHelpers';
+import {
+    createSwarmContactRandomHelper,
+    createSwarmContactHelper,
+} from '../helpers/swarmContactHelpers';
+// @ts-ignore
+import { generateSecureRandom } from 'react-native-securerandom';
+import {
+    mergeUpdatedPosts,
+    copyPostWithReferences,
+    createPostWithLinkMetaData,
+    makePostId,
+} from '../helpers/postHelpers';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
 import {
@@ -32,15 +47,30 @@ import { Post } from '../models/Post';
 import { ImageData } from '../models/ImageData';
 import { isContactFeed, makeContactFromRecentPostFeed, makeBzzFeedUrlFromIdentity } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
-import { Contact, MutualContact } from '../models/Contact';
+import {
+    Contact,
+    MutualContact,
+    NonMutualContact,
+} from '../models/Contact';
 import { ContactActions } from './ContactActions';
 import { ThunkTypes, Thunk, isActionTypes } from './actionHelpers';
 import { SwarmStorage } from '../cli/protocolTest/SwarmStorage';
 import { makeNaclEncryption, Crypto } from '../cli/protocolTest/protocolTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
-import { calculatePrivateTopic } from '../protocols/privateSharing';
+import {
+    calculatePrivateTopic,
+    PrivateChannelCommand,
+} from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
-import { syncPrivateChannelWithContact, applyPrivateChannelUpdate, privateChannelAddPost, privateChannelRemovePost } from '../protocols/privateChannel';
+import { SECOND } from '../DateUtils';
+import { getNonMutualContacts } from '../selectors/selectors';
+import {
+    syncPrivateChannelWithContact,
+    applyPrivateChannelUpdate,
+    privateChannelAddPost,
+    privateChannelRemovePost,
+} from '../protocols/privateChannel';
+import { uploadImage as swarmStorageUploadImage } from '../swarm-social/swarmStorage';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -161,6 +191,14 @@ export const AsyncActions = {
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateSecureRandom(length),
             };
+            const modelHelper = new ReactNativeModelHelper(getState().settings.swarmGatewayAddress);
+            const imageResizer = {
+                resizeImage: resizeImageIfNeeded,
+                resizeImageForPlaceholder,
+            };
+            const uploadImage = (image: ImageData) => {
+                return swarmStorageUploadImage(swarmApi.bzz, image, imageResizer, modelHelper.getLocalPath);
+            };
             const actions = [];
             for (const contact of contacts) {
                 const privateChannelUpdate = await syncPrivateChannelWithContact(
@@ -168,7 +206,9 @@ export const AsyncActions = {
                     identity.address as HexString,
                     storage,
                     crypto,
+                    uploadImage,
                 );
+                Debug.log('syncPrivatePostsWithContacts', {privateChannelUpdate});
                 const topic = privateChannelUpdate.topic;
                 const author = {
                     name: contact.name,
@@ -177,7 +217,7 @@ export const AsyncActions = {
                 };
                 const updatedPrivateChannel = applyPrivateChannelUpdate(
                     privateChannelUpdate,
-                    (command) => {
+                    (command: PrivateChannelCommand) => {
                         switch (command.type) {
                             case 'post': {
                                 const post = {
@@ -195,6 +235,14 @@ export const AsyncActions = {
                             }
                         }
                     },
+                    (command: PrivateChannelCommand) => {
+                        switch (command.type) {
+                            case 'post': {
+                                actions.push(Actions.updatePrivatePostImages(topic, command.post._id, command.post.images));
+                                return;
+                            }
+                        }
+                    }
                 );
                 actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
             }
@@ -502,6 +550,39 @@ export const AsyncActions = {
             dispatch(Actions.addContact(invitedContact));
         };
     },
+    advanceContacts: (): Thunk => {
+        return async (dispatch, getState) => {
+            const contactHelper = getSwarmContactHelper(getState());
+            const contacts = getNonMutualContacts(getState());
+            for (const contact of contacts) {
+                dispatch(AsyncActions.advanceContact(contact, contactHelper));
+            }
+        };
+    },
+    advanceContact: (contact: NonMutualContact, contactHelper?: ContactHelper): Thunk => {
+        return async (dispatch, getState) => {
+            const swarmContactHelper = contactHelper != null ? contactHelper : getSwarmContactHelper(getState());
+            const updatedContact = await advanceContactState(contact, swarmContactHelper, 20 * SECOND);
+            dispatch(Actions.updateContactState(contact, updatedContact));
+        };
+    },
+};
+
+const getSwarmContactHelper = (state: AppState): ContactHelper => {
+    const swarmGateway = state.settings.swarmGatewayAddress;
+    const author = state.author;
+    const profile = {
+        name: author.name,
+        image: author.image,
+        identity: author.identity!,
+    };
+    const contactHelper = createSwarmContactHelper(
+        profile,
+        swarmGateway,
+        generateSecureRandom,
+    );
+
+    return contactHelper;
 };
 
 const mergeImages = (localImages: ImageData[], uploadedImages: ImageData[]): ImageData[] => {
