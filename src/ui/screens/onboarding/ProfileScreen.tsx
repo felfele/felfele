@@ -11,7 +11,7 @@ import { Author } from '../../../models/Author';
 import { ImageData } from '../../../models/ImageData';
 import { AsyncImagePicker } from '../../../AsyncImagePicker';
 import { Colors, ComponentColors } from '../../../styles';
-import { DispatchProps as IdentitySettingsDispatchProps } from '../../../components/IdentitySettings';
+import { DispatchProps as ContactScreenDispatchProps } from '../profile/ContactScreen';
 import { TouchableView } from '../../../components/TouchableView';
 import { defaultImages } from '../../../defaultImages';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
@@ -26,7 +26,7 @@ import { getImageSource } from '../../../helpers/imageDataHelpers';
 
 export type CreateUserCallback = (name: string, image: ImageData, navigation: TypedNavigation) => void;
 
-export interface DispatchProps extends IdentitySettingsDispatchProps {
+export interface DispatchProps extends ContactScreenDispatchProps {
     onCreateUser: CreateUserCallback;
 }
 

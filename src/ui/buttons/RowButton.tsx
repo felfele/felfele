@@ -6,6 +6,8 @@ import {
     View,
     GestureResponderEvent,
     TouchableWithoutFeedback,
+    ViewStyle,
+    StyleProp,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RegularText } from '../misc/text';
@@ -20,6 +22,7 @@ interface Props {
     switchState?: boolean;
     switchDisabled?: boolean;
     buttonStyle: 'none' | 'switch' | 'navigate';
+    containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const RowItem = React.memo((props: Props) => {
@@ -42,11 +45,11 @@ export const RowItem = React.memo((props: Props) => {
 const RowButton = (props: Props) => {
     return (
         <TouchableWithoutFeedback
-            style={styles.container}
+            style={props.containerStyle}
             onPress={props.onPress}
             onLongPress={props.onLongPress}
         >
-            <View style={styles.container}>
+            <View style={[styles.container, props.containerStyle]}>
                 {props.icon &&
                 <RowIcon>
                     {props.icon}
@@ -72,7 +75,7 @@ const RowButton = (props: Props) => {
 
 const RowSwitchButton = (props: Props) => {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, props.containerStyle]}>
             {props.icon &&
             <RowIcon>
                 {props.icon}
