@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     rowIcon: {
-        paddingRight: 5,
+        paddingRight: 10,
         alignItems: 'center',
     },
 });

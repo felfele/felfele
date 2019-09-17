@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
         margin: 0,
     },
     qrCodeContainer: {
-        marginVertical: 10,
+        marginVertical: 20,
         width: QRCodeWidth,
         height: QRCodeWidth,
         padding: 0,
