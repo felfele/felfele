@@ -1,7 +1,7 @@
 import { PostListDict } from './version4';
 import { Actions } from '../actions/Actions';
 import { ActionTypes } from '../actions/ActionTypes';
-import { removeFromArray } from '../helpers/immutable';
+import { removeFromArray, updateArrayItem } from '../helpers/immutable';
 
 export const privatePostsReducer = (privatePosts: PostListDict = {}, action: Actions): PostListDict => {
     switch (action.type) {
@@ -25,6 +25,24 @@ export const privatePostsReducer = (privatePosts: PostListDict = {}, action: Act
                 return privatePosts;
             }
             const updatedTopicPosts = removeFromArray(topicPosts, ind);
+            return {
+                ...privatePosts,
+                [action.payload.topic]: updatedTopicPosts,
+            };
+        }
+        case ActionTypes.UPDATE_PRIVATE_POST_IMAGES: {
+            if (action.payload.topic in privatePosts === false) {
+                return privatePosts;
+            }
+            const topicPosts = privatePosts[action.payload.topic];
+            const ind = topicPosts.findIndex(post => post._id === action.payload.id);
+            if (ind === -1) {
+                return privatePosts;
+            }
+            const updatedTopicPosts = updateArrayItem(topicPosts, ind, post => ({
+                ...post,
+                images: action.payload.images,
+            }));
             return {
                 ...privatePosts,
                 [action.payload.topic]: updatedTopicPosts,
