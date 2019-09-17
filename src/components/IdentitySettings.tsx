@@ -42,6 +42,7 @@ import { advanceContactState } from '../helpers/contactHelpers';
 import { SECOND } from '../DateUtils';
 import { getInviteLink, getFollowLink } from '../helpers/deepLinking';
 import { PublicProfile } from '../models/Profile';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -147,7 +148,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
 
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
-        <SafeAreaView style={styles.safeAreaContainer}>
+        <FragmentSafeAreaViewWithoutTabBar>
             { props.invitedContact &&
                 <ContactStateChangeListener
                     contact={props.invitedContact}
@@ -179,7 +180,6 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             modelHelper={modelHelper}
                         />
                     </TouchableOpacity>
-                    <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
                     <SimpleTextInput
                         style={styles.row}
                         defaultValue={props.profile.name}
@@ -208,6 +208,10 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             <ActivityIndicator />
                     }
                     </TouchableView>
+                    <View style={styles.qrCodeHintContainer}>
+                        <RegularText style={styles.qrCodeHint}>This is your contact code.</RegularText>
+                        <RegularText style={styles.qrCodeHint}>Ask people to scan it or share a link.</RegularText>
+                    </View>
                     <TwoButton
                         leftButton={{
                             label: 'Share link',
@@ -223,7 +227,7 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                 </ScrollView>
                 <TabBarPlaceholder/>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     );
 };
 
@@ -255,12 +259,14 @@ const styles = StyleSheet.create({
         color: Colors.DARK_GRAY,
         fontSize: 14,
     },
-    tooltip: {
+    qrCodeHintContainer: {
+        paddingBottom: 20,
+    },
+    qrCodeHint: {
         paddingHorizontal: 10,
-        paddingTop: 20,
-        paddingBottom: 7,
         color: Colors.GRAY,
-        fontSize: 12,
+        fontSize: 14,
+        alignSelf: 'center',
     },
     imagePickerContainer: {
         flexDirection: 'row',
