@@ -89,7 +89,7 @@ export interface Routes {
         feeds: Feed[],
         subCategoryName: string,
     };
-    YourTab: {};
+    YourFeed: {};
     ContactView: {
         publicKey: string;
     };

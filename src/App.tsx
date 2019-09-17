@@ -100,6 +100,9 @@ const privateChannelTabScenes: NavigationRouteConfigMap = {
     ContactInfo: {
         screen: ContactInfoContainer,
     },
+    YourFeed: {
+        screen: YourFeedContainer,
+    },
 };
 
 const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
@@ -112,12 +115,9 @@ const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
     },
 );
 
-const yourTabScenes: NavigationRouteConfigMap = {
+const profileScenes: NavigationRouteConfigMap = {
     Profile: {
         screen: IdentitySettingsContainer,
-    },
-    YourTab: {
-        screen: YourFeedContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -126,7 +126,7 @@ const yourTabScenes: NavigationRouteConfigMap = {
         screen: FeedSettingsContainer,
     },
 };
-const ProfileNavigator = createStackNavigator(yourTabScenes,
+const ProfileNavigator = createStackNavigator(profileScenes,
     {
         mode: 'card',
         navigationOptions: {
