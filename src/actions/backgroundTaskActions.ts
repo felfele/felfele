@@ -31,7 +31,9 @@ const registerFoundationFeedNotificiations = (intervalMinutes: number, dispatch:
             if (isFeedUpdated) {
                 const posts = mergeUpdatedPosts(recentPosts, previousPosts);
                 dispatch(Actions.updateRssPosts(posts));
-                localNotification('There is a new version available!');
+                if (previousPosts.length > 0) {
+                    localNotification('There is a new version available!');
+                }
             }
         });
     }
