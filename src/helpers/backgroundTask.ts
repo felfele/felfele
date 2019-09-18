@@ -2,6 +2,7 @@ import BackgroundFetch from 'react-native-background-fetch';
 
 import { Debug } from '../Debug';
 import { MINUTE } from '../DateUtils';
+import { Platform } from 'react-native';
 
 type Task = () => void;
 type AsyncTask = () => Promise<void>;
@@ -26,8 +27,16 @@ export const registerBackgroundTask = (name: string, intervalMinutes: number, ta
         setTimeout(timedTask, intervalMinutes * MINUTE);
     };
 
-    // start timed task
-    timedTask();
+    if (Platform.OS === 'android') {
+        // On Android, setting a long running timer keeps the app awake
+        // but timers can only be called when the app is in the foreground
+        // see https://github.com/facebook/react-native/issues/12981
+        // So we just run safeTask once and then run it regularly when the
+        // app is in the backround
+        safeTask();
+    } else {
+        timedTask();
+    }
 
     BackgroundFetch.configure({
         minimumFetchInterval: intervalMinutes,
