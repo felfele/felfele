@@ -102,7 +102,7 @@ android {
 
     defaultConfig {
         applicationId "org.felfele.mobile"
-        versionCode 11
+        versionCode 12
         versionName "1.0.7"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
