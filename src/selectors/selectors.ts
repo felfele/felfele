@@ -55,6 +55,10 @@ const isNonMutualContact = (contact: Contact): contact is NonMutualContact => {
     return contact.type !== 'mutual-contact';
 };
 
+export const getMutualContacts = createSelector([ getContacts ], (contacts) => {
+    return contacts.filter(isMutualContact);
+});
+
 export const getNonMutualContacts = createSelector([ getContacts ], (contacts) => {
     return contacts.filter(isNonMutualContact);
 });

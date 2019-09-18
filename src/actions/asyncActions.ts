@@ -63,7 +63,7 @@ import {
 } from '../protocols/privateSharing';
 import { PrivateIdentity } from '../models/Identity';
 import { SECOND } from '../DateUtils';
-import { getNonMutualContacts } from '../selectors/selectors';
+import { getNonMutualContacts, getMutualContacts } from '../selectors/selectors';
 import {
     syncPrivateChannelWithContact,
     applyPrivateChannelUpdate,
@@ -150,6 +150,17 @@ export const AsyncActions = {
             ]);
             const posts = mergeUpdatedPosts(allPosts[0].concat(allPosts[1]), previousPosts);
             dispatch(Actions.updateRssPosts(posts));
+        };
+    },
+    syncPrivateChannelWithAllContacts: (): Thunk => {
+        return async (dispatch, getState) => {
+            const mutualContacts = getMutualContacts(getState());
+            const contactsToBeSynced = mutualContacts
+                .filter(contact => contact.privateChannel.unsyncedCommands.length > 0)
+            ;
+            if (contactsToBeSynced.length > 0) {
+                await dispatch(AsyncActions.syncPrivatePostsWithContacts(contactsToBeSynced));
+            }
         };
     },
     syncPrivatePostsWithContactFeeds: (contactFeeds: ContactFeed[]): Thunk => {
