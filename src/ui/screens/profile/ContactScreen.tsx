@@ -4,7 +4,6 @@ import {
     KeyboardAvoidingView,
     StyleSheet,
     View,
-    TouchableOpacity,
     Dimensions,
     ScrollView,
     ActivityIndicator,
@@ -14,20 +13,17 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import { generateSecureRandom } from 'react-native-securerandom';
 import { NavigationEvents } from 'react-navigation';
 
-import { SimpleTextInput } from '../../../components/SimpleTextInput';
 import { ImageData } from '../../../models/ImageData';
 import { Feed } from '../../../models/Feed';
-import { AsyncImagePicker } from '../../../AsyncImagePicker';
 import { ComponentColors, Colors } from '../../../styles';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { RegularText } from '../../misc/text';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
 import { defaultImages } from '../../../defaultImages';
-import { DEFAULT_AUTHOR_NAME } from '../../../reducers/defaultData';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { LocalFeed } from '../../../social/api';
-import { showShareFeedDialog, showShareContactDialog } from '../../../helpers/shareDialogs';
+import { showShareContactDialog } from '../../../helpers/shareDialogs';
 import { TwoButton } from '../../buttons/TwoButton';
 import { ImageDataView } from '../../../components/ImageDataView';
 import { InvitedContact, Contact, MutualContact } from '../../../models/Contact';
@@ -59,7 +55,6 @@ export interface StateProps {
     navigation: TypedNavigation;
     gatewayAddress: string;
     invitedContact?: InvitedContact;
-    showInviteCode: boolean;
 }
 
 const SCREEN_TITLE = 'Contact';
@@ -129,17 +124,11 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
 }
 
 export const ContactScreen = (props: DispatchProps & StateProps) => {
-    const qrCodeValue = props.showInviteCode
-        ? generateInviteQRCodeValue(props.profile.name, props.invitedContact)
-        : generateFollowRCodeValue(props.ownFeed)
-    ;
-    if (props.showInviteCode && qrCodeValue == null) {
+    const qrCodeValue = generateInviteQRCodeValue(props.profile.name, props.invitedContact);
+    if (qrCodeValue == null) {
         props.onChangeQRCode();
     }
-    const onPressShare = props.showInviteCode
-        ? () => props.invitedContact && showShareContactDialog(props.invitedContact, props.profile.name)
-        : () => showShareFeedDialog(props.ownFeed)
-    ;
+    const onPressShare = () => props.invitedContact && showShareContactDialog(props.invitedContact, props.profile.name);
 
     return (
         <FragmentSafeAreaViewWithoutTabBar>
@@ -211,10 +200,6 @@ export const ContactScreen = (props: DispatchProps & StateProps) => {
 };
 
 const styles = StyleSheet.create({
-    safeAreaContainer: {
-        backgroundColor: ComponentColors.HEADER_COLOR,
-        flex: 1,
-    },
     mainContainer: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
@@ -223,18 +208,6 @@ const styles = StyleSheet.create({
         paddingLeft: 0,
         marginTop: 10,
     },
-    row: {
-        width: '100%',
-        backgroundColor: 'white',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 1,
-        borderTopColor: 'lightgray',
-        borderTopWidth: 1,
-        paddingVertical: 14,
-        paddingHorizontal: 10,
-        color: Colors.DARK_GRAY,
-        fontSize: 14,
-    },
     qrCodeHintContainer: {
         paddingBottom: 20,
     },
@@ -242,10 +215,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: Colors.GRAY,
         fontSize: 14,
-        alignSelf: 'center',
-    },
-    imagePickerContainer: {
-        flexDirection: 'row',
         alignSelf: 'center',
     },
     profileImage: {

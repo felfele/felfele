@@ -18,7 +18,6 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
         image: state.author.image,
         identity: state.author.identity!,
     };
-    const showInviteCode = state.settings.showDebugMenu;
 
     return {
         profile,
@@ -26,7 +25,6 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
         ownFeed,
         gatewayAddress: state.settings.swarmGatewayAddress,
         invitedContact,
-        showInviteCode,
    };
 };
 
