@@ -17,7 +17,8 @@ export function createAction<T extends string, P>(type: T, payload?: P) {
     return payload === undefined ? { type } : { type, payload };
 }
 
-export type Thunk = (dispatch: any, getState: () => AppState) => Promise<void>;
+export type Dispatch = (thunk: ThunkTypes) => Promise<void>;
+export type Thunk = (dispatch: Dispatch, getState: () => AppState) => Promise<void>;
 export type ThunkTypes = Thunk | Actions;
 
 export const isActionTypes = (t: ThunkTypes): t is Actions => {
