@@ -5,14 +5,14 @@ import { Post } from '../models/Post';
 import { Actions } from '../actions/Actions';
 import { Feed } from '../models/Feed';
 import { TypedNavigation } from '../helpers/navigation';
+import { getYourSortedUniquePosts } from '../selectors/selectors';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    const posts = state.localPosts;
-    const filteredPosts = posts;
+    const posts = getYourSortedUniquePosts(state);
 
     return {
         navigation: ownProps.navigation,
-        posts: filteredPosts,
+        posts,
         feeds: state.feeds.filter(feed => feed != null && feed.followed === true),
         profileImage: state.author.image,
         gatewayAddress: state.settings.swarmGatewayAddress,
@@ -21,7 +21,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onRefreshPosts: (feeds: Feed[]) => {
+        onRefreshPosts: () => {
             // workaround to finish refresh
             dispatch(Actions.timeTick());
         },

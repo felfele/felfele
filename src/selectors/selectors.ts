@@ -1,12 +1,13 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../reducers/AppState';
-import { Post } from '../models/Post';
+import { Post, PrivatePost } from '../models/Post';
 import { Feed } from '../models/Feed';
 import { MutualContact, Contact, InvitedContact, NonMutualContact } from '../models/Contact';
 import { makeContactFeedFromMutualContact } from '../helpers/feedHelpers';
 import { ContactFeed } from '../models/ContactFeed';
 import { LocalFeed } from '../social/api';
 import { HexString } from '../helpers/opaqueTypes';
+import { PostListDict } from '../reducers/version4';
 
 const isPostFromFollowedFeed = (post: Post, followedFeeds: Feed[]): boolean => {
     return followedFeeds.find(feed => {
@@ -37,6 +38,7 @@ const getRssPosts = (state: AppState) => state.rssPosts;
 const getLocalPosts = (state: AppState) => state.localPosts;
 const getProfile = (state: AppState) => state.author;
 const getContacts = (state: AppState) => state.contacts;
+const getPrivatePosts = (state: AppState) => state.privatePosts;
 
 const getSelectedFeedPosts = (state: AppState, feedUrl: string) => {
     return state.rssPosts
@@ -105,7 +107,7 @@ const postUpdateTime = (post: Post): number => {
         ;
 };
 
-const postTimeCompare = (a: Post, b: Post): number => {
+export const postTimeCompare = (a: Post, b: Post): number => {
     const aUpdateTime = postUpdateTime(a);
     const bUpdateTime = postUpdateTime(b);
     return bUpdateTime - aUpdateTime;
@@ -135,6 +137,28 @@ export const getPrivateChannelPosts = createSelector([ getSelectedTopicPosts ], 
     return posts;
 });
 
-export const getYourPosts = createSelector([ getLocalPosts, getProfile ], (posts, author) => {
-    return posts.filter(post => post.author && post.author.name === author.name);
+export const getYourPosts = createSelector([ getLocalPosts, getPrivatePosts, getProfile ], (posts: Post[], privatePosts: PostListDict, author) => {
+    const yourPubicKey = author.identity!.publicKey;
+    const yourPrivatePosts = Object
+        .values(privatePosts)
+        .reduce((prev, curr) => prev.concat(curr), [])
+        .filter(post => post.author.identity != null && post.author.identity.publicKey === yourPubicKey)
+    ;
+
+    return posts
+        .filter(post => post.author && post.author.name === author.name)
+        .concat(yourPrivatePosts)
+    ;
+});
+
+export const getYourSortedUniquePosts = createSelector([ getYourPosts ], (posts) => {
+    const arePostsEqual = (a: Post, b: Post) => a._id === b._id;
+    return posts
+        .sort(postTimeCompare)
+        .reduce<Post[]>((prev, curr, ind, arr) =>
+            ind > 0 && arePostsEqual(curr, arr[ind - 1])
+                ? prev
+                : prev.concat(curr)
+        , [])
+    ;
 });

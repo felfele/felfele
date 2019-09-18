@@ -209,12 +209,6 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             : props.onUpdateAuthor(name)
                         }
                     />
-                    <RegularText style={styles.tooltip}>{ACTIVITY_LABEL}</RegularText>
-                    <RowItem
-                        title={VIEW_POSTS_LABEL}
-                        buttonStyle='navigate'
-                        onPress={() => props.navigation.navigate('YourTab', {})}
-                    />
                     <TouchableView style={styles.qrCodeContainer} onLongPress={props.onChangeQRCode}>
                     { qrCodeValue != null
                         ?

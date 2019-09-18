@@ -4,7 +4,7 @@ import { StateProps, DispatchProps, FeedView, ViewFeed } from '../components/Fee
 import { Actions } from '../actions/Actions';
 import { AsyncActions } from '../actions/asyncActions';
 import { Feed } from '../models/Feed';
-import { getFeedPosts, getYourPosts, getContactFeeds } from '../selectors/selectors';
+import { getFeedPosts, getContactFeeds, getYourSortedUniquePosts } from '../selectors/selectors';
 import { TypedNavigation } from '../helpers/navigation';
 
 const emptyFeed = (name: string = '', isOwnFeed: boolean = false, isLocalFeed = false): ViewFeed => ({
@@ -49,7 +49,7 @@ export const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNa
     // Note: this is a moderately useful selector (recalculated if another feedUrl is opened (cache size == 1))
     // see https://github.com/reduxjs/reselect/blob/master/README.md#accessing-react-props-in-selectors
     const feedPosts = getFeedPosts(state, feedUrl);
-    const ownPosts = getYourPosts(state);
+    const ownPosts = getYourSortedUniquePosts(state);
     const posts = isOwnFeed
         ? ownPosts
         : feedPosts;
