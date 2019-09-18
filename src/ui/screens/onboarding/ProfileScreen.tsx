@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     },
     tooltip: {
         marginVertical: 10,
-        paddingLeft: 10,
+        paddingHorizontal: 10,
         color: Colors.GRAY,
     },
     imagePickerContainer: {
