@@ -12,12 +12,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as AreYouSureDialog from '../../../components/AreYouSureDialog';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
-import { TwoButton } from '../../buttons/TwoButton';
 import { RegularText } from '../../misc/text';
-import { showShareFeedDialog } from '../../../helpers/shareDialogs';
 import { ImageDataView } from '../../../components/ImageDataView';
 import { getFeedImage } from '../../../helpers/feedHelpers';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
+import { WideButton } from '../../buttons/WideButton';
 
 export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
@@ -84,14 +83,8 @@ export class RSSFeedInfo extends React.Component<Props> {
                             ? FOLLOWED_STATUS
                             : NOT_FOLLOWED_STATUS
                     }</RegularText>
-                    <TwoButton
-                        leftButton={followToggleButton}
-                        rightButton={{
-                            label: 'Share link',
-                            icon: <Icon name='share' size={24} color={Colors.BRAND_PURPLE}/>,
-                            style: styles.buttonStyle,
-                            onPress: async () => showShareFeedDialog(this.props.feed),
-                        }}
+                    <WideButton
+                        {...followToggleButton}
                     />
                 </View>
             </FragmentSafeAreaViewWithoutTabBar>

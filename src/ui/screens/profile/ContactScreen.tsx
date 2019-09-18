@@ -32,7 +32,7 @@ import { TouchableView } from '../../../components/TouchableView';
 import { createSwarmContactHelper } from '../../../helpers/swarmContactHelpers';
 import { advanceContactState } from '../../../helpers/contactHelpers';
 import { SECOND } from '../../../DateUtils';
-import { getInviteLink, getFollowLink } from '../../../helpers/deepLinking';
+import { getInviteLink } from '../../../helpers/deepLinking';
 import { PublicProfile } from '../../../models/Profile';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 import { RowItem } from '../../buttons/RowButton';
@@ -66,13 +66,6 @@ const generateInviteQRCodeValue = (profileName: string, invitedContact?: Invited
         return undefined;
     }
     return getInviteLink(invitedContact, profileName);
-};
-
-const generateFollowRCodeValue = (feed?: Feed): string | undefined => {
-    if (feed == null) {
-        return undefined;
-    }
-    return getFollowLink(feed.feedUrl);
 };
 
 interface ContactStateChangeListenerProps {

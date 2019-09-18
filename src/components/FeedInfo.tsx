@@ -5,10 +5,8 @@ import {
     View,
     Dimensions,
 } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 
 import { Feed } from '../models/Feed';
-import { SimpleTextInput } from './SimpleTextInput';
 import { Debug } from '../Debug';
 import { ComponentColors, Colors, defaultMediumFont } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
@@ -16,10 +14,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { unfollowFeed } from './FeedView';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
-import { WideButton } from '../ui/buttons/WideButton';
-import { RegularText } from '../ui/misc/text';
-import { showShareFeedDialog } from '../helpers/shareDialogs';
 import { PublicProfile } from '../models/Profile';
+import { getFeedImage } from '../helpers/feedHelpers';
+import { ImageDataView } from './ImageDataView';
+import { ModelHelper } from '../models/ModelHelper';
+import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.8;
 const QRCodeHeight = QRCodeWidth;
@@ -50,13 +49,17 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
         url: '',
     };
 
+    private modelHelper: ModelHelper;
+
     constructor(props: Props) {
         super(props);
         this.state.url = this.props.feed.feedUrl;
+        this.modelHelper = new ReactNativeModelHelper(this.props.swarmGateway);
     }
 
     public render() {
         const isFollowed = this.props.feed.followed;
+        const imageWidth = Dimensions.get('window').width * 0.7;
 
         const icon = (name: string, size: number = 20) => <Icon name={name} size={size} color={ComponentColors.NAVIGATION_BUTTON_COLOR} />;
         const button = (iconName: string, onPress: () => void) => ({
@@ -83,42 +86,19 @@ export class FeedInfo extends React.Component<Props, FeedInfoState> {
                     navigation={this.props.navigation}
                 />
                 <View style={styles.container}>
-                    <SimpleTextInput
-                        defaultValue={this.state.url}
-                        style={styles.linkInput}
-                        onChangeText={(text) => this.setState({ url: text })}
-                        autoCapitalize='none'
-                        autoFocus={false}
-                        autoCorrect={false}
-                        editable={false}
-                        returnKeyType='done'
+                    <ImageDataView
+                        source={getFeedImage(this.props.feed)}
+                        modelHelper={this.modelHelper}
+                        style={{
+                            width: imageWidth,
+                            height: imageWidth,
+                            alignSelf: 'center',
+                            marginVertical: 20,
+                        }}
+                        resizeMode='cover'
                     />
-                    <this.ExistingItemView />
                 </View>
             </FragmentSafeAreaViewWithoutTabBar>
-        );
-    }
-
-    private ExistingItemView = () => {
-        const qrCodeValue = this.props.feed.feedUrl;
-        return (
-            <View>
-                <View style={styles.qrCodeContainer}>
-                    <QRCode
-                        value={qrCodeValue}
-                        size={QRCodeWidth}
-                        color={Colors.BLACK}
-                        backgroundColor={ComponentColors.BACKGROUND_COLOR}
-                    />
-                </View>
-                <RegularText style={styles.qrCodeText}>Show this QR code or use the link</RegularText>
-                <WideButton
-                    label='SHARE'
-                    icon={<Icon name='share' size={24} color={Colors.BRAND_PURPLE} />}
-                    style={{marginTop: 20}}
-                    onPress={async () => showShareFeedDialog(this.props.feed)}
-                />
-            </View>
         );
     }
 
