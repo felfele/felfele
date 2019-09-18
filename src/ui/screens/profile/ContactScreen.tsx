@@ -7,41 +7,39 @@ import {
     TouchableOpacity,
     Dimensions,
     ScrollView,
-    SafeAreaView,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
-import { withNavigationFocus, NavigationEvents } from 'react-navigation';
+import { NavigationEvents } from 'react-navigation';
 
-import { SimpleTextInput } from './SimpleTextInput';
-import { Author } from '../models/Author';
-import { ImageData } from '../models/ImageData';
-import { Feed } from '../models/Feed';
-import { AsyncImagePicker } from '../AsyncImagePicker';
-import { ComponentColors, Colors } from '../styles';
-import { NavigationHeader } from './NavigationHeader';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { RowItem } from '../ui/buttons/RowButton';
-import { RegularText } from '../ui/misc/text';
-import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
-import { defaultImages } from '../defaultImages';
-import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
-import { TypedNavigation } from '../helpers/navigation';
-import { LocalFeed } from '../social/api';
-import { showShareFeedDialog, showShareContactDialog } from '../helpers/shareDialogs';
-import { TwoButton } from '../ui/buttons/TwoButton';
-import { ImageDataView } from '../components/ImageDataView';
-import { InvitedContact, Contact, MutualContact } from '../models/Contact';
-import { Debug } from '../Debug';
-import { TouchableView } from './TouchableView';
-import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
-import { advanceContactState } from '../helpers/contactHelpers';
-import { SECOND } from '../DateUtils';
-import { getInviteLink, getFollowLink } from '../helpers/deepLinking';
-import { PublicProfile } from '../models/Profile';
+import { SimpleTextInput } from '../../../components/SimpleTextInput';
+import { ImageData } from '../../../models/ImageData';
+import { Feed } from '../../../models/Feed';
+import { AsyncImagePicker } from '../../../AsyncImagePicker';
+import { ComponentColors, Colors } from '../../../styles';
+import { NavigationHeader } from '../../../components/NavigationHeader';
+import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
+import { RegularText } from '../../misc/text';
+import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { defaultImages } from '../../../defaultImages';
+import { DEFAULT_AUTHOR_NAME } from '../../../reducers/defaultData';
+import { TypedNavigation } from '../../../helpers/navigation';
+import { LocalFeed } from '../../../social/api';
+import { showShareFeedDialog, showShareContactDialog } from '../../../helpers/shareDialogs';
+import { TwoButton } from '../../buttons/TwoButton';
+import { ImageDataView } from '../../../components/ImageDataView';
+import { InvitedContact, Contact, MutualContact } from '../../../models/Contact';
+import { Debug } from '../../../Debug';
+import { TouchableView } from '../../../components/TouchableView';
+import { createSwarmContactHelper } from '../../../helpers/swarmContactHelpers';
+import { advanceContactState } from '../../../helpers/contactHelpers';
+import { SECOND } from '../../../DateUtils';
+import { getInviteLink, getFollowLink } from '../../../helpers/deepLinking';
+import { PublicProfile } from '../../../models/Profile';
+import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
+import { RowItem } from '../../buttons/RowButton';
 
 const defaultUserImage = defaultImages.defaultUser;
 
@@ -64,11 +62,7 @@ export interface StateProps {
     showInviteCode: boolean;
 }
 
-const NAME_LABEL = 'NAME';
-const NAME_PLACEHOLDER = DEFAULT_AUTHOR_NAME;
-const SCREEN_TITLE = 'Profile';
-const ACTIVITY_LABEL = 'ACTIVITY';
-const VIEW_POSTS_LABEL = 'View all your posts';
+const SCREEN_TITLE = 'Contact';
 
 const QRCodeWidth = Dimensions.get('window').width * 0.6;
 
@@ -102,11 +96,11 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
 
     public render = () => (
         <NavigationEvents
-            onDidFocus={payload => {
+            onDidFocus={() => {
                 Debug.log('ContactStateChangeListener.render', 'onDidFocus', this.props);
                 this.tryAdvanceContactState();
             }}
-            onDidBlur={payload => {
+            onDidBlur={() => {
                 Debug.log('ContactStateChangeListener.render', 'onDidBlur', this.props);
                 this.isCanceled = true;
             }}
@@ -134,7 +128,7 @@ class ContactStateChangeListener extends React.PureComponent<ContactStateChangeL
     }
 }
 
-export const IdentitySettings = (props: DispatchProps & StateProps) => {
+export const ContactScreen = (props: DispatchProps & StateProps) => {
     const qrCodeValue = props.showInviteCode
         ? generateInviteQRCodeValue(props.profile.name, props.invitedContact)
         : generateFollowRCodeValue(props.ownFeed)
@@ -147,9 +141,8 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
         : () => showShareFeedDialog(props.ownFeed)
     ;
 
-    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
-        <SafeAreaView style={styles.safeAreaContainer}>
+        <FragmentSafeAreaViewWithoutTabBar>
             { props.invitedContact &&
                 <ContactStateChangeListener
                     contact={props.invitedContact}
@@ -163,51 +156,23 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
             }
             <KeyboardAvoidingView style={styles.mainContainer}>
                 <NavigationHeader
-                    rightButton1={
-                        props.ownFeed != null
-                            ? {
-                                label: <MaterialCommunityIcon
-                                    name={'share'}
-                                    size={20}
-                                    color={ComponentColors.NAVIGATION_BUTTON_COLOR}
-                                />,
-                                onPress: async () => showShareFeedDialog(props.ownFeed),
-                            }
-                            : undefined
-                    }
                     title={SCREEN_TITLE}
                 />
                 <ScrollView
                     keyboardShouldPersistTaps='handled'
                 >
-                    <TouchableOpacity
-                        onPress={async () => {
-                            await openImagePicker(props.onUpdatePicture);
-                        }}
-                        style={styles.imagePickerContainer}
-                    >
-                        <ImageDataView
-                            source={props.profile.image}
-                            defaultImage={defaultUserImage}
-                            style={styles.imagePicker}
-                            modelHelper={modelHelper}
-                        />
-                    </TouchableOpacity>
-                    <RegularText style={styles.tooltip}>{NAME_LABEL}</RegularText>
-                    <SimpleTextInput
-                        style={styles.row}
-                        defaultValue={props.profile.name}
-                        placeholder={NAME_PLACEHOLDER}
-                        autoCapitalize='none'
-                        autoFocus={props.profile.name === ''}
-                        autoCorrect={false}
-                        selectTextOnFocus={true}
-                        returnKeyType={'done'}
-                        onSubmitEditing={(name) =>
-                            name === ''
-                            ? props.onUpdateAuthor(NAME_PLACEHOLDER)
-                            : props.onUpdateAuthor(name)
+                    <RowItem
+                        title='Edit profile'
+                        buttonStyle='navigate'
+                        containerStyle={styles.editProfileContainer}
+                        icon={<ImageDataView
+                                source={props.profile.image}
+                                defaultImage={defaultUserImage}
+                                style={styles.profileImage}
+                                modelHelper={new ReactNativeModelHelper(props.gatewayAddress)}
+                            />
                         }
+                        onPress={() => props.navigation.navigate('EditProfileContainer', {})}
                     />
                     <TouchableView style={styles.qrCodeContainer} onLongPress={props.onChangeQRCode}>
                     { qrCodeValue != null
@@ -222,30 +187,27 @@ export const IdentitySettings = (props: DispatchProps & StateProps) => {
                             <ActivityIndicator />
                     }
                     </TouchableView>
+                    <View style={styles.qrCodeHintContainer}>
+                        <RegularText style={styles.qrCodeHint}>This is your contact code.</RegularText>
+                        <RegularText style={styles.qrCodeHint}>Ask people to scan it or share a link.</RegularText>
+                    </View>
                     <TwoButton
                         leftButton={{
-                            label: 'Share',
+                            label: 'Share link',
                             icon: <MaterialCommunityIcon name='share' size={24} color={Colors.BRAND_PURPLE} />,
                             onPress: onPressShare,
                         }}
                         rightButton={{
-                            label: 'Add channel',
-                            icon: <MaterialCommunityIcon name='account-plus' size={24} color={Colors.BRAND_PURPLE} />,
+                            label: 'Scan a QR code',
+                            icon: <MaterialCommunityIcon name='crop-free' size={24} color={Colors.BRAND_PURPLE} />,
                             onPress: () => props.navigation.navigate('FeedLinkReader', {}),
                         }}
                     />
                 </ScrollView>
                 <TabBarPlaceholder/>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </FragmentSafeAreaViewWithoutTabBar>
     );
-};
-
-const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
-    const imageData = await AsyncImagePicker.showImagePicker();
-    if (imageData != null) {
-        onUpdatePicture(imageData);
-    }
 };
 
 const styles = StyleSheet.create({
@@ -256,6 +218,10 @@ const styles = StyleSheet.create({
     mainContainer: {
         backgroundColor: ComponentColors.BACKGROUND_COLOR,
         flex: 1,
+    },
+    editProfileContainer: {
+        paddingLeft: 0,
+        marginTop: 10,
     },
     row: {
         width: '100%',
@@ -269,25 +235,26 @@ const styles = StyleSheet.create({
         color: Colors.DARK_GRAY,
         fontSize: 14,
     },
-    tooltip: {
+    qrCodeHintContainer: {
+        paddingBottom: 20,
+    },
+    qrCodeHint: {
         paddingHorizontal: 10,
-        paddingTop: 20,
-        paddingBottom: 7,
         color: Colors.GRAY,
-        fontSize: 12,
+        fontSize: 14,
+        alignSelf: 'center',
     },
     imagePickerContainer: {
         flexDirection: 'row',
         alignSelf: 'center',
     },
-    imagePicker: {
-        borderRadius : 72.5,
-        width: 145,
-        height: 145,
-        marginVertical: 10,
+    profileImage: {
+        width: 44,
+        height: 44,
+        margin: 0,
     },
     qrCodeContainer: {
-        marginVertical: 10,
+        marginVertical: 20,
         width: QRCodeWidth,
         height: QRCodeWidth,
         padding: 0,

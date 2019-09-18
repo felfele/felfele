@@ -30,7 +30,6 @@ import { FilterListEditorContainer } from './containers/FilterListEditorContaine
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
 import { PostEditorContainer } from './containers/PostEditorContainer';
-import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { appendToLog } from './log';
@@ -52,7 +51,7 @@ import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
 import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
-import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import { ContactScreenContainer } from './ui/screens/profile/ContactScreenContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
 import { BASE_URL } from './helpers/deepLinking';
@@ -74,6 +73,7 @@ import { ContactConfirmContainer } from './ui/screens/contact/ContactConfirmCont
 import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContainer';
 import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
 import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
+import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -117,13 +117,16 @@ const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
 
 const profileScenes: NavigationRouteConfigMap = {
     Profile: {
-        screen: IdentitySettingsContainer,
+        screen: ContactScreenContainer,
     },
     Feed: {
         screen: FeedContainer,
     },
     FeedSettings: {
         screen: FeedSettingsContainer,
+    },
+    EditProfileContainer: {
+        screen: EditProfileContainer,
     },
 };
 const ProfileNavigator = createStackNavigator(profileScenes,
@@ -279,7 +282,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
-                        name={'account'}
+                        name={'account-circle'}
                         size={24}
                         color={tintColor}
                     />
@@ -395,7 +398,7 @@ const OnboardingNavigator = createStackNavigator({
         screen: WelcomeContainer,
     },
     ProfileOnboarding: {
-        screen: ProfileContainer,
+        screen: ContactScreenContainer,
     },
 }, {
     mode: 'card',

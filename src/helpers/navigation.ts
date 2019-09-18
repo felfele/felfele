@@ -112,6 +112,7 @@ export interface Routes {
         contact: MutualContact;
         isReceiver: boolean;
     };
+    EditProfileContainer: {};
 }
 
 export interface TypedNavigation {
