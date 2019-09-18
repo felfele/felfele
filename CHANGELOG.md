@@ -1,3 +1,10 @@
+## v1.0.7 (2019-09-04) Beta release
+
+This release adds the following new features and fixes:
+- Feature: New contact tab with improved contact flow. Contacts are now the default, old follow based model is deprecated. (https://github.com/felfele/felfele/pull/505 and https://github.com/felfele/felfele/pull/497)
+- Feature: Private channels are synchronized in the background (https://github.com/felfele/felfele/pull/508)
+- Bugfix: iOS splash screen logo size (https://github.com/felfele/felfele/pull/504)
+
 ## v1.0.6 (2019-09-04) App Store release
 
 This release adds the following new features and fixes:
