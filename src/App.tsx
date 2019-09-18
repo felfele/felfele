@@ -74,6 +74,7 @@ import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContai
 import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
 import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
 import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer';
+import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -398,7 +399,7 @@ const OnboardingNavigator = createStackNavigator({
         screen: WelcomeContainer,
     },
     ProfileOnboarding: {
-        screen: ContactScreenContainer,
+        screen: ProfileContainer,
     },
 }, {
     mode: 'card',
