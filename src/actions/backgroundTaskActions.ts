@@ -9,9 +9,7 @@ import { Post } from '../models/Post';
 import { Actions } from './Actions';
 import { RecentPostFeed } from '../social/api';
 import { AppState } from '../reducers/AppState';
-import { getMutualContacts } from '../selectors/selectors';
 import { AsyncActions } from './asyncActions';
-import { Debug } from '../Debug';
 
 const registerFoundationFeedNotificiations = (intervalMinutes: number, dispatch: Dispatch, getState: () => AppState) => {
     const foundationFeeds = getState().feeds.filter(feed => feed.feedUrl === FELFELE_FOUNDATION_URL);
@@ -21,8 +19,7 @@ const registerFoundationFeedNotificiations = (intervalMinutes: number, dispatch:
             ? posts[0].createdAt
             : 0
         ;
-        registerBackgroundTask(intervalMinutes, async () => {
-            Debug.log('Background feed check started');
+        registerBackgroundTask('Foundation feed check', intervalMinutes, async () => {
             const previousPosts = getState().rssPosts.filter(post => post.author != null && post.author.uri ===  foundationFeed.feedUrl);
             const previousSortedPosts = previousPosts.sort((a, b) => b.createdAt - a.createdAt);
             const address = Swarm.makeFeedAddressFromBzzFeedUrl(foundationFeeds[0].feedUrl);
@@ -36,23 +33,8 @@ const registerFoundationFeedNotificiations = (intervalMinutes: number, dispatch:
                 dispatch(Actions.updateRssPosts(posts));
                 localNotification('There is a new version available!');
             }
-            Debug.log('Background feed check finished', {isFeedUpdated});
         });
     }
-};
-
-const registerPrivateChannelSync = (intervalMinutes: number, dispatch: Dispatch, getState: () => AppState) => {
-    registerBackgroundTask(intervalMinutes, async () => {
-        Debug.log('Background privateChannel sync started');
-        const mutualContacts = getMutualContacts(getState());
-        const contactsToBeSynced = mutualContacts
-            .filter(contact => contact.privateChannel.unsyncedCommands.length > 0)
-        ;
-        if (contactsToBeSynced.length > 0) {
-            await dispatch(AsyncActions.syncPrivatePostsWithContacts(contactsToBeSynced));
-        }
-        Debug.log('Background privateChannel sync finished', {numSynced: contactsToBeSynced.length});
-    });
 };
 
 // this is a workaround for not having a dependency on backgroundFetch in the share extension
@@ -60,7 +42,7 @@ export const BackgroundTaskActions = {
     registerBackgroundTasks: (): Thunk => {
         return async (dispatch, getState) => {
             registerFoundationFeedNotificiations(12 * 60, dispatch, getState);
-            registerPrivateChannelSync(1 * 60, dispatch, getState);
+            registerBackgroundTask('Private channel sync', 1 * 60, () => dispatch(AsyncActions.syncPrivateChannelWithAllContacts()));
         };
     },
 };

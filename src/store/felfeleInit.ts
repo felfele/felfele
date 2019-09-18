@@ -29,9 +29,6 @@ export const felfeleInitAppActions = (store: Store<AppState, Actions>) => {
     store.dispatch(AsyncActions.advanceContacts());
     // @ts-ignore
     store.dispatch(AsyncActions.downloadFollowedFeedPosts());
-    const mutualContacts = getMutualContacts(store.getState());
-    // @ts-ignore
-    store.dispatch(AsyncActions.syncPrivatePostsWithContacts(mutualContacts));
 
     setInterval(() => store.dispatch(Actions.timeTick()), 60000);
 };
