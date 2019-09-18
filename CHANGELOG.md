@@ -1,4 +1,4 @@
-## v1.0.7 (2019-09-04) Beta release
+## v1.0.7 (2019-09-18) Beta release
 
 This release adds the following new features and fixes:
 - Feature: New contact tab with improved contact flow. Contacts are now the default, old follow based model is deprecated. (https://github.com/felfele/felfele/pull/505 and https://github.com/felfele/felfele/pull/497)
