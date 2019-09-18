@@ -1,14 +1,6 @@
-import { getFollowLink, getFeedUrlFromFollowLink, getInviteLink, getInviteCodeFromInviteLink } from '../../src/helpers/deepLinking';
+import { getInviteLink, getInviteCodeFromInviteLink } from '../../src/helpers/deepLinking';
 import { InvitedContact } from '../../src/models/Contact';
 import { HexString } from '../../src/helpers/opaqueTypes';
-
-test('follow link encoding and decoding', () => {
-    const feedUrl = 'bzz://abcdef';
-    const followLink = getFollowLink(feedUrl);
-    const result = getFeedUrlFromFollowLink(followLink);
-
-    expect(result).toEqual(feedUrl);
-});
 
 test('invite link encoding and decoding', () => {
     const randomSeed = '755c77b5753fd526605c532dd07e46fb3cdd7d13a244eab1de871fc8e8250653' as HexString;
