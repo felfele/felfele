@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         paddingVertical: 40,
+        paddingHorizontal: 10,
     },
     title: {
         fontSize: 18,
