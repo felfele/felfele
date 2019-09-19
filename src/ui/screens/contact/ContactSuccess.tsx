@@ -54,7 +54,7 @@ export const ContactSuccess = (props: Props) => {
             <View>
                 <IllustrationWithExplanation
                     title={'Yay!'}
-                    topic={'You’re now connected with Roger.'}
+                    topic={`You’re now connected with ${props.contact.name}.`}
                     explanation={'Use your private channel to share amazing things with each other!'}
                 >
                     <Balloon width={36} height={58}/>
