@@ -314,11 +314,17 @@ const metadataReducer = (metadata: Metadata = defaultMetadata, action: Actions):
     }
 };
 
+let ignoreActionsAfterReset = false;
+
 export const appStateReducer = (state: AppState = defaultState, action: Actions): AppState => {
     const startTime = Date.now();
+    if (ignoreActionsAfterReset === true) {
+        return state;
+    }
     switch (action.type) {
         case 'APP-STATE-RESET': {
             Debug.log('App state reset');
+            ignoreActionsAfterReset = true;
             return defaultState;
         }
         case 'APP-STATE-SET': {
