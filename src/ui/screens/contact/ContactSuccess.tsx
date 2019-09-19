@@ -66,15 +66,9 @@ export const ContactSuccess = (props: Props) => {
                         style: { marginTop: 20 },
                         icon: <Icon name='arrow-right' color={Colors.BRAND_PURPLE} size={24}/>,
                         onPress: async () => {
-                            const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(props.contact.identity);
-                            const feed = await fetchRecentPostFeed(feedAddress, props.gatewayAddress);
-                            if (feed != null && feed.feedUrl !== '') {
-                                props.navigation.replace('ContactView', {
-                                    publicKey: props.contact.identity.publicKey,
-                                });
-                            } else {
-                                props.navigation.popToTop();
-                            }
+                            props.navigation.replace('ContactView', {
+                                publicKey: props.contact.identity.publicKey,
+                            });
                         },
                     }}
                 />
