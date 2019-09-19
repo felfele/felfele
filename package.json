@@ -62,7 +62,7 @@
     "e2e:ios": "detox test -c ios.sim.debug --cleanup",
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh",
     "postinstall": "npm run fix-androidx",
-    "increment-build": "react-native-version --never-amend --increment-build"
+    "increment-build": "react-native-version --never-amend --increment-build && scripts/patch_version_ts.sh"
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.5.0",
