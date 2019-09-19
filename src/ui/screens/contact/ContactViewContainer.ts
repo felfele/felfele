@@ -59,7 +59,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
         onConfirmContact: (contact: MutualContact) => {
         },
         onRemoveContact: (contact: Contact) => {
-            dispatch(Actions.removeContact(contact));
+            dispatch(AsyncActions.removeContactAndAllPosts(contact));
             ownProps.navigation.popToTop();
         },
         onRefreshPosts: (feeds: Feed[]) => {

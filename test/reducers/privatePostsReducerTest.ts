@@ -118,6 +118,38 @@ describe('privatePostsReducer', () => {
 
             expect(result[topic].length).toBe(0);
         });
+    });
 
+    describe('removePrivatePostsWithTopic', () => {
+        it('should remove topic if exists', () => {
+            const topic = 'a' as HexString;
+            const privatePosts: PostListDict = {
+                [topic]: [],
+            };
+            const action = PrivatePostActions.removePrivatePostsWithTopic(topic);
+            const result = privatePostsReducer(privatePosts, action);
+
+            expect(result[topic]).toBeUndefined();
+        });
+        it('should work even if  the topic does not exist', () => {
+            const topic = 'a' as HexString;
+            const privatePosts: PostListDict = {};
+            const action = PrivatePostActions.removePrivatePostsWithTopic(topic);
+            const result = privatePostsReducer(privatePosts, action);
+
+            expect(result[topic]).toBeUndefined();
+        });
+        it('should not remove topic with different key', () => {
+            const topicA = 'a' as HexString;
+            const topicB = 'b' as HexString;
+            const privatePosts: PostListDict = {
+                [topicB]: [],
+            };
+
+            const action = PrivatePostActions.removePrivatePostsWithTopic(topicA);
+            const result = privatePostsReducer(privatePosts, action);
+            expect(result[topicB]).toEqual([]);
+
+        });
     });
 });
