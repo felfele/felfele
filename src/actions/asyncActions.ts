@@ -508,6 +508,7 @@ export const AsyncActions = {
                 AsyncActions.updateProfileImage(image),
                 AsyncActions.createUserIdentity(identity),
                 AsyncActions.createOwnFeed(),
+                AsyncActions.generateInvitedContact(),
             ]));
         };
     },
