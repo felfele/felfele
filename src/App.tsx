@@ -365,7 +365,9 @@ const Scenes: NavigationRouteConfigMap = {
         path: 'invite/:randomSeed/:contactPublicKey',
     },
     InviteLinkWithProfileName: {
-        screen: InviteLinkContainer,
+        screen: ({navigation}: NavigationScreenProps) => (
+            <InviteLinkContainer navigation={navigation} isNameFromLink={true}/>
+        ),
         path: 'invite/:randomSeed/:contactPublicKey/:profileName',
     },
     ContactView: {
