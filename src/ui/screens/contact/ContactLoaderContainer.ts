@@ -26,7 +26,7 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
             const updatedContact = await advanceContactState(codeReceivedContact, swarmContactHelper, 20 * SECOND);
             dispatch(ContactActions.addContact(updatedContact));
             if (updatedContact.type === 'mutual-contact') {
-                ownProps.navigation.navigate('ContactSuccess', { contact: updatedContact, isReceiver: true });
+                ownProps.navigation.replace('ContactSuccess', { contact: updatedContact, isReceiver: true });
             } else {
                 onInviteContactFailed(ownProps.navigation, inviteCode.profileName);
             }
