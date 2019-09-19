@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ViewStyle, ScrollView, SafeAreaView, Alert } from 'react-native';
+import { View, ViewStyle, ScrollView, SafeAreaView, Alert, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
@@ -201,7 +201,8 @@ const onAppStateReset = async (props: Props) => {
     Debug.log('onAppStateReset: ', confirmed);
     if (confirmed) {
         props.onAppStateReset();
-        await Utils.waitMillisec(1000);
+        const timeout = Platform.OS === 'android' ? 3000 : 1000;
+        await Utils.waitMillisec(timeout);
         restartApp();
     }
 };
