@@ -129,9 +129,27 @@ export const getPrivateChannelFeedsPosts = createSelector([ getRssPosts, getPriv
     return rssPosts.filter(post => isPostFromPrivateChannelFeed(post, privateChannelFeeds));
 });
 
-export const getAllPrivateChannelPosts = (state: AppState) => {
-    return Object.entries(state.privatePosts).reduce<Post[]>((prev, curr) => prev.concat(curr[1]), []);
+const sortedUniquePosts = (posts: Post[]) => {
+    const arePostsEqual = (a: Post, b: Post) => a._id === b._id;
+    return posts
+        .sort(postTimeCompare)
+        .reduce<Post[]>((prev, curr, ind, arr) =>
+            ind > 0 && arePostsEqual(curr, arr[ind - 1])
+                ? prev
+                : prev.concat(curr)
+        , [])
+    ;
 };
+
+export const getAllPrivateChannelPosts = createSelector([ getPrivatePosts ], (privatePosts) => {
+    const postsByTopics = Object.values(privatePosts);
+    const emptyPrivatePosts: PrivatePost[] = [];
+    const allPrivatePosts = emptyPrivatePosts
+        .concat(...postsByTopics)
+    ;
+
+    return sortedUniquePosts(allPrivatePosts);
+});
 
 export const getFeedPosts = createSelector([ getSelectedFeedPosts ], (posts) => {
     return posts;
@@ -157,13 +175,5 @@ export const getYourPosts = createSelector([ getLocalPosts, getPrivatePosts, get
 });
 
 export const getYourSortedUniquePosts = createSelector([ getYourPosts ], (posts) => {
-    const arePostsEqual = (a: Post, b: Post) => a._id === b._id;
-    return posts
-        .sort(postTimeCompare)
-        .reduce<Post[]>((prev, curr, ind, arr) =>
-            ind > 0 && arePostsEqual(curr, arr[ind - 1])
-                ? prev
-                : prev.concat(curr)
-        , [])
-    ;
+    return sortedUniquePosts(posts);
 });
