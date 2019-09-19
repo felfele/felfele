@@ -48,6 +48,13 @@ export const privatePostsReducer = (privatePosts: PostListDict = {}, action: Act
                 [action.payload.topic]: updatedTopicPosts,
             };
         }
+        case ActionTypes.REMOVE_PRIVATE_POSTS_WITH_TOPIC: {
+            const privatePostsCopy = {
+                ...privatePosts,
+            };
+            delete privatePostsCopy[action.payload.topic];
+            return privatePostsCopy;
+        }
         default: {
             return privatePosts;
         }

@@ -577,6 +577,16 @@ export const AsyncActions = {
             dispatch(Actions.updateContactState(contact, updatedContact));
         };
     },
+    removeContactAndAllPosts: (contact: Contact): Thunk => {
+        return async (dispatch, getState) => {
+            if (contact.type === 'mutual-contact') {
+                const sharedKey = deriveSharedKey(getState().author.identity!, contact.identity);
+                const topic = calculatePrivateTopic(sharedKey);
+                dispatch(Actions.removePrivatePostsWithTopic(topic));
+            }
+            dispatch(Actions.removeContact(contact));
+        };
+    },
 };
 
 const getSwarmContactHelper = (state: AppState): ContactHelper => {

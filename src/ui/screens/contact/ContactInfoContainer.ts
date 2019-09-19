@@ -6,6 +6,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { MutualContact, Contact } from '../../../models/Contact';
 import { findContactByPublicKey, UnknownContact } from '../../../helpers/contactHelpers';
 import { ContactConfirm } from './ContactConfirm';
+import { AsyncActions } from '../../../actions/asyncActions';
 
 const mapStateToProps = (state: AppState, ownProps: {navigation: TypedNavigation}): StateProps => {
     const publicKey = ownProps.navigation.getParam<'ContactInfo', 'publicKey'>('publicKey');
@@ -24,7 +25,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: {navigation: TypedNavigatio
             ownProps.navigation.navigate('ContactSuccess', { contact: contact, isReceiver: true });
         },
         onRemoveContact: (contact: Contact) => {
-            dispatch(Actions.removeContact(contact));
+            dispatch(AsyncActions.removeContactAndAllPosts(contact));
         },
     };
 };

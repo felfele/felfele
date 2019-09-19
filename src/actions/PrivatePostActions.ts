@@ -11,4 +11,6 @@ export const PrivatePostActions = {
         createAction(ActionTypes.REMOVE_PRIVATE_POST, { topic, id }),
     updatePrivatePostImages: (topic: HexString, id: HexString, images: ImageData[]) =>
         createAction(ActionTypes.UPDATE_PRIVATE_POST_IMAGES, { topic, id, images }),
+    removePrivatePostsWithTopic: (topic: HexString) =>
+        createAction(ActionTypes.REMOVE_PRIVATE_POSTS_WITH_TOPIC, { topic }),
 };
