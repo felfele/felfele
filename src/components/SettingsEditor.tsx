@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, Vibration, Linking } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
-import { Version } from '../Version';
+import { Version, BuildNumber } from '../Version';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/buttons/RowButton';
@@ -29,7 +29,11 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 export const SettingsEditor = (props: Props) => {
-    const version = 'Version: ' + Version;
+    const buildNumber = props.settings.showDebugMenu
+        ? ` (Build number ${BuildNumber})`
+        : ''
+    ;
+    const version = 'Version: ' + Version + buildNumber;
     return (
         <FragmentSafeAreaViewForTabBar>
             <NavigationHeader
