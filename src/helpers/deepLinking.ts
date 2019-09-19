@@ -28,8 +28,15 @@ export const getInviteLink = (contact: InvitedContact, profileName: string): str
     return `${inviteLinkWithoutUsername}/${encodeURIComponent(profileName)}`;
 };
 
-export const getInviteLinkWithBase64Params = (base64RandomSeed: string, base64ContactPublicKey: string) => {
-    return `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}`;
+export const getInviteLinkWithBase64Params = (
+    base64RandomSeed: string,
+    base64ContactPublicKey: string,
+    urlEncodedProfileName?: string,
+) => {
+    return urlEncodedProfileName != null
+        ? `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}/${urlEncodedProfileName}`
+        : `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}`
+    ;
 };
 
 export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | undefined => {
