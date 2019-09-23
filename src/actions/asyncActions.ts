@@ -211,23 +211,24 @@ export const AsyncActions = {
                 return swarmStorageUploadImage(swarmApi.bzz, image, imageResizer, modelHelper.getLocalPath);
             };
             const actions = [];
-            for (const contact of contacts) {
-                const privateChannelUpdate = await syncPrivateChannelWithContact(
-                    contact,
-                    identity.address as HexString,
-                    storage,
-                    crypto,
-                    uploadImage,
-                );
-                Debug.log('syncPrivatePostsWithContacts', {privateChannelUpdate});
-                const topic = privateChannelUpdate.topic;
+            const syncUpdatePromises = contacts.map(contact => syncPrivateChannelWithContact(
+                contact,
+                identity.address as HexString,
+                storage,
+                crypto,
+                uploadImage,
+            ));
+            const syncUpdates = await Promise.all(syncUpdatePromises);
+            for (const syncUpdate of syncUpdates) {
+                Debug.log('syncPrivatePostsWithContacts', {syncUpdate});
+                const topic = syncUpdate.topic;
                 const author = {
-                    name: contact.name,
-                    image: contact.image,
-                    uri: makeBzzFeedUrlFromIdentity(contact.identity),
+                    name: syncUpdate.contact.name,
+                    image: syncUpdate.contact.image,
+                    uri: makeBzzFeedUrlFromIdentity(syncUpdate.contact.identity),
                 };
                 const updatedPrivateChannel = applyPrivateChannelUpdate(
-                    privateChannelUpdate,
+                    syncUpdate,
                     (command: PrivateChannelCommand) => {
                         switch (command.type) {
                             case 'post': {
@@ -255,7 +256,7 @@ export const AsyncActions = {
                         }
                     }
                 );
-                actions.push(Actions.updateContactPrivateChannel(contact, updatedPrivateChannel));
+                actions.push(Actions.updateContactPrivateChannel(syncUpdate.contact, updatedPrivateChannel));
             }
             actions.map(action => dispatch(action));
         };

@@ -24,7 +24,7 @@ export const makeEmptyPrivateChannel = (): PrivateChannelSyncData => ({
 
 interface PrivateChannelUpdate {
     topic: HexString;
-    privateChannel: PrivateChannelSyncData;
+    contact: MutualContact;
     syncedLocalTimeline: Timeline<PrivateChannelCommand>;
     peerTimeline: Timeline<PrivateChannelCommand>;
 }
@@ -186,7 +186,7 @@ export const syncPrivateChannelWithContact = async (
 
         return {
             topic,
-            privateChannel: contact.privateChannel,
+            contact,
             syncedLocalTimeline: syncedTimeline,
             peerTimeline,
         };
@@ -194,7 +194,7 @@ export const syncPrivateChannelWithContact = async (
         Debug.log('syncPrivateChannelWithContact', {e});
         return {
             topic,
-            privateChannel: contact.privateChannel,
+            contact,
             syncedLocalTimeline: [],
             peerTimeline: [],
         };
@@ -215,15 +215,15 @@ export const applyPrivateChannelUpdate = (
     }
     const peerLastSeenChapterId = update.peerTimeline.length !== 0
         ? getNewestChapterId(update.peerTimeline)
-        : update.privateChannel.peerLastSeenChapterId
+        : update.contact.privateChannel.peerLastSeenChapterId
     ;
     const lastSyncedChapterId = update.syncedLocalTimeline.length !== 0
         ? getNewestChapterId(update.syncedLocalTimeline)
-        : update.privateChannel.lastSyncedChapterId
+        : update.contact.privateChannel.lastSyncedChapterId
     ;
     const unsyncedCommands = update.syncedLocalTimeline.length !== 0
         ? []
-        : update.privateChannel.unsyncedCommands
+        : update.contact.privateChannel.unsyncedCommands
     ;
     return {
         peerLastSeenChapterId,
