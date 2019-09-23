@@ -33,6 +33,7 @@ import {
     copyPostWithReferences,
     createPostWithLinkMetaData,
     makePostId,
+    copyPostPrivately,
 } from '../helpers/postHelpers';
 import { Debug } from '../Debug';
 import { Utils } from '../Utils';
@@ -322,12 +323,16 @@ export const AsyncActions = {
                     const privateChannel = contactFeed.contact.privateChannel;
                     const sharedSecret = deriveSharedKey(identity, contactFeed.contact.identity);
                     const topic = calculatePrivateTopic(sharedSecret);
-                    const post = {
-                        ...postWithLinkMetaData,
-                        topic,
-                        author,
-                        _id: postId,
-                    };
+                    const post = originalPost._id == null || originalPost.topic != null
+                        ? copyPostPrivately(postWithLinkMetaData, author, postId, topic)
+                        : {
+                            ...copyPostWithReferences(postWithLinkMetaData, author, postId, topic),
+                            topic,
+                            author,
+                            _id: postId,
+                        }
+                    ;
+
                     const privateChannelWithPost = privateChannelAddPost(privateChannel, post);
                     dispatch(Actions.addPrivatePost(post.topic, post));
                     dispatch(Actions.updateContactPrivateChannel(contactFeed.contact, privateChannelWithPost));
