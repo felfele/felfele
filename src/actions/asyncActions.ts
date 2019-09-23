@@ -152,7 +152,13 @@ export const AsyncActions = {
             dispatch(Actions.updateRssPosts(posts));
         };
     },
-    syncPrivateChannelWithAllContacts: (): Thunk => {
+    syncPrivateChannels: (): Thunk => {
+        return async (dispatch, getState) => {
+            const mutualContacts = getMutualContacts(getState());
+            await dispatch(AsyncActions.syncPrivatePostsWithContacts(mutualContacts));
+        };
+    },
+    syncUnsyncedPrivateChannels: (): Thunk => {
         return async (dispatch, getState) => {
             const mutualContacts = getMutualContacts(getState());
             const contactsToBeSynced = mutualContacts

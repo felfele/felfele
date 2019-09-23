@@ -44,7 +44,7 @@ export const BackgroundTaskActions = {
     registerBackgroundTasks: (): Thunk => {
         return async (dispatch, getState) => {
             registerFoundationFeedNotificiations(12 * 60, dispatch, getState);
-            registerBackgroundTask('Private channel sync', 1 * 60, () => dispatch(AsyncActions.syncPrivateChannelWithAllContacts()));
+            registerBackgroundTask('Private channel sync', 1 * 60, () => dispatch(AsyncActions.syncUnsyncedPrivateChannels()));
         };
     },
 };
