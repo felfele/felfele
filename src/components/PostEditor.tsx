@@ -277,8 +277,7 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private sendUpdate = async () => {
-        const post = await createPostWithLinkMetaData(this.state.post);
-        this.props.onPost(post);
+        this.props.onPost(this.state.post);
     }
 }
 
