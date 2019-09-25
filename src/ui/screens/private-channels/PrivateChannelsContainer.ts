@@ -9,7 +9,10 @@ import { Post } from '../../../models/Post';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const allPosts = getAllPrivateChannelPosts(state);
-    const ownPublicKey = state.author.identity!.publicKey;
+    const ownPublicKey = state.author.identity != null
+        ? state.author.identity.publicKey
+        : undefined
+    ;
     const isOwnPost = (post: Post) => post.author != null && post.author.identity != null && post.author.identity.publicKey === ownPublicKey;
     const posts = allPosts.filter(post => !isOwnPost(post));
     const privateChannelFeeds = getPrivateChannelFeeds(state);
