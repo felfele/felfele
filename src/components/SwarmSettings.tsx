@@ -17,6 +17,7 @@ import * as Swarm from '../swarm/Swarm';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { safeFetch } from '../Network';
 import { Debug } from '../Debug';
+import { generateSecureRandom } from '../helpers/secureRandom';
 
 export interface StateProps {
     swarmGatewayAddress: string;
@@ -39,6 +40,33 @@ const pingSwarm = async (props: Props) => {
         const swarmApi = Swarm.makeBzzApi(props.swarmGatewayAddress);
         const hash = await swarmApi.uploadString('hello');
         Debug.log('SwarmSettings.pingSwarm', {result, hash});
+    } catch (e) {
+        Debug.log('SwarmSettings.pingSwarm', e);
+    }
+};
+
+const updateFeed = async (props: Props) => {
+    try {
+        const identity = await Swarm.generateSecureIdentity(generateSecureRandom);
+        const feedAddress = {
+            user: identity.address,
+            topic: '',
+        };
+        const signDigest = (digest: number[]) => Swarm.signDigest(digest, identity);
+        const swarmApi = Swarm.makeApi(feedAddress, signDigest, props.swarmGatewayAddress);
+        const feedTemplate = await swarmApi.feed.update('test');
+        const result = await swarmApi.feed.download(0);
+        Debug.log('SwarmSettings.updateFeed', {result, feedTemplate});
+    } catch (e) {
+        Debug.log('SwarmSettings.pingSwarm', e);
+    }
+};
+
+const downloadHello = async (props: Props) => {
+    try {
+        const swarmApi = Swarm.makeBzzApi(props.swarmGatewayAddress);
+        const data = await swarmApi.downloadString('962cb5eaf8b7e299188590ace09d509f5bc3983f76f9f4211de6d52ba010413d', 0);
+        Debug.log('SwarmSettings.pingSwarm', {data});
     } catch (e) {
         Debug.log('SwarmSettings.pingSwarm', e);
     }
@@ -104,21 +132,18 @@ export const SwarmSettings = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <MaterialCommunityIcon name='server-network' />
+                        <MaterialCommunityIcon name='check-circle-outline' />
                     }
-                    title={`Use public network: ${Swarm.defaultPublicGateway}`}
-                    onPress={() => props.onChangeSwarmGatewayAddress(Swarm.defaultPublicGateway)}
+                    title={`Update feed`}
+                    onPress={() => updateFeed(props)}
                     buttonStyle='none'
                 />
-
-                <View style={{paddingBottom: 20}} />
-
                 <RowItem
                     icon={
-                        <MaterialCommunityIcon name='server-network' />
+                        <MaterialCommunityIcon name='check-circle-outline' />
                     }
-                    title={`Ping`}
-                    onPress={() => pingSwarm(props)}
+                    title={`Download hello`}
+                    onPress={() => downloadHello(props)}
                     buttonStyle='none'
                 />
 
