@@ -167,7 +167,7 @@ dependencies {
     compile 'androidx.appcompat:appcompat:1.0.0'
     compile "com.facebook.react:react-native:+"  // From node_modules
 
-    compile fileTree(dir: 'lib', include: 'felfelego-0.0.1.aar')
+    compile fileTree(dir: 'lib', include: 'mobileswarm.aar')
 }
 
 // Run this once to be able to run the application with BUCK
