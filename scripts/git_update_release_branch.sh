@@ -5,6 +5,6 @@
 release_branch=$1
 
 git checkout release
-git merge $release_branch
+git merge "$release_branch"
 git push origin release
-git co $release_branch
+git co "$release_branch"
