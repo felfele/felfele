@@ -41,7 +41,7 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		9433A2A9637C4EE1BD8F70B7 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64CDFEF29F854BA190B5DE2C /* TSBackgroundFetch.framework */; };
 		9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD9E60E512304A688F30EDBD /* libRCTImageResizer.a */; };
-		9A6DF41C22D8E46600D997B9 /* Statusgo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A6DF41B22D8E46600D997B9 /* Statusgo.framework */; };
+		9A05C954233BF47F00480A55 /* Mobileswarm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A05C953233BF47F00480A55 /* Mobileswarm.framework */; };
 		9A7D87B8218D043D0046F42B /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D879B218CD6550046F42B /* libRNCamera.a */; };
 		9A8C5D062188B2D10011F13D /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D032188B2930011F13D /* libRNRandomBytes.a */; };
 		9AE6B77922565DAB00BF8A2C /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE6B74D22565D8A00BF8A2C /* libRCTPushNotification.a */; };
@@ -585,7 +585,7 @@
 		7F1F9D8F2F5A4B92B714734E /* RCTRestart.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTRestart.xcodeproj; path = "../node_modules/react-native-restart/ios/RCTRestart.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
-		9A6DF41B22D8E46600D997B9 /* Statusgo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Statusgo.framework; sourceTree = "<group>"; };
+		9A05C953233BF47F00480A55 /* Mobileswarm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mobileswarm.framework; sourceTree = "<group>"; };
 		9A8C5CFD2188B2920011F13D /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
 		9AE6B73B22565D8900BF8A2C /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		9AFF87D51F448F6F0033DA0B /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
@@ -632,6 +632,7 @@
 				9AFF87DB1F448F8A0033DA0B /* libRCTCameraRoll.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
+				9A05C954233BF47F00480A55 /* Mobileswarm.framework in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
@@ -643,7 +644,6 @@
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				C5430E3289DB4BF9B2D510DE /* libRNVectorIcons.a in Frameworks */,
 				FE8AB2163F7C407CA2233F63 /* libRNImagePicker.a in Frameworks */,
-				9A6DF41C22D8E46600D997B9 /* Statusgo.framework in Frameworks */,
 				75E4D965E9574E3FAD25F309 /* libRNFS.a in Frameworks */,
 				4E079639DA9D43C784C81551 /* libReactNativePermissions.a in Frameworks */,
 				5F8BA18F66164AFF817725B4 /* libRNSecureRandom.a in Frameworks */,
@@ -980,7 +980,7 @@
 		9A8C5C9C2188982F0011F13D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9A6DF41B22D8E46600D997B9 /* Statusgo.framework */,
+				9A05C953233BF47F00480A55 /* Mobileswarm.framework */,
 				64CDFEF29F854BA190B5DE2C /* TSBackgroundFetch.framework */,
 			);
 			name = Frameworks;
@@ -1147,7 +1147,6 @@
 				BC524A9B22CF3EF400879B0E /* Sources */,
 				BC524A9C22CF3EF400879B0E /* Frameworks */,
 				BC524A9D22CF3EF400879B0E /* Resources */,
-				BC524C1122D36A5300879B0E /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -1881,6 +1880,7 @@
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
+					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1935,6 +1935,7 @@
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
 					"\"$(SRCROOT)/Felfele\"",
+					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",

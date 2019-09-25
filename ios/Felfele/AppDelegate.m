@@ -16,7 +16,7 @@
 #import <React/RCTPushNotificationManager.h>
 #import "RNSplashScreen.h"
 
-#import <Statusgo/Statusgo.h>
+#import <Mobileswarm/Mobileswarm.h>
 
 @implementation AppDelegate
 
@@ -54,9 +54,11 @@
 
   NSString *appFolderPath = [self getPathForDirectory:NSDocumentDirectory];
   NSLog(@"App Directory is: %@", appFolderPath);
-  const char *cfilename=[appFolderPath UTF8String];
-  char *result = StartNode((char *)cfilename, ":0", "", "debug");
-  NSLog(@"result: %s", result);
+  NSString *listenAddress = @":0";
+  NSString *bootnodeURL = @"";
+  NSString *logLevel = @"debug";
+  NSString *result = MobileswarmStartNode(appFolderPath, listenAddress, bootnodeURL, logLevel);
+  NSLog(@"result: %@", result);
   
   [RNSplashScreen show];
   return YES;
