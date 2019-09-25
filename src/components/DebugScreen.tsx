@@ -30,6 +30,7 @@ import { deriveSharedKey } from '../helpers/contactHelpers';
 import { calculatePrivateTopic } from '../protocols/privateSharing';
 import { byteArrayToHex } from '../helpers/conversion';
 import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     appState: AppState;
@@ -77,7 +78,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 );
 
 export const DebugScreen = (props: Props) => (
-    <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
+    <FragmentSafeAreaViewWithoutTabBar>
         <NavigationHeader
             navigation={props.navigation}
             title='Debug menu'
@@ -190,7 +191,7 @@ export const DebugScreen = (props: Props) => (
                 />
             </ScrollView>
         </View>
-    </SafeAreaView>
+    </FragmentSafeAreaViewWithoutTabBar>
 );
 
 const onAppStateReset = async (props: Props) => {
