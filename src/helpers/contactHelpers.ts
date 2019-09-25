@@ -8,6 +8,9 @@ import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { serialize } from '../social/serialization';
 import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
+import { WEEK } from '../DateUtils';
+
+export const CONTACT_EXPIRE_THRESHOLD = WEEK;
 
 export interface UnknownContact {
     type: 'unknown-contact';
@@ -42,6 +45,10 @@ export const calculateVerificationCode = (publicKey: string): string => {
     const prefix12 = (s: number) => prefix(s, '000000000000');
     const stringValue = prefix12(numericValue);
     return `${stringValue.slice(0, 4)}-${stringValue.slice(4, 8)}-${stringValue.slice(8)}`;
+};
+
+export const isInvitedContactExpired = (contact: InvitedContact): boolean => {
+    return contact.createdAt + CONTACT_EXPIRE_THRESHOLD > Date.now();
 };
 
 export interface ContactRandomHelper {

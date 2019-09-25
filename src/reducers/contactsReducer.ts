@@ -1,6 +1,7 @@
 import { Contact } from '../models/Contact';
 import { Actions } from '../actions/Actions';
 import { replaceItemInArray, removeFromArray } from '../helpers/immutable';
+import { isInvitedContactExpired } from '../helpers/contactHelpers';
 
 export const contactsReducer = (contacts: Contact[] = [], action: Actions): Contact[] => {
     switch (action.type) {
@@ -68,6 +69,11 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
                     : contacts
                 ;
             }
+        }
+        case 'REMOVE-EXPIRED-CONTACTS': {
+            return contacts.filter(contact =>
+                    contact.type !== 'invited-contact'
+                    || contact.type === 'invited-contact' && isInvitedContactExpired(contact));
         }
         case 'UPDATE-CONTACT-PRIVATE-CHANNEL': {
             const index = contacts.findIndex(contact =>
