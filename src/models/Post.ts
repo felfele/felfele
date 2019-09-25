@@ -1,11 +1,7 @@
 import { Model } from './Model';
 import { ImageData } from './ImageData';
 import { Author } from './Author';
-
-interface Location {
-    latitude: number;
-    longitude: number;
-}
+import { HexString } from '../helpers/opaqueTypes';
 
 type PostLink = string;
 
@@ -24,10 +20,17 @@ export interface PublicPost extends Model {
 
 export interface Post extends PublicPost {
     link?: string;
-    location?: Location;
-    deleted?: boolean;
     author?: Author;
     updatedAt?: number;
-    liked?: boolean;
     isUploading?: boolean;
+    topic?: HexString;
+}
+
+export interface PostWithId extends Post {
+    _id: HexString;
+}
+
+export interface PrivatePost extends PostWithId {
+    author: Author;
+    topic: HexString;
 }

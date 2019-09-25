@@ -1,3 +1,6 @@
+import { AppState } from '../reducers/AppState';
+import { Actions } from './Actions';
+
 // based on https://medium.com/@martin_hotell/improved-redux-type-safety-with-typescript-2-8-2c11a8062575
 
 export interface Action<T extends string> {
@@ -13,3 +16,11 @@ export function createAction<T extends string, P>(type: T, payload: P): ActionWi
 export function createAction<T extends string, P>(type: T, payload?: P) {
     return payload === undefined ? { type } : { type, payload };
 }
+
+export type Dispatch = (thunk: ThunkTypes) => Promise<void>;
+export type Thunk = (dispatch: Dispatch, getState: () => AppState) => Promise<void>;
+export type ThunkTypes = Thunk | Actions;
+
+export const isActionTypes = (t: ThunkTypes): t is Actions => {
+    return (t as Actions).type !== undefined;
+};

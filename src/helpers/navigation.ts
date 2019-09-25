@@ -1,8 +1,13 @@
 import { ContentFilter } from '../models/ContentFilter';
 import { Feed } from '../models/Feed';
 import { SubCategoryMap } from '../models/recommendation/NewsSource';
-import { LocalFeed, RecentPostFeed } from '../social/api';
-import { Contact } from '../models/Contact';
+import { LocalFeed } from '../social/api';
+import { Post } from '../models/Post';
+import { MutualContact } from '../models/Contact';
+import { ContactFeed } from '../models/ContactFeed';
+import { NavigationNavigateAction } from 'react-navigation';
+import { InviteCode } from '../models/InviteCode';
+import { ContactHelper } from './contactHelpers';
 
 export interface Routes {
     App: {};
@@ -10,13 +15,15 @@ export interface Routes {
     Onboarding: {};
     ProfileOnboarding: {};
     Welcome: {};
-    Post: {};
+    Post: {
+        selectedFeeds: Feed[],
+    };
     Root: {};
     ProfileTab: {};
     PostTab: {};
-    FavoriteTab: {};
+    PrivateChannelTab: {};
     SettingsTab: {};
-    AllFeedTab: {};
+    PublicChannelTab: {};
     BugReportView: {};
     SwarmSettingsContainer: {};
     FilterListEditorContainer: {};
@@ -25,12 +32,15 @@ export interface Routes {
     BackupRestore: {};
     LogViewer: {};
     Debug: {};
-    FeedListViewerContainer: {
+    PublicChannelsListContainer: {
         showExplore: boolean,
         feeds?: Feed[],
     };
     FavoriteListViewerContainer: {
         feeds: Feed[],
+    };
+    PrivateChannelListContainer: {
+        contactFeeds: ContactFeed[],
     };
     Feed: {
         feedUrl: string,
@@ -39,12 +49,22 @@ export interface Routes {
     FeedInfo: {
         feed: Feed;
     };
-    FeedInfoDeepLink: {
+    FeedLinkReader: {
+    };
+    RSSFeedLoader: {
         feedUrl: string;
     };
-    FeedInfoInviteLink: {
+    RSSFeedInfo: {
+        feed: Feed;
+    };
+    InviteLink: {
         randomSeed: string;
         contactPublicKey: string;
+    };
+    InviteLinkWithProfileName: {
+        randomSeed: string;
+        contactPublicKey: string;
+        profileName: string;
     };
     EditFilter: {
         filter: ContentFilter,
@@ -57,7 +77,6 @@ export interface Routes {
         name: string,
     };
     CategoriesContainer: {
-
     };
     SubCategoriesContainer: {
         title: string,
@@ -70,19 +89,36 @@ export interface Routes {
         feeds: Feed[],
         subCategoryName: string,
     };
-    YourTab: {};
+    YourFeed: {};
     ContactView: {
         publicKey: string;
-        feed: Feed;
     };
     ContactInfo: {
         publicKey: string;
     };
+    ShareWithContainer: {
+        post: Post;
+        selectedFeeds: Feed[];
+        onDoneSharing?: () => void;
+    };
+    ContactLoader: {
+        inviteCode: InviteCode;
+        contactHelper: ContactHelper;
+    };
+    ContactConfirm: {
+        inviteCode: InviteCode;
+    };
+    ContactSuccess: {
+        contact: MutualContact;
+        isReceiver: boolean;
+    };
+    EditProfileContainer: {};
 }
 
 export interface TypedNavigation {
     goBack: <K extends keyof Routes>(routeKey?: K | null) => boolean;
     navigate: <K extends keyof Routes>(routeKey: K, params: Routes[K]) => boolean;
+    replace: <K extends keyof Routes>(routeKey: K, params: Routes[K], action?: NavigationNavigateAction) => boolean;
     pop: (n?: number, params?: { immediate?: boolean }) => boolean;
     popToTop: () => void;
     getParam: <K extends keyof Routes, P extends keyof Routes[K]>(param: P) => Routes[K][P];

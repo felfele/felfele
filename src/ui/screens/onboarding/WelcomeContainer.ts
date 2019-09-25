@@ -5,9 +5,14 @@ import {
     WelcomeScreen,
 } from './WelcomeScreen';
 import { AppState } from '../../../reducers/AppState';
-import { AsyncActions } from '../../../actions/Actions';
+import { AsyncActions } from '../../../actions/asyncActions';
+import { Actions } from '../../../actions/Actions';
 import { ImageData } from '../../../models/ImageData';
 import { TypedNavigation } from '../../../helpers/navigation';
+import testIdentity from '../../../../testdata/testIdentity.json';
+import { PrivateIdentity } from '../../../models/Identity';
+import * as Swarm from '../../../swarm/Swarm';
+import { getDefaultUserImage } from '../../../defaultUserImage';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     return {
@@ -22,7 +27,11 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
             dispatch(AsyncActions.downloadFollowedFeedPosts());
         },
         onCreateUser: async (name: string, image: ImageData, navigation: TypedNavigation) => {
-            await dispatch(AsyncActions.createUser(name, image));
+            dispatch(Actions.changeSettingShowDebugMenu(true));
+            dispatch(Actions.changeSettingSwarmGatewayAddress(Swarm.defaultDebugGateway));
+            const identity = testIdentity as PrivateIdentity;
+            const defaultImage = await getDefaultUserImage();
+            await dispatch(AsyncActions.createUser('TestUser', defaultImage, identity));
             navigation.navigate('Loading', {});
         },
     };

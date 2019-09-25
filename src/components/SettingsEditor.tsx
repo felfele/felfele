@@ -1,19 +1,15 @@
 import * as React from 'react';
-import { StyleSheet, ScrollView, Vibration } from 'react-native';
+import { StyleSheet, ScrollView, Vibration, Linking } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Settings } from '../models/Settings';
-import { Version } from '../Version';
+import { Version, BuildNumber } from '../Version';
 import { Colors, ComponentColors } from '../styles';
 import { NavigationHeader } from './NavigationHeader';
 import { RowItem } from '../ui/buttons/RowButton';
-import { SuperGridSectionList } from 'react-native-super-grid';
-import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
-import { GridCard, getGridCardSize, GRID_SPACING } from '../ui/misc/GridCard';
-import { RegularText, MediumText } from '../ui/misc/text';
+import { RegularText } from '../ui/misc/text';
 import { RecentPostFeed } from '../social/api';
 import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
-import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TouchableView } from './TouchableView';
@@ -32,51 +28,21 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-const YOUR_FEEDS = 'YOUR CHANNELS';
-const PREFERENCES_LABEL = 'PREFERENCES';
-
 export const SettingsEditor = (props: Props) => {
-    const version = 'Version: ' + Version;
-    const modelHelper = new ReactNativeModelHelper(props.settings.swarmGatewayAddress);
-    const itemDimension = getGridCardSize();
+    const buildNumber = props.settings.showDebugMenu
+        ? ` (Build number ${BuildNumber})`
+        : ''
+    ;
+    const version = 'Version: ' + Version + buildNumber;
     return (
         <FragmentSafeAreaViewForTabBar>
             <NavigationHeader
                 title='Settings'
             />
-            <ScrollView style={{ backgroundColor: ComponentColors.BACKGROUND_COLOR }}>
-                <SuperGridSectionList
-                    style={{ flex: 1, backgroundColor: ComponentColors.BACKGROUND_COLOR }}
-                    spacing={GRID_SPACING}
-                    fixed={true}
-                    itemDimension={itemDimension}
-                    sections={[{
-                        title: `${YOUR_FEEDS} ${props.ownFeeds.length}`,
-                        data: props.ownFeeds,
-                    }]}
-                    renderItem={({ item }) => {
-                        return (
-                                <GridCard
-                                    title={item.name}
-                                    image={item.authorImage}
-                                    onPress={() => props.navigation.navigate('FeedSettings', { feed: item as any })}
-                                    size={itemDimension}
-                                    defaultImage={defaultImages.defaultUser}
-                                    modelHelper={modelHelper}
-                                />
-                        );
-                    }}
-                    renderSectionHeader={({ section }) => (
-                        <MediumText style={styles.label}>{section.title}</MediumText>
-                    )}
-                />
-                <RegularText
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                    style={styles.label}
-                >
-                    {PREFERENCES_LABEL}
-                </RegularText>
+            <ScrollView style={{
+                backgroundColor: ComponentColors.BACKGROUND_COLOR,
+                paddingTop: 10,
+            }}>
                 <RowItem
                     title='Save to Camera Roll'
                     switchState={props.settings.saveToCameraRoll}
@@ -87,6 +53,11 @@ export const SettingsEditor = (props: Props) => {
                     title='Send bug report'
                     buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('BugReportView', {})}
+                />
+                <RowItem
+                    title='Terms & Privacy Policy'
+                    buttonStyle='navigate'
+                    onPress={() => Linking.openURL('https://felfele.org/legal')}
                 />
                 <TouchableView
                     onLongPress={() => {
@@ -99,7 +70,7 @@ export const SettingsEditor = (props: Props) => {
                 { props.settings.showDebugMenu &&
                 <RowItem
                     icon={
-                        <Ionicons name='md-bug' size={24} color={ComponentColors.BUTTON_COLOR}/>
+                        <Ionicons name='md-bug' size={24} color={ComponentColors.TEXT_COLOR}/>
                     }
                     title='Debug menu'
                     buttonStyle='navigate'

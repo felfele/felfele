@@ -1,6 +1,6 @@
 import { addOption } from './cliParser';
 import * as Swarm from '../swarm/Swarm';
-import { makeSwarmStorage, makeSwarmStorageSyncer } from '../swarm-social/swarmStorage';
+import { makeSwarmPostStorage, makeSwarmPostStorageSyncer } from '../swarm-social/swarmStorage';
 import { output, jsonPrettyPrint } from './cliHelpers';
 import { swarmConfig } from './swarmConfig';
 import { PrivateIdentity } from '../models/Identity';
@@ -38,7 +38,7 @@ const createDeterministicRandomGenerator = (randomSeed: HexString): () => string
 export const feedCommandDefinition =
     addOption('-i, --identity <identity-file>', 'Identity file', (identityFile) => loadIdentityFile(identityFile))
     .
-    addCommand('list [user]', 'List feed', async (optionalUser) => {
+    addCommand('list [user] [topic]', 'List feed', async (optionalUser, optionalTopic) => {
         const privateIdentity = getPrivateIdentity();
         const user = optionalUser != null
             ? optionalUser
@@ -46,13 +46,17 @@ export const feedCommandDefinition =
                 ? privateIdentity.address
                 : throwError('user is not provided')
         ;
+        const topic = optionalTopic != null
+            ? optionalTopic
+            : ''
+        ;
         const feedAddress: Swarm.FeedAddress = {
-            topic: '',
+            topic,
             user,
         };
         const dummySigner = (digest: number[]) => '';
         const swarmApi = Swarm.makeApi(feedAddress, dummySigner, swarmConfig.gatewayAddress);
-        const storageApi = makeSwarmStorage(swarmApi);
+        const storageApi = makeSwarmPostStorage(swarmApi);
         const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
         output('Recent post feed', jsonPrettyPrint(recentPostFeed));
 
@@ -69,7 +73,7 @@ export const feedCommandDefinition =
         };
         const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
         const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
-        const storageApi = makeSwarmStorage(swarmApi);
+        const storageApi = makeSwarmPostStorage(swarmApi);
         const address = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
         const feedUrl = Swarm.makeBzzFeedUrl(address);
         const recentPostFeed: RecentPostFeed = {
@@ -94,8 +98,8 @@ export const feedCommandDefinition =
         const source = generateUnsecureRandomHexString(32);
         const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
         const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
-        const storageApi = makeSwarmStorage(swarmApi);
-        const storageSyncApi = makeSwarmStorageSyncer(storageApi);
+        const storageApi = makeSwarmPostStorage(swarmApi);
+        const storageSyncApi = makeSwarmPostStorageSyncer(storageApi);
         const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
         const post: Post = {
             text: markdownText,
@@ -120,7 +124,7 @@ export const feedCommandDefinition =
         };
         const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
         const swarmApi = Swarm.makeApi(feedAddress, signer, swarmConfig.gatewayAddress);
-        const storageApi = makeSwarmStorage(swarmApi);
+        const storageApi = makeSwarmPostStorage(swarmApi);
         const recentPostFeed = await storageApi.downloadRecentPostFeed(0);
         const publicRecentPostFeed = {
             ...recentPostFeed,
@@ -155,8 +159,8 @@ export const feedCommandDefinition =
             const address = Swarm.makeFeedAddressFromPublicIdentity(privateIdentity);
             const signer = (digest: number[]) => Swarm.signDigest(digest, privateIdentity);
             const swarmApi = Swarm.makeApi(address, signer, swarmConfig.gatewayAddress);
-            const storageApi = makeSwarmStorage(swarmApi);
-            const storageSyncApi = makeSwarmStorageSyncer(storageApi);
+            const storageApi = makeSwarmPostStorage(swarmApi);
+            const storageSyncApi = makeSwarmPostStorageSyncer(storageApi);
             const feedUrl = Swarm.makeBzzFeedUrl(address);
             const authorName = generateRandomName();
             const authorImage = {

@@ -1,7 +1,13 @@
-import { Post, PostReferences } from '../models/Post';
+import { Post, PostReferences, PrivatePost, PublicPost } from '../models/Post';
 import { Author } from '../models/Author';
-import { HtmlMetaData } from './htmlMetaData';
+import { HtmlMetaData, fetchHtmlMetaData } from './htmlMetaData';
 import { ImageData } from '../models/ImageData';
+import { HexString } from './opaqueTypes';
+import { getHttpLinkFromText } from './urlUtils';
+import { markdownEscape } from '../markdown';
+import { serialize } from '../social/serialization';
+import { byteArrayToHex } from './conversion';
+import { cryptoHash } from './crypto';
 
 export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[] => {
     const uniqueAuthors = new Map<string, Author>();
@@ -18,6 +24,31 @@ export const mergeUpdatedPosts = (updatedPosts: Post[], oldPosts: Post[]): Post[
     const startId = Date.now();
     const posts = sortedPosts.map((post, index) => ({...post, _id: post._id ? post._id : startId + index}));
     return posts;
+};
+
+export const createPostWithLinkMetaData = async (originalPost: Post): Promise<Post> => {
+    const httpLink = getHttpLinkFromText(originalPost.text);
+
+    if (httpLink != null) {
+        const url = httpLink;
+        const htmlMetaData = await fetchHtmlMetaData(url);
+        const post = convertPostToParentPost(convertHtmlMetaDataToPost({
+            ...htmlMetaData,
+            description: '',
+        }));
+        return {
+            ...post,
+            createdAt: originalPost.createdAt,
+            updatedAt: originalPost.createdAt,
+        };
+    } else {
+        const markdownText = markdownEscape(originalPost.text);
+        const post = {
+            ...originalPost,
+            text: markdownText,
+        };
+        return post;
+    }
 };
 
 export const convertHtmlMetaDataToPost = (htmlMetaData: HtmlMetaData): Post => {
@@ -70,4 +101,56 @@ export const isChildrenPostUploading = (post: Post, localPosts: Post[]): boolean
         }
     }
     return false;
+};
+
+export const copyPostWithReferences = (post: Post, author: Author, id: number | string, topic: HexString | undefined): Post => {
+    return {
+        ...post,
+        _id: id,
+        author,
+        topic,
+        updatedAt: Date.now(),
+        references: {
+            parent: post.link ? post.link : '',
+            original: post.references != null
+                ? post.references.original
+                : post.link != null
+                    ? post.link
+                    : ''
+            ,
+            originalAuthor: post.references != null
+                ? post.references.originalAuthor
+                : post.author != null
+                    ? post.author
+                    : {
+                        name: '',
+                        uri: '',
+                        image: {},
+                    }
+            ,
+        },
+    };
+};
+
+export const copyPostPrivately = (post: Post, author: Author, id: HexString, topic: HexString): PrivatePost => {
+    return {
+        ...post,
+        _id: id,
+        author,
+        topic,
+        createdAt: Date.now(),
+        updatedAt: undefined,
+        references: undefined,
+    };
+};
+
+export const makePostId = (post: Post): HexString => {
+    const publicPost: PublicPost = {
+        text: post.text,
+        images: post.images,
+        createdAt: post.createdAt,
+        references: post.references,
+    };
+    const postJSON = serialize(publicPost);
+    return byteArrayToHex(cryptoHash(postJSON), false);
 };

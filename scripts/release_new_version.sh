@@ -3,7 +3,7 @@
 function ask {
     while true; do
         echo
-        read -p "$1, press y when done: " -n1 input
+        read -r -p "$1, press y when done: " -n1 input
         echo
         if [ "$input" = "y" ]; then
             return
@@ -31,7 +31,7 @@ version="$(./scripts/cli.sh version)"
 output "Version: $version"
 
 release_branch="release-$version"
-git checkout -b $release_branch
+git checkout -b "$release_branch"
 output "Commit and push changes to the repo"
 commit_message="Bumped version to $version"
 git commit -am "$commit_message" && git push origin "$release_branch"

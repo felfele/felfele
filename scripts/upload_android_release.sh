@@ -9,5 +9,7 @@ apk_target="felfele.apk"
 deployment_user="deployment"
 
 scp "$apk_source" "$deployment_user@$server_name:$server_dir/$apk_versioned_target"
+# shellcheck disable=SC2029
 ssh "$deployment_user@$server_name" "rm $server_dir/$apk_target"
+# shellcheck disable=SC2029
 ssh "$deployment_user@$server_name" "ln -s $server_dir/$apk_versioned_target $server_dir/$apk_target"

@@ -46,20 +46,6 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
         case 'DELETE-ALL-CONTACTS': {
             return [];
         }
-        case 'CONFIRM-CONTACT': {
-            const index = contacts.findIndex(contact =>
-                contact.type === 'mutual-contact' &&
-                contact.identity.publicKey === action.payload.contact.identity.publicKey
-            );
-            if (index === -1) {
-                return contacts;
-            }
-            const confirmedContact = {
-                ...contacts[index],
-                confirmed: true,
-            };
-            return replaceItemInArray(contacts, confirmedContact, index);
-        }
         case 'REMOVE-CONTACT': {
             if (action.payload.contact.type === 'mutual-contact') {
                 const publicKey = action.payload.contact.identity.publicKey;
@@ -82,6 +68,20 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
                     : contacts
                 ;
             }
+        }
+        case 'UPDATE-CONTACT-PRIVATE-CHANNEL': {
+            const index = contacts.findIndex(contact =>
+                contact.type === 'mutual-contact' &&
+                contact.identity.publicKey === action.payload.contact.identity.publicKey
+            );
+            if (index === -1) {
+                return contacts;
+            }
+            const updatedContact = {
+                ...contacts[index],
+                privateChannel: action.payload.privateChannel,
+            };
+            return replaceItemInArray(contacts, updatedContact, index);
         }
     }
     return contacts;

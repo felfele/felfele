@@ -1,24 +1,33 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { AsyncActions, Actions } from '../actions/Actions';
 import { StateProps, DispatchProps, PostEditor } from '../components/PostEditor';
 import { Post } from '../models/Post';
-import { TypedNavigation, Routes } from '../helpers/navigation';
+import { TypedNavigation } from '../helpers/navigation';
+import { Actions } from '../actions/Actions';
+import { Debug } from '../Debug';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
+    const goBack = () => {
+        Debug.log('PostEditorContainer.mapStateToProps.goBack');
+        return ownProps.navigation.goBack();
+    };
     return {
         name: state.author.name,
         avatar: state.author.image,
-        navigation: ownProps.navigation,
+        goBack,
         draft: state.draft,
         gatewayAddress: state.settings.swarmGatewayAddress,
    };
 };
 
-const mapDispatchToProps = (dispatch: any): DispatchProps => {
+export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
    return {
        onPost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
+            const selectedFeeds = ownProps.navigation.getParam<'Post', 'selectedFeeds'>('selectedFeeds');
+            ownProps.navigation.navigate('ShareWithContainer', {
+                post,
+                selectedFeeds,
+            });
        },
        onSaveDraft: (draft: Post) => {
            dispatch(Actions.addDraft(draft));

@@ -3,7 +3,7 @@ import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
-import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { TouchableView, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { MediumText, RegularText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
 
@@ -75,13 +75,11 @@ export const NavigationHeader = (props: Props) => (
                     testID={props.rightButton1.testID || 'NavigationHeader/RightButton1'}
                 />}
             {props.rightButton2 &&
-                <View style={{paddingRight: 10}}>
-                    <RightButton
-                        onPress={props.rightButton2.onPress}
-                        label={props.rightButton2.label}
-                        testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
-                    />
-                </View>
+                <RightButton
+                    onPress={props.rightButton2.onPress}
+                    label={props.rightButton2.label}
+                    testID={props.rightButton2.testID || 'NavigationHeader/RightButton2'}
+                />
             }
         </View>
     </View>
@@ -102,7 +100,7 @@ const RightButton = (props: { onPress?: () => void, label?: string | React.React
             onPress={props.onPress}
             testID={props.testID}
             style={styles.rightButtonContainer}
-            hitSlop={{...TouchableViewDefaultHitSlop, left: 10}}
+            hitSlop={{...TOUCHABLE_VIEW_DEFAULT_HIT_SLOP, left: 10}}
         >
             <ButtonLabel label={props.label} />
         </TouchableView>
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
     },
     headerButtonText: {
         color: Colors.WHITE,
-        fontSize: 18,
+        fontSize: 14,
     },
     leftContainer: {
         flex: 1,
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        paddingRight: 10,
     },
     titleText: {
         fontSize: 15,

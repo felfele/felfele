@@ -6,10 +6,14 @@ const keyBlacklist = new Set<string>()
     .add('isUploading')
     ;
 
+export const isKeySerializable = (key: string): boolean =>
+    key.startsWith('_') || keyBlacklist.has(key)
+;
+
 export const serialize = (data: any): string => {
     try {
         const serializedData = JSON.stringify(data, (key, value) => {
-            return (typeof key === 'string' && (key.startsWith('_') || keyBlacklist.has(key)))
+            return (typeof key === 'string' && isKeySerializable(key))
                 ? undefined
                 : value
             ;

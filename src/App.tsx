@@ -7,35 +7,39 @@ import {
     NavigationScreenProps,
 } from 'react-navigation';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, YellowBox, View } from 'react-native';
+import {
+    Platform,
+    YellowBox,
+    View,
+    AppState,
+    AppStateStatus,
+} from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 // @ts-ignore
 import { setCustomText } from 'react-native-global-props';
+// @ts-ignore
+import { BottomTabBar } from 'react-navigation-tabs';
 
 import { SettingsEditorContainer } from './containers/SettingsEditorContainer';
 import { Debug } from './Debug';
-import { store, persistor } from './reducers';
-import { EditFeedContainer as FeedInfoContainer } from './containers/FeedInfoContainer';
-import { AllFeedContainer } from './containers/AllFeedContainer';
+import { EditFeedContainer as FeedInfoContainer, RSSFeedInfoContainer } from './containers/FeedInfoContainer';
 import { FilterListEditorContainer } from './containers/FilterListEditorContainer';
 import { EditFilterContainer } from './containers/EditFilterContainer';
 import { YourFeedContainer } from './containers/YourFeedContainer';
 import { PostEditorContainer } from './containers/PostEditorContainer';
-import { IdentitySettingsContainer } from './containers/IdentitySettingsContainer';
 import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
 import { defaultTextProps, ComponentColors } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
-import { FavoritesContainer } from './containers/FavoritesContainer';
 import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
 import { BackupContainer } from './containers/BackupContainer';
 import { SettingsFeedViewContainer } from './containers/SettingsFeedViewContainer';
-import { FeedListViewerContainer } from './containers/FeedListViewerContainer';
 import { SwarmSettingsContainer } from './containers/SwarmSettingsContainer';
 import { BugReportViewWithTabBar } from './components/BugReportView';
 import { TopLevelErrorBoundary } from './components/TopLevelErrorBoundary';
@@ -45,18 +49,32 @@ import { SubCategoriesContainer } from './ui/screens/explore/SubCategoriesContai
 import { NewsSourceGridContainer } from './ui/screens/explore/NewsSourceGridContainer';
 import { NewsSourceFeedContainer } from './containers/NewSourceFeedContainer';
 import { TypedNavigation } from './helpers/navigation';
-import { FavoriteListViewerContainer } from './containers/FavoriteListViewerContainer';
 import { initializeNotifications } from './helpers/notifications';
 import { WelcomeContainer } from './ui/screens/onboarding/WelcomeContainer';
-import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import { ContactScreenContainer } from './ui/screens/profile/ContactScreenContainer';
 import { HideWhenKeyboardShownComponent } from './ui/misc/HideWhenKeyboardShownComponent';
 import { ContactViewContainer } from './ui/screens/contact/ContactViewContainer';
-// @ts-ignore
-import { BottomTabBar } from 'react-navigation-tabs';
-import { FeedInfoFollowLinkContainer } from './containers/FeedInfoFollowLinkContainer';
 import { BASE_URL } from './helpers/deepLinking';
-import { FeedInfoInviteLinkContainer } from './containers/FeedInfoInviteLinkContainer';
+import { InviteLinkContainer } from './ui/screens/contact/InviteLinkContainer';
+import { initStore, getSerializedAppState, getAppStateFromSerialized } from './store';
+import { Persistor } from 'redux-persist';
+import { Actions } from './actions/Actions';
+import { restartApp } from './helpers/restart';
+import { felfeleInitAppActions } from './store/felfeleInit';
 import { ContactInfoContainer } from './ui/screens/contact/ContactInfoContainer';
+import { FELFELE_APP_NAME } from './reducers/defaultData';
+import { PrivateChannelsContainer } from './ui/screens/private-channels/PrivateChannelsContainer';
+import { PrivateChannelListContainer} from './ui/screens/private-channels/PrivateChannelsListContainer';
+import { ShareWithContainer } from './ui/screens/share-with/ShareWithContainer';
+import { ContactSuccessContainer } from './ui/screens/contact/ContactSuccessContainer';
+import { PublicChannelsContainer } from './ui/screens/public-channels/PublicChannelsContainer';
+import { PublicChannelsListContainer } from './ui/screens/public-channels/PublicChannelsListContainer';
+import { ContactConfirmContainer } from './ui/screens/contact/ContactConfirmContainer';
+import { ContactLoaderContainer } from './ui/screens/contact/ContactLoaderContainer';
+import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkReaderContainer';
+import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
+import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer';
+import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -67,40 +85,40 @@ Debug.addLogger(appendToLog);
 setCustomText(defaultTextProps);
 initializeNotifications();
 
-const favoriteTabScenes: NavigationRouteConfigMap = {
-    FavoriteTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <FavoritesContainer navigation={navigation}/>
-        ),
+const privateChannelTabScenes: NavigationRouteConfigMap = {
+    PrivateChannelTab: {
+        screen: PrivateChannelsContainer,
     },
     Feed: {
         screen: FeedContainer,
     },
-    FavoriteListViewerContainer: {
-        screen: FavoriteListViewerContainer,
+    PrivateChannelListContainer: {
+        screen: PrivateChannelListContainer,
     },
-    FeedFromList: {
-        screen: SettingsFeedViewContainer,
+    ContactView: {
+        screen: ContactViewContainer,
+    },
+    ContactInfo: {
+        screen: ContactInfoContainer,
+    },
+    YourFeed: {
+        screen: YourFeedContainer,
     },
 };
-const FavoriteFeedNavigator = createStackNavigator(favoriteTabScenes,
+
+const PrivateChannelNavigator = createStackNavigator(privateChannelTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'FavoriteTab',
+        initialRouteName: 'PrivateChannelTab',
     },
 );
 
-const yourTabScenes: NavigationRouteConfigMap = {
+const profileScenes: NavigationRouteConfigMap = {
     Profile: {
-        screen: IdentitySettingsContainer,
-    },
-    YourTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <YourFeedContainer navigation={navigation}/>
-        ),
+        screen: ContactScreenContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -108,8 +126,11 @@ const yourTabScenes: NavigationRouteConfigMap = {
     FeedSettings: {
         screen: FeedSettingsContainer,
     },
+    EditProfileContainer: {
+        screen: EditProfileContainer,
+    },
 };
-const ProfileNavigator = createStackNavigator(yourTabScenes,
+const ProfileNavigator = createStackNavigator(profileScenes,
     {
         mode: 'card',
         navigationOptions: {
@@ -119,19 +140,15 @@ const ProfileNavigator = createStackNavigator(yourTabScenes,
     },
 );
 
-const allFeedTabScenes: NavigationRouteConfigMap = {
-    AllFeed: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <AllFeedContainer
-                navigation={navigation}
-            />
-        ),
+const publicChannelTabScenes: NavigationRouteConfigMap = {
+    PublicChannelTab: {
+        screen: PublicChannelsContainer,
     },
     Feed: {
         screen: FeedContainer,
     },
-    FeedListViewerContainer: {
-        screen: FeedListViewerContainer,
+    PublicChannelsListContainer: {
+        screen: PublicChannelsListContainer,
     },
     CategoriesContainer: {
         screen: CategoriesContainer,
@@ -153,21 +170,19 @@ const allFeedTabScenes: NavigationRouteConfigMap = {
     },
 };
 
-const AllFeedNavigator = createStackNavigator(allFeedTabScenes,
+const PublicChannelNavigator = createStackNavigator(publicChannelTabScenes,
     {
         mode: 'card',
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'AllFeed',
+        initialRouteName: 'PublicChannelTab',
     },
 );
 
 const settingsTabScenes: NavigationRouteConfigMap = {
     SettingsTab: {
-        screen: ({navigation}: NavigationScreenProps) => (
-            <SettingsEditorContainer navigation={navigation} />
-        ),
+        screen: SettingsEditorContainer,
     },
     Debug: {
         screen: DebugScreenContainer,
@@ -212,24 +227,24 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 
 const Root = createBottomTabNavigator(
     {
-        AllFeedTab: {
-            screen: AllFeedNavigator,
+        PublicChannelTab: {
+            screen: PublicChannelNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'home'}
+                    <MaterialCommunityIcon
+                        name={'earth'}
                         size={24}
                         color={tintColor}
                     />
                 ),
             },
         },
-        FavoriteTab: {
-            screen: FavoriteFeedNavigator,
+        PrivateChannelTab: {
+            screen: PrivateChannelNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
-                        name={'star'}
+                        name={'account-multiple'}
                         size={24}
                         color={tintColor}
                     />
@@ -256,7 +271,9 @@ const Root = createBottomTabNavigator(
                     </View>
                 ),
                 tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
-                    navigation.navigate('Post', {});
+                    navigation.navigate('Post', {
+                        selectedFeeds: [],
+                    });
                 },
                 tabBarTestID: 'TabBarPostButton',
             },
@@ -266,7 +283,7 @@ const Root = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <Icon
-                        name={'account'}
+                        name={'account-circle'}
                         size={24}
                         color={tintColor}
                     />
@@ -334,19 +351,39 @@ const Scenes: NavigationRouteConfigMap = {
     FeedInfo: {
         screen: FeedInfoContainer,
     },
-    FeedInfoDeepLink: {
-        screen: FeedInfoFollowLinkContainer,
-        path: 'follow/:feedUrl',
+    FeedLinkReader: {
+        screen: FeedLinkReaderContainer,
     },
-    FeedInfoInviteLink: {
-        screen: FeedInfoInviteLinkContainer,
+    RSSFeedLoader: {
+        screen: RSSFeedLoaderContainer,
+    },
+    RSSFeedInfo: {
+        screen: RSSFeedInfoContainer,
+    },
+    InviteLink: {
+        screen: InviteLinkContainer,
         path: 'invite/:randomSeed/:contactPublicKey',
+    },
+    InviteLinkWithProfileName: {
+        screen: ({navigation}: NavigationScreenProps) => (
+            <InviteLinkContainer navigation={navigation} isNameFromLink={true}/>
+        ),
+        path: 'invite/:randomSeed/:contactPublicKey/:profileName',
     },
     ContactView: {
         screen: ContactViewContainer,
     },
-    ContactInfo: {
-        screen: ContactInfoContainer,
+    ContactConfirm: {
+        screen: ContactConfirmContainer,
+    },
+    ContactLoader: {
+        screen: ContactLoaderContainer,
+    },
+    ContactSuccess: {
+        screen: ContactSuccessContainer,
+    },
+    ShareWithContainer: {
+        screen: ShareWithContainer,
     },
 };
 
@@ -387,16 +424,61 @@ const InitialNavigator = createSwitchNavigator({
     backBehavior: 'initialRoute',
 });
 
-export default class App extends React.Component {
+interface FelfeleAppState {
+    store: any;
+    persistor: Persistor | null;
+    nativeAppState: AppStateStatus;
+}
+
+export default class FelfeleApp extends React.Component<{}, FelfeleAppState> {
+    public state: FelfeleAppState = {
+        store: null,
+        persistor: null,
+        nativeAppState: AppState.currentState,
+    };
+
     public render() {
+        if (this.state.store == null) {
+            return null;
+        }
         return (
             <TopLevelErrorBoundary>
-                <Provider store={store}>
-                    <PersistGate loading={null} persistor={persistor}>
+                <Provider store={this.state.store!}>
+                    <PersistGate loading={null} persistor={this.state.persistor!}>
                         <InitialNavigator/>
                     </PersistGate>
                 </Provider>
             </TopLevelErrorBoundary>
         );
+    }
+
+    public async componentDidMount() {
+        AppState.addEventListener('change', this.handleAppStateChange);
+        const { store, persistor } = await initStore(felfeleInitAppActions);
+        this.setState({
+            store,
+            persistor,
+        });
+    }
+
+    public componentWillUnmount() {
+      AppState.removeEventListener('change', this.handleAppStateChange);
+    }
+
+    private handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        if (this.state.nativeAppState.match(/inactive|background/) && nextAppState === 'active') {
+            Debug.log('App has come to the foreground');
+            if (this.state.store != null) {
+                const serializedAppState = await getSerializedAppState();
+                const appState = await getAppStateFromSerialized(serializedAppState);
+                if (appState.lastEditingApp != null && appState.lastEditingApp !== FELFELE_APP_NAME) {
+                    this.state.store.dispatch(Actions.updateAppLastEditing(FELFELE_APP_NAME));
+                    restartApp();
+                }
+            }
+        }
+        this.setState({
+            nativeAppState: nextAppState,
+        });
     }
 }

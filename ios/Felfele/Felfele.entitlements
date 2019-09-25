@@ -6,5 +6,9 @@
 	<array>
 		<string>applinks:app.felfele.org</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.app.felfele</string>
+	</array>
 </dict>
 </plist>

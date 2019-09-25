@@ -102,7 +102,10 @@ class BugReportView extends React.Component<Props, State> {
                     navigation={this.props.navigation}
                     title='Bug Report'
                 />
-                <ScrollView contentContainerStyle={styles.contentContainer}>
+                <ScrollView
+                    contentContainerStyle={styles.contentContainer}
+                    keyboardShouldPersistTaps={'handled'}
+                >
                     <View style={styles.iconContainer}>
                         <Icon
                             name={'bug'}

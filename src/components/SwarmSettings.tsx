@@ -3,9 +3,7 @@ import {
     View,
     KeyboardAvoidingView,
     Text,
-    TouchableOpacity,
     StyleSheet,
-    SafeAreaView,
     ScrollView,
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -58,9 +56,8 @@ export const SwarmSettings = (props: Props) => (
                 <SimpleTextInput
                     style={styles.row}
                     defaultValue={props.swarmGatewayAddress}
-                    placeholder={'https://swarm-gateways.net'}
+                    placeholder={props.swarmGatewayAddress}
                     autoCapitalize='none'
-                    autoFocus={true}
                     autoCorrect={false}
                     selectTextOnFocus={true}
                     returnKeyType={'done'}
@@ -82,8 +79,27 @@ export const SwarmSettings = (props: Props) => (
                     icon={
                         <MaterialCommunityIcon name='server-network' />
                     }
-                    title={`Use debug server: http://localhost:8500`}
-                    onPress={() => props.onChangeSwarmGatewayAddress('http://localhost:8500')}
+                    title={`Use debug server: ${Swarm.defaultDebugGateway}`}
+                    onPress={() => props.onChangeSwarmGatewayAddress(Swarm.defaultDebugGateway)}
+                    buttonStyle='none'
+                />
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='server-network' />
+                    }
+                    title={`Use public network: ${Swarm.defaultPublicGateway}`}
+                    onPress={() => props.onChangeSwarmGatewayAddress(Swarm.defaultPublicGateway)}
+                    buttonStyle='none'
+                />
+
+                <View style={{paddingBottom: 20}} />
+
+                <RowItem
+                    icon={
+                        <MaterialCommunityIcon name='check-circle-outline' />
+                    }
+                    title={`Ping`}
+                    onPress={() => pingSwarm(props)}
                     buttonStyle='none'
                 />
                 <RowItem

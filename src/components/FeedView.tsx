@@ -11,6 +11,8 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { FELFELE_ASSISTANT_URL } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { LocalFeed } from '../social/api';
+import { isFelfeleResource } from '../helpers/urlUtils';
+import { WideButton } from '../ui/buttons/WideButton';
 
 export interface DispatchProps {
     onRefreshPosts: (feeds: Feed[]) => void;
@@ -44,43 +46,30 @@ export const FeedView = (props: Props) => {
         label: icon(iconName, color),
         onPress,
     });
-    const toggleFavorite = () => props.onToggleFavorite(props.feed.feedUrl);
-    const navigateToFeedSettings = () => props.navigation.navigate(
-        'FeedSettings',
-        { feed: props.feed as unknown as LocalFeed },
-    );
+    const isUrlFelfeleResource = isFelfeleResource(props.feed.feedUrl);
     const navigateToFeedInfo = () => props.navigation.navigate(
-        'FeedInfo', {
+        isUrlFelfeleResource ? 'FeedInfo' : 'RSSFeedInfo', {
             feed: props.feed,
         }
     );
-    const onLinkPressed = async () => onFollowPressed(
-        props.feed,
-        props.onUnfollowFeed,
-        props.onFollowFeed
-    );
-
-    const rightButton1 = props.feed.isOwnFeed
-        ? props.feed.name.length > 0
-            ? button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedSettings)
-            : undefined
-        : isOnboardingFeed
-            ? undefined
-            : props.feed.followed === true
-                ? props.feed.favorite === true
-                    ? button('star', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
-                    : button('star-outline', ComponentColors.NAVIGATION_BUTTON_COLOR, toggleFavorite)
-                : button('link', ComponentColors.NAVIGATION_BUTTON_COLOR, onLinkPressed)
-    ;
-
-    const rightButton2 = props.feed.isLocalFeed || isOnboardingFeed
+    const rightButton1 = props.feed.isLocalFeed || isOnboardingFeed
         ? undefined
-        : button('dots-vertical', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
+        : button('information', ComponentColors.NAVIGATION_BUTTON_COLOR, navigateToFeedInfo)
     ;
     const refreshableFeedProps = {
         ...props,
         feeds: [props.feed],
     };
+    const listHeader = props.feed.isLocalFeed || isOnboardingFeed
+        ? undefined
+        : props.feed.followed !== true
+            ? <WideButton
+                label='Follow this channel'
+                icon={icon('link', ComponentColors.BUTTON_COLOR)}
+                onPress={() => props.onFollowFeed(props.feed)}
+            />
+            : undefined
+    ;
     return (
         <RefreshableFeed modelHelper={modelHelper} {...refreshableFeedProps}>
             {{
@@ -91,20 +80,12 @@ export const FeedView = (props: Props) => {
                         label: HeaderDefaultLeftButtonIcon,
                     }}
                     rightButton1={rightButton1}
-                    rightButton2={rightButton2}
                     title={props.feed.name}
                 />,
+                listHeader,
             }}
         </RefreshableFeed>
     );
-};
-
-const onFollowPressed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void, onFollowFeed: (feed: Feed) => void) => {
-    if (feed.followed === true) {
-        await unfollowFeed(feed, onUnfollowFeed);
-    } else {
-        onFollowFeed(feed);
-    }
 };
 
 export const unfollowFeed = async (feed: Feed, onUnfollowFeed: (feed: Feed) => void) => {

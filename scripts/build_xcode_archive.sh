@@ -6,5 +6,5 @@ if [ "$1" != "" ]; then
 fi
 
 cd ios
-xcodebuild -allowProvisioningUpdates -quiet -scheme Felfele $TARGET
+xcodebuild -allowProvisioningUpdates -quiet -scheme Felfele "$TARGET"
 cd ..

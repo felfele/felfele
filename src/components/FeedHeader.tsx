@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { AsyncImagePicker } from '../AsyncImagePicker';
 import { Post } from '../models/Post';
-import { TouchableView, TouchableViewDefaultHitSlop } from './TouchableView';
+import { TouchableView, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { DefaultStyle, Colors } from '../styles';
 import { RegularText } from '../ui/misc/text';
 import { ImageData } from '../models/ImageData';
@@ -16,11 +16,14 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { defaultImages } from '../defaultImages';
 import { TypedNavigation } from '../helpers/navigation';
 import { ImageDataView } from '../components/ImageDataView';
+import { ContactFeed } from '../models/ContactFeed';
+import { Feed } from '../models/Feed';
 
 export interface StateProps {
     navigation: TypedNavigation;
     profileImage: ImageData;
     gatewayAddress: string;
+    selectedFeeds: Feed[];
 }
 
 export interface DispatchProps {
@@ -42,7 +45,9 @@ export class FeedHeader extends React.PureComponent<Props> {
             createdAt: Date.now(),
         };
         this.props.onSaveDraft(post);
-        this.props.navigation.navigate('Post', {});
+        this.props.navigation.navigate('Post', {
+            selectedFeeds: this.props.selectedFeeds,
+        });
     }
 
     public render() {
@@ -54,11 +59,13 @@ export class FeedHeader extends React.PureComponent<Props> {
                 <ProfileIcon profileImage={this.props.profileImage} gatewayAddress={this.props.gatewayAddress}/>
                 <TouchableView
                     onPress={() =>
-                        this.props.navigation.navigate('Post', {})
+                        this.props.navigation.navigate('Post', {
+                            selectedFeeds: this.props.selectedFeeds,
+                        })
                     }
                     style={styles.headerTextContainer}
                     hitSlop={{
-                        ...TouchableViewDefaultHitSlop,
+                        ...TOUCHABLE_VIEW_DEFAULT_HIT_SLOP,
                         left: 0,
                     }}
                     testID='FeedHeader/TouchableHeaderText'
@@ -101,6 +108,7 @@ const styles = StyleSheet.create({
     },
     cameraIconContainer: {
         paddingHorizontal: 10,
+        paddingRight: 15,
     },
     headerTextContainer: {
         flex: 1,

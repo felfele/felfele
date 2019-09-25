@@ -1,15 +1,16 @@
 import { connect } from 'react-redux';
 import { AppState } from '../reducers/AppState';
-import { Actions, AsyncActions } from '../actions/Actions';
+import { Actions } from '../actions/Actions';
+import { AsyncActions } from '../actions/asyncActions';
 import { StateProps, DispatchProps, FeedInfo } from '../components/FeedInfo';
 import { Feed } from '../models/Feed';
-import { TypedNavigation, Routes } from '../helpers/navigation';
-import { Contact } from '../models/Contact';
+import { TypedNavigation } from '../helpers/navigation';
+import { RSSFeedInfo } from '../ui/screens/rss-feed/RSSFeedInfo';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
-    // this fixes rerendering after unfollow
-    updateNavParam(state.feeds, ownProps.navigation);
-    const navParamFeed = ownProps.navigation.getParam<'FeedInfo', 'feed'>('feed');
+    // this is needed because initally we receive the feed as a navigation param, and when we follow it,
+    // it gets added to the state, and further changes to it are not reflected in the original object
+    const navParamFeed = getFeedToOpen(state.feeds, ownProps.navigation);
     const isKnownFeed = state.feeds.find(feed => navParamFeed.feedUrl === feed.feedUrl) != null;
     const profile = {
         name: state.author.name,
@@ -26,22 +27,20 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     };
 };
 
-const updateNavParam = (feeds: Feed[], navigation: TypedNavigation) => {
+const getFeedToOpen = (feeds: Feed[], navigation: TypedNavigation) => {
     const feedUrl = navigation.getParam<'FeedInfo', 'feed'>('feed').feedUrl;
     const isFollowed = navigation.getParam<'FeedInfo', 'feed'>('feed').followed;
 
-    const updatedFeed = feeds.find(feed => feed.feedUrl === feedUrl);
-    if (updatedFeed != null && updatedFeed.followed !== isFollowed) {
-        navigation.setParams<'FeedInfo'>({ feed: updatedFeed });
+    const updatedFeed = feeds.find(feed => feed.feedUrl === feedUrl && feed.followed !== isFollowed);
+    if (updatedFeed != null) {
+        return updatedFeed;
+    } else {
+        return navigation.getParam<'FeedInfo', 'feed'>('feed');
     }
 };
 
 export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
-        onAddFeed: (feed: Feed) => {
-            dispatch(AsyncActions.addFeed(feed));
-            dispatch(AsyncActions.downloadPostsFromFeeds([feed]));
-        },
         onRemoveFeed: (feed: Feed) => {
             dispatch(Actions.removeFeed(feed));
             dispatch(AsyncActions.downloadFollowedFeedPosts());
@@ -50,9 +49,6 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
         onUnfollowFeed: (feed: Feed) => {
             dispatch(Actions.unfollowFeed(feed));
         },
-        onAddContact: (contact: Contact) => {
-            dispatch(AsyncActions.addContact(contact));
-        },
     };
 };
 
@@ -60,3 +56,8 @@ export const EditFeedContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(FeedInfo);
+
+export const RSSFeedInfoContainer = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(RSSFeedInfo);

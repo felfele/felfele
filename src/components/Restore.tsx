@@ -8,7 +8,7 @@ import {
     isValidBackupLinkData,
     downloadBackupFromSwarm,
 } from '../helpers/backup';
-import { getAppStateFromSerialized } from '../reducers';
+import { getAppStateFromSerialized } from '../store';
 import { TypedNavigation } from '../helpers/navigation';
 import * as Swarm from '../swarm/Swarm';
 import { AppState } from '../reducers/AppState';

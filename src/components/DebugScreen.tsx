@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { View, ViewStyle, ScrollView, SafeAreaView, Alert } from 'react-native';
+import { View, ViewStyle, ScrollView, SafeAreaView, Alert, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore
 import { generateSecureRandom } from 'react-native-securerandom';
 
-import { getSerializedAppState, getAppStateFromSerialized } from '../reducers';
+import { getSerializedAppState, getAppStateFromSerialized } from '../store';
 import { AppState } from '../reducers/AppState';
 import { Debug } from '../Debug';
 import { NavigationHeader } from './NavigationHeader';
@@ -16,10 +16,21 @@ import * as Swarm from '../swarm/Swarm';
 import { restartApp } from '../helpers/restart';
 import { Utils } from '../Utils';
 import { TypedNavigation } from '../helpers/navigation';
-
-import debugIdentities from '../../debugIdentities.json';
 import { Feed } from '../models/Feed';
-import { Post } from '../models/Post';
+import { Post, PrivatePost } from '../models/Post';
+
+import debugIdentities from '../../testdata/debugIdentities.json';
+import contactIdentity1 from '../../testdata/contactIdentity1.json';
+import contactIdentity2 from '../../testdata/contactIdentity2.json';
+import contactIdentity3 from '../../testdata/contactIdentity3.json';
+import contactIdentity4 from '../../testdata/contactIdentity4.json';
+import { MutualContact } from '../models/Contact';
+import { HexString } from '../helpers/opaqueTypes';
+import { deriveSharedKey } from '../helpers/contactHelpers';
+import { calculatePrivateTopic } from '../protocols/privateSharing';
+import { byteArrayToHex } from '../helpers/conversion';
+import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
+import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
 
 export interface StateProps {
     appState: AppState;
@@ -35,6 +46,8 @@ export interface DispatchProps {
     onAddFeed: (feed: Feed) => void;
     onRefreshFeeds: (feeds: Feed[]) => void;
     onAddPost: (post: Post) => void;
+    onAddContact: (contact: MutualContact) => void;
+    onAddPrivatePost: (topic: HexString, post: PrivatePost) => void;
 }
 
 type Props = StateProps & DispatchProps;
@@ -65,7 +78,7 @@ const MaterialCommunityIcon = (props: IconProps) => (
 );
 
 export const DebugScreen = (props: Props) => (
-    <SafeAreaView style={{ backgroundColor: ComponentColors.HEADER_COLOR, flex: 1 }}>
+    <FragmentSafeAreaViewWithoutTabBar>
         <NavigationHeader
             navigation={props.navigation}
             title='Debug menu'
@@ -82,7 +95,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete contacts'
                     onPress={async () => await onDeleteContacts(props)}
@@ -90,7 +103,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete feeds'
                     onPress={async () => await onDeleteFeeds(props)}
@@ -98,7 +111,7 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='trash-can-outline' />
                     }
                     title='Delete all posts'
                     onPress={async () => await onDeletePosts(props)}
@@ -106,15 +119,15 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='account-multiple' />
                     }
-                    title='Follow debug feeds'
-                    onPress={async () => await onLoadFeeds(props)}
+                    title='Setup debug contacts'
+                    onPress={async () => await onSetupContacts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-warning' />
+                        <MaterialCommunityIcon name='file-document-box-multiple-outline' />
                     }
                     title='Generate 100 posts'
                     onPress={async () => await onGeneratePosts(props)}
@@ -130,10 +143,10 @@ export const DebugScreen = (props: Props) => (
                 />
                 <RowItem
                     icon={
-                        <IonIcon name='md-person' />
+                        <MaterialCommunityIcon name='message-text-outline' />
                     }
-                    title='Generate new identity'
-                    onPress={async () => await onGenerateNewIdentity(props)}
+                    title='Create private post'
+                    onPress={async () => await onCreatePrivatePost(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -178,7 +191,7 @@ export const DebugScreen = (props: Props) => (
                 />
             </ScrollView>
         </View>
-    </SafeAreaView>
+    </FragmentSafeAreaViewWithoutTabBar>
 );
 
 const onAppStateReset = async (props: Props) => {
@@ -189,7 +202,8 @@ const onAppStateReset = async (props: Props) => {
     Debug.log('onAppStateReset: ', confirmed);
     if (confirmed) {
         props.onAppStateReset();
-        await Utils.waitMillisec(3 * 1000);
+        const timeout = Platform.OS === 'android' ? 3000 : 1000;
+        await Utils.waitMillisec(timeout);
         restartApp();
     }
 };
@@ -237,19 +251,20 @@ const onCreateIdentity = async (props: Props) => {
     }
 };
 
-const onGenerateNewIdentity = async (props: Props) => {
-    const privateIdentity = await Swarm.generateSecureIdentity(generateSecureRandom);
-    // tslint:disable-next-line:no-console
-    console.log(privateIdentity);
-};
-
 const onLogAppStateVersion = async () => {
     const serializedAppState = await getSerializedAppState();
     const appState = await getAppStateFromSerialized(serializedAppState);
     Debug.log('onLogAppStateVersion', appState._persist);
 };
 
-const onLoadFeeds = async (props: Props) => {
+const onSetupContacts = async (props: Props) => {
+    const contactIdentities = [
+            contactIdentity1,
+            contactIdentity2,
+            contactIdentity3,
+            contactIdentity4,
+        ]
+    ;
     const feeds = debugIdentities.map((identity, index) => {
         const feedUrl = Swarm.makeBzzFeedUrl(Swarm.makeFeedAddressFromPublicIdentity(identity));
         const feed: Feed = {
@@ -262,7 +277,19 @@ const onLoadFeeds = async (props: Props) => {
         return feed;
     });
     props.onRefreshFeeds(feeds);
-    Debug.log('onLoadFeeds', 'finished');
+
+    contactIdentities.map((identity, index) => {
+        const contact: MutualContact = {
+            type: 'mutual-contact',
+            name: `Contact${index + 1}`,
+            identity,
+            image: {},
+            privateChannel: makeEmptyPrivateChannel(),
+        };
+        props.onAddContact(contact);
+    });
+
+    Debug.log('onSetupContacts', 'finished');
 };
 
 const onGeneratePosts = async (props: Props) => {
@@ -278,4 +305,20 @@ const onGeneratePosts = async (props: Props) => {
         props.onAddPost(post);
         await Utils.waitUntil(postTime + 1);
     }
+};
+
+const onCreatePrivatePost = (props: Props) => {
+    const sharedKey = deriveSharedKey(props.appState.author.identity!, contactIdentity1);
+    const topic = calculatePrivateTopic(sharedKey);
+    const postTime = Date.now();
+    const id = byteArrayToHex(generateSecureRandom(32), false);
+    const post: PrivatePost = {
+        text: `Post ${postTime}`,
+        images: [],
+        createdAt: postTime,
+        author: props.appState.author,
+        topic,
+        _id: id,
+    };
+    props.onAddPrivatePost(topic, post);
 };

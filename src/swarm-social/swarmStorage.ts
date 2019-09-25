@@ -1,8 +1,8 @@
 import {
     PostCommand,
     PostCommandLog,
-    Storage,
-    StorageSyncer,
+    PostStorage,
+    PostStorageSyncer,
     StorageSyncUpdate,
     RecentPostFeed,
     getLatestPostCommandEpochFromLog,
@@ -51,12 +51,12 @@ const defaultSwarmHelpers: SwarmHelpers = {
     getLocalPath: (localPath) => localPath,
 };
 
-interface SwarmStorage extends Storage {
+interface SwarmPostStorage extends PostStorage {
     readonly swarmApi: Swarm.Api;
     readonly swarmHelpers: SwarmHelpers;
 }
 
-export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers = defaultSwarmHelpers): SwarmStorage => ({
+export const makeSwarmPostStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers = defaultSwarmHelpers): SwarmPostStorage => ({
     swarmApi,
     swarmHelpers,
     uploadPostCommand: async (postCommand: PostCommand) => {
@@ -92,11 +92,11 @@ export const makeSwarmStorage = (swarmApi: Swarm.Api, swarmHelpers: SwarmHelpers
     },
 });
 
-export const makeSwarmStorageSyncer = (swarmStorage: SwarmStorage): StorageSyncer => ({
+export const makeSwarmPostStorageSyncer = (swarmPostStorage: SwarmPostStorage): PostStorageSyncer => ({
     sync: async (postCommandLog: PostCommandLog, recentPostFeed: RecentPostFeed): Promise<StorageSyncUpdate> => {
         const lastSeenEpoch = getLatestPostCommandEpochFromLog(postCommandLog);
-        const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmStorage);
-        const updatedRecentPostFeed = await swarmStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
+        const syncedPostCommandLog = await syncPostCommandLogWithStorage(postCommandLog, swarmPostStorage);
+        const updatedRecentPostFeed = await swarmPostStorage.uploadRecentPostFeed(syncedPostCommandLog, recentPostFeed);
         const postCommandUpdates = getPostCommandUpdatesSinceEpoch(syncedPostCommandLog, lastSeenEpoch);
         const updatedPosts = getLatestPostsFromLog(postCommandUpdates);
         return {
@@ -207,7 +207,7 @@ const makeSwarmFile = (nameWithoutExtension: string, localPath: string): Swarm.F
     };
 };
 
-const uploadImage = async (
+export const uploadImage = async (
     swarm: Swarm.BzzApi,
     image: ImageData,
     imageResizer: ImageResizer,
@@ -229,7 +229,6 @@ const uploadImage = async (
         const uri = manifestUri + '/' + resizedImageFile.name;
         return {
             ...image,
-            localPath: undefined,
             uri,
         };
     }
@@ -242,12 +241,12 @@ const uploadImages = async (
     imageResizer: ImageResizer,
     getLocalPath: (localPath: string) => string,
 ): Promise<ImageData[]> => {
-    const updateImages: ImageData[] = [];
+    const uploadedImages: ImageData[] = [];
     for (const image of images) {
         const updateImage = await uploadImage(swarm, image, imageResizer, getLocalPath);
-        updateImages.push(updateImage);
+        uploadedImages.push(updateImage);
     }
-    return updateImages;
+    return uploadedImages;
 };
 
 const uploadAuthor = async (

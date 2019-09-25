@@ -11,6 +11,7 @@ import { PublicIdentity } from '../models/Identity';
 import { ContactFeed } from '../models/ContactFeed';
 import { MutualContact } from '../models/Contact';
 import { publicKeyToIdentity } from './contactHelpers';
+import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 
 export const isRecentPostFeed = (feed: Feed): feed is RecentPostFeed => {
     return (feed as RecentPostFeed).authorImage != null;
@@ -47,8 +48,8 @@ export const makeContactFromRecentPostFeed = (feed: RecentPostFeed): MutualConta
             type: 'mutual-contact',
             name: feed.name,
             image: feed.authorImage,
-            confirmed: false,
             identity,
+            privateChannel: makeEmptyPrivateChannel(),
         };
     } catch (e) {
         return undefined;
@@ -74,7 +75,8 @@ export const sortFeedsByName = (feeds: Feed[]): Feed[] => {
 
 export const makeBzzFeedUrlFromIdentity = (identity: PublicIdentity): string => {
     const feedAddress = Swarm.makeFeedAddressFromPublicIdentity(identity);
-    return Swarm.makeBzzFeedUrl(feedAddress);
+    const feedUrl = Swarm.makeBzzFeedUrl(feedAddress);
+    return feedUrl;
 };
 
 export const fetchRecentPostFeed = async (feedAddress: Swarm.FeedAddress, swarmGateway: string): Promise<RecentPostFeed | null> => {
@@ -104,6 +106,20 @@ export const fetchFeedFromUrl = async (url: string, swarmGateway: string): Promi
             Debug.log('fetchFeedFromUrl', 'feed', feed);
             return feed;
         }
+    } catch (e) {
+        Debug.log(e);
+        return null;
+    }
+};
+
+export const fetchRSSFeedFromUrl = async (url: string): Promise<Feed | null> => {
+    try {
+        Debug.log('fetchRSSFeedFromUrl', 'url', url);
+        const canonicalUrl = urlUtils.getCanonicalUrl(url);
+        Debug.log('fetchRSSFeedFromUrl', 'canonicalUrl', canonicalUrl);
+        const feed = await RSSFeedManager.fetchFeedFromUrl(canonicalUrl);
+        Debug.log('fetchRSSFeedFromUrl', 'feed', feed);
+        return feed;
     } catch (e) {
         Debug.log(e);
         return null;

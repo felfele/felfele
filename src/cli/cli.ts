@@ -15,7 +15,10 @@ import { RSSFeedManager } from '../RSSPostManager';
 import * as urlUtils from '../helpers/urlUtils';
 import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { flowTestCommandDefinition } from './flowTestCommands';
+import { protocolTestCommandDefinition as protocolCommandDefinition } from './protocolCommands';
+import { swarmHelperTests } from './swarmHelperTest';
+import { privateSharingTests } from '../protocols/privateSharingTest';
+import { benchmarkCommandDefinition } from './benchmarkCommands';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -48,7 +51,12 @@ const definitions =
             const allTests: any = {
                 ...apiTests,
                 ...syncTests,
+                ...swarmHelperTests,
+                ...privateSharingTests,
             };
+            if (process.env.SWARM_GATEWAY != null) {
+                output('Running with SWARM at', process.env.SWARM_GATEWAY);
+            }
             if (testName == null) {
                 for (const test of Object.keys(allTests)) {
                     output('Running test:', test);
@@ -130,7 +138,9 @@ const definitions =
         output({data});
     })
     .
-    addCommand('flowTest', 'Test interactive workflows', flowTestCommandDefinition)
+    addCommand('protocol', 'Test protocols', protocolCommandDefinition)
+    .
+    addCommand('benchmark', 'Measure the time a function takes', benchmarkCommandDefinition)
 ;
 
 parseArguments(process.argv, definitions, output, output);

@@ -14,6 +14,7 @@ import {
 } from './api';
 import { Post} from '../models/Post';
 import { Debug } from '../Debug';
+import { assertEquals } from '../helpers/assertEquals';
 
 const assertPostCommandsAreSortedAndUnique = (commands: PostCommand[]): void => {
     const sortedCommands = sortAndFilterPostCommands(commands);
@@ -106,16 +107,6 @@ export const assertPostCommandLogsAreJSONEqual = (postCommandLogA: PostCommandLo
         if (JSON.stringify(postCommandLogA.commands[i]) !== JSON.stringify(postCommandLogB.commands[i])) {
             throw new Error(`assertPostCommandLogsAreEqual failed: diff at ${i}, left: ${postCommandLogA}, right: ${postCommandLogB}`);
         }
-    }
-};
-
-export const assertEquals = <T>(expected: T, actual: T) => {
-    if (expected !== actual) {
-        // tslint:disable-next-line:no-console
-        console.log('expected: ', expected);
-        // tslint:disable-next-line:no-console
-        console.log('actual: ', actual);
-        throw new Error(`assertEquals failed: expected: ${expected}, actual: ${actual}`);
     }
 };
 

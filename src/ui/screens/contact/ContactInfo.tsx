@@ -6,8 +6,6 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaVi
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { Contact, MutualContact } from '../../../models/Contact';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { ContactVerificationView } from './ContactVerification';
-import { PublicProfile } from '../../../models/Profile';
 import { WideButton } from '../../buttons/WideButton';
 import { ImageDataView } from '../../../components/ImageDataView';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
@@ -19,7 +17,6 @@ import * as AreYouSureDialog from '../../../components/AreYouSureDialog';
 export interface StateProps {
     contact: Contact | UnknownContact;
     navigation: TypedNavigation;
-    profile: PublicProfile;
     gatewayAddress: string;
 }
 
@@ -56,30 +53,28 @@ export const ContactInfo = (props: Props) => {
                             modelHelper={modelHelper}
                         />
                     </View>
-                    <ContactVerificationView
-                        contact={mutualContact}
-                        ownIdentity={props.profile.identity}
-                        onConfirmContact={props.onConfirmContact}
-                        onRemoveContact={(contact) => onRemoveContact(props, contact)}
+                    <WideButton
+                        label={'Delete'}
+                        style={{marginTop: 20}}
+                        icon={<Icon name='delete' color={Colors.DARK_RED} size={24}/>}
+                        onPress={() => removeContact(props.onRemoveContact, mutualContact, props.navigation)}
+                        fontStyle={{ color: Colors.DARK_RED }}
                     />
                 </View>
-            }
-            {mutualContact != null && mutualContact.confirmed &&
-                <WideButton
-                    label={'DELETE'}
-                    style={{marginTop: 20}}
-                    icon={<Icon name='account-alert' color={Colors.BRAND_PURPLE} size={24} />}
-                    onPress={() => onRemoveContact(props, mutualContact)}
-                />
             }
         </FragmentSafeAreaViewWithoutTabBar>
     );
 };
 
-const onRemoveContact = async (props: Props, contact: Contact) => {
+const removeContact = async (
+    onRemoveContact: (contact: Contact) => void,
+    contact: Contact,
+    navigation: TypedNavigation,
+) => {
     const confirmUnfollow = await AreYouSureDialog.show('Are you sure you want to delete the contact?');
     if (confirmUnfollow) {
-        props.onRemoveContact(contact);
+        onRemoveContact(contact);
+        navigation.popToTop();
     }
 };
 
