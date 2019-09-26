@@ -90,6 +90,12 @@ const definitions =
             output(data);
         })
         .
+        addCommand('set <data>', 'Upload data', async (data: string) => {
+            const bzz = Swarm.makeBzzApi(swarmConfig.gatewayAddress);
+            const hash = await bzz.uploadString(data);
+            output(hash);
+        })
+        .
         addCommand('sha3 <input>', 'Generate SHA3 hash of input', (input) => {
             const byteArrayData = stringToByteArray(input);
             const paddingByteArray: number[] = new Array<number>(4096 - byteArrayData.length);
