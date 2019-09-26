@@ -6,5 +6,6 @@ if [ "$1" != "" ]; then
 fi
 
 cd ios
-xcodebuild -allowProvisioningUpdates -quiet -scheme Felfele "$TARGET"
+# shellcheck disable=SC2086
+xcodebuild -allowProvisioningUpdates -quiet -scheme Felfele $TARGET
 cd ..
