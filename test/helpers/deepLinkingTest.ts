@@ -22,5 +22,5 @@ test('invite link encoding and decoding', () => {
     expect(inviteCode).not.toBeUndefined();
     expect(inviteCode!.randomSeed).toEqual(randomSeed);
     expect(inviteCode!.contactPublicKey).toEqual(contactIdentity.publicKey);
-    expect(inviteCode.expiry).toEqual(invitedContact.createdAt + CONTACT_EXPIRY_THRESHOLD);
+    expect(inviteCode!.expiry).toEqual(invitedContact.createdAt + CONTACT_EXPIRY_THRESHOLD);
 });
