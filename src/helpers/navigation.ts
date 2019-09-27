@@ -65,6 +65,7 @@ export interface Routes {
         randomSeed: string;
         contactPublicKey: string;
         profileName: string;
+        expiry: number;
     };
     EditFilter: {
         filter: ContentFilter,

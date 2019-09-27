@@ -3,6 +3,7 @@ import * as base64ab from 'base64-arraybuffer';
 import { InvitedContact } from '../models/Contact';
 import { InviteCode } from '../models/InviteCode';
 import { hexToUint8Array, byteArrayToHex } from './conversion';
+import { CONTACT_EXPIRY_THRESHOLD } from './contactHelpers';
 
 export const BASE_URL = 'https://app.felfele.org/';
 const SEPARATOR = '/';
@@ -25,16 +26,17 @@ export const getInviteLink = (contact: InvitedContact, profileName: string): str
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
     const base64ContactPublicKey = urlSafeBase64Encode(contactPulicKeyBytes);
     const inviteLinkWithoutUsername = getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
-    return `${inviteLinkWithoutUsername}/${encodeURIComponent(profileName)}`;
+    return `${inviteLinkWithoutUsername}/${encodeURIComponent(profileName)}/${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}`;
 };
 
 export const getInviteLinkWithBase64Params = (
     base64RandomSeed: string,
     base64ContactPublicKey: string,
     urlEncodedProfileName?: string,
+    expiry?: number,
 ) => {
     return urlEncodedProfileName != null
-        ? `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}/${urlEncodedProfileName}`
+        ? `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}/${urlEncodedProfileName}/${expiry}`
         : `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}`
     ;
 };
@@ -45,14 +47,16 @@ export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | un
     }
     const strippedLink = inviteLink.replace(`${BASE_URL}${INVITE}`, '');
     try {
-        const [base64RandomSeed, base64ContactPublicKey, urlEncodedProfileName] = strippedLink.split(SEPARATOR);
+        const [ base64RandomSeed, base64ContactPublicKey, urlEncodedProfileName, stringExpiry ] = strippedLink.split(SEPARATOR);
         const randomSeed = byteArrayToHex(urlSafeBase64Decode(base64RandomSeed), false);
         const contactPublicKey = byteArrayToHex(urlSafeBase64Decode(base64ContactPublicKey));
         const profileName = decodeURIComponent(urlEncodedProfileName);
+        const expiry = Number.parseInt(stringExpiry, 10);
         return {
             randomSeed,
             contactPublicKey,
             profileName,
+            expiry,
         };
     } catch (e) {
         return undefined;

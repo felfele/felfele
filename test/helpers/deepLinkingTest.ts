@@ -1,6 +1,7 @@
 import { getInviteLink, getInviteCodeFromInviteLink } from '../../src/helpers/deepLinking';
 import { InvitedContact } from '../../src/models/Contact';
 import { HexString } from '../../src/helpers/opaqueTypes';
+import { CONTACT_EXPIRY_THRESHOLD } from '../../src/helpers/contactHelpers';
 
 test('invite link encoding and decoding', () => {
     const randomSeed = '755c77b5753fd526605c532dd07e46fb3cdd7d13a244eab1de871fc8e8250653' as HexString;
@@ -21,4 +22,5 @@ test('invite link encoding and decoding', () => {
     expect(inviteCode).not.toBeUndefined();
     expect(inviteCode!.randomSeed).toEqual(randomSeed);
     expect(inviteCode!.contactPublicKey).toEqual(contactIdentity.publicKey);
+    expect(inviteCode.expiry).toEqual(invitedContact.createdAt + CONTACT_EXPIRY_THRESHOLD);
 });

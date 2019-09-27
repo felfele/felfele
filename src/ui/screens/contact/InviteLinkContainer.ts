@@ -6,10 +6,8 @@ import { getInviteLinkWithBase64Params } from '../../../helpers/deepLinking';
 import { Debug } from '../../../Debug';
 import { FeedLinkReader, StateProps } from '../feed-link-reader/FeedLinkReader';
 
-const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, isNameFromLink: boolean }): StateProps => {
-    const link = ownProps.isNameFromLink === true
-        ? getLinkWithProfileName(ownProps.navigation)
-        : getLink(ownProps.navigation);
+const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
+    const link = getLinkWithProfileName(ownProps.navigation);
     Clipboard.setString(link);
 
     return {
@@ -17,19 +15,18 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
     };
 };
 
-const getLink = (navigation: TypedNavigation): string => {
-    const base64RandomSeed = navigation.getParam<'InviteLink', 'randomSeed'>('randomSeed');
-    const base64ContactPublicKey = navigation.getParam<'InviteLink', 'contactPublicKey'>('contactPublicKey');
-    Debug.log('InviteLinkContainer.getLink', {base64RandomSeed, base64ContactPublicKey});
-    return getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
-};
-
 const getLinkWithProfileName = (navigation: TypedNavigation): string => {
-    const base64RandomSeed = navigation.getParam<'InviteLink', 'randomSeed'>('randomSeed');
-    const base64ContactPublicKey = navigation.getParam<'InviteLink', 'contactPublicKey'>('contactPublicKey');
+    const base64RandomSeed = navigation.getParam<'InviteLinkWithProfileName', 'randomSeed'>('randomSeed');
+    const base64ContactPublicKey = navigation.getParam<'InviteLinkWithProfileName', 'contactPublicKey'>('contactPublicKey');
     const urlEncodedProfileName = navigation.getParam<'InviteLinkWithProfileName', 'profileName'>('profileName');
-    Debug.log('InviteLinkContainer.getLinkWithProfileName', {base64RandomSeed, base64ContactPublicKey, profileName: urlEncodedProfileName});
-    return getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey, urlEncodedProfileName);
+    const expiry = navigation.getParam<'InviteLinkWithProfileName', 'expiry'>('expiry');
+    Debug.log('InviteLinkContainer.getLinkWithProfileName', {
+        base64RandomSeed,
+        base64ContactPublicKey,
+        profileName: urlEncodedProfileName,
+        expiry,
+    });
+    return getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey, urlEncodedProfileName, expiry);
 };
 
 export const InviteLinkContainer = connect(mapStateToProps)(FeedLinkReader);

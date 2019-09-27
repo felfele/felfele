@@ -4,4 +4,5 @@ export interface InviteCode {
     randomSeed: HexString;
     contactPublicKey: HexString;
     profileName?: string;
+    expiry: number;
 }

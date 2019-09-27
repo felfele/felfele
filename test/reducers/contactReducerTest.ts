@@ -5,7 +5,7 @@ import { HexString } from '../../src/helpers/opaqueTypes';
 import { PublicIdentity } from '../../src/models/Identity';
 import { PrivateChannelSyncData, makeEmptyPrivateChannel } from '../../src/protocols/privateChannel';
 import { ChapterReference } from '../../src/protocols/timeline';
-import { CONTACT_EXPIRE_THRESHOLD } from '../../src/helpers/contactHelpers';
+import { CONTACT_EXPIRY_THRESHOLD } from '../../src/helpers/contactHelpers';
 
 const testRandomSeed = '9932c9eb82bfc80dace2d511b03ec391a1ea0d984f91a78ea3be13a0493d1803' as HexString;
 
@@ -128,13 +128,13 @@ test('remove expired contacts should only remove expired contacts', () => {
         type: 'invited-contact',
         contactIdentity: testContactIdentity,
         randomSeed: testRandomSeed,
-        createdAt: Date.now() - (CONTACT_EXPIRE_THRESHOLD + 1),
+        createdAt: Date.now() - (CONTACT_EXPIRY_THRESHOLD + 1),
     };
     const notExpiredInvitedContact: InvitedContact = {
         type: 'invited-contact',
         contactIdentity: testContactIdentity,
         randomSeed: testRandomSeed,
-        createdAt: Date.now() - (CONTACT_EXPIRE_THRESHOLD - 1),
+        createdAt: Date.now() - (CONTACT_EXPIRY_THRESHOLD - 1),
     };
     const contacts = [testAcceptedContact, expiredInvitedContact, notExpiredInvitedContact, testMutualContact];
 

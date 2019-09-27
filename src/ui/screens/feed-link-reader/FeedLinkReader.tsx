@@ -6,6 +6,7 @@ import {
     Clipboard,
     RegisteredStyle,
     ViewStyle,
+    Alert,
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
@@ -18,6 +19,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 import { getInviteCodeFromInviteLink } from '../../../helpers/deepLinking';
 import { getFelfeleLinkFromClipboardData } from '../../../helpers/feedInfoHelper';
+import { isInvitationValid } from '../../../helpers/contactHelpers';
 
 const QRCameraWidth = Dimensions.get('window').width;
 const QRCameraHeight = QRCameraWidth;
@@ -68,12 +70,12 @@ export class FeedLinkReader extends React.Component<Props, State> {
                         autoFocus={false}
                         autoCorrect={false}
                         returnKeyType='done'
-                        onSubmitEditing={async () => await this.handleLink(this.state.url)}
+                        onSubmitEditing={() => this.handleLink(this.state.url)}
                         onEndEditing={() => {}}
                     />
                     <View style={styles.qrCameraContainer}>
                         <QRCodeScanner
-                            onRead={async (event) => await this.onScanSuccess(event.data)}
+                            onRead={(event) => this.onScanSuccess(event.data)}
                             containerStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
                             cameraStyle={styles.qrCameraStyle as any as RegisteredStyle<ViewStyle>}
                             fadeIn={false}
@@ -89,10 +91,30 @@ export class FeedLinkReader extends React.Component<Props, State> {
         Debug.log('FeedLinkReader.processLink', 'this.state', this.state, 'link', link);
         const inviteCode = getInviteCodeFromInviteLink(link);
         if (inviteCode != null) {
-            this.props.navigation.replace('ContactConfirm', { inviteCode });
+            if (inviteCode.expiry != null && isInvitationValid(inviteCode.expiry)) {
+                this.props.navigation.replace('ContactConfirm', { inviteCode });
+            } else {
+                this.showExpiredLinkAlert();
+            }
             return;
         }
         this.props.navigation.replace('RSSFeedLoader', { feedUrl: link });
+    }
+
+    private showExpiredLinkAlert() {
+        Alert.alert(
+            'This contact link is not valid or might have expired',
+            undefined,
+            [
+                {
+                    text: 'OK',
+                    onPress: async () => {
+                        this.props.navigation.popToTop();
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     private addFelfeleFeedsFromClipboard = async () => {
@@ -103,17 +125,17 @@ export class FeedLinkReader extends React.Component<Props, State> {
                 url: link,
             });
             Clipboard.setString('');
-            await this.handleLink(link);
+            this.handleLink(link);
         }
     }
 
-    private onScanSuccess = async (data: any) => {
+    private onScanSuccess = (data: any) => {
         try {
             Debug.log('FeedLinkReader.onScanSuccess', 'data', data);
             this.setState({
                 url: data,
             });
-            await this.handleLink(data);
+            this.handleLink(data);
         } catch (e) {
             Debug.log(e);
         }

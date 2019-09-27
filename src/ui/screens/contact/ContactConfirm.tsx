@@ -16,6 +16,7 @@ import { InviteCode } from '../../../models/InviteCode';
 import { generateSecureRandom } from '../../../helpers/secureRandom';
 import { PublicProfile } from '../../../models/Profile';
 import { createSwarmContactHelper } from '../../../helpers/swarmContactHelpers';
+import { DateUtils } from '../../../DateUtils';
 
 export interface StateProps {
     inviteCode: InviteCode;
@@ -60,7 +61,8 @@ export const ContactConfirm = (props: Props) => {
                     />
                 </View>
                 <RegularText style={{ textAlign: 'center', color: Colors.BROWNISH_GRAY }}>
-                    {`Connect with ${props.inviteCode.profileName}?`}
+                    {`Connect with ${props.inviteCode.profileName}?
+This link will expire in ${DateUtils.printableElapsedTime(props.inviteCode.expiry!)}`}
                 </RegularText>
                 <TwoButton
                     leftButton={{

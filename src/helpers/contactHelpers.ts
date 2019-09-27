@@ -10,7 +10,7 @@ import { serialize } from '../social/serialization';
 import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 import { WEEK } from '../DateUtils';
 
-export const CONTACT_EXPIRE_THRESHOLD = WEEK;
+export const CONTACT_EXPIRY_THRESHOLD = WEEK;
 
 export interface UnknownContact {
     type: 'unknown-contact';
@@ -48,7 +48,11 @@ export const calculateVerificationCode = (publicKey: string): string => {
 };
 
 export const isInvitedContactExpired = (contact: InvitedContact): boolean => {
-    return contact.createdAt + CONTACT_EXPIRE_THRESHOLD > Date.now();
+    return contact.createdAt + CONTACT_EXPIRY_THRESHOLD > Date.now();
+};
+
+export const isInvitationValid = (expiry: number): boolean => {
+    return expiry > Date.now();
 };
 
 export interface ContactRandomHelper {
