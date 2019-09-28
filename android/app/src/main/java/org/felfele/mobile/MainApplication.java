@@ -3,25 +3,12 @@ package org.felfele.mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import com.avishayil.rnrestart.ReactNativeRestartPackage;
-import fr.bamlab.rnimageresizer.ImageResizerPackage;
-import com.horcrux.svg.SvgPackage;
-import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
-import com.rnfs.RNFSPackage;
-import org.reactnative.camera.RNCameraPackage;
-import com.imagepicker.ImagePickerPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rngrp.RNGRPPackage;
-import com.alinz.parkerdan.shareextension.SharePackage;
 
 import java.util.Arrays;
 import java.util.List;
