@@ -91,6 +91,7 @@
     "react-native-image-resizer": "1.0.0",
     "react-native-markdown-renderer": "3.2.8",
     "react-native-parse-html": "2.2.6",
+    "react-native-permissions": "2.0.0",
     "react-native-push-notification": "3.1.2",
     "react-native-qrcode-scanner": "1.1.2",
     "react-native-qrcode-svg": "5.1.2",
