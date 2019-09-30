@@ -360,9 +360,9 @@ const Scenes: NavigationRouteConfigMap = {
     RSSFeedInfo: {
         screen: RSSFeedInfoContainer,
     },
-    InviteLinkWithProfileName: {
+    InviteLink: {
         screen: InviteLinkContainer,
-        path: 'invite/:randomSeed/:contactPublicKey/:profileName/:expiry',
+        path: 'invite/:params',
     },
     ContactView: {
         screen: ContactViewContainer,

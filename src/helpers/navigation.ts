@@ -58,14 +58,7 @@ export interface Routes {
         feed: Feed;
     };
     InviteLink: {
-        randomSeed: string;
-        contactPublicKey: string;
-    };
-    InviteLinkWithProfileName: {
-        randomSeed: string;
-        contactPublicKey: string;
-        profileName: string;
-        expiry: number;
+        params: string;
     };
     EditFilter: {
         filter: ContentFilter,

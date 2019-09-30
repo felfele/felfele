@@ -1,14 +1,13 @@
 // @ts-ignore
 import * as base64ab from 'base64-arraybuffer';
 import { InvitedContact } from '../models/Contact';
-import { InviteCode } from '../models/InviteCode';
+import { InviteCode, isVersion1RawInviteCode, InviteCodeFields, INVITE_CODE_VERSION } from '../models/InviteCode';
 import { hexToUint8Array, byteArrayToHex } from './conversion';
 import { CONTACT_EXPIRY_THRESHOLD } from './contactHelpers';
 
 export const BASE_URL = 'https://app.felfele.org/';
-const SEPARATOR = '/';
+const SEPARATOR = '&';
 const INVITE = 'invite/';
-export const INVITE_PATH = `${INVITE}:randomSeed${SEPARATOR}:contactPublicKey`;
 
 const urlSafeBase64Encode = (data: Uint8Array) => {
     const unsafeBase64 = base64ab.encode(data.buffer);
@@ -21,12 +20,25 @@ const urlSafeBase64Decode = (data: string) => {
 };
 
 export const getInviteLink = (contact: InvitedContact, profileName: string): string => {
+    return `${BASE_URL}${INVITE}${makeInviteParams(contact, profileName)}`;
+};
+
+export const getInviteLinkWithParams = (params: string): string => {
+    return `${BASE_URL}${INVITE}${params}`;
+};
+
+const makeInviteParams = (contact: InvitedContact, profileName: string): string => {
     const randomSeedBytes = hexToUint8Array(contact.randomSeed);
-    const contactPulicKeyBytes = hexToUint8Array(contact.contactIdentity.publicKey);
+    const contactPublicKeyBytes = hexToUint8Array(contact.contactIdentity.publicKey);
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
-    const base64ContactPublicKey = urlSafeBase64Encode(contactPulicKeyBytes);
-    const inviteLinkWithoutUsername = getInviteLinkWithBase64Params(base64RandomSeed, base64ContactPublicKey);
-    return `${inviteLinkWithoutUsername}/${encodeURIComponent(profileName)}/${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}`;
+    const base64ContactPublicKey = urlSafeBase64Encode(contactPublicKeyBytes);
+    return `\
+${InviteCodeFields.randomSeed}=${base64RandomSeed}${SEPARATOR}\
+${InviteCodeFields.contactPublicKey}=${base64ContactPublicKey}${SEPARATOR}\
+${InviteCodeFields.profileName}=${encodeURIComponent(profileName)}${SEPARATOR}\
+${InviteCodeFields.expiry}=${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}${SEPARATOR}\
+${InviteCodeFields.version}=${INVITE_CODE_VERSION}\
+`;
 };
 
 export const getInviteLinkWithBase64Params = (
@@ -47,18 +59,29 @@ export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | un
     }
     const strippedLink = inviteLink.replace(`${BASE_URL}${INVITE}`, '');
     try {
-        const [ base64RandomSeed, base64ContactPublicKey, urlEncodedProfileName, stringExpiry ] = strippedLink.split(SEPARATOR);
-        const randomSeed = byteArrayToHex(urlSafeBase64Decode(base64RandomSeed), false);
-        const contactPublicKey = byteArrayToHex(urlSafeBase64Decode(base64ContactPublicKey));
-        const profileName = decodeURIComponent(urlEncodedProfileName);
-        const expiry = Number.parseInt(stringExpiry, 10);
-        return {
-            randomSeed,
-            contactPublicKey,
-            profileName,
-            expiry,
-        };
+        const jsonObj = makeJsonObjFromParams(strippedLink);
+        if (isVersion1RawInviteCode(jsonObj)) {
+            return {
+                version: Number.parseInt(jsonObj.version, 10),
+                randomSeed: byteArrayToHex(urlSafeBase64Decode(jsonObj.randomSeed), false),
+                contactPublicKey: byteArrayToHex(urlSafeBase64Decode(jsonObj.contactPublicKey)),
+                expiry: Number.parseInt(jsonObj.expiry, 10),
+                profileName: decodeURIComponent(jsonObj.profileName),
+            };
+        } else {
+            throw Error(`malformed invite link ${strippedLink}`);
+        }
     } catch (e) {
         return undefined;
     }
+};
+
+const makeJsonObjFromParams = (params: string) => {
+    const paramsArr = params.split(SEPARATOR);
+    const obj: { [k: string]: string } = {};
+    for (const item of paramsArr) {
+        const [ key, value] = item.split('=');
+        obj[key] = value;
+    }
+    return obj;
 };
