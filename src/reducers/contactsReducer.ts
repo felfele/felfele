@@ -73,7 +73,7 @@ export const contactsReducer = (contacts: Contact[] = [], action: Actions): Cont
         case 'REMOVE-EXPIRED-CONTACTS': {
             return contacts.filter(contact =>
                     contact.type !== 'invited-contact'
-                    || contact.type === 'invited-contact' && isInvitedContactExpired(contact));
+                    || contact.type === 'invited-contact' && isInvitedContactExpired(contact, action.payload.timestamp));
         }
         case 'UPDATE-CONTACT-PRIVATE-CHANNEL': {
             const index = contacts.findIndex(contact =>

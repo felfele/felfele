@@ -124,21 +124,22 @@ test('remove should work if mutual not found', () => {
 });
 
 test('remove expired contacts should only remove expired contacts', () => {
+    const NOW = 1569837778855;
     const expiredInvitedContact: InvitedContact = {
         type: 'invited-contact',
         contactIdentity: testContactIdentity,
         randomSeed: testRandomSeed,
-        createdAt: Date.now() - (CONTACT_EXPIRY_THRESHOLD + 1),
+        createdAt: NOW - (CONTACT_EXPIRY_THRESHOLD + 1),
     };
     const notExpiredInvitedContact: InvitedContact = {
         type: 'invited-contact',
         contactIdentity: testContactIdentity,
         randomSeed: testRandomSeed,
-        createdAt: Date.now() - (CONTACT_EXPIRY_THRESHOLD - 1),
+        createdAt: NOW - (CONTACT_EXPIRY_THRESHOLD - 1),
     };
     const contacts = [testAcceptedContact, expiredInvitedContact, notExpiredInvitedContact, testMutualContact];
 
-    const action = ContactActions.removeExpiredContacts();
+    const action = ContactActions.removeExpiredContacts(NOW);
     const result = contactsReducer(contacts, action);
 
     expect(result).toEqual([testAcceptedContact, notExpiredInvitedContact, testMutualContact]);
