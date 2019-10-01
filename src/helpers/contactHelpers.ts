@@ -47,12 +47,12 @@ export const calculateVerificationCode = (publicKey: string): string => {
     return `${stringValue.slice(0, 4)}-${stringValue.slice(4, 8)}-${stringValue.slice(8)}`;
 };
 
-export const isInvitedContactExpired = (contact: InvitedContact, timestamp = Date.now()): boolean => {
-    return contact.createdAt + CONTACT_EXPIRY_THRESHOLD > timestamp;
+export const isInvitedContactExpired = (contact: InvitedContact, currentDate = Date.now()): boolean => {
+    return contact.createdAt + CONTACT_EXPIRY_THRESHOLD > currentDate;
 };
 
-export const isInvitationValid = (expiry: number, timestamp = Date.now()): boolean => {
-    return expiry > timestamp;
+export const isInvitationValid = (expiry: number, currentDate = Date.now()): boolean => {
+    return expiry > currentDate;
 };
 
 export interface ContactRandomHelper {

@@ -1,7 +1,12 @@
 // @ts-ignore
 import * as base64ab from 'base64-arraybuffer';
 import { InvitedContact } from '../models/Contact';
-import { InviteCode, isVersion1RawInviteCode, InviteCodeFields, INVITE_CODE_VERSION } from '../models/InviteCode';
+import {
+    InviteCode,
+    isVersion1RawInviteCode,
+    InviteCodeFields,
+    INVITE_CODE_VERSION,
+} from '../models/InviteCode';
 import { hexToUint8Array, byteArrayToHex } from './conversion';
 import { CONTACT_EXPIRY_THRESHOLD } from './contactHelpers';
 
@@ -39,18 +44,6 @@ ${InviteCodeFields.profileName}=${encodeURIComponent(profileName)}${SEPARATOR}\
 ${InviteCodeFields.expiry}=${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}${SEPARATOR}\
 ${InviteCodeFields.version}=${INVITE_CODE_VERSION}\
 `;
-};
-
-export const getInviteLinkWithBase64Params = (
-    base64RandomSeed: string,
-    base64ContactPublicKey: string,
-    urlEncodedProfileName?: string,
-    expiry?: number,
-) => {
-    return urlEncodedProfileName != null
-        ? `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}/${urlEncodedProfileName}/${expiry}`
-        : `${BASE_URL}${INVITE}${base64RandomSeed}/${base64ContactPublicKey}`
-    ;
 };
 
 export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | undefined => {
