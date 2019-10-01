@@ -1,6 +1,6 @@
 import { HexString } from '../helpers/opaqueTypes';
 
-export const enum InviteCodeFields {
+export enum InviteCodeFields {
     version = 'version',
     randomSeed = 'randomSeed',
     contactPublicKey = 'contactPublicKey',
