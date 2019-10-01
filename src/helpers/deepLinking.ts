@@ -3,12 +3,11 @@ import * as base64ab from 'base64-arraybuffer';
 import { InvitedContact } from '../models/Contact';
 import {
     InviteCode,
-    isVersion1RawInviteCode,
-    InviteCodeFields,
     INVITE_CODE_VERSION,
 } from '../models/InviteCode';
 import { hexToUint8Array, byteArrayToHex } from './conversion';
 import { CONTACT_EXPIRY_THRESHOLD } from './contactHelpers';
+import { Debug } from '../Debug';
 
 export const BASE_URL = 'https://app.felfele.org/';
 const SEPARATOR = '&';
@@ -38,11 +37,11 @@ const makeInviteParams = (contact: InvitedContact, profileName: string): string 
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
     const base64ContactPublicKey = urlSafeBase64Encode(contactPublicKeyBytes);
     return `\
-${InviteCodeFields.randomSeed}=${base64RandomSeed}${SEPARATOR}\
-${InviteCodeFields.contactPublicKey}=${base64ContactPublicKey}${SEPARATOR}\
-${InviteCodeFields.profileName}=${encodeURIComponent(profileName)}${SEPARATOR}\
-${InviteCodeFields.expiry}=${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}${SEPARATOR}\
-${InviteCodeFields.version}=${INVITE_CODE_VERSION}\
+${INVITE_CODE_VERSION}${SEPARATOR}\
+${base64RandomSeed}${SEPARATOR}\
+${base64ContactPublicKey}${SEPARATOR}\
+${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}\
+${encodeURIComponent(profileName)}${SEPARATOR}\
 `;
 };
 
@@ -52,29 +51,26 @@ export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | un
     }
     const strippedLink = inviteLink.replace(`${BASE_URL}${INVITE}`, '');
     try {
-        const jsonObj = makeJsonObjFromParams(strippedLink);
-        if (isVersion1RawInviteCode(jsonObj)) {
-            return {
-                version: Number.parseInt(jsonObj.version, 10),
-                randomSeed: byteArrayToHex(urlSafeBase64Decode(jsonObj.randomSeed), false),
-                contactPublicKey: byteArrayToHex(urlSafeBase64Decode(jsonObj.contactPublicKey)),
-                expiry: Number.parseInt(jsonObj.expiry, 10),
-                profileName: decodeURIComponent(jsonObj.profileName),
-            };
-        } else {
-            throw Error(`malformed invite link ${strippedLink}`);
+        const [versionString, ...rest] = strippedLink.split(SEPARATOR);
+        const version = Number.parseInt(versionString, 10);
+        switch (version) {
+            case 1: return parseVersion1Params(rest);
+            default: throw new Error('unknown version');
         }
     } catch (e) {
+        Debug.log('deepLinking.getInviteCodeFromInviteLink', e);
         return undefined;
     }
 };
 
-const makeJsonObjFromParams = (params: string) => {
-    const paramsArr = params.split(SEPARATOR);
-    const obj: { [k: string]: string } = {};
-    for (const item of paramsArr) {
-        const [ key, value] = item.split('=');
-        obj[key] = value;
+const parseVersion1Params = (params: string[]): InviteCode => {
+    if (params.length !== 4) {
+        throw new Error('invalid parameters');
     }
-    return obj;
+    return {
+        randomSeed: byteArrayToHex(urlSafeBase64Decode(params[0]), false),
+        contactPublicKey: byteArrayToHex(urlSafeBase64Decode(params[1]), false),
+        expiry: Number.parseInt(params[2], 10),
+        profileName: decodeURIComponent(params[3]),
+    };
 };
