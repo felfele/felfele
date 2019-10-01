@@ -69,7 +69,7 @@ const parseVersion1Params = (params: string[]): InviteCode => {
     }
     return {
         randomSeed: byteArrayToHex(urlSafeBase64Decode(params[0]), false),
-        contactPublicKey: byteArrayToHex(urlSafeBase64Decode(params[1]), false),
+        contactPublicKey: byteArrayToHex(urlSafeBase64Decode(params[1])),
         expiry: Number.parseInt(params[2], 10),
         profileName: decodeURIComponent(params[3]),
     };
