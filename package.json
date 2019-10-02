@@ -34,7 +34,7 @@
     "node-fetch": "2.3.0",
     "react-native-asset": "1.1.2",
     "react-native-debugger-open": "0.3.17",
-    "react-native-schemes-manager": "2.0.0",
+    "react-native-schemes-manager": "^2.0.0",
     "react-native-svg-transformer": "0.12.1",
     "react-native-typescript-transformer": "1.2.10",
     "react-native-version": "3.1.0",
@@ -45,6 +45,7 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "fix-androidx": "scripts/fix_androidx.sh",
+    "fix-xcode": "react-native-schemes-manager all",
     "ios": "react-native run-ios",
     "link": "react-native link",
     "link-assets": "react-native-asset",
@@ -62,7 +63,7 @@
     "e2e:build:ios": "detox build",
     "e2e:ios": "detox test -c ios.sim.debug --cleanup",
     "postversion": "react-native-version --never-amend && scripts/patch_version_ts.sh",
-    "postinstall": "npm run fix-androidx",
+    "postinstall": "npm run fix-androidx && npm run fix-xcode",
     "increment-build": "react-native-version --never-amend --increment-build && scripts/patch_version_ts.sh"
   },
   "dependencies": {
@@ -144,5 +145,12 @@
         "name": "iPhone 7"
       }
     }
+  },
+  "xcodeSchemes": {
+    "Release": [
+      "Beta"
+    ],
+    "Debug": [],
+    "projectDirectory": "ios"
   }
 }
