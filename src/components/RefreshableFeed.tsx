@@ -17,13 +17,13 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaVi
 import { ContactFeed } from '../models/ContactFeed';
 
 export interface DispatchProps {
-    onRefreshPosts: (feeds: Feed[] | ContactFeed[]) => void;
+    onRefreshPosts: (feeds: Array<Feed | ContactFeed>) => void;
 }
 
 export interface StateProps {
     navigation: TypedNavigation;
     posts: Post[];
-    feeds: Feed[] | ContactFeed[];
+    feeds: Array<Feed | ContactFeed>;
     modelHelper: ModelHelper;
     children: {
         // WARNING, type parameter included for reference, but it does not typecheck

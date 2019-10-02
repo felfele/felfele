@@ -4,7 +4,6 @@ import { AppState } from '../../../reducers/AppState';
 import { StateProps, DispatchProps, ShareWithScreen, FeedSection } from './ShareWithScreen';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { sortFeedsByName, isContactFeed } from '../../../helpers/feedHelpers';
-import { ContactFeed } from '../../../models/ContactFeed';
 import { getContactFeeds } from '../../../selectors/selectors';
 import { AsyncActions } from '../../../actions/asyncActions';
 import { Post } from '../../../models/Post';

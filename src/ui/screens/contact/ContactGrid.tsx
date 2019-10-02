@@ -18,7 +18,7 @@ export interface DispatchProps {
 
 export interface FeedSection {
     title?: string;
-    data: ContactFeed[] | Feed [];
+    data: Array<Feed | ContactFeed>;
 }
 
 export interface StateProps {

@@ -8,6 +8,7 @@ import { DispatchProps } from '../../../components/RefreshableFeed';
 import { Post } from '../../../models/Post';
 import { Feed } from '../../../models/Feed';
 import { isContactFeed } from '../../../helpers/feedHelpers';
+import { ContactFeed } from '../../../models/ContactFeed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation }): StateProps => {
     const allPosts = getAllPrivateChannelPosts(state);
@@ -29,7 +30,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
-        onRefreshPosts: (feeds: Feed[]) => {
+        onRefreshPosts: (feeds: Array<Feed | ContactFeed>) => {
             dispatch(AsyncActions.advanceContacts());
             dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(feeds.filter(isContactFeed)));
         },
