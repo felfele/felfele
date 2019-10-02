@@ -6,7 +6,6 @@ import {
     Alert,
     KeyboardAvoidingView,
     StyleSheet,
-    ActivityIndicator,
     Dimensions,
     Keyboard,
 } from 'react-native';
@@ -18,7 +17,7 @@ import { ImageData } from '../models/ImageData';
 import { SimpleTextInput } from './SimpleTextInput';
 import { NavigationHeader } from './NavigationHeader';
 import { Debug } from '../Debug';
-import { markdownEscape, markdownUnescape } from '../markdown';
+import { markdownUnescape } from '../markdown';
 import { ComponentColors, Colors } from '../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from '../ui/misc/Avatar';
@@ -26,11 +25,7 @@ import { ReactNativeModelHelper } from '../models/ReactNativeModelHelper';
 import { ModelHelper } from '../models/ModelHelper';
 import { TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
-import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
-import { convertPostToParentPost, convertHtmlMetaDataToPost, createPostWithLinkMetaData } from '../helpers/postHelpers';
-import { getHttpLinkFromText } from '../helpers/urlUtils';
 import { Utils } from '../Utils';
-import { TypedNavigation } from '../helpers/navigation';
 import { NavigationEvents } from 'react-navigation';
 
 export interface StateProps {

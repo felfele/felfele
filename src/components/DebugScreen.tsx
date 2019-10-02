@@ -45,7 +45,6 @@ export interface DispatchProps {
     onDeletePosts: () => void;
     onAddFeed: (feed: Feed) => void;
     onRefreshFeeds: (feeds: Feed[]) => void;
-    onAddPost: (post: Post) => void;
     onAddContact: (contact: MutualContact) => void;
     onAddPrivatePost: (topic: HexString, post: PrivatePost) => void;
 }
@@ -123,14 +122,6 @@ export const DebugScreen = (props: Props) => (
                     }
                     title='Setup debug contacts'
                     onPress={async () => await onSetupContacts(props)}
-                    buttonStyle='none'
-                />
-                <RowItem
-                    icon={
-                        <MaterialCommunityIcon name='file-document-box-multiple-outline' />
-                    }
-                    title='Generate 100 posts'
-                    onPress={async () => await onGeneratePosts(props)}
                     buttonStyle='none'
                 />
                 <RowItem
@@ -290,21 +281,6 @@ const onSetupContacts = async (props: Props) => {
     });
 
     Debug.log('onSetupContacts', 'finished');
-};
-
-const onGeneratePosts = async (props: Props) => {
-    const numPosts = 100;
-    for (let i = 0; i < numPosts; i++) {
-        const postTime = Date.now();
-        const post: Post = {
-            text: `Post ${i + 1} of ${numPosts} at ${postTime}`,
-            images: [],
-            createdAt: Date.now(),
-            author: props.appState.author,
-        };
-        props.onAddPost(post);
-        await Utils.waitUntil(postTime + 1);
-    }
 };
 
 const onCreatePrivatePost = (props: Props) => {
