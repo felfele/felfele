@@ -3,12 +3,11 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../reducers/AppState';
 import { StateProps, DispatchProps, ShareWithScreen, FeedSection } from './ShareWithScreen';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { sortFeedsByName } from '../../../helpers/feedHelpers';
+import { sortFeedsByName, isContactFeed } from '../../../helpers/feedHelpers';
 import { ContactFeed } from '../../../models/ContactFeed';
 import { getContactFeeds } from '../../../selectors/selectors';
 import { AsyncActions } from '../../../actions/asyncActions';
 import { Post } from '../../../models/Post';
-import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
@@ -37,16 +36,19 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
         onShareWithContacts: (post: Post, feeds: Feed[]) => {
-            const isContactFeed = (feed: Feed): feed is ContactFeed => (feed as ContactFeed).contact != null;
             const contactFeeds = feeds.filter(isContactFeed);
             dispatch(AsyncActions.shareWithContactFeeds(post, contactFeeds));
         },
-        onDoneSharing: () => {
+        onDoneSharing: (navigateTo?: () => void) => {
             const onDoneSharing = ownProps.navigation.getParam<'ShareWithContainer', 'onDoneSharing'>('onDoneSharing');
             if (onDoneSharing != null) {
                 onDoneSharing();
             }
-            ownProps.navigation.popToTop();
+            if (navigateTo != null) {
+                navigateTo();
+            } else {
+                ownProps.navigation.popToTop();
+            }
         },
     };
 };

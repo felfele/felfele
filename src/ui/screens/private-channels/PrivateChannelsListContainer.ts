@@ -4,7 +4,7 @@ import { AppState } from '../../../reducers/AppState';
 import { StateProps, DispatchProps, PrivateChannelsListView, FeedSection } from './PrivateChannelsListView';
 import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { sortFeedsByName } from '../../../helpers/feedHelpers';
+import { sortFeedsByName, isContactFeed } from '../../../helpers/feedHelpers';
 import { ContactFeed } from '../../../models/ContactFeed';
 
 const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigation, showExplore: boolean }): StateProps => {
@@ -31,10 +31,10 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
 
 export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigation }): DispatchProps => {
     return {
-        onPressChannel: (feed: ContactFeed) => {
-            if (feed.contact != null) {
+        onPressChannel: (feed: ContactFeed | Feed) => {
+            if (isContactFeed(feed)) {
                 ownProps.navigation.navigate('ContactView', {
-                    publicKey: feed.contact!.identity.publicKey,
+                    publicKey: feed.contact.identity.publicKey,
                 });
             } else {
                 ownProps.navigation.navigate('Feed', {

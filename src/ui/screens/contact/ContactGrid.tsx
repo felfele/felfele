@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SuperGridSectionList } from 'react-native-super-grid';
 
 import { ContactFeed } from '../../../models/ContactFeed';
@@ -10,14 +10,15 @@ import { getFeedImage } from '../../../helpers/feedHelpers';
 import { defaultImages } from '../../../defaultImages';
 import { MediumText } from '../../misc/text';
 import { TabBarPlaceholder } from '../../misc/TabBarPlaceholder';
+import { Feed } from '../../../models/Feed';
 
 export interface DispatchProps {
-    onPressFeed: (feed: ContactFeed) => void;
+    onPressFeed: (feed: ContactFeed | Feed) => void;
 }
 
 export interface FeedSection {
     title?: string;
-    data: ContactFeed[];
+    data: ContactFeed[] | Feed [];
 }
 
 export interface StateProps {

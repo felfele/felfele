@@ -4,31 +4,27 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { ContactFeed } from '../../../models/ContactFeed';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { FragmentSafeAreaViewWithoutTabBar, FragmentSafeAreaViewForTabBar } from '../../misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewForTabBar } from '../../misc/FragmentSafeAreaView';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import {
     ContactGrid,
-    StateProps as ContactGridStateProps,
-    DispatchProps as ContactGridDispatchProps,
 } from '../contact/ContactGrid';
 import { Post } from '../../../models/Post';
 import { removeFromArray } from '../../../helpers/immutable';
-import { WideButton } from '../../buttons/WideButton';
 import { Colors, ComponentColors } from '../../../styles';
-import { highestSeenLogicalTime } from '../../../protocols/timeline';
-import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 import { RegularText, MediumText } from '../../misc/text';
 import { TouchableView } from '../../../components/TouchableView';
+import { isContactFeed } from '../../../helpers/feedHelpers';
 
 export interface DispatchProps {
-    onDoneSharing: () => void;
+    onDoneSharing: (navigateTo?: () => void) => void;
     onShareWithContacts: (post: Post, feed: Feed[]) => void;
 }
 
 export interface FeedSection {
     title?: string;
-    data: ContactFeed[];
+    data: ContactFeed[] | Feed[];
 }
 
 export interface StateProps {
@@ -153,6 +149,22 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
             isSending: true,
         });
         this.props.onShareWithContacts(this.props.post, this.state.selectedFeeds);
-        this.props.onDoneSharing();
+        this.props.onDoneSharing(() => {
+            const feed = this.state.selectedFeeds[0];
+            if (this.state.selectedFeeds.length === 1) {
+                if (isContactFeed(feed)) {
+                    this.props.navigation.navigate('ContactView', {
+                        publicKey: feed.contact.identity.publicKey,
+                    });
+                } else {
+                    this.props.navigation.navigate('Feed', {
+                        feedUrl: feed.feedUrl,
+                        name: feed.name,
+                    });
+                }
+            } else {
+                this.props.navigation.popToTop();
+            }
+        });
     }
 }
