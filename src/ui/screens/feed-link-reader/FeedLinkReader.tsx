@@ -17,7 +17,7 @@ import { NavigationHeader } from '../../../components/NavigationHeader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
-import { getInviteCodeFromInviteLink } from '../../../helpers/deepLinking';
+import { getInviteCodeFromInviteLink, isInviteLink } from '../../../helpers/deepLinking';
 import { getFelfeleLinkFromClipboardData } from '../../../helpers/feedInfoHelper';
 import { isInvitationValid } from '../../../helpers/contactHelpers';
 
@@ -89,16 +89,18 @@ export class FeedLinkReader extends React.Component<Props, State> {
 
     private handleLink(link: string) {
         Debug.log('FeedLinkReader.processLink', 'this.state', this.state, 'link', link);
-        const inviteCode = getInviteCodeFromInviteLink(link);
-        if (inviteCode != null) {
-            if (inviteCode.expiry != null && isInvitationValid(inviteCode.expiry)) {
-                this.props.navigation.replace('ContactConfirm', { inviteCode });
-            } else {
-                this.showExpiredLinkAlert();
-            }
-            return;
+        if (isInviteLink(link) === false) {
+            this.props.navigation.replace('RSSFeedLoader', { feedUrl: link });
         }
-        this.props.navigation.replace('RSSFeedLoader', { feedUrl: link });
+        try {
+            const inviteCode = getInviteCodeFromInviteLink(link);
+            if (inviteCode != null && isInvitationValid(inviteCode.expiry)) {
+                this.props.navigation.replace('ContactConfirm', { inviteCode });
+            }
+        } catch (e) {
+            Debug.log('FeedLinkReader.handleLink', e);
+        }
+        this.showExpiredLinkAlert();
     }
 
     private showExpiredLinkAlert() {

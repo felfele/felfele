@@ -25,3 +25,18 @@ test('invite link encoding and decoding', () => {
     expect(inviteCode!.contactPublicKey).toEqual(contactIdentity.publicKey);
     expect(inviteCode!.expiry).toEqual(invitedContact.createdAt + CONTACT_EXPIRY_THRESHOLD);
 });
+
+test('correct version 1 invite link can be parsed', () => {
+    const inviteLink = 'https://app.felfele.org/invite/1&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258&fff';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).not.toThrow();
+});
+
+test('invite link with unknown version throws error', () => {
+    const inviteLink = 'https://app.felfele.org/invite/2&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258&fff';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('unknown version');
+});
+
+test('version 1 malformed invite link throws error', () => {
+    const inviteLink = 'https://app.felfele.org/invite/2&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('unknown version');
+});

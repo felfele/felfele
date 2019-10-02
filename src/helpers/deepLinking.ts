@@ -40,26 +40,23 @@ const makeInviteParams = (contact: InvitedContact, profileName: string): string 
 ${INVITE_CODE_VERSION}${SEPARATOR}\
 ${base64RandomSeed}${SEPARATOR}\
 ${base64ContactPublicKey}${SEPARATOR}\
-${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}\
-${encodeURIComponent(profileName)}${SEPARATOR}\
+${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}${SEPARATOR}\
+${encodeURIComponent(profileName)}\
 `;
 };
 
+export const isInviteLink = (link: string) => link.startsWith(`${BASE_URL}${INVITE}`);
+
 export const getInviteCodeFromInviteLink = (inviteLink: string): InviteCode | undefined => {
-    if (!inviteLink.startsWith(`${BASE_URL}${INVITE}`)) {
+    if (isInviteLink(inviteLink) === false) {
         return undefined;
     }
     const strippedLink = inviteLink.replace(`${BASE_URL}${INVITE}`, '');
-    try {
-        const [versionString, ...rest] = strippedLink.split(SEPARATOR);
-        const version = Number.parseInt(versionString, 10);
-        switch (version) {
-            case 1: return parseVersion1Params(rest);
-            default: throw new Error('unknown version');
-        }
-    } catch (e) {
-        Debug.log('deepLinking.getInviteCodeFromInviteLink', e);
-        return undefined;
+    const [versionString, ...rest] = strippedLink.split(SEPARATOR);
+    const version = Number.parseInt(versionString, 10);
+    switch (version) {
+        case 1: return parseVersion1Params(rest);
+        default: throw new Error('unknown version');
     }
 };
 
