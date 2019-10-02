@@ -35,3 +35,8 @@ test('invite link with unknown version throws error', () => {
     const inviteLink = 'https://app.felfele.org/invite/2&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258&fff';
     expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('unknown version');
 });
+
+test('invite link with less than 4 parameters throws error', () => {
+    const inviteLink = 'https://app.felfele.org/invite/1&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('invalid parameters');
+});

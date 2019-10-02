@@ -36,13 +36,9 @@ const makeInviteParams = (contact: InvitedContact, profileName: string): string 
     const contactPublicKeyBytes = hexToUint8Array(contact.contactIdentity.publicKey);
     const base64RandomSeed = urlSafeBase64Encode(randomSeedBytes);
     const base64ContactPublicKey = urlSafeBase64Encode(contactPublicKeyBytes);
-    return `\
-${INVITE_CODE_VERSION}${SEPARATOR}\
-${base64RandomSeed}${SEPARATOR}\
-${base64ContactPublicKey}${SEPARATOR}\
-${contact.createdAt + CONTACT_EXPIRY_THRESHOLD}${SEPARATOR}\
-${encodeURIComponent(profileName)}\
-`;
+    const expiry = contact.createdAt + CONTACT_EXPIRY_THRESHOLD;
+    const urlEncodedProfileName = encodeURIComponent(profileName);
+    return [ INVITE_CODE_VERSION, base64RandomSeed, base64ContactPublicKey, expiry, urlEncodedProfileName ].join(SEPARATOR);
 };
 
 export const isInviteLink = (link: string) => link.startsWith(`${BASE_URL}${INVITE}`);
