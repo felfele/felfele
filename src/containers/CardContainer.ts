@@ -41,7 +41,7 @@ const getOriginalAuthorFeed = (post: Post, state: AppState): AuthorFeed | undefi
 };
 
 const getAuthorFeedOrUndefined = (
-    feed: ContactFeed | undefined
+    feed: ContactFeed | Feed | undefined
 ) => {
     return feed != null
         ? {

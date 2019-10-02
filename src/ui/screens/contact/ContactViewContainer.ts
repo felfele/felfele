@@ -11,6 +11,7 @@ import { findContactByPublicKey, UnknownContact, deriveSharedKey } from '../../.
 import { Actions } from '../../../actions/Actions';
 import { Post } from '../../../models/Post';
 import { calculatePrivateTopic } from '../../../protocols/privateSharing';
+import { isContactFeed } from '../../../helpers/feedHelpers';
 
 const getContactPosts = (state: AppState, contact: MutualContact) => {
     const topic = calculatePrivateTopic(deriveSharedKey(state.author.identity!, contact.identity));
@@ -63,7 +64,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             ownProps.navigation.popToTop();
         },
         onRefreshPosts: (feeds: Feed[]) => {
-            dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(feeds));
+            dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(feeds.filter(isContactFeed)));
         },
         onSaveDraft: (draft: Post) => {
             dispatch(Actions.addDraft(draft));
