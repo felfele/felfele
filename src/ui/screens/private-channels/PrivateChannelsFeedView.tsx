@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Feed } from '../../../models/Feed';
 import { Post } from '../../../models/Post';
 import { RefreshableFeed, DispatchProps } from '../../../components/RefreshableFeed';
 import { NavigationHeader } from '../../../components/NavigationHeader';
