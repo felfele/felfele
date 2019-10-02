@@ -6,6 +6,7 @@ import {
 
 import { getInviteLink } from './deepLinking';
 import { InvitedContact } from '../models/Contact';
+import { CONTACT_EXPIRY_THRESHOLD } from './contactHelpers';
 
 export const showShareContactDialog = async (contact: InvitedContact, profileName: string) => {
     const title = 'Send an invite';

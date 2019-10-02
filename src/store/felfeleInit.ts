@@ -4,6 +4,7 @@ import { Actions } from '../actions/Actions';
 import { AsyncActions } from '../actions/asyncActions';
 import { BackgroundTaskActions } from '../actions/backgroundTaskActions';
 import { FELFELE_APP_NAME } from '../reducers/defaultData';
+import { ContactActions } from '../actions/ContactActions';
 
 export const felfeleInitAppActions = (store: Store<AppState, Actions>) => {
     // tslint:disable-next-line:no-console
@@ -26,6 +27,7 @@ export const felfeleInitAppActions = (store: Store<AppState, Actions>) => {
     store.dispatch(BackgroundTaskActions.registerBackgroundTasks());
     // @ts-ignore
     store.dispatch(AsyncActions.advanceContacts());
+    store.dispatch(ContactActions.removeExpiredContacts());
     // @ts-ignore
     store.dispatch(AsyncActions.downloadFollowedFeedPosts());
     // @ts-ignore

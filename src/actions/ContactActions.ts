@@ -14,6 +14,8 @@ export const ContactActions = {
         createAction(ActionTypes.UPDATE_CONTACT_STATE, { contact, updatedContact }),
     removeContact: (contact: Contact) =>
         createAction(ActionTypes.REMOVE_CONTACT, { contact }),
+    removeExpiredContacts: (currentDate?: number) =>
+        createAction(ActionTypes.REMOVE_EXPIRED_CONTACTS, { currentDate }),
     deleteAllContacts: () =>
         createAction(ActionTypes.DELETE_ALL_CONTACTS, {}),
     updateContactPrivateChannel: (contact: MutualContact, privateChannel: PrivateChannelSyncData) =>

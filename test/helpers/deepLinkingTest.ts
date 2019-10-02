@@ -1,6 +1,7 @@
 import { getInviteLink, getInviteCodeFromInviteLink } from '../../src/helpers/deepLinking';
 import { InvitedContact } from '../../src/models/Contact';
 import { HexString } from '../../src/helpers/opaqueTypes';
+import { CONTACT_EXPIRY_THRESHOLD } from '../../src/helpers/contactHelpers';
 
 test('invite link encoding and decoding', () => {
     const randomSeed = '755c77b5753fd526605c532dd07e46fb3cdd7d13a244eab1de871fc8e8250653' as HexString;
@@ -15,10 +16,27 @@ test('invite link encoding and decoding', () => {
         contactIdentity,
         createdAt: 0,
     };
+
     const inviteLink = getInviteLink(invitedContact, 'testName');
     const inviteCode = getInviteCodeFromInviteLink(inviteLink);
 
     expect(inviteCode).not.toBeUndefined();
     expect(inviteCode!.randomSeed).toEqual(randomSeed);
     expect(inviteCode!.contactPublicKey).toEqual(contactIdentity.publicKey);
+    expect(inviteCode!.expiry).toEqual(invitedContact.createdAt + CONTACT_EXPIRY_THRESHOLD);
+});
+
+test('correct version 1 invite link can be parsed', () => {
+    const inviteLink = 'https://app.felfele.org/invite/1&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258&fff';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).not.toThrow();
+});
+
+test('invite link with unknown version throws error', () => {
+    const inviteLink = 'https://app.felfele.org/invite/2&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258&fff';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('unknown version');
+});
+
+test('invite link with less than 4 parameters throws error', () => {
+    const inviteLink = 'https://app.felfele.org/invite/1&7NWsGi+_Zad6oxtWcZnG6a3IDIg96aXzI59rGK08No8=&A0htzKYoCkSsjKbKMWhGTxYpWkSlf+uDiUILUXLbRLXO&1570552184258';
+    expect(() => getInviteCodeFromInviteLink(inviteLink)).toThrow('invalid parameters');
 });

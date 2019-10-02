@@ -16,6 +16,7 @@ import { InviteCode } from '../../../models/InviteCode';
 import { generateSecureRandom } from '../../../helpers/secureRandom';
 import { PublicProfile } from '../../../models/Profile';
 import { createSwarmContactHelper } from '../../../helpers/swarmContactHelpers';
+import { DateUtils } from '../../../DateUtils';
 
 export interface StateProps {
     inviteCode: InviteCode;
@@ -30,7 +31,7 @@ export type Props = StateProps & DispatchProps;
 
 export const ContactConfirm = (props: Props) => {
     const imageWidth = Dimensions.get('window').width * 0.65;
-    const title = props.inviteCode.profileName != null ? props.inviteCode.profileName : 'Add contact';
+    const title = props.inviteCode.profileName;
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
     return (
         <FragmentSafeAreaViewWithoutTabBar>
@@ -60,7 +61,8 @@ export const ContactConfirm = (props: Props) => {
                     />
                 </View>
                 <RegularText style={{ textAlign: 'center', color: Colors.BROWNISH_GRAY }}>
-                    {`Connect with ${props.inviteCode.profileName}?`}
+                    {`Connect with ${props.inviteCode.profileName}?
+This link will expire in ${DateUtils.printableElapsedTime(props.inviteCode.expiry)}`}
                 </RegularText>
                 <TwoButton
                     leftButton={{
