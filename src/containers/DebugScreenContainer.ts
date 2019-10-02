@@ -45,9 +45,6 @@ const mapDispatchToProps = (dispatch: any): DispatchProps => {
         onRefreshFeeds: (feeds: Feed[]) => {
             dispatch(AsyncActions.downloadPostsFromFeeds(feeds));
         },
-        onAddPost: (post: Post) => {
-            dispatch(AsyncActions.createPost(post));
-        },
         onAddContact: (contact: MutualContact) => {
             dispatch(AsyncActions.addContact(contact));
         },

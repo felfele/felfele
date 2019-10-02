@@ -268,25 +268,6 @@ export const AsyncActions = {
             actions.map(action => dispatch(action));
         };
     },
-    createPost: (post: Post): Thunk => {
-        return async (dispatch, getState) => {
-            dispatch(Actions.removeDraft());
-            const { metadata, author } = getState();
-            post._id = metadata.highestSeenPostId + 1;
-            post.author = author;
-            dispatch(InternalActions.addPost(post));
-            dispatch(InternalActions.increaseHighestSeenPostId());
-            Debug.log('Post saved and synced, ', post._id);
-
-            const ownFeeds = getState().ownFeeds;
-            if (ownFeeds.length > 0) {
-                const localFeed = getState().ownFeeds[0];
-                if (localFeed.autoShare) {
-                    dispatch(AsyncActions.sharePost(post));
-                }
-            }
-        };
-    },
     removePost: (post: Post): Thunk => {
         return async (dispatch, getState) => {
             dispatch(Actions.deletePost(post));
@@ -311,6 +292,7 @@ export const AsyncActions = {
     shareWithContactFeeds: (originalPost: Post, contactFeeds: ContactFeed[]): Thunk => {
         return async (dispatch, getState) => {
             Debug.log('shareWithContactFeeds', originalPost);
+            dispatch(Actions.removeDraft());
             const { author } = getState();
             const identity = author.identity!;
             const postWithLinkMetaData = await createPostWithLinkMetaData(originalPost);
@@ -342,32 +324,6 @@ export const AsyncActions = {
             dispatch(AsyncActions.syncPrivatePostsWithContactFeeds(contactFeeds));
         };
     },
-    sharePost: (post: Post): Thunk => {
-        return async (dispatch, getState) => {
-            Debug.log('sharePost', 'post', post);
-            const author = getState().author;
-            if (post.author != null &&
-                post.author.identity != null &&
-                post.author.identity.publicKey === author.identity!.publicKey
-            ) {
-                dispatch(AsyncActions.shareOwnPost(post));
-            }
-            else {
-                dispatch(AsyncActions.shareOthersPost(post));
-            }
-        };
-    },
-    shareOthersPost: (post: Post): Thunk => {
-        return async (dispatch, getState) => {
-            const { metadata, author } = getState();
-            const id = metadata.highestSeenPostId + 1;
-            const newPost = copyPostWithReferences(post, author, id, undefined);
-
-            dispatch(InternalActions.addPost(newPost));
-            dispatch(InternalActions.increaseHighestSeenPostId());
-            dispatch(AsyncActions.shareOwnPost(newPost));
-        };
-    },
     createOwnFeed: (): Thunk => {
         return async (dispatch, getState) => {
             const identity = getState().author.identity!;
@@ -389,22 +345,6 @@ export const AsyncActions = {
             };
             dispatch(InternalActions.addOwnFeed(ownFeed));
             dispatch(AsyncActions.syncLocalFeed(ownFeed));
-        };
-    },
-    shareOwnPost: (post: Post): Thunk => {
-        return async (dispatch, getState) => {
-            if (getState().ownFeeds[0] == null) {
-                await dispatch(AsyncActions.createOwnFeed());
-            }
-            const localFeed = getState().ownFeeds[0];
-            dispatch(Actions.updatePostIsUploading(post, true));
-
-            const updatedPostCommandLog = shareNewPost(post, '', localFeed.postCommandLog);
-            dispatch(Actions.updateOwnFeed({
-                ...localFeed,
-                postCommandLog: updatedPostCommandLog,
-            }));
-            dispatch(AsyncActions.syncLocalFeed(localFeed));
         };
     },
     syncLocalFeed: (feed: LocalFeed): Thunk => {
