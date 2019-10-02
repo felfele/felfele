@@ -18,7 +18,7 @@ import { TouchableView } from '../../../components/TouchableView';
 import { isContactFeed } from '../../../helpers/feedHelpers';
 
 export interface DispatchProps {
-    onDoneSharing: (navigateTo?: () => void) => void;
+    onDoneSharing: (feeds: Feed[]) => void;
     onShareWithContacts: (post: Post, feed: Feed[]) => void;
 }
 
@@ -149,22 +149,6 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
             isSending: true,
         });
         this.props.onShareWithContacts(this.props.post, this.state.selectedFeeds);
-        this.props.onDoneSharing(() => {
-            const feed = this.state.selectedFeeds[0];
-            if (this.state.selectedFeeds.length === 1) {
-                if (isContactFeed(feed)) {
-                    this.props.navigation.navigate('ContactView', {
-                        publicKey: feed.contact.identity.publicKey,
-                    });
-                } else {
-                    this.props.navigation.navigate('Feed', {
-                        feedUrl: feed.feedUrl,
-                        name: feed.name,
-                    });
-                }
-            } else {
-                this.props.navigation.popToTop();
-            }
-        });
+        this.props.onDoneSharing(this.state.selectedFeeds);
     }
 }

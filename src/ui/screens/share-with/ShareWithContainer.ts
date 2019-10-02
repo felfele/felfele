@@ -38,13 +38,23 @@ const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedNavigati
             const contactFeeds = feeds.filter(isContactFeed);
             dispatch(AsyncActions.shareWithContactFeeds(post, contactFeeds));
         },
-        onDoneSharing: (navigateTo?: () => void) => {
+        onDoneSharing: (feeds: Feed[]) => {
             const onDoneSharing = ownProps.navigation.getParam<'ShareWithContainer', 'onDoneSharing'>('onDoneSharing');
             if (onDoneSharing != null) {
                 onDoneSharing();
             }
-            if (navigateTo != null) {
-                navigateTo();
+            const feed = feeds[0];
+            if (feeds.length === 1) {
+                if (isContactFeed(feed)) {
+                    ownProps.navigation.navigate('ContactView', {
+                        publicKey: feed.contact.identity.publicKey,
+                    });
+                } else {
+                    ownProps.navigation.navigate('Feed', {
+                        feedUrl: feed.feedUrl,
+                        name: feed.name,
+                    });
+                }
             } else {
                 ownProps.navigation.popToTop();
             }
