@@ -272,7 +272,10 @@ export class PostEditor extends React.Component<Props, State> {
     }
 
     private sendUpdate = async () => {
-        this.props.onPost(this.state.post);
+        this.props.onPost({
+            ...this.state.post,
+            createdAt: Date.now(),
+        });
     }
 }
 
