@@ -2083,7 +2083,7 @@
 		9A5BB8172344F4170076D88B /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
 				BUNDLE_SUFFIX = Beta;
 				CODE_SIGN_ENTITLEMENTS = Felfele/Felfele.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
