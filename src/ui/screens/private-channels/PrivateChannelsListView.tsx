@@ -7,15 +7,16 @@ import { ContactGrid } from '../contact/ContactGrid';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ComponentColors } from '../../../styles';
 import { WideButton } from '../../buttons/WideButton';
+import { Feed } from '../../../models/Feed';
 
 export interface DispatchProps {
-    onPressChannel: (feed: ContactFeed) => void;
+    onPressChannel: (feed: ContactFeed | Feed) => void;
     onAddChannel: () => void;
 }
 
 export interface FeedSection {
     title?: string;
-    data: ContactFeed[];
+    data: Array<Feed | ContactFeed>;
 }
 
 export interface StateProps {

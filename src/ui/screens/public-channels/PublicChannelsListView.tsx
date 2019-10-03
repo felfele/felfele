@@ -15,21 +15,20 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../../ui/misc/FragmentSafeAreaView';
 import { TwoButton } from '../../../ui/buttons/TwoButton';
 import { getFeedImage } from '../../../helpers/feedHelpers';
-import { ContactFeed } from '../../../models/ContactFeed';
 
 export interface DispatchProps {
-    onPressFeed: (feed: ContactFeed) => void;
+    onPressFeed: (feed: Feed) => void;
     openExplore: () => void;
 }
 
-export interface FeedSection {
+export interface PublicFeedSection {
     title?: string;
-    data: ContactFeed[];
+    data: Feed[];
 }
 
 export interface StateProps {
     navigation: TypedNavigation;
-    sections: FeedSection[];
+    sections: PublicFeedSection[];
     gatewayAddress: string;
     title: string;
     showExplore: boolean;

@@ -4,31 +4,27 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { ContactFeed } from '../../../models/ContactFeed';
 import { TypedNavigation } from '../../../helpers/navigation';
-import { FragmentSafeAreaViewWithoutTabBar, FragmentSafeAreaViewForTabBar } from '../../misc/FragmentSafeAreaView';
+import { FragmentSafeAreaViewForTabBar } from '../../misc/FragmentSafeAreaView';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import {
     ContactGrid,
-    StateProps as ContactGridStateProps,
-    DispatchProps as ContactGridDispatchProps,
 } from '../contact/ContactGrid';
 import { Post } from '../../../models/Post';
 import { removeFromArray } from '../../../helpers/immutable';
-import { WideButton } from '../../buttons/WideButton';
 import { Colors, ComponentColors } from '../../../styles';
-import { highestSeenLogicalTime } from '../../../protocols/timeline';
-import { Debug } from '../../../Debug';
 import { Feed } from '../../../models/Feed';
 import { RegularText, MediumText } from '../../misc/text';
 import { TouchableView } from '../../../components/TouchableView';
+import { isContactFeed } from '../../../helpers/feedHelpers';
 
 export interface DispatchProps {
-    onDoneSharing: () => void;
+    onDoneSharing: (feeds: Feed[]) => void;
     onShareWithContacts: (post: Post, feed: Feed[]) => void;
 }
 
 export interface FeedSection {
     title?: string;
-    data: ContactFeed[];
+    data: Array<Feed | ContactFeed>;
 }
 
 export interface StateProps {
@@ -153,6 +149,6 @@ export class ShareWithScreen extends React.Component<DispatchProps & StateProps,
             isSending: true,
         });
         this.props.onShareWithContacts(this.props.post, this.state.selectedFeeds);
-        this.props.onDoneSharing();
+        this.props.onDoneSharing(this.state.selectedFeeds);
     }
 }

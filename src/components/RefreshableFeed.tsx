@@ -14,15 +14,16 @@ import { Props as FeedHeaderProps } from './FeedHeader';
 import { ModelHelper } from '../models/ModelHelper';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';
+import { ContactFeed } from '../models/ContactFeed';
 
 export interface DispatchProps {
-    onRefreshPosts: (feeds: Feed[]) => void;
+    onRefreshPosts: (feeds: Array<Feed | ContactFeed>) => void;
 }
 
 export interface StateProps {
     navigation: TypedNavigation;
     posts: Post[];
-    feeds: Feed[];
+    feeds: Array<Feed | ContactFeed>;
     modelHelper: ModelHelper;
     children: {
         // WARNING, type parameter included for reference, but it does not typecheck

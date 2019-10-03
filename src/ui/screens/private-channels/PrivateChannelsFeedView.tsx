@@ -1,19 +1,14 @@
 import * as React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Feed } from '../../../models/Feed';
 import { Post } from '../../../models/Post';
-import { RefreshableFeed } from '../../../components/RefreshableFeed';
+import { RefreshableFeed, DispatchProps } from '../../../components/RefreshableFeed';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { Colors, ComponentColors } from '../../../styles';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { PlaceholderCard } from '../../misc/PlaceholderCard';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { ContactFeed } from '../../../models/ContactFeed';
-
-export interface DispatchProps {
-    onRefreshPosts: (feeds: ContactFeed[]) => void;
-}
 
 export interface StateProps {
     navigation: TypedNavigation;

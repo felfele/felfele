@@ -30,8 +30,15 @@ import { Feed } from '../models/Feed';
 import { DEFAULT_AUTHOR_NAME } from '../reducers/defaultData';
 import { TypedNavigation } from '../helpers/navigation';
 import { ContactFeed } from '../models/ContactFeed';
+import { isContactFeed } from '../helpers/feedHelpers';
 
-export interface AuthorFeed extends ContactFeed {
+export type AuthorFeed = UIFeed | UIContactFeed;
+
+export interface UIFeed extends Feed {
+    isKnownFeed: boolean;
+}
+
+export interface UIContactFeed extends ContactFeed {
     isKnownFeed: boolean;
 }
 
@@ -110,9 +117,9 @@ const CardBody = (props: {
     const authorFeed = props.authorFeed;
     const cardTopOnPress = authorFeed != null
         ? authorFeed.isKnownFeed
-            ? authorFeed.contact != null
+            ? isContactFeed(authorFeed)
                 ? () => props.navigation.navigate('ContactView', {
-                    publicKey: authorFeed.contact!.identity.publicKey,
+                    publicKey: authorFeed.contact.identity.publicKey,
                 })
                 : () => props.navigation.navigate('Feed', {
                     feedUrl: authorFeed.feedUrl,
