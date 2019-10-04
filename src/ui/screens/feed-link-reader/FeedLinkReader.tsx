@@ -91,16 +91,19 @@ export class FeedLinkReader extends React.Component<Props, State> {
         Debug.log('FeedLinkReader.processLink', 'this.state', this.state, 'link', link);
         if (isInviteLink(link) === false) {
             this.props.navigation.replace('RSSFeedLoader', { feedUrl: link });
-        }
-        try {
-            const inviteCode = getInviteCodeFromInviteLink(link);
-            if (inviteCode != null && isInvitationValid(inviteCode.expiry)) {
-                this.props.navigation.replace('ContactConfirm', { inviteCode });
+        } else {
+            try {
+                const inviteCode = getInviteCodeFromInviteLink(link);
+                if (inviteCode != null && isInvitationValid(inviteCode.expiry)) {
+                    this.props.navigation.replace('ContactConfirm', { inviteCode });
+                } else {
+                    this.showExpiredLinkAlert();
+                }
+            } catch (e) {
+                Debug.log('FeedLinkReader.handleLink', e);
+                this.showExpiredLinkAlert();
             }
-        } catch (e) {
-            Debug.log('FeedLinkReader.handleLink', e);
         }
-        this.showExpiredLinkAlert();
     }
 
     private showExpiredLinkAlert() {
