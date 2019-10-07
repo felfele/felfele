@@ -13,7 +13,6 @@ import { AsyncImagePicker } from '../../../AsyncImagePicker';
 import { Colors, ComponentColors } from '../../../styles';
 import { DispatchProps as ContactScreenDispatchProps } from '../profile/ContactScreen';
 import { TouchableView } from '../../../components/TouchableView';
-import { defaultImages } from '../../../defaultImages';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';
@@ -21,10 +20,18 @@ import { RegularText } from '../../misc/text';
 import { TypedNavigation } from '../../../helpers/navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { defaultAuthor } from '../../../reducers/defaultData';
-import { getDefaultUserImage } from '../../../defaultUserImage';
+import { getFallbackUserImage } from '../../../defaultUserImage';
 import { getImageSource } from '../../../helpers/imageDataHelpers';
+import { PrivateIdentity } from '../../../models/Identity';
+import * as Swarm from '../../../swarm/Swarm';
+import { generateSecureRandom } from '../../../helpers/secureRandom';
 
-export type CreateUserCallback = (name: string, image: ImageData, navigation: TypedNavigation) => void;
+export type CreateUserCallback = (
+    name: string,
+    image: ImageData,
+    navigation: TypedNavigation,
+    identity?: PrivateIdentity,
+) => void;
 
 export interface DispatchProps extends ContactScreenDispatchProps {
     onCreateUser: CreateUserCallback;
@@ -40,8 +47,18 @@ type Props = DispatchProps & StateProps;
 
 export const ProfileScreen = (props: Props) => {
     const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImage = getImageSource(props.author.image, modelHelper, defaultImages.defaultUser);
+    const authorImage = getImageSource(props.author.image, modelHelper);
     const isFormFilled = props.author.name !== '' && props.author.name !== defaultAuthor.name;
+    const [ identity, setIdentity ] = React.useState<PrivateIdentity | undefined>(undefined);
+    React.useEffect(() => {
+        Swarm.generateSecureIdentity(generateSecureRandom).then(value => {
+            setIdentity(value);
+            getFallbackUserImage(value.publicKey).then(image => {
+                props.onUpdatePicture(image);
+            });
+        });
+    }, []);
+
     return (
         <Page
             backgroundColor={ComponentColors.BACKGROUND_COLOR}
@@ -53,7 +70,7 @@ export const ProfileScreen = (props: Props) => {
             rightButton={{
                 label: 'DONE',
                 disabled: !isFormFilled,
-                onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser),
+                onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser, identity),
                 alignItems: 'flex-end',
             }}
         >
@@ -106,17 +123,18 @@ export const ProfileScreen = (props: Props) => {
     );
 };
 
-export const onDoneCreatingProfile = async (author: Author, navigation: TypedNavigation, onCreateUser: CreateUserCallback) => {
+export const onDoneCreatingProfile = async (author: Author, navigation: TypedNavigation, onCreateUser: CreateUserCallback, identity?: PrivateIdentity) => {
     onCreateUser(
         author.name !== ''
             ? author.name
             : defaultAuthor.name
         ,
-        author.image.uri !== ''
+        author.image.uri !== '' || author.image.localPath !== ''
             ? author.image
-            : await getDefaultUserImage()
+            : await getFallbackUserImage(author.identity!.publicKey)
         ,
         navigation,
+        identity,
     );
 };
 

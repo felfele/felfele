@@ -1,6 +1,5 @@
 // @ts-ignore
 import FSStorage from 'redux-persist-fs-storage';
-// @ts-ignore
 import * as RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
@@ -24,9 +23,11 @@ import { getLegacyAppState } from './legacyAsyncStorage';
 // This is not very nice, but it's initialized at app startup
 export let persistConfig: FelfelePersistConfig;
 
+export const APP_GROUP = 'group.app.felfele';
+
 const getStorageEngine = async () => {
     return Platform.OS === 'ios'
-        ? await RNFS.pathForGroup('group.app.felfele').then((folder: any) => FSStorage(folder))
+        ? await RNFS.pathForGroup(APP_GROUP).then((folder: any) => FSStorage(folder))
         : FSStorage();
 };
 

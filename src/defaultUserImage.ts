@@ -1,8 +1,13 @@
-// @ts-ignore
 import * as RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
 
 import { ImageData } from './models/ImageData';
+import { byteArrayToHex } from './helpers/conversion';
+import { keccak256 } from 'js-sha3';
+// @ts-ignore
+import Identicon from 'identicon.js';
+import { Debug } from './Debug';
+import { APP_GROUP } from './store';
 
 const USER_IMAGE_ASSET_DIR = 'custom';
 const USER_IMAGE_NAME = 'defaultuser.png';
@@ -27,4 +32,26 @@ export const getDefaultUserImage = async (): Promise<ImageData> => {
     } else {
         throw new Error('unsupported platform: ' + Platform.OS);
     }
+};
+
+export const getFallbackUserImage = async (publicKey: string): Promise<ImageData> => {
+    const pathForGroup = await RNFS.pathForGroup(APP_GROUP);
+    const userImagePath = `${FILE_PROTOCOL}${pathForGroup}/${publicKey}.png`;
+    if (!await RNFS.exists(userImagePath)) {
+        try {
+            await RNFS.writeFile(userImagePath, createUserImage(publicKey), 'base64');
+            const exists = await RNFS.exists(userImagePath);
+            Debug.log('exists', userImagePath, exists);
+        } catch (e) {
+            Debug.log('error', userImagePath, e);
+        }
+    }
+    return {
+        localPath: userImagePath,
+    };
+};
+
+const createUserImage = (publicKey: string): string => {
+    const identiconHash = byteArrayToHex(keccak256.array(publicKey), false);
+    return new Identicon(identiconHash, { size: 512, margin: 0.2 }).toString();
 };
