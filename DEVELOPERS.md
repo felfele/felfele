@@ -63,3 +63,27 @@ Then start the packager as normal.
 It is iOS only for now.
 
 `npm run e2e:ios`
+
+## Build configurations
+
+There are four build configuration on iOS:
+- Release: production version, this builds the Felfele app
+- Debug: debug version
+- BetaRelease: test app with different app group, this builds the FelfeleBeta app
+- BetaDebug: debug version of test app with different app group
+
+For example running the BetaDebug version locally:
+
+`npm run ios -- --simulator "iPhone 11" --scheme FelfeleBeta --configuration BetaDebug`
+
+## Build beta version
+
+Increase build number:
+
+`./scripts/increase_build_number.sh`
+
+Make a beta archive
+
+`./scripts/build_xcode_archive.sh FelfeleBeta archive`
+
+Upload with XCode Organizer to the App Store

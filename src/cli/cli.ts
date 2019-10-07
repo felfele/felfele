@@ -1,6 +1,6 @@
 import { keccak256 } from 'js-sha3';
 
-import { Version } from '../Version';
+import { Version, BuildNumber } from '../Version';
 import { apiTests } from '../social/apiTest';
 import { syncTests } from '../social/syncTest';
 import * as Swarm from '../swarm/Swarm';
@@ -46,6 +46,8 @@ const definitions =
     addOption('-n, --no-colors', 'no colors in output', () => Debug.useColors = false)
     .
     addCommand('version', 'Print app version', () => output(Version))
+    .
+    addCommand('buildNumber', 'Print app build number', () => output(BuildNumber))
     .
     addCommand('test [name]', 'Run integration tests', async (testName) => {
             const allTests: any = {
