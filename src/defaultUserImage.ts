@@ -41,7 +41,7 @@ export const getFallbackUserImage = async (publicKey: string): Promise<ImageData
         try {
             await RNFS.writeFile(userImagePath, createUserImage(publicKey), 'base64');
         } catch (e) {
-            Debug.log('error', userImagePath, e);
+            Debug.log('getFallbackUserImage', userImagePath, e);
         }
     }
     return {
