@@ -20,14 +20,24 @@ import { appStateReducer } from '../reducers';
 import { defaultState } from '../reducers/defaultData';
 import { Actions } from '../actions/Actions';
 import { getLegacyAppState } from './legacyAsyncStorage';
+import { getAppGroup } from '../BuildEnvironment';
+import { Debug } from '../Debug';
 
 // This is not very nice, but it's initialized at app startup
 export let persistConfig: FelfelePersistConfig;
 
+const getIOSStorageEngine = async () => {
+    const group = getAppGroup();
+    const path = await RNFS.pathForGroup(group);
+    Debug.log('getIOSStorageEngine', {group, path});
+    return FSStorage(path);
+};
+
 const getStorageEngine = async () => {
     return Platform.OS === 'ios'
-        ? await RNFS.pathForGroup('group.app.felfele').then((folder: any) => FSStorage(folder))
-        : FSStorage();
+        ? getIOSStorageEngine()
+        : FSStorage()
+    ;
 };
 
 class FelfelePersistConfig implements PersistConfig {

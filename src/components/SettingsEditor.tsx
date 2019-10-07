@@ -13,6 +13,7 @@ import { TabBarPlaceholder } from '../ui/misc/TabBarPlaceholder';
 import { TypedNavigation } from '../helpers/navigation';
 import { FragmentSafeAreaViewForTabBar } from '../ui/misc/FragmentSafeAreaView';
 import { TouchableView } from './TouchableView';
+import { getBuildEnvironment } from '../BuildEnvironment';
 
 export interface StateProps {
     navigation: TypedNavigation;
@@ -29,11 +30,14 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 export const SettingsEditor = (props: Props) => {
-    const buildNumber = props.settings.showDebugMenu
-        ? ` (Build number ${BuildNumber})`
+    const spacePrefix = (s: string) => s !== '' ? ' ' + s : '';
+    const buildEnvironment = spacePrefix(getBuildEnvironment());
+    const buildNumber = ` (Build number ${BuildNumber})`;
+    const buildInfo = props.settings.showDebugMenu
+        ? buildNumber
         : ''
     ;
-    const version = 'Version: ' + Version + buildNumber;
+    const version = 'Version: ' + Version + buildEnvironment + buildInfo;
     return (
         <FragmentSafeAreaViewForTabBar>
             <NavigationHeader

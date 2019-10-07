@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -41,6 +40,8 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		9433A2A9637C4EE1BD8F70B7 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64CDFEF29F854BA190B5DE2C /* TSBackgroundFetch.framework */; };
 		9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD9E60E512304A688F30EDBD /* libRCTImageResizer.a */; };
+		9A5BB95F2345E15E0076D88B /* RNConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5BB95E2345E15E0076D88B /* RNConfig.m */; };
+		9A5BB9602345E15E0076D88B /* RNConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5BB95E2345E15E0076D88B /* RNConfig.m */; };
 		9A7D87B8218D043D0046F42B /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D879B218CD6550046F42B /* libRNCamera.a */; };
 		9A8C5D062188B2D10011F13D /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D032188B2930011F13D /* libRNRandomBytes.a */; };
 		9AE6B77922565DAB00BF8A2C /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE6B74D22565D8A00BF8A2C /* libRCTPushNotification.a */; };
@@ -584,6 +585,8 @@
 		7F1F9D8F2F5A4B92B714734E /* RCTRestart.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTRestart.xcodeproj; path = "../node_modules/react-native-restart/ios/RCTRestart.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
+		9A5BB9232345E1070076D88B /* RNConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNConfig.h; sourceTree = "<group>"; };
+		9A5BB95E2345E15E0076D88B /* RNConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNConfig.m; path = Felfele/RNConfig.m; sourceTree = "<group>"; };
 		9A8C5CFD2188B2920011F13D /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
 		9AE6B73B22565D8900BF8A2C /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		9AFF87D51F448F6F0033DA0B /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
@@ -790,6 +793,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				BC07DDEB2269C80F00A4200A /* Launch Screen.storyboard */,
 				03A1795D212C40C39F390FC8 /* RNBackgroundFetch+AppDelegate.m */,
+				9A5BB9232345E1070076D88B /* RNConfig.h */,
+				9A5BB95E2345E15E0076D88B /* RNConfig.m */,
 			);
 			name = Felfele;
 			sourceTree = "<group>";
@@ -1791,7 +1796,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export DEVELOPMENT_BUILD_CONFIGURATIONS=\"+(Debug)\"\nexport NODE_BINARY=node\n../node_modules/react-native-schemes-manager/lib/react-native-xcode.sh";
+			shellScript = "export DEVELOPMENT_BUILD_CONFIGURATIONS=\"+(BetaDebug|Debug)\"\nexport NODE_BINARY=node\n../node_modules/react-native-schemes-manager/lib/react-native-xcode.sh";
 		};
 		BC524C1122D36A5300879B0E /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1821,6 +1826,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				576DE1F77EAC47C9AD8F17F4 /* RNBackgroundFetch+AppDelegate.m in Sources */,
+				9A5BB95F2345E15E0076D88B /* RNConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1829,6 +1835,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC524AE822CF3F3F00879B0E /* Share.m in Sources */,
+				9A5BB9602345E15E0076D88B /* RNConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1857,10 +1864,10 @@
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				BUNDLE_SUFFIX = "";
 				CODE_SIGN_ENTITLEMENTS = Felfele/Felfele.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = NO;
@@ -1910,8 +1917,8 @@
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				BUNDLE_SUFFIX = "";
 				CODE_SIGN_ENTITLEMENTS = Felfele/Felfele.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2042,10 +2049,11 @@
 			};
 			name = Release;
 		};
-		9A5BB8162344F4170076D88B /* Beta */ = {
+		9A5BB8162344F4170076D88B /* BetaRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_SUFFIX = Beta;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -2078,13 +2086,13 @@
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Beta;
+			name = BetaRelease;
 		};
-		9A5BB8172344F4170076D88B /* Beta */ = {
+		9A5BB8172344F4170076D88B /* BetaRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
-				BUNDLE_SUFFIX = Beta;
 				CODE_SIGN_ENTITLEMENTS = Felfele/Felfele.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2130,11 +2138,12 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Beta;
+			name = BetaRelease;
 		};
-		9A5BB8182344F4170076D88B /* Beta */ = {
+		9A5BB8182344F4170076D88B /* BetaRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2174,11 +2183,156 @@
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Beta;
+			name = BetaRelease;
+		};
+		9A5BB981234641640076D88B /* BetaDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_SUFFIX = Beta;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = BetaDebug;
+		};
+		9A5BB982234641640076D88B /* BetaDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
+				CODE_SIGN_ENTITLEMENTS = Felfele/Felfele.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = L28HZC6MAV;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
+					"$(SRCROOT)/../node_modules/react-native-image-picker/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-securerandom/ios",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-image-resizer/ios/RCTImageResizer",
+					"$(SRCROOT)/../node_modules/react-native-restart/ios/RCTRestart/**",
+					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
+					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
+					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
+					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
+				);
+				INFOPLIST_FILE = Felfele/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Felfele\"",
+					"\"$(SRCROOT)/Felfele\"",
+					"\"$(SRCROOT)/Felfele\"",
+					"\"$(SRCROOT)/Felfele\"",
+					"\"$(SRCROOT)/Felfele\"",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.felfele.mobile.FelfeleBeta;
+				PRODUCT_NAME = "Felfele$(BUNDLE_SUFFIX)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = BetaDebug;
+		};
+		9A5BB983234641640076D88B /* BetaDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Share/Share.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L28HZC6MAV;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../node_modules/react-native-share-extension/ios/**",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
+				);
+				INFOPLIST_FILE = Share/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.felfele.mobile.FelfeleBeta.Share;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = BetaDebug;
 		};
 		BC524AAB22CF3EF500879B0E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2223,6 +2377,7 @@
 		BC524AAC22CF3EF500879B0E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP = "group.app.felfele$(BUNDLE_SUFFIX)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2271,8 +2426,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
+				9A5BB982234641640076D88B /* BetaDebug */,
 				13B07F951A680F5B00A75B9A /* Release */,
-				9A5BB8172344F4170076D88B /* Beta */,
+				9A5BB8172344F4170076D88B /* BetaRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2281,8 +2437,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
+				9A5BB981234641640076D88B /* BetaDebug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
-				9A5BB8162344F4170076D88B /* Beta */,
+				9A5BB8162344F4170076D88B /* BetaRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2291,8 +2448,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC524AAB22CF3EF500879B0E /* Debug */,
+				9A5BB983234641640076D88B /* BetaDebug */,
 				BC524AAC22CF3EF500879B0E /* Release */,
-				9A5BB8182344F4170076D88B /* Beta */,
+				9A5BB8182344F4170076D88B /* BetaRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

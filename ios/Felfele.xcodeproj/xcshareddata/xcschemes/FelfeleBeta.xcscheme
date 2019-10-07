@@ -78,7 +78,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Beta"
+      buildConfiguration = "BetaDebug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -119,7 +119,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Beta"
+      buildConfiguration = "BetaRelease"
       customArchiveName = "FelfeleBeta"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>

@@ -147,10 +147,8 @@
     }
   },
   "xcodeSchemes": {
-    "Release": [
-      "Beta"
-    ],
-    "Debug": [],
+    "Release": ["BetaRelease"],
+    "Debug": ["BetaDebug"],
     "projectDirectory": "ios"
   }
 }
