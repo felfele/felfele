@@ -1,11 +1,12 @@
 #!/bin/bash -e
 
+SCHEME=Felfele
 TARGET=archive
 if [ "$1" != "" ]; then
+    SCHEME="$1"
+    shift
     TARGET="$*"
 fi
 
-cd ios
 # shellcheck disable=SC2086
-xcodebuild -allowProvisioningUpdates -quiet -scheme Felfele $TARGET
-cd ..
+(cd ios && xcodebuild -allowProvisioningUpdates -quiet -scheme $SCHEME $TARGET)
