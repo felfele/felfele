@@ -76,3 +76,14 @@ For example running the BetaDebug version locally:
 
 `npm run ios -- --simulator "iPhone 11" --scheme FelfeleBeta --configuration BetaDebug`
 
+## Build beta version
+
+Increase build number:
+
+`./scripts/increase_build_number.sh`
+
+Make a beta archive
+
+`./scripts/build_xcode_archive.sh FelfeleBeta archive`
+
+Upload with XCode Organizer to the App Store
