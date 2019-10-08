@@ -42,8 +42,6 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		9433A2A9637C4EE1BD8F70B7 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64CDFEF29F854BA190B5DE2C /* TSBackgroundFetch.framework */; };
 		9721902B3A25482C954DB20F /* libRCTImageResizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD9E60E512304A688F30EDBD /* libRCTImageResizer.a */; };
-		9A5BB95F2345E15E0076D88B /* RNConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5BB95E2345E15E0076D88B /* RNConfig.m */; };
-		9A5BB9602345E15E0076D88B /* RNConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5BB95E2345E15E0076D88B /* RNConfig.m */; };
 		9A7D87B8218D043D0046F42B /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7D879B218CD6550046F42B /* libRNCamera.a */; };
 		9A8C5D062188B2D10011F13D /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A8C5D032188B2930011F13D /* libRNRandomBytes.a */; };
 		9ADF053A234C9D6600C4CDB8 /* libRNBuildConfig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ADF0528234C965E00C4CDB8 /* libRNBuildConfig.a */; };
@@ -597,8 +595,6 @@
 		7F1F9D8F2F5A4B92B714734E /* RCTRestart.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTRestart.xcodeproj; path = "../node_modules/react-native-restart/ios/RCTRestart.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8883D7EBD0E5420DAA3180F4 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
-		9A5BB9232345E1070076D88B /* RNConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNConfig.h; sourceTree = "<group>"; };
-		9A5BB95E2345E15E0076D88B /* RNConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNConfig.m; path = Felfele/RNConfig.m; sourceTree = "<group>"; };
 		9A8C5CFD2188B2920011F13D /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
 		9AE6B73B22565D8900BF8A2C /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		9AFF87D51F448F6F0033DA0B /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
@@ -807,8 +803,6 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				BC07DDEB2269C80F00A4200A /* Launch Screen.storyboard */,
 				03A1795D212C40C39F390FC8 /* RNBackgroundFetch+AppDelegate.m */,
-				9A5BB9232345E1070076D88B /* RNConfig.h */,
-				9A5BB95E2345E15E0076D88B /* RNConfig.m */,
 			);
 			name = Felfele;
 			sourceTree = "<group>";
@@ -1861,7 +1855,6 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				576DE1F77EAC47C9AD8F17F4 /* RNBackgroundFetch+AppDelegate.m in Sources */,
-				9A5BB95F2345E15E0076D88B /* RNConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1870,7 +1863,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC524AE822CF3F3F00879B0E /* Share.m in Sources */,
-				9A5BB9602345E15E0076D88B /* RNConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
