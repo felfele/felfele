@@ -1,2 +1,2 @@
 export const Version = '1.0.7';
-export const BuildNumber = '22';
+export const BuildNumber = '23';
