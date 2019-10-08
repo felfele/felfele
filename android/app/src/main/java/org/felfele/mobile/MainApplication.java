@@ -39,7 +39,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
-            new RNBuildConfigPackage(),
+        new RNBuildConfigPackage(BuildConfig.class),
         new AsyncStoragePackage(),
         new RNBackgroundFetchPackage(),
         new ReactNativePushNotificationPackage(),
