@@ -24,11 +24,17 @@ npm run check
 output "Increasing the build number..."
 ./scripts/increase_build_number.sh
 
+output "Determining the version number..."
+version="$(./scripts/cli.sh version)"
+output "Version: $version"
+
 output "Determining the build number..."
 build="$(./scripts/cli.sh buildNumber)"
 output "Build number: $build"
 
-release_branch="build-$build"
+tag="beta-$version-$build"
+
+release_branch="beta-$version-$build"
 git checkout -b "$release_branch"
 output "Commit and push changes to the repo"
 commit_message="Bumped build number to $build"
@@ -40,3 +46,11 @@ output "Build the iOS version with XCode for archive..."
 ask "Upload the build to the App Store"
 
 ask "In AppstoreConnect provide the crypto information to enable the new build"
+
+output "Tagging the git release with $tag..."
+./scripts/git_tag.sh "$tag"
+
+output "Updating the git release branch with to the master..."
+./scripts/git_update_branch.sh "$release_branch" "beta"
+
+ask "Merge the release branch to master on Github"
