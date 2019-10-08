@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>AppGroup</key>
+	<string>$(APP_GROUP)</string>
+	<key>BuildEnvironment</key>
+	<string>$(BUNDLE_SUFFIX)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Felfele</string>
 	<key>CFBundleExecutable</key>
@@ -29,7 +33,7 @@
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
 				<integer>1</integer>
 				<key>NSExtensionActivationSupportsText</key>
-				<true />
+				<true/>
 			</dict>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>
@@ -51,24 +55,24 @@
 			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>swarm.felfele.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>swarm.helmethair.co</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>tumblr.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 				<key>NSIncludesSubdomains</key>
-				<true />
+				<true/>
 			</dict>
 		</dict>
 	</dict>
