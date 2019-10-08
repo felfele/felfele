@@ -1,19 +1,17 @@
-import { NativeModules } from 'react-native';
+import BuildConfig from 'react-native-build-config';
 
 export const DEFAULT_BUILD_ENVIRONMENT = '';
 
 export const getBuildEnvironment = (): string => {
-    const RNConfig = NativeModules.RNConfig;
-    return RNConfig != null
-        ? RNConfig.buildEnvironment
+    return BuildConfig != null
+        ? BuildConfig.BuildEnvironment
         : DEFAULT_BUILD_ENVIRONMENT
     ;
 };
 
 export const getAppGroup = (): string => {
-    const RNConfig = NativeModules.RNConfig;
-    return RNConfig != null
-        ? RNConfig.appGroup
+    return BuildConfig != null
+        ? BuildConfig.AppGroup
         : ''
     ;
 };
