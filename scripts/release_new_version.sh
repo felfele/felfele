@@ -55,11 +55,12 @@ ask "Upload the build to the Play Store"
 
 ask "Download the released versions and do manual QA (both android and iOS)"
 
-output "Tagging the git release with v$version..."
-./scripts/git_tag_release.sh "$version"
+tag="v$version"
+output "Tagging the git release with $tag..."
+./scripts/git_tag.sh "$tag"
 
 output "Updating the git release branch with to the master..."
-./scripts/git_update_release_branch.sh "$release_branch"
+./scripts/git_update_branch.sh "$release_branch" "release"
 
 ask "Merge the release branch to master on Github"
 
