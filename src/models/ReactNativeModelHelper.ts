@@ -30,7 +30,7 @@ export class ReactNativeModelHelper implements ModelHelper {
             return getSwarmGatewayUrl(image.uri, this.gatewayAddress);
         }
         if (image.data != null) {
-            return `data:image/gif;base64,${image.data}`;
+            return `data:image/png;base64,${image.data}`;
         }
         return '';
     }
