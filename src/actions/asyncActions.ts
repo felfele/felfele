@@ -72,6 +72,8 @@ import {
     privateChannelRemovePost,
 } from '../protocols/privateChannel';
 import { uploadImage as swarmStorageUploadImage } from '../swarm-social/swarmStorage';
+import { generateUnsecureRandomHexString } from '../helpers/unsecureRandom';
+import { copyImageToApp } from '../defaultUserImage';
 
 export const AsyncActions = {
     addFeed: (feed: Feed): Thunk => {
@@ -492,8 +494,11 @@ export const AsyncActions = {
             }
         };
     },
-    updateProfileImage: (image: ImageData): Thunk => {
+    updateProfileImage: (originalImage: ImageData): Thunk => {
         return async (dispatch, getState) => {
+            const image = {
+                localPath: await copyImageToApp(originalImage, `${generateUnsecureRandomHexString(8)}.png`),
+            };
             dispatch(InternalActions.updateAuthorImage(image));
             if (getState().ownFeeds.length > 0) {
                 const ownFeed = getState().ownFeeds[0];

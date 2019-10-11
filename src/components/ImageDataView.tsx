@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Image, StyleSheet, StyleProp, ImageStyle, ImageProps, ImageBackground } from 'react-native';
+import {
+    Image,
+    StyleSheet,
+    StyleProp,
+    ImageStyle,
+    ImageProps,
+    ImageBackground,
+} from 'react-native';
 
 import { ImageData, BundledImage } from '../models/ImageData';
 import { ModelHelper } from '../models/ModelHelper';
@@ -12,6 +19,7 @@ export interface StateProps extends ImageProps {
     style?: StyleProp<ImageStyle>;
     modelHelper: ModelHelper;
     background?: boolean;
+    backgroundImageStyle?: StyleProp<ImageStyle>;
 }
 
 export type Props = StateProps & Partial<ChildrenProps>;
@@ -29,9 +37,11 @@ export const ImageDataView = (props: Props) => {
             : props.source.height
         : props.source.height;
     if (props.background === true) {
+        const { backgroundImageStyle, ...rest } = props;
         return (
             <ImageBackground
-                {...props}
+                {...rest}
+                imageStyle={backgroundImageStyle}
                 source={source}
                 style={[props.style, {
                     width: width,

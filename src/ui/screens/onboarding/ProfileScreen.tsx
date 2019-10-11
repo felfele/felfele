@@ -4,33 +4,27 @@ import {
     StyleSheet,
     View,
     Dimensions,
-    ImageBackground,
     KeyboardAvoidingView,
 } from 'react-native';
+
 import { Author } from '../../../models/Author';
 import { ImageData } from '../../../models/ImageData';
 import { AsyncImagePicker } from '../../../AsyncImagePicker';
 import { Colors, ComponentColors } from '../../../styles';
 import { DispatchProps as ContactScreenDispatchProps } from '../profile/ContactScreen';
-import { TouchableView } from '../../../components/TouchableView';
 import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { Page } from './Page';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { RegularText } from '../../misc/text';
 import { TypedNavigation } from '../../../helpers/navigation';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { defaultAuthor } from '../../../reducers/defaultData';
-import { getFallbackUserImage } from '../../../defaultUserImage';
-import { getImageSource } from '../../../helpers/imageDataHelpers';
-import { PrivateIdentity } from '../../../models/Identity';
-import * as Swarm from '../../../swarm/Swarm';
-import { generateSecureRandom } from '../../../helpers/secureRandom';
+import { AvatarPicker } from '../../misc/AvatarPicker';
+import { createUserImage } from '../../../defaultUserImage';
 
 export type CreateUserCallback = (
     name: string,
     image: ImageData,
     navigation: TypedNavigation,
-    identity?: PrivateIdentity,
 ) => void;
 
 export interface DispatchProps extends ContactScreenDispatchProps {
@@ -45,96 +39,87 @@ export interface StateProps {
 
 type Props = DispatchProps & StateProps;
 
-export const ProfileScreen = (props: Props) => {
-    const modelHelper = new ReactNativeModelHelper(props.gatewayAddress);
-    const authorImage = getImageSource(props.author.image, modelHelper);
-    const isFormFilled = props.author.name !== '' && props.author.name !== defaultAuthor.name;
-    const [ identity, setIdentity ] = React.useState<PrivateIdentity | undefined>(undefined);
-    React.useEffect(() => {
-        Swarm.generateSecureIdentity(generateSecureRandom).then(value => {
-            setIdentity(value);
-            getFallbackUserImage(value.publicKey).then(image => {
-                props.onUpdatePicture(image);
-            });
-        });
-    }, []);
+interface State {
+    image: ImageData;
+}
 
-    return (
-        <Page
-            backgroundColor={ComponentColors.BACKGROUND_COLOR}
-            leftButton={{
-                label: isFormFilled ? 'Looks good!' : '',
-                onPress: () => {},
-                alignItems: 'flex-start',
-            }}
-            rightButton={{
-                label: 'DONE',
-                disabled: !isFormFilled,
-                onPress: () => onDoneCreatingProfile(props.author, props.navigation, props.onCreateUser, identity),
-                alignItems: 'flex-end',
-            }}
-        >
-            <NavigationHeader
-                title='Your profile'
-                navigation={props.navigation}
-            />
-            <KeyboardAvoidingView behavior='position'>
-                <View style={styles.imagePickerContainer}>
-                    <TouchableView
-                        onPress={async () => {
-                            await openImagePicker(props.onUpdatePicture);
-                        }}
-                    >
-                        <ImageBackground
-                            source={authorImage}
-                            style={styles.imageBackground}
-                            imageStyle={styles.image}
-                        >
-                            <View style={styles.imagePickerIcon}>
-                                <Icon
-                                    name={'pencil'}
-                                    size={18}
-                                    color={Colors.BLACK}
-                                />
-                            </View>
-                        </ImageBackground>
+export class ProfileScreen extends React.Component<Props, State> {
+    public state: State = {
+        image: createUserImage(),
+    };
 
-                    </TouchableView>
-                </View>
-                <RegularText style={styles.tooltip}>NAME</RegularText>
-                <SimpleTextInput
-                    style={styles.textInput}
-                    defaultValue={props.author.name}
-                    placeholder={'Type your name here'}
-                    placeholderTextColor={Colors.GRAY}
-                    autoCapitalize='none'
-                    autoFocus={false}
-                    autoCorrect={false}
-                    selectTextOnFocus={true}
-                    returnKeyType={'done'}
-                    onSubmitEditing={props.onUpdateAuthor}
-                    onChangeText={props.onUpdateAuthor}
+    public render() {
+        const modelHelper = new ReactNativeModelHelper(this.props.gatewayAddress);
+        const isFormFilled = this.props.author.name !== '' && this.props.author.name !== defaultAuthor.name;
+
+        return (
+            <Page
+                backgroundColor={ComponentColors.BACKGROUND_COLOR}
+                leftButton={{
+                    label: isFormFilled ? 'Looks good!' : '',
+                    onPress: () => {},
+                    alignItems: 'flex-start',
+                }}
+                rightButton={{
+                    label: 'DONE',
+                    disabled: !isFormFilled,
+                    onPress: () => onDoneCreatingProfile({
+                        ...this.props.author,
+                        image: this.state.image,
+                    }, this.props.navigation, this.props.onCreateUser),
+                    alignItems: 'flex-end',
+                }}
+            >
+                <NavigationHeader
+                    title='Your profile'
+                    navigation={this.props.navigation}
                 />
-                <RegularText style={styles.tooltip}>
-                    We will automatically create a channel using your name and picture. You can change this anytime.
-                </RegularText>
-            </KeyboardAvoidingView>
-        </Page>
-    );
-};
+                <KeyboardAvoidingView behavior='position'>
+                    <View style={styles.imagePickerContainer}>
+                        <AvatarPicker
+                            modelHelper={modelHelper}
+                            width={WIDTH}
+                            onSelect={this.onUpdateImage}
+                            image={this.state.image}
+                        />
+                    </View>
+                    <RegularText style={styles.tooltip}>NAME</RegularText>
+                    <SimpleTextInput
+                        style={styles.textInput}
+                        defaultValue={this.props.author.name}
+                        placeholder={'Type your name here'}
+                        placeholderTextColor={Colors.GRAY}
+                        autoCapitalize='none'
+                        autoFocus={false}
+                        autoCorrect={false}
+                        selectTextOnFocus={true}
+                        returnKeyType={'done'}
+                        onSubmitEditing={this.props.onUpdateAuthor}
+                        onChangeText={this.props.onUpdateAuthor}
+                    />
+                    <RegularText style={styles.tooltip}>
+                        You can change your name and picture anytime.
+                    </RegularText>
+                </KeyboardAvoidingView>
+            </Page>
+        );
+    }
 
-export const onDoneCreatingProfile = async (author: Author, navigation: TypedNavigation, onCreateUser: CreateUserCallback, identity?: PrivateIdentity) => {
+    private onUpdateImage = (image: ImageData) => {
+        this.setState({
+            image,
+        });
+    }
+}
+
+export const onDoneCreatingProfile = async (author: Author, navigation: TypedNavigation, onCreateUser: CreateUserCallback) => {
     onCreateUser(
         author.name !== ''
             ? author.name
             : defaultAuthor.name
         ,
-        author.image.uri !== '' || author.image.localPath !== ''
-            ? author.image
-            : await getFallbackUserImage(author.identity!.publicKey)
-        ,
+        author.image,
         navigation,
-        identity,
     );
 };
 
@@ -172,7 +157,6 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         justifyContent: 'flex-end',
         alignItems: 'center',
-
     },
     image: {
         borderRadius : 0.25 * WIDTH,

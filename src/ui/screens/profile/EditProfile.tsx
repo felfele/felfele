@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     ScrollView,
-    TouchableOpacity,
     StyleSheet,
     Dimensions,
     ImageBackground,
