@@ -2,6 +2,7 @@ import { ImageData } from './models/ImageData';
 import { Platform, Alert } from 'react-native';
 import { Debug } from './Debug';
 import ImagePicker from 'react-native-image-picker';
+import { FILE_PROTOCOL } from './helpers/filesystem';
 
 // tslint:disable-next-line:no-var-requires
 const RNFS = require('react-native-fs');
@@ -71,14 +72,14 @@ const defaultImagePickerOtions: Options = {
 
 const removePathPrefix = async (response: Response): Promise<string> => {
     if (Platform.OS === 'ios') {
-        const documentPath = 'file://' + RNFS.DocumentDirectoryPath + '/';
+        const documentPath = FILE_PROTOCOL + RNFS.DocumentDirectoryPath + '/';
         const path = response.uri;
         if (path.startsWith(documentPath)) {
             return path.substring(documentPath.length);
         }
     } else if (Platform.OS === 'android') {
         const filePath = await RNGRP.getRealPathFromURI(response.uri);
-        return 'file://' + filePath;
+        return FILE_PROTOCOL + filePath;
     }
     return response.uri;
 };

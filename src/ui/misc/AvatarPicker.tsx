@@ -7,6 +7,7 @@ import { ModelHelper } from '../../models/ModelHelper';
 import { TouchableView } from '../../components/TouchableView';
 import { ImageData } from '../../models/ImageData';
 import { AsyncImagePicker } from '../../AsyncImagePicker';
+import { Debug } from '../../Debug';
 
 interface Props {
     modelHelper: ModelHelper;
@@ -48,6 +49,7 @@ export const AvatarPicker = (props: Props) => {
 
 const openImagePicker = async (onUpdatePicture: (image: ImageData) => void) => {
     const imageData = await AsyncImagePicker.showImagePicker();
+    Debug.log('openImagePicker', imageData);
     if (imageData != null) {
         onUpdatePicture(imageData);
     }

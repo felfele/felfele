@@ -7,10 +7,11 @@ import { ImageData } from './models/ImageData';
 import { Debug } from './Debug';
 import { getAppGroup } from './BuildEnvironment';
 import { generateUnsecureRandomHexString } from './helpers/unsecureRandom';
+import { getPathForFile, FILE_PROTOCOL, copyToAppDataDir, getAbsolutePathFromLocalPath } from './helpers/filesystem';
+import { isString } from 'util';
 
 const USER_IMAGE_ASSET_DIR = 'custom';
 const USER_IMAGE_NAME = 'defaultuser.png';
-const FILE_PROTOCOL = 'file://';
 
 export const getDefaultUserImage = async (): Promise<ImageData> => {
     if (Platform.OS === 'android') {
@@ -45,42 +46,11 @@ export const copyImageToApp = async (image: ImageData, filename: string): Promis
             }
         }
         return `${FILE_PROTOCOL}${path}`;
-    } else if (image.localPath != null) {
-        if (Platform.OS === 'ios') {
-            const pathForGroup = await RNFS.pathForGroup(getAppGroup());
-            return `${FILE_PROTOCOL}${pathForGroup}/${filename}`;
-        } else if (Platform.OS === 'android') {
-            return `${FILE_PROTOCOL}${RNFS.DocumentDirectoryPath}/${filename}`;
-        } else {
-            throw Error(`copyImageToApp, unsupported platform ${Platform.OS}`);
-        }
+    } else if (image.localPath != null && isString(image.localPath)) {
+        return await copyToAppDataDir(getAbsolutePathFromLocalPath(image.localPath), filename);
     } else {
         throw Error(`copyImageToApp, unsupported image ${image}`);
     }
-};
-
-const getPathForFile = async (filename: string): Promise<string> => {
-    if (Platform.OS === 'ios') {
-        const pathForGroup = await RNFS.pathForGroup(getAppGroup());
-        return `${pathForGroup}/${filename}`;
-    } else if (Platform.OS === 'android') {
-        return `${RNFS.DocumentDirectoryPath}/${filename}`;
-    } else {
-        throw Error('unsupported platform');
-    }
-};
-
-export const writeImageToFile = async (filename: string, data: string): Promise<ImageData> => {
-    const pathForGroup = await RNFS.pathForGroup(getAppGroup());
-    const userImagePath = `${FILE_PROTOCOL}${pathForGroup}/${filename}.png`;
-    try {
-        await RNFS.writeFile(userImagePath, data, 'base64');
-    } catch (e) {
-        Debug.log('getFallbackUserImage', userImagePath, e);
-    }
-    return {
-        localPath: userImagePath,
-    };
 };
 
 export const createUserImage = (hash = generateUnsecureRandomHexString(15)): ImageData => {
