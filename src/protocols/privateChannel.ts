@@ -1,14 +1,37 @@
-import { PrivateChannelCommand, calculatePrivateTopic, PrivateChannelCommandPost, PrivateChannelCommandRemove } from './privateSharing';
 import { ChapterReference, Timeline, PartialChapter, readTimeline, makePartialChapter, fetchTimeline, getNewestChapterId, uploadTimeline } from './timeline';
 import { MutualContact } from '../models/Contact';
 import { ProtocolStorage } from './ProtocolStorage';
 import { HexString } from '../helpers/opaqueTypes';
 import { serialize, deserialize } from '../social/serialization';
-import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
+import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString, byteArrayToHex } from '../helpers/conversion';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { PrivatePost, PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
+import { cryptoHash } from '../helpers/crypto';
+import { updateArrayItem } from '../helpers/immutable';
+
+interface PrivateChannelCommandBase {
+    protocol: 'private';    // TODO this could be a hash to the actual protocol description
+    version: 1;
+}
+
+export interface PrivateChannelCommandPost extends PrivateChannelCommandBase {
+    type: 'post';
+    post: PostWithId;
+    version: 1;
+}
+
+export interface PrivateChannelCommandRemove extends PrivateChannelCommandBase {
+    type: 'remove';
+    version: 1;
+    id: HexString;
+}
+
+export type PrivateChannelCommand =
+    | PrivateChannelCommandPost
+    | PrivateChannelCommandRemove
+;
 
 export interface PrivateChannelSyncData {
     unsyncedCommands: PrivateChannelCommand[];
@@ -29,6 +52,12 @@ interface PrivateChannelUpdate {
     peerTimeline: Timeline<PrivateChannelCommand>;
 }
 
+export const calculatePrivateTopic = (sharedKey: HexString): HexString => {
+    const sharedKeyBytes = hexToUint8Array(sharedKey);
+    const topicBytes = cryptoHash(sharedKeyBytes);
+    return byteArrayToHex(topicBytes, false);
+};
+
 const privateChannelAppendCommand = (privateChannel: PrivateChannelSyncData, command: PrivateChannelCommand): PrivateChannelSyncData => {
     return {
         ...privateChannel,
@@ -46,7 +75,21 @@ export const privateChannelAddPost = (privateChannel: PrivateChannelSyncData, po
     return privateChannelAppendCommand(privateChannel, command);
 };
 
+const privateChannelTryRemoveUnsyncedPost = (privateChannel: PrivateChannelSyncData, id: HexString): PrivateChannelSyncData => {
+    const updatedUnsyncedCommands = privateChannel.unsyncedCommands.filter(
+        command => !(command.type === 'post' && command.post._id === id)
+    );
+    return {
+        ...privateChannel,
+        unsyncedCommands: updatedUnsyncedCommands,
+    };
+};
+
 export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData, id: HexString): PrivateChannelSyncData => {
+    const updatedPrivateChannel = privateChannelTryRemoveUnsyncedPost(privateChannel, id);
+    if (updatedPrivateChannel.unsyncedCommands < privateChannel.unsyncedCommands) {
+        return updatedPrivateChannel;
+    }
     const command: PrivateChannelCommandRemove = {
         type: 'remove',
         version: 1,

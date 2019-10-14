@@ -61,7 +61,7 @@ import { HexString } from '../helpers/opaqueTypes';
 import {
     calculatePrivateTopic,
     PrivateChannelCommand,
-} from '../protocols/privateSharing';
+} from '../protocols/privateChannel';
 import { PrivateIdentity } from '../models/Identity';
 import { SECOND } from '../DateUtils';
 import { getNonMutualContacts, getMutualContacts } from '../selectors/selectors';

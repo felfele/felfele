@@ -28,11 +28,12 @@ import { GroupCommand, GroupCommandPost, GroupCommandAdd } from '../protocols/gr
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
 import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime, fetchTimeline } from '../protocols/timeline';
-import { calculatePrivateTopic, PrivateSharingContext, privateSharePost, privateSync, downloadUploadedLocalPrivateCommands, listTimelinePosts } from '../protocols/privateSharing';
-import { privateSharingTests } from '../protocols/privateSharingTest';
+import { calculatePrivateTopic, makeEmptyPrivateChannel, privateChannelAddPost, applyPrivateChannelUpdate, syncPrivateChannelWithContact } from '../protocols/privateChannel';
+import { privateChannelProtocolTests } from '../protocols/privateChannelProtocolTest';
 import fs from 'fs';
-import { makePost } from '../protocols/privateSharingTestHelpers';
+import { makePost, PrivateSharingContext, listTimelinePosts } from '../protocols/privateChannelProtocolTestHelpers';
 import { cryptoHash } from '../helpers/crypto';
+import { MutualContact } from '../models/Contact';
 
 export const protocolTestCommandDefinition =
     addCommand('invite', 'Test invite protocol', async () => {
@@ -614,7 +615,7 @@ export const protocolTestCommandDefinition =
     .
     addCommand('privateSharing', 'Test 1on1 private messaging',
         addCommand('test [name]', 'Run tests', async (name?: string) => {
-            const allTests: any = privateSharingTests;
+            const allTests: any = privateChannelProtocolTests;
             for (const test of Object.keys(allTests)) {
                 if (typeof name === 'string' && !test.startsWith(name)) {
                     continue;
@@ -635,10 +636,13 @@ export const protocolTestCommandDefinition =
             const generateDeterministicRandom = createAsyncDeterministicRandomGenerator();
             const identity = loadIdentityFile(identityFile);
             const contactIdentity = loadIdentityFile(contactIdentityFile);
-            const profile: PrivateProfile = {
+            const privateChannel = makeEmptyPrivateChannel();
+            const contact: MutualContact = {
+                type: 'mutual-contact',
                 name: 'test',
                 image: {},
                 identity,
+                privateChannel,
             };
             const storage = await makeStorage(() => Promise.resolve(identity));
             const signDigest = (digest: number[]) => SwarmHelpers.signDigest(digest, identity);
@@ -648,76 +652,24 @@ export const protocolTestCommandDefinition =
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateDeterministicRandom(length),
             };
-            const sharedSecret = deriveSharedKey(profile.identity, contactIdentity);
-            const context: PrivateSharingContext = {
-                profile,
-                contactIdentity,
-                localTimeline: [],
-                remoteTimeline: [],
-                sharedSecret,
-                storage,
-                crypto,
-            };
-
-            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
-            const contextBeforePost = {
-                ...context,
-                localTimeline,
-            };
-
-            const postId = optionalPostId != null
-                ? optionalPostId as HexString
-                : byteArrayToHex(await generateUnsecureRandom(32))
-            ;
+            const sharedSecret = deriveSharedKey(identity, contactIdentity);
             const topic = calculatePrivateTopic(sharedSecret);
             const post = {
                 ...makePost(markdown),
                 topic,
-                author: {
-                    name: profile.name,
-                    uri: '',
-                    image: profile.image,
+            };
+            const syncDataWithPost = await privateChannelAddPost(privateChannel, post);
+            const update = await syncPrivateChannelWithContact(
+                {
+                    ...contact,
+                    privateChannel: syncDataWithPost,
                 },
-            };
-            const contextWithPost = await privateSharePost(contextBeforePost, post);
-
-            const contextAfterPost = await privateSync(contextWithPost);
-        })
-        .
-        addCommand('listTimeline <identity-file> <contact-identity-file>', 'List private timeline', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
-            const loadIdentityFile = (filename: string) => {
-                const data = fs.readFileSync(filename).toString();
-                return JSON.parse(data) as PrivateIdentity;
-            };
-            const generateDeterministicRandom = createAsyncDeterministicRandomGenerator();
-            const identity = loadIdentityFile(identityFile);
-            const contactIdentity = loadIdentityFile(contactIdentityFile);
-            const profile: PrivateProfile = {
-                name: 'test',
-                image: {},
-                identity,
-            };
-            const storage = await makeStorage(() => Promise.resolve(identity));
-            const signDigest = (digest: number[]) => SwarmHelpers.signDigest(digest, identity);
-            const crypto: Crypto = {
-                ...makeNaclEncryption(),
-                signDigest,
-                deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
-                random: (length: number) => generateDeterministicRandom(length),
-            };
-            const sharedSecret = deriveSharedKey(profile.identity, contactIdentity);
-            const context: PrivateSharingContext = {
-                profile,
-                contactIdentity,
-                localTimeline: [],
-                remoteTimeline: [],
-                sharedSecret,
+                identity.address as HexString,
                 storage,
                 crypto,
-            };
-
-            const timeline = await downloadUploadedLocalPrivateCommands(context);
-            output(jsonPrettyPrint(timeline));
+                (image) => Promise.resolve(image),
+            );
+            const syncDataAfterPost = applyPrivateChannelUpdate(update);
         })
         .
         addCommand('list <identity-file> <contact-identity-file>', 'List shared posts', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
@@ -742,23 +694,22 @@ export const protocolTestCommandDefinition =
                 random: (length: number) => generateDeterministicRandom(length),
             };
             const sharedSecret = deriveSharedKey(profile.identity, contactIdentity);
-            const context: PrivateSharingContext = {
-                profile,
-                contactIdentity,
-                localTimeline: [],
-                remoteTimeline: [],
-                sharedSecret,
+            const privateChannel = makeEmptyPrivateChannel();
+            const contact: MutualContact = {
+                type: 'mutual-contact',
+                name: 'test',
+                image: {},
+                identity,
+                privateChannel,
+            };
+            const update = await syncPrivateChannelWithContact(
+                contact,
+                identity.address as HexString,
                 storage,
                 crypto,
-            };
-
-            const localTimeline = await downloadUploadedLocalPrivateCommands(context);
-            const contextBeforeSync = {
-                ...context,
-                localTimeline,
-            };
-            const contextAfterSync = await privateSync(contextBeforeSync);
-            const posts = listTimelinePosts(contextAfterSync.localTimeline.concat(contextAfterSync.remoteTimeline));
+                (image) => Promise.resolve(image),
+            );
+            const posts = listTimelinePosts(update.peerTimeline);
             output(posts);
         })
 

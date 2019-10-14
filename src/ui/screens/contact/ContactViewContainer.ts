@@ -10,7 +10,7 @@ import { AsyncActions } from '../../../actions/asyncActions';
 import { findContactByPublicKey, UnknownContact, deriveSharedKey } from '../../../helpers/contactHelpers';
 import { Actions } from '../../../actions/Actions';
 import { Post } from '../../../models/Post';
-import { calculatePrivateTopic } from '../../../protocols/privateSharing';
+import { calculatePrivateTopic } from '../../../protocols/privateChannel';
 import { isContactFeed } from '../../../helpers/feedHelpers';
 
 const getContactPosts = (state: AppState, contact: MutualContact) => {
