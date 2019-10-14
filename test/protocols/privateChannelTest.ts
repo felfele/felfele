@@ -27,16 +27,13 @@ const testMutualContact: MutualContact = {
 
 const uploadImage = (image: ImageData): Promise<ImageData> => Promise.resolve(image);
 
-describe('Test private sharing', () => {
-    const tests: any = privateChannelProtocolTests;
-    for (const privateSharingTest of Object.keys(tests)) {
-        test('' + privateSharingTest, async () => {
-            await tests[privateSharingTest]();
+describe('Test private channel protocol', () => {
+    const protocolTests: any = privateChannelProtocolTests;
+    for (const protocolTest of Object.keys(protocolTests)) {
+        test('' + protocolTest, async () => {
+            await protocolTests[protocolTest]();
         });
     }
-});
-
-describe('uploadUnsyncedCommands', () => {
 });
 
 describe('syncing', () => {
