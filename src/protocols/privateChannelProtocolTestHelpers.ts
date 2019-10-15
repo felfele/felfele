@@ -16,7 +16,7 @@ import { ProtocolStorage } from './ProtocolStorage';
 import { Timeline, PartialChapter } from './timeline';
 import { postTimeCompare } from '../selectors/selectors';
 
-export interface PrivateSharingContext {
+export interface PrivateChannelContext {
     profile: PublicProfile;
     contactIdentity: PublicIdentity;
     syncData: PrivateChannelSyncData;
@@ -26,16 +26,16 @@ export interface PrivateSharingContext {
     posts: Post[];
 }
 
-export enum PrivateSharingProfile {
+export enum PrivateChannelProfile {
     ALICE = 0,
     BOB = 1,
 }
 
-export type PrivateSharingFunction = (context: PrivateSharingContext) => Promise<PrivateSharingContext>;
-export type PrivateSharingAction = [PrivateSharingProfile, PrivateSharingFunction];
+export type PrivateChannelFunction = (context: PrivateChannelContext) => Promise<PrivateChannelContext>;
+export type PrivateChannelAction = [PrivateChannelProfile, PrivateChannelFunction];
 
-export interface PrivateSharingState {
-    contexts: [PrivateSharingContext, PrivateSharingContext];
+export interface PrivateChannelState {
+    contexts: [PrivateChannelContext, PrivateChannelContext];
 }
 
 export const makePost = (text: string, createdAt: number = Date.now()): Post & { _id: HexString } => {
@@ -82,21 +82,21 @@ export const listTimelinePosts = (timeline: Timeline<PrivateChannelCommand>): Po
     return posts;
 };
 
-export interface PrivateSharingProtocolTester {
-    ALICE: PrivateSharingProfile.ALICE;
-    BOB: PrivateSharingProfile.BOB;
-    sharePostText: (text: string, createdAt: number) => PrivateSharingFunction;
-    sharePost: (post: Post & { _id: HexString }) => PrivateSharingFunction;
-    deletePost: (id: HexString) => PrivateSharingFunction;
-    sync: () => PrivateSharingFunction;
-    listPosts: (context: PrivateSharingContext) => Post[];
-    makePosts: (profile: PrivateSharingProfile, numPosts: number) => Promise<PrivateSharingAction[]>;
-    execute: (actions: PrivateSharingAction[]) => Promise<PrivateSharingState>;
+export interface PrivateChannelProtocolTester {
+    ALICE: PrivateChannelProfile.ALICE;
+    BOB: PrivateChannelProfile.BOB;
+    sharePostText: (text: string, createdAt: number) => PrivateChannelFunction;
+    sharePost: (post: Post & { _id: HexString }) => PrivateChannelFunction;
+    deletePost: (id: HexString) => PrivateChannelFunction;
+    sync: () => PrivateChannelFunction;
+    listPosts: (context: PrivateChannelContext) => Post[];
+    makePosts: (profile: PrivateChannelProfile, numPosts: number) => Promise<PrivateChannelAction[]>;
+    execute: (actions: PrivateChannelAction[]) => Promise<PrivateChannelState>;
     generateRandomHex: () => HexString;
-    debugState: (state: PrivateSharingState) => void;
+    debugState: (state: PrivateChannelState) => void;
 }
 
-export const makePrivateChannelProtocolTester = async (randomSeed: string = randomNumbers[0]): Promise<PrivateSharingProtocolTester> => {
+export const makePrivateChannelProtocolTester = async (randomSeed: string = randomNumbers[0]): Promise<PrivateChannelProtocolTester> => {
     const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
     const generateAsyncDeterministicRandom = (length: number) => Promise.resolve(generateDeterministicRandom(length));
     const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateAsyncDeterministicRandom);
@@ -118,7 +118,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
     const makeContextFromProfiles = async (
         profile: PrivateProfile,
         contactIdentity: PublicIdentity,
-    ): Promise<PrivateSharingContext> => ({
+    ): Promise<PrivateChannelContext> => ({
         profile,
         contactIdentity,
         syncData: makeEmptyPrivateChannel(),
@@ -128,7 +128,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         posts: [],
     });
 
-    const composeState = async (state: PrivateSharingState, actions: PrivateSharingAction[]): Promise<PrivateSharingState> => {
+    const composeState = async (state: PrivateChannelState, actions: PrivateChannelAction[]): Promise<PrivateChannelState> => {
         for (const action of actions) {
             const p = action[0];
             const f = action[1];
@@ -138,14 +138,14 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         return state;
     };
 
-    const debugState = (state: PrivateSharingState) => {
-        const ALICE = PrivateSharingProfile.ALICE;
+    const debugState = (state: PrivateChannelState) => {
+        const ALICE = PrivateChannelProfile.ALICE;
         const postsAlice = listPosts(state.contexts[ALICE]);
         Debug.log({
             syncData: state.contexts[ALICE].syncData,
             postsAlice,
         });
-        const BOB = PrivateSharingProfile.BOB;
+        const BOB = PrivateChannelProfile.BOB;
         const postsBob = listPosts(state.contexts[BOB]);
         Debug.log({
             syncData: state.contexts[BOB].syncData,
@@ -154,7 +154,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         return state;
     };
 
-    const inputState: PrivateSharingState = {
+    const inputState: PrivateChannelState = {
         contexts: [
             await makeContextFromProfiles(aliceProfile, bobProfile.identity),
             await makeContextFromProfiles(bobProfile, aliceProfile.identity),
@@ -166,7 +166,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         return dateNow;
     };
 
-    const sharePost = (post: Post & { _id: HexString }): PrivateSharingFunction => {
+    const sharePost = (post: Post & { _id: HexString }): PrivateChannelFunction => {
         return async (context) => {
             const syncData = privateChannelAddPost(context.syncData, post);
             return {
@@ -176,7 +176,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         };
     };
 
-    const listPosts = (context: PrivateSharingContext): Post[] => {
+    const listPosts = (context: PrivateChannelContext): Post[] => {
         const postId = (p: Post) => typeof p._id === 'string' ? p._id : '' + (p._id || '');
         const idCompare = (a: Post, b: Post) => postId(a).localeCompare(postId(b));
         return context.posts.sort((a, b) => postTimeCompare(a, b) || idCompare(a, b));
@@ -204,15 +204,15 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
     };
 
     return {
-        ALICE: PrivateSharingProfile.ALICE,
-        BOB: PrivateSharingProfile.BOB,
+        ALICE: PrivateChannelProfile.ALICE,
+        BOB: PrivateChannelProfile.BOB,
         sharePostText: (text: string, createdAt: number = Date.now()) => {
             return sharePost(makePost(text, createdAt));
         },
         sharePost: (post: Post & { _id: HexString }) => {
             return sharePost(post);
         },
-        deletePost: (id: HexString): PrivateSharingFunction => {
+        deletePost: (id: HexString): PrivateChannelFunction => {
             return async (context) => {
                 const syncData = privateChannelRemovePost(context.syncData, id);
                 return {
@@ -221,7 +221,7 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
                 };
             };
         },
-        sync: (): PrivateSharingFunction => {
+        sync: (): PrivateChannelFunction => {
             return async (context) => {
                 const contact: MutualContact = {
                     type: 'mutual-contact',
@@ -252,15 +252,15 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
             };
         },
         listPosts,
-        makePosts: async (profile: PrivateSharingProfile, numPosts: number): Promise<PrivateSharingAction[]> => {
-            const actions: PrivateSharingAction[] = [];
+        makePosts: async (profile: PrivateChannelProfile, numPosts: number): Promise<PrivateChannelAction[]> => {
+            const actions: PrivateChannelAction[] = [];
             for (let i = 0; i < numPosts; i++) {
-                const action: PrivateSharingAction = [profile, sharePost(makePost(`hello ${i}`))];
+                const action: PrivateChannelAction = [profile, sharePost(makePost(`hello ${i}`))];
                 actions.push(action);
             }
             return actions;
         },
-        execute: async (actions: PrivateSharingAction[]): Promise<PrivateSharingState> => {
+        execute: async (actions: PrivateChannelAction[]): Promise<PrivateChannelState> => {
             return composeState(inputState, actions);
         },
         generateRandomHex,

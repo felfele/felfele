@@ -1,15 +1,27 @@
-import { ChapterReference, Timeline, PartialChapter, readTimeline, makePartialChapter, fetchTimeline, getNewestChapterId, uploadTimeline } from './timeline';
+import {
+    ChapterReference,
+    Timeline,
+    PartialChapter,
+    makePartialChapter,
+    fetchTimeline,
+    getNewestChapterId,
+    uploadTimeline,
+} from './timeline';
 import { MutualContact } from '../models/Contact';
 import { ProtocolStorage } from './ProtocolStorage';
 import { HexString } from '../helpers/opaqueTypes';
 import { serialize, deserialize } from '../social/serialization';
-import { stringToUint8Array, hexToUint8Array, Uint8ArrayToString, byteArrayToHex } from '../helpers/conversion';
+import {
+    stringToUint8Array,
+    hexToUint8Array,
+    Uint8ArrayToString,
+    byteArrayToHex,
+} from '../helpers/conversion';
 import { ProtocolCrypto } from './ProtocolCrypto';
-import { PrivatePost, PostWithId } from '../models/Post';
+import { PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { cryptoHash } from '../helpers/crypto';
-import { updateArrayItem } from '../helpers/immutable';
 
 interface PrivateChannelCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description

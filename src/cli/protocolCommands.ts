@@ -1,7 +1,7 @@
 import { addCommand } from './cliParser';
-import { generateUnsecureRandom, createDeterministicRandomGenerator, createAsyncDeterministicRandomGenerator } from '../helpers/unsecureRandom';
-import { output, jsonPrettyPrint } from './cliHelpers';
-import { byteArrayToHex, hexToByteArray, stripHexPrefix, hexToUint8Array, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
+import { generateUnsecureRandom, createAsyncDeterministicRandomGenerator } from '../helpers/unsecureRandom';
+import { output } from './cliHelpers';
+import { byteArrayToHex, stripHexPrefix, hexToUint8Array, stringToUint8Array, Uint8ArrayToString } from '../helpers/conversion';
 import { Debug } from '../Debug';
 import { createSwarmContactHelper } from '../helpers/swarmContactHelpers';
 import * as SwarmHelpers from '../swarm/Swarm';
@@ -27,11 +27,11 @@ import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { GroupCommand, GroupCommandPost, GroupCommandAdd } from '../protocols/group';
 import { PublicIdentity, PrivateIdentity } from '../models/Identity';
 import { serialize, deserialize } from '../social/serialization';
-import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime, fetchTimeline } from '../protocols/timeline';
+import { Timeline, PartialChapter, ChapterReference, Chapter, uploadTimeline, highestSeenLogicalTime, highestSeenRemoteLogicalTime } from '../protocols/timeline';
 import { calculatePrivateTopic, makeEmptyPrivateChannel, privateChannelAddPost, applyPrivateChannelUpdate, syncPrivateChannelWithContact } from '../protocols/privateChannel';
 import { privateChannelProtocolTests } from '../protocols/privateChannelProtocolTest';
 import fs from 'fs';
-import { makePost, PrivateSharingContext, listTimelinePosts } from '../protocols/privateChannelProtocolTestHelpers';
+import { makePost, PrivateChannelContext, listTimelinePosts } from '../protocols/privateChannelProtocolTestHelpers';
 import { cryptoHash } from '../helpers/crypto';
 import { MutualContact } from '../models/Contact';
 
@@ -254,20 +254,6 @@ export const protocolTestCommandDefinition =
                 },
             };
             return appendGroupCommandToTimeline(context, command);
-        };
-        const sendGroupCommand = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithTimeline> => {
-            const topic = calculateGroupTopic(context.group);
-            const random = await context.crypto.random(32);
-            const encryptTimeline = (s: string): Uint8Array => {
-                const dataBytes = stringToUint8Array(s);
-                const secretBytes = hexToUint8Array(context.group.sharedSecret);
-                return context.crypto.encrypt(dataBytes, secretBytes, random);
-            };
-
-            await updateTimeline(context.storage, context.profile.identity, context.crypto.signDigest, topic, groupCommand, encryptTimeline);
-            return {
-                ...context.group,
-            };
         };
         const appendGroupCommandToTimeline = async (context: GroupProtocolContext, groupCommand: GroupCommand): Promise<GroupWithTimeline> => {
             const ownerIdentity = context.profile.identity;
@@ -501,7 +487,7 @@ export const protocolTestCommandDefinition =
             profile: PublicProfile;
             crypto: Crypto;
             group: GroupWithTimeline;
-            privateContexts: PrivateSharingContext[];
+            privateContexts: PrivateChannelContext[];
         }
         type GroupProtocolFunction = (context: GroupProtocolContext) => GroupWithTimeline | Promise<GroupWithTimeline>;
         type GroupProtocolAction = [Profile, GroupProtocolFunction];
@@ -628,7 +614,7 @@ export const protocolTestCommandDefinition =
             }
         })
         .
-        addCommand('post <identity-file> <contact-identity-file> <markdown> [postID]', 'Post private message', async (identityFile: string, contactIdentityFile: string, markdown: string, optionalPostId?: string) => {
+        addCommand('post <identity-file> <contact-identity-file> <markdown>', 'Post private message', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
             const loadIdentityFile = (filename: string) => {
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
@@ -669,10 +655,9 @@ export const protocolTestCommandDefinition =
                 crypto,
                 (image) => Promise.resolve(image),
             );
-            const syncDataAfterPost = applyPrivateChannelUpdate(update);
         })
         .
-        addCommand('list <identity-file> <contact-identity-file>', 'List shared posts', async (identityFile: string, contactIdentityFile: string, markdown: string) => {
+        addCommand('list <identity-file> <contact-identity-file>', 'List shared posts', async (identityFile: string, contactIdentityFile: string) => {
             const loadIdentityFile = (filename: string) => {
                 const data = fs.readFileSync(filename).toString();
                 return JSON.parse(data) as PrivateIdentity;
@@ -693,7 +678,6 @@ export const protocolTestCommandDefinition =
                 deriveSharedKey: (publicKey: HexString) => deriveSharedKey(identity, {publicKey, address: ''}),
                 random: (length: number) => generateDeterministicRandom(length),
             };
-            const sharedSecret = deriveSharedKey(profile.identity, contactIdentity);
             const privateChannel = makeEmptyPrivateChannel();
             const contact: MutualContact = {
                 type: 'mutual-contact',
