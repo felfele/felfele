@@ -54,7 +54,7 @@ export const copyImageToApp = async (image: ImageData, filename: string): Promis
 };
 
 export const createUserImage = (hash = generateUnsecureRandomHexString(15)): ImageData => {
-    const data = new Identicon(hash, { size: 512, margin: 0.2 }).toString();
+    const data = new Identicon(hash, { size: 192, margin: 0.2 }).toString();
     return {
         data,
     };
