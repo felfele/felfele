@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     ScrollView,
-    TouchableOpacity,
     StyleSheet,
     Dimensions,
     ImageBackground,
@@ -23,6 +22,7 @@ import { ReactNativeModelHelper } from '../../../models/ReactNativeModelHelper';
 import { RegularText } from '../../misc/text';
 import { getImageSource } from '../../../helpers/imageDataHelpers';
 import { TouchableView } from '../../../components/TouchableView';
+import { AvatarPicker } from '../../misc/AvatarPicker';
 
 const openImagePicker = async (onUpdatePicture: (imageData: ImageData) => void) => {
     const imageData = await AsyncImagePicker.showImagePicker();
@@ -59,23 +59,12 @@ export const EditProfile = (props: StateProps & DispatchProps) => (
                         await openImagePicker(props.onUpdatePicture);
                     }}
                 >
-                    <ImageBackground
-                        source={getImageSource(
-                            props.profile.image,
-                            new ReactNativeModelHelper(props.gatewayAddress),
-                            defaultImages.defaultUser)
-                        }
-                        style={styles.imageBackground}
-                        imageStyle={styles.image}
-                    >
-                        <View style={styles.imagePickerIcon}>
-                            <Icon
-                                name={'pencil'}
-                                size={18}
-                                color={Colors.BLACK}
-                            />
-                        </View>
-                    </ImageBackground>
+                    <AvatarPicker
+                        modelHelper={new ReactNativeModelHelper(props.gatewayAddress)}
+                        width={WIDTH}
+                        onSelect={props.onUpdatePicture}
+                        image={props.profile.image}
+                    />
                 </TouchableView>
             </View>
             <RegularText style={styles.tooltip}>NAME</RegularText>

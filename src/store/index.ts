@@ -1,6 +1,5 @@
 // @ts-ignore
 import FSStorage from 'redux-persist-fs-storage';
-// @ts-ignore
 import * as RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
 import thunkMiddleware from 'redux-thunk';
