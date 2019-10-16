@@ -9,12 +9,13 @@ import { deriveSharedKey } from '../helpers/contactHelpers';
 import { Debug } from '../Debug';
 import { createDeterministicRandomGenerator } from '../helpers/unsecureRandom';
 import { makePostId } from '../helpers/postHelpers';
-import { makeEmptyPrivateChannel, privateChannelAddPost, privateChannelRemovePost, syncPrivateChannelWithContact, applyPrivateChannelUpdate, PrivateChannelSyncData, PrivateChannelCommand, PrivateChannelCommandPost } from './privateChannel';
+import { makeEmptyPrivateChannel, privateChannelAddPost, privateChannelRemovePost, syncPrivateChannelWithContact, applyPrivateChannelUpdate, PrivateChannelSyncData, PrivateChannelCommand, PrivateChannelCommandPost, privateChannelInviteToGroup } from './privateChannel';
 import { MutualContact } from '../models/Contact';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { Timeline, PartialChapter } from './timeline';
 import { postTimeCompare } from '../selectors/selectors';
+import { Group } from './group';
 
 export interface PrivateChannelContext {
     profile: PublicProfile;
@@ -88,6 +89,7 @@ export interface PrivateChannelProtocolTester {
     sharePostText: (text: string, createdAt: number) => PrivateChannelFunction;
     sharePost: (post: Post & { _id: HexString }) => PrivateChannelFunction;
     deletePost: (id: HexString) => PrivateChannelFunction;
+    invite: (group: Group) => PrivateChannelFunction;
     sync: () => PrivateChannelFunction;
     listPosts: (context: PrivateChannelContext) => Post[];
     makePosts: (profile: PrivateChannelProfile, numPosts: number) => Promise<PrivateChannelAction[]>;
@@ -215,6 +217,15 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
         deletePost: (id: HexString): PrivateChannelFunction => {
             return async (context) => {
                 const syncData = privateChannelRemovePost(context.syncData, id);
+                return {
+                    ...context,
+                    syncData,
+                };
+            };
+        },
+        invite: (group: Group) => {
+            return async (context) => {
+                const syncData = privateChannelInviteToGroup(context.syncData, group);
                 return {
                     ...context,
                     syncData,

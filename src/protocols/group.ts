@@ -1,38 +1,95 @@
-import { keccak256 } from 'js-sha3';
 import { PublicIdentity } from '../models/Identity';
-import { Post } from '../models/Post';
+import { Post, PostWithId } from '../models/Post';
+import { HexString } from '../helpers/opaqueTypes';
+import { ImageData } from '../models/ImageData';
+import { ChapterReference } from './timeline';
+import { PublicProfile } from '../models/Profile';
+
+interface PeerSyncData {
+    peerLastSeenChapterId: ChapterReference | undefined;
+}
+
+interface GroupPeer extends PeerSyncData, PublicProfile {
+}
+
+interface OwnSyncData {
+    unsyncedCommands: GroupCommand[];
+    lastSyncedChapterId: ChapterReference | undefined;
+}
+
+export interface GroupMember {
+    address: HexString;
+    publicKey?: HexString | undefined;
+    name: string;
+    image: ImageData;
+}
+
+export interface Group {
+    sharedSecret: HexString;
+    topic: HexString;
+    members: GroupMember[];
+}
+
+export interface GroupSyncData extends Group {
+    ownSyncData: OwnSyncData;
+    peers: GroupPeer[];
+}
+
+interface GroupSyncUpdate {
+}
 
 interface GroupCommandBase {
-    logicalTime: number;
     protocol: 'group';
     version: 1;
 }
 
-export interface GroupCommandAdd extends GroupCommandBase {
-    type: 'group-command-add';
+export interface GroupCommandAddMember extends GroupCommandBase {
+    type: 'add-member';
 
-    identity: PublicIdentity;
-    name: string;
+    member: GroupMember;
 }
 
-export interface GroupCommandRemove extends GroupCommandBase {
-    type: 'group-command-remove';
+export interface GroupCommandRemoveMember extends GroupCommandBase {
+    type: 'remove-member';
 
-    identity: PublicIdentity;
+    address: HexString;
 }
 
 export interface GroupCommandPost extends GroupCommandBase {
-    type: 'group-command-post';
+    type: 'post';
 
     post: Post;
 }
 
-export type GroupCommand = GroupCommandAdd | GroupCommandRemove | GroupCommandPost;
+export type GroupCommand = GroupCommandAddMember | GroupCommandRemoveMember | GroupCommandPost;
 
-const flattenUint8Arrays = (inputs: Uint8Array[]): Uint8Array => {
-    const numbers = inputs
-        .map(input => Array.from(input))
-        .reduce((prev, curr) => prev.concat(curr), [])
-    ;
-    return new Uint8Array(numbers);
+const groupAppendCommand = (syncData: OwnSyncData, command: GroupCommand): OwnSyncData => {
+    return {
+        ...syncData,
+        unsyncedCommands: [command, ...syncData.unsyncedCommands],
+    };
+};
+
+export const groupAddMember = (syncData: OwnSyncData, member: GroupMember): OwnSyncData => {
+    const command: GroupCommandAddMember = {
+        type: 'add-member',
+        version: 1,
+        protocol: 'group',
+        member,
+    };
+    return groupAppendCommand(syncData, command);
+};
+
+export const groupPost = (syncData: OwnSyncData, post: PostWithId): OwnSyncData => {
+    const command: GroupCommandPost = {
+        type: 'post',
+        version: 1,
+        protocol: 'group',
+        post,
+    };
+    return groupAppendCommand(syncData, command);
+};
+
+export const groupSync = async (syncData: OwnSyncData): Promise<GroupSyncUpdate> => {
+    return {};
 };
