@@ -233,7 +233,7 @@ describe('post id generation', () => {
 
         const id = makePostId(post);
 
-        expect(id).toBe('ffde563b8a0ac491f63aeb07ea0655c3f5362630d5c7189996d06ba15a8e0466');
+        expect(id).toBe('76e1f329fdd75682f63a26739d1bdc6c9c51f79fcae10e0ee82195383d792396');
     });
     it('generates the same id with other properties', () => {
         const authorA: Author = {
@@ -253,9 +253,9 @@ describe('post id generation', () => {
 
         const id = makePostId(post);
 
-        expect(id).toBe('ffde563b8a0ac491f63aeb07ea0655c3f5362630d5c7189996d06ba15a8e0466');
+        expect(id).toBe('76e1f329fdd75682f63a26739d1bdc6c9c51f79fcae10e0ee82195383d792396');
     });
-    it('generates id with image', () => {
+    it('generates same id with different image', () => {
         const image = {
             uri: 'uri',
         };
@@ -267,21 +267,6 @@ describe('post id generation', () => {
 
         const id = makePostId(post);
 
-        expect(id).toBe('d0be44a943cd3938ceb2745db02791aff59cce0526d3388a679858c4f57813ab');
-    });
-    it('generates the same id with image localPath', () => {
-        const image = {
-            uri: 'uri',
-            localPath: 'localPath',
-        };
-        const post: Post = {
-            images: [image],
-            text: '',
-            createdAt: 1,
-        };
-
-        const id = makePostId(post);
-
-        expect(id).toBe('d0be44a943cd3938ceb2745db02791aff59cce0526d3388a679858c4f57813ab');
+        expect(id).toBe('76e1f329fdd75682f63a26739d1bdc6c9c51f79fcae10e0ee82195383d792396');
     });
 });

@@ -27,7 +27,7 @@ import contactIdentity4 from '../../testdata/contactIdentity4.json';
 import { MutualContact } from '../models/Contact';
 import { HexString } from '../helpers/opaqueTypes';
 import { deriveSharedKey } from '../helpers/contactHelpers';
-import { calculatePrivateTopic } from '../protocols/privateSharing';
+import { calculatePrivateTopic } from '../protocols/privateChannel';
 import { byteArrayToHex } from '../helpers/conversion';
 import { makeEmptyPrivateChannel } from '../protocols/privateChannel';
 import { FragmentSafeAreaViewWithoutTabBar } from '../ui/misc/FragmentSafeAreaView';

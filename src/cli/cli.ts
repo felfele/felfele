@@ -17,7 +17,7 @@ import { fetchOpenGraphData } from '../helpers/openGraph';
 import { fetchHtmlMetaData } from '../helpers/htmlMetaData';
 import { protocolTestCommandDefinition as protocolCommandDefinition } from './protocolCommands';
 import { swarmHelperTests } from './swarmHelperTest';
-import { privateSharingTests } from '../protocols/privateSharingTest';
+import { privateChannelProtocolTests } from '../protocols/privateChannelProtocolTest';
 import { benchmarkCommandDefinition } from './benchmarkCommands';
 
 // tslint:disable-next-line:no-var-requires
@@ -54,7 +54,7 @@ const definitions =
                 ...apiTests,
                 ...syncTests,
                 ...swarmHelperTests,
-                ...privateSharingTests,
+                ...privateChannelProtocolTests,
             };
             if (process.env.SWARM_GATEWAY != null) {
                 output('Running with SWARM at', process.env.SWARM_GATEWAY);

@@ -145,11 +145,9 @@ export const copyPostPrivately = (post: Post, author: Author, id: HexString, top
 };
 
 export const makePostId = (post: Post): HexString => {
-    const publicPost: PublicPost = {
+    const publicPost = {
         text: post.text,
-        images: post.images,
         createdAt: post.createdAt,
-        references: post.references,
     };
     const postJSON = serialize(publicPost);
     return byteArrayToHex(cryptoHash(postJSON), false);
