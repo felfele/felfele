@@ -11,7 +11,7 @@ import { makePostId } from '../helpers/postHelpers';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
-import { groupAddMember, GroupPeer, groupPost, Group, OwnSyncData, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommandPost, GroupCommand, GroupSyncPeer } from './group';
+import { groupAddMember, GroupPeer, groupPost, Group, OwnSyncData, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommandPost, GroupCommand, GroupSyncPeer, groupRemovePost } from './group';
 
 export interface GroupContext extends GroupSyncData {
     profile: PublicProfile;
@@ -43,9 +43,17 @@ export interface GroupState {
         GroupContext,
         GroupContext,
     ];
+    profiles: [
+        PrivateProfile,
+        PrivateProfile,
+        PrivateProfile,
+        PrivateProfile,
+        PrivateProfile,
+        PrivateProfile,
+    ];
 }
 
-export const makePost = (text: string, createdAt: number = Date.now()): Post & { _id: HexString } => {
+export const makePost = (text: string, createdAt: number = Date.now()): PostWithId => {
     const post = {
         text,
         images: [],
@@ -70,7 +78,7 @@ export interface GroupProtocolTester {
     receivePrivateInvite: (from: GroupProfile) => GroupFunction;
     sharePostText: (text: string, createdAt: number) => GroupFunction;
     sharePost: (post: Post & { _id: HexString }) => GroupFunction;
-    deletePost: (id: HexString) => GroupFunction;
+    removePost: (id: HexString) => GroupFunction;
     sync: () => GroupFunction;
     listPosts: (context: GroupContext) => Post[];
     makePosts: (profile: GroupProfile, numPosts: number) => Promise<GroupAction[]>;
@@ -111,8 +119,6 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
     const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateAsyncDeterministicRandom);
     const generateRandomHex = () => byteArrayToHex(generateDeterministicRandom(32), false);
 
-    const profiles = await createProfiles(generateIdentity);
-
     const debugState = (state: GroupState) => {
         for (const context of state.contexts) {
             const posts = listPosts(context);
@@ -151,6 +157,10 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
                 context.posts.push(post);
                 return;
             }
+            case 'remove-post': {
+                context.posts = context.posts.filter(post => post._id == null || post._id !== command.id);
+                return;
+            }
         }
     };
 
@@ -172,8 +182,8 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
             };
         },
         invite: (groupProfile: GroupProfile) => {
-            return async (context) => {
-                const profile = profiles[groupProfile];
+            return async (context, state) => {
+                const profile = state.profiles[groupProfile];
                 const profileAddress = profile.identity.address;
                 const index = context.contacts.findIndex(c => c.address === profileAddress);
                 if (index === -1) {
@@ -224,10 +234,13 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
                     command => executeCommand(command, context),
                     command => executeCommand(command, context),
                 );
-                return {
+                const posts = context.posts;
+                const retval = {
                     ...context,
                     ...groupSyncData,
+                    posts,
                 };
+                return retval;
             };
         },
         sharePostText: (text: string, createdAt: number = Date.now()) => {
@@ -236,8 +249,14 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
         sharePost: (post: PostWithId) => {
             return sharePost(post);
         },
-        deletePost: (): GroupFunction => {
-            return async (context) => context;
+        removePost: (id: HexString): GroupFunction => {
+            return async (context) => {
+                const ownSyncData = groupRemovePost(context.ownSyncData, id);
+                return {
+                    ...context,
+                    ownSyncData,
+                };
+            };
         },
         listPosts,
         makePosts: async (): Promise<GroupAction[]> => {
@@ -246,6 +265,7 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
         },
         execute: async (actions: GroupAction[]): Promise<GroupState> => {
             const storage = await makeStorage(generateIdentity);
+            const profiles = await createProfiles(generateIdentity);
 
             const makeContextContact = (profile: PublicProfile): GroupSyncPeer => ({
                 name: profile.name,
@@ -284,12 +304,20 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
 
             const inputState: GroupState = {
                 contexts: [
-                    await makeContextFromTestConfig(groupTestConfig[0]),
-                    await makeContextFromTestConfig(groupTestConfig[1]),
-                    await makeContextFromTestConfig(groupTestConfig[2]),
-                    await makeContextFromTestConfig(groupTestConfig[3]),
-                    await makeContextFromTestConfig(groupTestConfig[4]),
-                    await makeContextFromTestConfig(groupTestConfig[5]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.ALICE]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.BOB]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.CAROL]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.DAVID]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.EVE]),
+                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.MALLORY]),
+                ],
+                profiles: [
+                    profiles[GroupProfile.ALICE],
+                    profiles[GroupProfile.BOB],
+                    profiles[GroupProfile.CAROL],
+                    profiles[GroupProfile.DAVID],
+                    profiles[GroupProfile.EVE],
+                    profiles[GroupProfile.MALLORY],
                 ],
             };
 

@@ -83,7 +83,18 @@ export interface GroupCommandPost extends GroupCommandBase {
     post: PostWithId;
 }
 
-export type GroupCommand = GroupCommandAddMember | GroupCommandRemoveMember | GroupCommandPost;
+export interface GroupCommandRemovePost extends GroupCommandBase {
+    type: 'remove-post';
+
+    id: HexString;
+}
+
+export type GroupCommand =
+    | GroupCommandAddMember
+    | GroupCommandRemoveMember
+    | GroupCommandPost
+    | GroupCommandRemovePost
+;
 
 const groupAppendCommand = (syncData: OwnSyncData, command: GroupCommand): OwnSyncData => {
     return {
@@ -108,6 +119,16 @@ export const groupPost = (syncData: OwnSyncData, post: PostWithId): OwnSyncData 
         version: 1,
         protocol: 'group',
         post,
+    };
+    return groupAppendCommand(syncData, command);
+};
+
+export const groupRemovePost = (syncData: OwnSyncData, id: HexString): OwnSyncData => {
+    const command: GroupCommandRemovePost = {
+        type: 'remove-post',
+        version: 1,
+        protocol: 'group',
+        id,
     };
     return groupAppendCommand(syncData, command);
 };
@@ -280,13 +301,17 @@ export const groupSync = async (
     }
 };
 
+const reverseMap = <T, K>(arr: T[], fun: (t: T) => K): K[] =>
+    arr.map((_, index) => fun(arr[arr.length - 1 - index]))
+;
+
 export const groupApplySyncUpdate = (
     update: GroupSyncUpdate,
     executeRemoteCommand?: (command: GroupCommand) => void,
     executeLocalCommand?: (command: GroupCommand) => void,
 ): GroupSyncData => {
     if (executeLocalCommand != null) {
-        update.ownSyncDataUpdate.timeline.map(chapter => executeLocalCommand(chapter.content));
+        reverseMap(update.ownSyncDataUpdate.timeline, chapter => executeLocalCommand(chapter.content));
     }
 
     const ownSyncData: OwnSyncData = {
@@ -304,7 +329,7 @@ export const groupApplySyncUpdate = (
     const addedMembers: PeerSyncDataUpdate[] = [];
     const removedMembers: HexString[] = [];
     update.peerSyncDataUpdates.map(peerSyncUpdate => {
-        peerSyncUpdate.timeline.map(chapter => {
+        reverseMap(peerSyncUpdate.timeline, chapter => {
             const command = chapter.content;
             if (executeRemoteCommand != null) {
                 executeRemoteCommand(command);
