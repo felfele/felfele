@@ -8,7 +8,7 @@ import {
 import { HexString } from '../helpers/opaqueTypes';
 
 const sharedSecret = 'abc' as HexString;
-const topic = 'def' as HexString;
+const topic = '0000000000000000000000000000000000000000000000000000000000000000' as HexString;
 
 const groupTestConfig: GroupTestConfig = [
     [
@@ -257,6 +257,34 @@ export const groupProtocolTests = {
 
         assertEquals(1, aliceContext.posts.length);
         assertEquals(1, bobContext.posts.length);
+    },
+
+    testGroupMultiplePosts: async () => {
+        const t = await makeGroupProtocolTester(groupTestConfig);
+        const bText = 'B';
+        const aText = 'A';
+        const actions: GroupAction[] = [
+            [t.ALICE, t.createGroup(topic, sharedSecret)],
+            [t.ALICE, t.invite(t.BOB)],
+            [t.BOB, t.receivePrivateInvite(t.ALICE)],
+            [t.BOB, t.sharePostText(bText, 1)],
+            [t.BOB, t.sync()],
+            [t.ALICE, t.sharePostText(aText, 1)],
+            [t.ALICE, t.sync()],
+            [t.BOB, t.sync()],
+        ];
+        const outputState = await t.execute(actions);
+
+        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
+        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+
+        assertEquals(2, alicePosts.length);
+        assertEquals(aText, alicePosts[0].text);
+        assertEquals(bText, alicePosts[1].text);
+
+        assertEquals(2, bobPosts.length);
+        assertEquals(aText, bobPosts[0].text);
+        assertEquals(bText, bobPosts[1].text);
     },
 
 };

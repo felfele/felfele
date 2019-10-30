@@ -285,7 +285,6 @@ export const groupApplySyncUpdate = (
     executeRemoteCommand?: (command: GroupCommand) => void,
     executeLocalCommand?: (command: GroupCommand) => void,
 ): GroupSyncData => {
-    Debug.log('groupApplySyncUpdate', update);
     if (executeLocalCommand != null) {
         update.ownSyncDataUpdate.timeline.map(chapter => executeLocalCommand(chapter.content));
     }

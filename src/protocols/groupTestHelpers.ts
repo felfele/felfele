@@ -144,7 +144,11 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
     const executeCommand = (command: GroupCommand, context: GroupContext) => {
         switch (command.type) {
             case 'post': {
-                context.posts.push(command.post);
+                const post = {
+                    ...command.post,
+                    _id: command.post._id || makePostId(command.post),
+                };
+                context.posts.push(post);
                 return;
             }
         }
