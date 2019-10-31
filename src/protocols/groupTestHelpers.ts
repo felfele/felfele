@@ -13,11 +13,15 @@ import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
 import { groupAddMember, GroupPeer, groupPost, Group, OwnSyncData, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommandPost, GroupCommand, GroupSyncPeer, groupRemovePost } from './group';
 
+interface PeerPost extends Post {
+    ownerAddress: HexString;
+}
+
 export interface GroupContext extends GroupSyncData {
     profile: PublicProfile;
     crypto: ProtocolCrypto;
     storage: ProtocolStorage;
-    posts: Post[];
+    posts: PeerPost[];
     contacts: GroupSyncPeer[];
 }
 
@@ -34,23 +38,11 @@ export enum GroupProfile {
 export type GroupFunction = (context: GroupContext, state: GroupState) => Promise<GroupContext>;
 export type GroupAction = [GroupProfile, GroupFunction];
 
+type FixedArray<T> = [T, T, T, T, T, T];
+
 export interface GroupState {
-    contexts: [
-        GroupContext,
-        GroupContext,
-        GroupContext,
-        GroupContext,
-        GroupContext,
-        GroupContext,
-    ];
-    profiles: [
-        PrivateProfile,
-        PrivateProfile,
-        PrivateProfile,
-        PrivateProfile,
-        PrivateProfile,
-        PrivateProfile,
-    ];
+    contexts: FixedArray<GroupContext>;
+    profiles: FixedArray<PrivateProfile>;
 }
 
 export const makePost = (text: string, createdAt: number = Date.now()): PostWithId => {
@@ -103,15 +95,7 @@ const createProfiles = async (generateIdentity: () => Promise<PrivateIdentity>):
 };
 
 type GroupTestContactConfig = [GroupProfile, GroupProfile[]];
-
-export type GroupTestConfig = [
-    GroupTestContactConfig,
-    GroupTestContactConfig,
-    GroupTestContactConfig,
-    GroupTestContactConfig,
-    GroupTestContactConfig,
-    GroupTestContactConfig,
-];
+export type GroupTestConfig = FixedArray<GroupTestContactConfig>;
 
 export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, randomSeed: string = randomNumbers[0]): Promise<GroupProtocolTester> => {
     const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
@@ -134,7 +118,9 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
     const listPosts = (context: GroupContext): Post[] => {
         const postId = (p: Post) => typeof p._id === 'string' ? p._id : '' + (p._id || '');
         const idCompare = (a: Post, b: Post) => postId(a).localeCompare(postId(b));
-        return context.posts.sort((a, b) => postTimeCompare(a, b) || idCompare(a, b));
+        return context.posts
+            .sort((a, b) => postTimeCompare(a, b) || idCompare(a, b))
+        ;
     };
 
     const sharePost = (post: PostWithId) => {
@@ -147,18 +133,30 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
         };
     };
 
-    const executeCommand = (command: GroupCommand, context: GroupContext) => {
+    const executeCommand = (command: GroupCommand, context: GroupContext, address: HexString) => {
+        Debug.log('executeCommand', {
+            profileName: context.profile.name,
+            profileAddress: context.profile.identity.address,
+            commandAddress: address,
+            posts: context.posts,
+            command,
+        });
         switch (command.type) {
             case 'post': {
                 const post = {
                     ...command.post,
+                    ownerAddress: address,
                     _id: command.post._id || makePostId(command.post),
                 };
                 context.posts.push(post);
                 return;
             }
             case 'remove-post': {
-                context.posts = context.posts.filter(post => post._id == null || post._id !== command.id);
+                const isRemoveOwnPost = (post: PeerPost, id: HexString) => post._id === command.id && post.ownerAddress === address;
+                context.posts = context.posts.filter(post =>
+                    post._id == null || isRemoveOwnPost(post, command.id) === false
+                );
+                Debug.log('executeCommand', command.type, {posts: context.posts});
                 return;
             }
         }
@@ -207,6 +205,10 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
                 const fromContext = state.contexts[from];
                 const members = fromContext.peers
                     .filter(member => member.address !== context.profile.identity.address)
+                    .map(member => ({
+                        ...member,
+                        peerLastSeenChapterId: undefined,
+                    }))
                     .concat([{
                         ...fromContext.profile,
                         address: fromContext.profile.identity.address as HexString,
@@ -223,6 +225,10 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
         },
         sync: () => {
             return async (context) => {
+                Debug.log('sync', {
+                    profileName: context.profile.name,
+                    profileAddress: context.profile.identity.address,
+                });
                 const update = await groupSync(
                     context,
                     context.storage,
@@ -231,14 +237,13 @@ export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, 
                 );
                 const groupSyncData = groupApplySyncUpdate(
                     update,
-                    command => executeCommand(command, context),
-                    command => executeCommand(command, context),
+                    (command, address) => executeCommand(command, context, address),
+                    command => executeCommand(command, context, context.profile.identity.address as HexString),
                 );
-                const posts = context.posts;
                 const retval = {
                     ...context,
                     ...groupSyncData,
-                    posts,
+                    posts: context.posts,
                 };
                 return retval;
             };

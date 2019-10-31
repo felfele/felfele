@@ -192,8 +192,6 @@ const uploadUnsyncedTimeline = async (
         imageSyncedTimeline.push(imageSyncedChapter);
     }
 
-    Debug.log('uploadUnsyncedTimeline', {imageSyncedTimeline});
-
     const syncedTimeline = await uploadTimeline(
         imageSyncedTimeline,
         storage,
@@ -270,6 +268,7 @@ export const groupSync = async (
             uploadImage,
         );
 
+        Debug.log('groupSync', {peers: group.peers});
         const peerSyncDataUpdates = await fetchPeerTimelines(
             group.peers,
             group.topic,
@@ -307,7 +306,7 @@ const reverseMap = <T, K>(arr: T[], fun: (t: T) => K): K[] =>
 
 export const groupApplySyncUpdate = (
     update: GroupSyncUpdate,
-    executeRemoteCommand?: (command: GroupCommand) => void,
+    executeRemoteCommand?: (command: GroupCommand, address: HexString) => void,
     executeLocalCommand?: (command: GroupCommand) => void,
 ): GroupSyncData => {
     if (executeLocalCommand != null) {
@@ -332,7 +331,7 @@ export const groupApplySyncUpdate = (
         reverseMap(peerSyncUpdate.timeline, chapter => {
             const command = chapter.content;
             if (executeRemoteCommand != null) {
-                executeRemoteCommand(command);
+                executeRemoteCommand(command, peerSyncUpdate.address);
             }
             switch (command.type) {
                 case 'add-member': {
