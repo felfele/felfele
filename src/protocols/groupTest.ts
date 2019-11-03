@@ -1,57 +1,68 @@
 import { assertEquals } from '../helpers/assertEquals';
 import {
-    makeGroupProtocolTester,
     GroupAction,
     GroupTestConfig,
     GroupProfile,
+    GroupProfile as G,
     makePost,
+    execute,
+    createGroup,
+    invite,
+    receivePrivateInvite,
+    sync,
+    sharePostText,
+    listPosts,
+    sharePost,
+    removePost,
 } from './groupTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 
 const sharedSecret = 'abc' as HexString;
 const topic = '0000000000000000000000000000000000000000000000000000000000000000' as HexString;
 
+const ALICE = GroupProfile.ALICE;
+const BOB = GroupProfile.BOB;
+const CAROL = GroupProfile.CAROL;
+const DAVID = GroupProfile.DAVID;
+const EVE = GroupProfile.EVE;
+const MALLORY = GroupProfile.MALLORY;
+
 const groupTestConfig: GroupTestConfig = [
-    [
-        GroupProfile.ALICE, [
-            GroupProfile.BOB,
-            GroupProfile.CAROL,
-        ],
-    ],
-    [
-        GroupProfile.BOB, [
-            GroupProfile.ALICE,
-            GroupProfile.CAROL,
-        ],
-    ],
-    [
-        GroupProfile.CAROL, [
-            GroupProfile.ALICE,
-            GroupProfile.BOB,
-            GroupProfile.DAVID,
-        ],
-    ],
-    [
-        GroupProfile.DAVID, [
-            GroupProfile.CAROL,
-        ],
-    ],
-    [
-        GroupProfile.EVE, [],
-    ],
-    [
-        GroupProfile.MALLORY, [],
-    ],
+    [ ALICE, [BOB, CAROL]],
+    [ BOB, [ALICE, CAROL]],
+    [ CAROL, [ALICE, BOB, DAVID]],
+    [ DAVID, [CAROL]],
+    [ EVE, []],
+    [ MALLORY, []],
+];
+
+const aliceAndBobInviteWithSyncActions: GroupAction[] = [
+    [ALICE, createGroup(topic, sharedSecret)],
+    [ALICE, invite(BOB)],
+    [ALICE, sync()],
+    [BOB, receivePrivateInvite(ALICE)],
+    [BOB, sync()],
+];
+
+const aliceBobAndCarolInviteWithSyncActions: GroupAction[] = [
+    [ALICE, createGroup(topic, sharedSecret)],
+    [ALICE, invite(BOB)],
+    [ALICE, invite(CAROL)],
+    [ALICE, sync()],
+    [BOB, receivePrivateInvite(ALICE)],
+    [BOB, sync()],
+    [CAROL, receivePrivateInvite(ALICE)],
+    [CAROL, sync()],
+    [ALICE, sync()],
 ];
 
 export const groupProtocolTests = {
     testGroupCreateGroup: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
+            [ALICE, createGroup(topic, sharedSecret)],
         ];
-        const outputState = await t.execute(actions);
-        const aliceContext = outputState.contexts[t.ALICE];
+        const outputState = await execute(actions, groupTestConfig);
+        const aliceContext = outputState.contexts[ALICE];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -60,16 +71,15 @@ export const groupProtocolTests = {
     },
 
     testGroupBasicInvite: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [BOB, receivePrivateInvite(ALICE)],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const aliceContext = outputState.contexts[t.ALICE];
-        const bobContext = outputState.contexts[t.BOB];
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -85,18 +95,11 @@ export const groupProtocolTests = {
     },
 
     testGroupBasicInviteWithSync: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
-        const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
-        ];
-        const outputState = await t.execute(actions);
+        const actions = aliceAndBobInviteWithSyncActions;
+        const outputState = await execute(actions, groupTestConfig);
 
-        const aliceContext = outputState.contexts[t.ALICE];
-        const bobContext = outputState.contexts[t.BOB];
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -112,25 +115,53 @@ export const groupProtocolTests = {
     },
 
     testGroupInviteTwo: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
-        const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.invite(t.CAROL)],
-            [t.CAROL, t.receivePrivateInvite(t.ALICE)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
-            [t.CAROL, t.sync()],
-        ];
-        const outputState = await t.execute(actions);
-        t.debugState(outputState);
+        const actions = aliceBobAndCarolInviteWithSyncActions;
+        const outputState = await execute(actions, groupTestConfig);
 
-        const aliceContext = outputState.contexts[t.ALICE];
-        const bobContext = outputState.contexts[t.BOB];
-        const carolContext = outputState.contexts[t.CAROL];
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
+        const carolContext = outputState.contexts[CAROL];
+
+        assertEquals(sharedSecret, aliceContext.sharedSecret);
+        assertEquals(topic, aliceContext.topic);
+
+        assertEquals(sharedSecret, bobContext.sharedSecret);
+        assertEquals(topic, bobContext.topic);
+
+        assertEquals(sharedSecret, carolContext.sharedSecret);
+        assertEquals(topic, carolContext.topic);
+
+        assertEquals(2, aliceContext.peers.length);
+        assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
+        assertEquals(aliceContext.peers[1].address, carolContext.profile.identity.address);
+
+        assertEquals(2, bobContext.peers.length);
+        assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
+        assertEquals(bobContext.peers[1].address, carolContext.profile.identity.address);
+
+        assertEquals(2, carolContext.peers.length);
+        assertEquals(carolContext.peers[0].address, bobContext.profile.identity.address);
+        assertEquals(carolContext.peers[1].address, aliceContext.profile.identity.address);
+    },
+
+    testGroupInviteTwoAlternative: async () => {
+        const actions: GroupAction[] = [
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sync()],
+            [ALICE, invite(CAROL)],
+            [CAROL, receivePrivateInvite(ALICE)],
+            [ALICE, sync()],
+            [BOB, sync()],
+            [CAROL, sync()],
+        ];
+        const outputState = await execute(actions, groupTestConfig);
+
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
+        const carolContext = outputState.contexts[CAROL];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -155,25 +186,23 @@ export const groupProtocolTests = {
     },
 
     testGroupChainedInvite: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.invite(t.CAROL)],
-            [t.BOB, t.sync()],
-            [t.CAROL, t.receivePrivateInvite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
-            [t.CAROL, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, invite(CAROL)],
+            [BOB, sync()],
+            [CAROL, receivePrivateInvite(BOB)],
+            [ALICE, sync()],
+            [BOB, sync()],
+            [CAROL, sync()],
         ];
-        const outputState = await t.execute(actions);
-        t.debugState(outputState);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const aliceContext = outputState.contexts[t.ALICE];
-        const bobContext = outputState.contexts[t.BOB];
-        const carolContext = outputState.contexts[t.CAROL];
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
+        const carolContext = outputState.contexts[CAROL];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -198,26 +227,24 @@ export const groupProtocolTests = {
     },
 
     testGroupChainedInviteNonContact: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.CAROL)],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.receivePrivateInvite(t.ALICE)],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.invite(t.DAVID)],
-            [t.CAROL, t.sync()],
-            [t.DAVID, t.receivePrivateInvite(t.CAROL)],
-            [t.DAVID, t.sync()],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(CAROL)],
+            [ALICE, sync()],
+            [CAROL, receivePrivateInvite(ALICE)],
+            [ALICE, sync()],
+            [CAROL, invite(DAVID)],
+            [CAROL, sync()],
+            [DAVID, receivePrivateInvite(CAROL)],
+            [DAVID, sync()],
+            [ALICE, sync()],
+            [CAROL, sync()],
         ];
-        const outputState = await t.execute(actions);
-        t.debugState(outputState);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const aliceContext = outputState.contexts[t.ALICE];
-        const carolContext = outputState.contexts[t.CAROL];
-        const davidContext = outputState.contexts[t.DAVID];
+        const aliceContext = outputState.contexts[ALICE];
+        const carolContext = outputState.contexts[CAROL];
+        const davidContext = outputState.contexts[DAVID];
 
         assertEquals(sharedSecret, aliceContext.sharedSecret);
         assertEquals(topic, aliceContext.topic);
@@ -242,42 +269,40 @@ export const groupProtocolTests = {
     },
 
     testGroupBasicPost: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.ALICE, t.sharePostText('hello', 1)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [BOB, receivePrivateInvite(ALICE)],
+            [ALICE, sharePostText('hello', 1)],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
 
         assertEquals(1, alicePosts.length);
         assertEquals(1, bobPosts.length);
     },
 
     testGroupMultiplePosts: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aText = 'A';
         const bText = 'B';
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePostText(bText, 1)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sharePostText(aText, 1)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePostText(bText, 1)],
+            [BOB, sync()],
+            [ALICE, sharePostText(aText, 1)],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
 
         assertEquals(2, alicePosts.length);
         assertEquals(aText, alicePosts[0].text);
@@ -289,28 +314,27 @@ export const groupProtocolTests = {
     },
 
     testGroupMultiplePostsWithThreePeers: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aPost = makePost('A', 1);
         const bPost = makePost('B', 1);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.sharePost(aPost)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.invite(t.CAROL)],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.receivePrivateInvite(t.ALICE)],
-            [t.CAROL, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePost(bPost)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, sharePost(aPost)],
+            [ALICE, invite(BOB)],
+            [ALICE, invite(CAROL)],
+            [ALICE, sync()],
+            [CAROL, receivePrivateInvite(ALICE)],
+            [CAROL, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePost(bPost)],
+            [BOB, sync()],
+            [ALICE, sync()],
+            [CAROL, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
-        const carolPosts = t.listPosts(outputState.contexts[t.CAROL]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
+        const carolPosts = listPosts(outputState.contexts[CAROL]);
 
         assertEquals(2, alicePosts.length);
         assertEquals(aPost.text, alicePosts[0].text);
@@ -326,25 +350,24 @@ export const groupProtocolTests = {
     },
 
     testGroupRemoveOwnPost: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aPost = makePost('A', 1);
         const bPost = makePost('B', 1);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePost(bPost)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sharePost(aPost)],
-            [t.ALICE, t.removePost(aPost._id)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePost(bPost)],
+            [BOB, sync()],
+            [ALICE, sharePost(aPost)],
+            [ALICE, removePost(aPost._id)],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
 
         assertEquals(1, alicePosts.length);
         assertEquals(bPost._id, alicePosts[0]._id);
@@ -354,26 +377,25 @@ export const groupProtocolTests = {
     },
 
     testGroupRemoveOwnPostWithExtraSync: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aPost = makePost('A', 1);
         const bPost = makePost('B', 1);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePost(bPost)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sharePost(aPost)],
-            [t.ALICE, t.sync()],
-            [t.ALICE, t.removePost(aPost._id)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePost(bPost)],
+            [BOB, sync()],
+            [ALICE, sharePost(aPost)],
+            [ALICE, sync()],
+            [ALICE, removePost(aPost._id)],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
 
         assertEquals(1, alicePosts.length);
         assertEquals(bPost._id, alicePosts[0]._id);
@@ -383,25 +405,24 @@ export const groupProtocolTests = {
     },
 
     testGroupRemovePostPeerShouldNotRemoveOwn: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aPost = makePost('A', 1);
         const bPost = makePost('B', 1);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePost(bPost)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sharePost(aPost)],
-            [t.ALICE, t.removePost(bPost._id)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, invite(BOB)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePost(bPost)],
+            [BOB, sync()],
+            [ALICE, sharePost(aPost)],
+            [ALICE, removePost(bPost._id)],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
 
         assertEquals(2, alicePosts.length);
         assertEquals(aPost.text, alicePosts[0].text);
@@ -413,30 +434,29 @@ export const groupProtocolTests = {
     },
 
     testGroupRemovePostPeerShouldNotRemoveOtherPeer: async () => {
-        const t = await makeGroupProtocolTester(groupTestConfig);
         const aPost = makePost('A', 1);
         const bPost = makePost('B', 1);
         const actions: GroupAction[] = [
-            [t.ALICE, t.createGroup(topic, sharedSecret)],
-            [t.ALICE, t.sharePost(aPost)],
-            [t.ALICE, t.invite(t.BOB)],
-            [t.ALICE, t.invite(t.CAROL)],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.receivePrivateInvite(t.ALICE)],
-            [t.BOB, t.sharePost(bPost)],
-            [t.BOB, t.sync()],
-            [t.ALICE, t.sync()],
-            [t.CAROL, t.receivePrivateInvite(t.ALICE)],
-            [t.CAROL, t.removePost(aPost._id)],
-            [t.CAROL, t.sync()],
-            [t.ALICE, t.sync()],
-            [t.BOB, t.sync()],
+            [ALICE, createGroup(topic, sharedSecret)],
+            [ALICE, sharePost(aPost)],
+            [ALICE, invite(BOB)],
+            [ALICE, invite(CAROL)],
+            [ALICE, sync()],
+            [BOB, receivePrivateInvite(ALICE)],
+            [BOB, sharePost(bPost)],
+            [BOB, sync()],
+            [ALICE, sync()],
+            [CAROL, receivePrivateInvite(ALICE)],
+            [CAROL, removePost(aPost._id)],
+            [CAROL, sync()],
+            [ALICE, sync()],
+            [BOB, sync()],
         ];
-        const outputState = await t.execute(actions);
+        const outputState = await execute(actions, groupTestConfig);
 
-        const alicePosts = t.listPosts(outputState.contexts[t.ALICE]);
-        const bobPosts = t.listPosts(outputState.contexts[t.BOB]);
-        const carolPosts = t.listPosts(outputState.contexts[t.CAROL]);
+        const alicePosts = listPosts(outputState.contexts[ALICE]);
+        const bobPosts = listPosts(outputState.contexts[BOB]);
+        const carolPosts = listPosts(outputState.contexts[CAROL]);
 
         assertEquals(2, alicePosts.length);
         assertEquals(aPost.text, alicePosts[0].text);

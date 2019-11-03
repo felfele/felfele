@@ -1,7 +1,6 @@
 import { Post, PostWithId } from '../models/Post';
 import { HexString } from '../helpers/opaqueTypes';
 import { randomNumbers, makeStorage, makeCrypto } from '../cli/protocolTest/protocolTestHelpers';
-import { byteArrayToHex } from '../helpers/conversion';
 import * as SwarmHelpers from '../swarm/Swarm';
 import { PrivateProfile, PublicProfile } from '../models/Profile';
 import { PrivateIdentity } from '../models/Identity';
@@ -11,18 +10,25 @@ import { makePostId } from '../helpers/postHelpers';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
-import { groupAddMember, GroupPeer, groupPost, Group, OwnSyncData, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommandPost, GroupCommand, GroupSyncPeer, groupRemovePost } from './group';
+import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group } from './group';
+import { PrivateChannelCommandInviteToGroup, makeEmptyPrivateChannel, privateChannelInviteToGroup } from './privateChannel';
+import { groupProtocolTests } from './groupTest';
 
 interface PeerPost extends Post {
     ownerAddress: HexString;
 }
 
+interface GroupContextContact extends GroupSyncPeer {
+    invite?: PrivateChannelCommandInviteToGroup;
+}
+
 export interface GroupContext extends GroupSyncData {
+    groupProfile: GroupProfile;
     profile: PublicProfile;
     crypto: ProtocolCrypto;
     storage: ProtocolStorage;
     posts: PeerPost[];
-    contacts: GroupSyncPeer[];
+    contacts: GroupContextContact[];
 }
 
 // For reference see https://en.wikipedia.org/wiki/Alice_and_Bob
@@ -39,6 +45,18 @@ export type GroupFunction = (context: GroupContext, state: GroupState) => Promis
 export type GroupAction = [GroupProfile, GroupFunction];
 
 type FixedArray<T> = [T, T, T, T, T, T];
+
+const asyncMapFixedArray = async <T, K>(arr: FixedArray<T>, fun: (t: T) => Promise<K>): Promise<FixedArray<K>> => {
+    const ret: FixedArray<K> = [
+        await fun(arr[0]),
+        await fun(arr[1]),
+        await fun(arr[2]),
+        await fun(arr[3]),
+        await fun(arr[4]),
+        await fun(arr[5]),
+    ];
+    return ret;
+};
 
 export interface GroupState {
     contexts: FixedArray<GroupContext>;
@@ -58,28 +76,7 @@ export const makePost = (text: string, createdAt: number = Date.now()): PostWith
     };
 };
 
-export interface GroupProtocolTester {
-    ALICE: GroupProfile.ALICE;
-    BOB: GroupProfile.BOB;
-    CAROL: GroupProfile.CAROL;
-    DAVID: GroupProfile.DAVID;
-    EVE: GroupProfile.EVE;
-    MALLORY: GroupProfile.MALLORY;
-    createGroup: (topic: HexString, sharedSecret: HexString) => GroupFunction;
-    invite: (profile: GroupProfile) => GroupFunction;
-    receivePrivateInvite: (from: GroupProfile) => GroupFunction;
-    sharePostText: (text: string, createdAt: number) => GroupFunction;
-    sharePost: (post: Post & { _id: HexString }) => GroupFunction;
-    removePost: (id: HexString) => GroupFunction;
-    sync: () => GroupFunction;
-    listPosts: (context: GroupContext) => Post[];
-    makePosts: (profile: GroupProfile, numPosts: number) => Promise<GroupAction[]>;
-    execute: (actions: GroupAction[]) => Promise<GroupState>;
-    generateRandomHex: () => HexString;
-    debugState: (state: GroupState) => void;
-}
-
-const createProfiles = async (generateIdentity: () => Promise<PrivateIdentity>): Promise<PrivateProfile[]> => {
+const createProfiles = async (generateIdentity: () => Promise<PrivateIdentity>): Promise<FixedArray<PrivateProfile>> => {
     const profiles: PrivateProfile[] = [];
     for (const profileName of Object.values(GroupProfile)) {
         if (typeof profileName === 'string') {
@@ -91,254 +88,262 @@ const createProfiles = async (generateIdentity: () => Promise<PrivateIdentity>):
             profiles.push(profile);
         }
     }
-    return profiles;
+    return profiles as FixedArray<PrivateProfile>;
 };
 
 type GroupTestContactConfig = [GroupProfile, GroupProfile[]];
 export type GroupTestConfig = FixedArray<GroupTestContactConfig>;
 
-export const makeGroupProtocolTester = async (groupTestConfig: GroupTestConfig, randomSeed: string = randomNumbers[0]): Promise<GroupProtocolTester> => {
+export const debugState = (state: GroupState) => {
+    for (const context of state.contexts) {
+        const posts = listPosts(context);
+        Debug.log({
+            name: context.profile.name,
+            posts,
+        });
+        Debug.log(context);
+    }
+    return state;
+};
+
+export const listPosts = (context: GroupContext): Post[] => {
+    const postId = (p: Post) => typeof p._id === 'string' ? p._id : '' + (p._id || '');
+    const idCompare = (a: Post, b: Post) => postId(a).localeCompare(postId(b));
+    return context.posts
+        .sort((a, b) => postTimeCompare(a, b) || idCompare(a, b))
+    ;
+};
+
+const executeCommand = (command: GroupCommand, context: GroupContext, address: HexString) => {
+    Debug.log('executeCommand', {
+        profileName: context.profile.name,
+        profileAddress: context.profile.identity.address,
+        commandAddress: address,
+        posts: context.posts,
+        command,
+    });
+    switch (command.type) {
+        case 'post': {
+            const post = {
+                ...command.post,
+                ownerAddress: address,
+                _id: command.post._id || makePostId(command.post),
+            };
+            context.posts.push(post);
+            return;
+        }
+        case 'remove-post': {
+            const isRemoveOwnPost = (post: PeerPost) => post._id === command.id && post.ownerAddress === address;
+            context.posts = context.posts.filter(post =>
+                post._id == null || isRemoveOwnPost(post) === false
+            );
+            Debug.log('executeCommand', command.type, {posts: context.posts});
+            return;
+        }
+    }
+};
+
+export const createGroup = (topic: HexString, sharedSecret: HexString): GroupFunction => {
+    return async (context) => {
+        return {
+            ...context,
+            topic,
+            sharedSecret,
+            peers: [],
+        };
+    };
+};
+
+const sendPrivateInvite = (from: GroupProfile, to: GroupProfile, state: GroupState) => {
+    const fromProfile = state.profiles[from];
+    const index = state.contexts[to].contacts.findIndex(c => c.address === fromProfile.identity.address);
+    if (index === -1) {
+        throw new Error(`unknown contact: ${fromProfile.name} of ${state.profiles[to].name}`);
+    }
+    const contact = state.contexts[to].contacts[index];
+    const group: Group = {
+        ...state.contexts[from],
+    };
+    const inviteCommand: PrivateChannelCommandInviteToGroup = {
+        type: 'invite',
+        version: 1,
+        protocol: 'private',
+        group,
+    };
+    contact.invite = inviteCommand;
+};
+
+const findContactByGroupProfile = (context: GroupContext, state: GroupState, groupProfile: GroupProfile): GroupContextContact | never => {
+    const profile = state.profiles[groupProfile];
+    const profileAddress = profile.identity.address;
+    const index = context.contacts.findIndex(c => c.address === profileAddress);
+    if (index === -1) {
+        throw new Error(`unknown contact: ${profile.name} of ${context.profile.name}`);
+    }
+    return context.contacts[index];
+};
+
+export const invite = (groupProfile: GroupProfile): GroupFunction => {
+    return async (context, state) => {
+        const contact = findContactByGroupProfile(context, state, groupProfile);
+
+        sendPrivateInvite(context.groupProfile, groupProfile, state);
+
+        const ownSyncData = groupAddMember(context.ownSyncData, contact);
+        const members = [...context.peers, contact];
+        return {
+            ...context,
+            ownSyncData,
+            peers: members,
+        };
+    };
+};
+
+export const receivePrivateInvite = (from: GroupProfile): GroupFunction => {
+    return async (context, state) => {
+        const fromProfile = state.profiles[from];
+        const fromProfileAddress = fromProfile.identity.address;
+        const contact = findContactByGroupProfile(context, state, from);
+        const inviteCommand = contact.invite;
+        if (inviteCommand == null) {
+            throw new Error(`missing invite: ${fromProfile.name} to ${context.profile.name}`);
+        }
+        const peers = inviteCommand.group.peers
+            .filter(member => member.address !== context.profile.identity.address)
+            .map(member => ({
+                ...member,
+                peerLastSeenChapterId: undefined,
+            }))
+            .concat([{
+                ...fromProfile,
+                address: fromProfileAddress as HexString,
+                peerLastSeenChapterId: undefined,
+            }])
+        ;
+        return {
+            ...context,
+            sharedSecret: inviteCommand.group.sharedSecret,
+            topic: inviteCommand.group.topic,
+            peers: peers,
+        };
+    };
+};
+
+export const sync = (): GroupFunction => {
+    return async (context) => {
+        Debug.log('sync', {
+            profileName: context.profile.name,
+            profileAddress: context.profile.identity.address,
+        });
+        const update = await groupSync(
+            context,
+            context.storage,
+            context.crypto,
+            (image) => Promise.resolve(image)
+        );
+        const groupSyncData = groupApplySyncUpdate(
+            update,
+            (command, address) => executeCommand(command, context, address),
+            command => executeCommand(command, context, context.profile.identity.address as HexString),
+        );
+        const retval = {
+            ...context,
+            ...groupSyncData,
+            posts: context.posts,
+        };
+        return retval;
+    };
+};
+
+export const sharePostText = (text: string, createdAt: number = Date.now()): GroupFunction => {
+    return sharePost(makePost(text, createdAt));
+};
+
+export const sharePost = (post: PostWithId) => {
+    return async (context: GroupContext): Promise<GroupContext> => {
+        const ownSyncData = groupPost(context.ownSyncData, post);
+        return {
+            ...context,
+            ownSyncData,
+        };
+    };
+};
+
+export const removePost = (id: HexString): GroupFunction => {
+    return async (context) => {
+        const ownSyncData = groupRemovePost(context.ownSyncData, id);
+        return {
+            ...context,
+            ownSyncData,
+        };
+    };
+};
+
+export const execute = async (
+    actions: GroupAction[],
+    groupTestConfig: GroupTestConfig,
+    randomSeed: string = randomNumbers[0],
+): Promise<GroupState> => {
     const generateDeterministicRandom = createDeterministicRandomGenerator(randomSeed);
     const generateAsyncDeterministicRandom = (length: number) => Promise.resolve(generateDeterministicRandom(length));
     const generateIdentity = () => SwarmHelpers.generateSecureIdentity(generateAsyncDeterministicRandom);
-    const generateRandomHex = () => byteArrayToHex(generateDeterministicRandom(32), false);
 
-    const debugState = (state: GroupState) => {
-        for (const context of state.contexts) {
-            const posts = listPosts(context);
-            Debug.log({
-                name: context.profile.name,
-                posts,
-            });
-            Debug.log(context);
+    const storage = await makeStorage(generateIdentity);
+    const profiles = await createProfiles(generateIdentity);
+
+    const makeContextContact = (profile: PublicProfile): GroupSyncPeer => ({
+        name: profile.name,
+        image: profile.image,
+        address: profile.identity.address as HexString,
+        peerLastSeenChapterId: undefined,
+    });
+
+    const makeContextFromProfiles = async (
+        groupProfile: GroupProfile,
+        profile: PrivateProfile,
+        contactProfiles: PublicProfile[],
+    ): Promise<GroupContext> => ({
+        topic: '' as HexString,
+        sharedSecret: '' as HexString,
+        ownSyncData: {
+            ownAddress: profile.identity.address as HexString,
+            unsyncedCommands: [],
+            lastSyncedChapterId: undefined,
+        },
+        groupProfile,
+        profile,
+        storage,
+        crypto: makeCrypto(profile.identity, generateAsyncDeterministicRandom),
+        posts: [],
+        peers: [],
+        contacts: contactProfiles.map(contactProfile => makeContextContact(contactProfile)),
+    });
+
+    const makeContextFromTestConfig = async (
+        testConfig: GroupTestContactConfig
+    ): Promise<GroupContext> =>
+        makeContextFromProfiles(
+            testConfig[0],
+            profiles[testConfig[0]],
+            testConfig[1].map(profile => profiles[profile])
+        )
+    ;
+
+    const contexts = await asyncMapFixedArray(groupTestConfig, makeContextFromTestConfig);
+    const inputState: GroupState = {
+        contexts,
+        profiles,
+    };
+
+    const composeState = async (state: GroupState, groupActions: GroupAction[]): Promise<GroupState> => {
+        for (const action of groupActions) {
+            const p = action[0];
+            const f = action[1];
+            const context = state.contexts[p];
+            state.contexts[p] = await f(context, state);
         }
         return state;
     };
 
-    const listPosts = (context: GroupContext): Post[] => {
-        const postId = (p: Post) => typeof p._id === 'string' ? p._id : '' + (p._id || '');
-        const idCompare = (a: Post, b: Post) => postId(a).localeCompare(postId(b));
-        return context.posts
-            .sort((a, b) => postTimeCompare(a, b) || idCompare(a, b))
-        ;
-    };
-
-    const sharePost = (post: PostWithId) => {
-        return async (context: GroupContext): Promise<GroupContext> => {
-            const ownSyncData = groupPost(context.ownSyncData, post);
-            return {
-                ...context,
-                ownSyncData,
-            };
-        };
-    };
-
-    const executeCommand = (command: GroupCommand, context: GroupContext, address: HexString) => {
-        Debug.log('executeCommand', {
-            profileName: context.profile.name,
-            profileAddress: context.profile.identity.address,
-            commandAddress: address,
-            posts: context.posts,
-            command,
-        });
-        switch (command.type) {
-            case 'post': {
-                const post = {
-                    ...command.post,
-                    ownerAddress: address,
-                    _id: command.post._id || makePostId(command.post),
-                };
-                context.posts.push(post);
-                return;
-            }
-            case 'remove-post': {
-                const isRemoveOwnPost = (post: PeerPost, id: HexString) => post._id === command.id && post.ownerAddress === address;
-                context.posts = context.posts.filter(post =>
-                    post._id == null || isRemoveOwnPost(post, command.id) === false
-                );
-                Debug.log('executeCommand', command.type, {posts: context.posts});
-                return;
-            }
-        }
-    };
-
-    return {
-        ALICE: GroupProfile.ALICE,
-        BOB: GroupProfile.BOB,
-        CAROL: GroupProfile.CAROL,
-        DAVID: GroupProfile.DAVID,
-        EVE: GroupProfile.EVE,
-        MALLORY: GroupProfile.MALLORY,
-        createGroup: (topic: HexString, sharedSecret: HexString): GroupFunction => {
-            return async (context) => {
-                return {
-                    ...context,
-                    topic,
-                    sharedSecret,
-                    peers: [],
-                };
-            };
-        },
-        invite: (groupProfile: GroupProfile) => {
-            return async (context, state) => {
-                const profile = state.profiles[groupProfile];
-                const profileAddress = profile.identity.address;
-                const index = context.contacts.findIndex(c => c.address === profileAddress);
-                if (index === -1) {
-                    return context;
-                }
-                const contact = context.contacts[index];
-                const ownSyncData = groupAddMember(context.ownSyncData, contact);
-                const members = [...context.peers, contact];
-                return {
-                    ...context,
-                    ownSyncData,
-                    peers: members,
-                };
-            };
-        },
-        receivePrivateInvite: (from: GroupProfile) => {
-            return async (context, state) => {
-                // TODO that's cheating, because we get the values from the state
-                // instead of proper messaging between the two profiles, possibly
-                // members can be in a different state already
-                const fromContext = state.contexts[from];
-                const members = fromContext.peers
-                    .filter(member => member.address !== context.profile.identity.address)
-                    .map(member => ({
-                        ...member,
-                        peerLastSeenChapterId: undefined,
-                    }))
-                    .concat([{
-                        ...fromContext.profile,
-                        address: fromContext.profile.identity.address as HexString,
-                        peerLastSeenChapterId: undefined,
-                    }])
-                ;
-                return {
-                    ...context,
-                    sharedSecret: fromContext.sharedSecret,
-                    topic: fromContext.topic,
-                    peers: members,
-                };
-            };
-        },
-        sync: () => {
-            return async (context) => {
-                Debug.log('sync', {
-                    profileName: context.profile.name,
-                    profileAddress: context.profile.identity.address,
-                });
-                const update = await groupSync(
-                    context,
-                    context.storage,
-                    context.crypto,
-                    (image) => Promise.resolve(image)
-                );
-                const groupSyncData = groupApplySyncUpdate(
-                    update,
-                    (command, address) => executeCommand(command, context, address),
-                    command => executeCommand(command, context, context.profile.identity.address as HexString),
-                );
-                const retval = {
-                    ...context,
-                    ...groupSyncData,
-                    posts: context.posts,
-                };
-                return retval;
-            };
-        },
-        sharePostText: (text: string, createdAt: number = Date.now()) => {
-            return sharePost(makePost(text, createdAt));
-        },
-        sharePost: (post: PostWithId) => {
-            return sharePost(post);
-        },
-        removePost: (id: HexString): GroupFunction => {
-            return async (context) => {
-                const ownSyncData = groupRemovePost(context.ownSyncData, id);
-                return {
-                    ...context,
-                    ownSyncData,
-                };
-            };
-        },
-        listPosts,
-        makePosts: async (): Promise<GroupAction[]> => {
-            const actions: GroupAction[] = [];
-            return actions;
-        },
-        execute: async (actions: GroupAction[]): Promise<GroupState> => {
-            const storage = await makeStorage(generateIdentity);
-            const profiles = await createProfiles(generateIdentity);
-
-            const makeContextContact = (profile: PublicProfile): GroupSyncPeer => ({
-                name: profile.name,
-                image: profile.image,
-                address: profile.identity.address as HexString,
-                peerLastSeenChapterId: undefined,
-            });
-
-            const makeContextFromProfiles = async (
-                profile: PrivateProfile,
-                contactProfiles: PublicProfile[],
-            ): Promise<GroupContext> => ({
-                topic: '' as HexString,
-                sharedSecret: '' as HexString,
-                ownSyncData: {
-                    ownAddress: profile.identity.address as HexString,
-                    unsyncedCommands: [],
-                    lastSyncedChapterId: undefined,
-                },
-                profile,
-                storage,
-                crypto: makeCrypto(profile.identity, generateAsyncDeterministicRandom),
-                posts: [],
-                peers: [],
-                contacts: contactProfiles.map(contactProfile => makeContextContact(contactProfile)),
-            });
-
-            const makeContextFromTestConfig = async (
-                testConfig: GroupTestContactConfig
-            ): Promise<GroupContext> =>
-                makeContextFromProfiles(
-                    profiles[testConfig[0]],
-                    testConfig[1].map(profile => profiles[profile])
-                )
-            ;
-
-            const inputState: GroupState = {
-                contexts: [
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.ALICE]),
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.BOB]),
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.CAROL]),
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.DAVID]),
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.EVE]),
-                    await makeContextFromTestConfig(groupTestConfig[GroupProfile.MALLORY]),
-                ],
-                profiles: [
-                    profiles[GroupProfile.ALICE],
-                    profiles[GroupProfile.BOB],
-                    profiles[GroupProfile.CAROL],
-                    profiles[GroupProfile.DAVID],
-                    profiles[GroupProfile.EVE],
-                    profiles[GroupProfile.MALLORY],
-                ],
-            };
-
-            const composeState = async (state: GroupState, groupActions: GroupAction[]): Promise<GroupState> => {
-                for (const action of groupActions) {
-                    const p = action[0];
-                    const f = action[1];
-                    const context = state.contexts[p];
-                    state.contexts[p] = await f(context, state);
-                }
-                return state;
-            };
-
-            return composeState(inputState, actions);
-        },
-        generateRandomHex,
-        debugState,
-    };
+    return composeState(inputState, actions);
 };
