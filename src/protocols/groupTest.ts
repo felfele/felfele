@@ -3,7 +3,6 @@ import {
     GroupAction,
     GroupTestConfig,
     GroupProfile,
-    GroupProfile as G,
     makePost,
     execute,
     createGroup,
@@ -14,6 +13,7 @@ import {
     listPosts,
     sharePost,
     removePost,
+    debugState,
 } from './groupTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 

@@ -11,11 +11,11 @@ import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
 import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember } from './group';
-import { PrivateChannelCommandInviteToGroup, makeEmptyPrivateChannel, privateChannelInviteToGroup } from './privateChannel';
-import { groupProtocolTests } from './groupTest';
+import { PrivateChannelCommandInviteToGroup } from './privateChannel';
 
 interface PeerPost extends Post {
     ownerAddress: HexString;
+    logicalTime: number;
 }
 
 interface GroupContextContact extends GroupSyncPeer {
@@ -29,7 +29,6 @@ export interface GroupContext extends GroupSyncData {
     storage: ProtocolStorage;
     posts: PeerPost[];
     contacts: GroupContextContact[];
-    logicalTime: number;
 }
 
 // For reference see https://en.wikipedia.org/wiki/Alice_and_Bob
@@ -95,8 +94,11 @@ const createProfiles = async (generateIdentity: () => Promise<PrivateIdentity>):
 type GroupTestContactConfig = [GroupProfile, GroupProfile[]];
 export type GroupTestConfig = FixedArray<GroupTestContactConfig>;
 
-export const debugState = (state: GroupState) => {
+export const debugState = (state: GroupState, profiles?: GroupProfile[]) => {
     for (const context of state.contexts) {
+        if (profiles != null && !(context.groupProfile in profiles)) {
+            continue;
+        }
         const posts = listPosts(context);
         Debug.log({
             name: context.profile.name,
@@ -110,8 +112,9 @@ export const debugState = (state: GroupState) => {
 export const listPosts = (context: GroupContext): Post[] => {
     const postId = (p: Post) => typeof p._id === 'string' ? p._id : '' + (p._id || '');
     const idCompare = (a: Post, b: Post) => postId(a).localeCompare(postId(b));
+    const logicalTimeCompare = (a: PeerPost, b: PeerPost) => a.logicalTime - b.logicalTime;
     return context.posts
-        .sort((a, b) => postTimeCompare(a, b) || idCompare(a, b))
+        .sort((a, b) => logicalTimeCompare(a, b) || idCompare(a, b))
     ;
 };
 
@@ -128,6 +131,7 @@ const executeCommand = (command: GroupCommand, context: GroupContext, address: H
             const post = {
                 ...command.post,
                 ownerAddress: address,
+                logicalTime: command.logicalTime,
                 _id: command.post._id || makePostId(command.post),
             };
             context.posts.push(post);
@@ -155,7 +159,7 @@ export const createGroup = (topic: HexString, sharedSecret: HexString): GroupFun
     };
 };
 
-const sendPrivateInvite = (from: GroupProfile, to: GroupProfile, state: GroupState) => {
+const sendPrivateInvite = (from: GroupProfile, to: GroupProfile, state: GroupState, logicalTime: number) => {
     const fromProfile = state.profiles[from];
     const index = state.contexts[to].contacts.findIndex(c => c.address === fromProfile.identity.address);
     if (index === -1) {
@@ -170,6 +174,7 @@ const sendPrivateInvite = (from: GroupProfile, to: GroupProfile, state: GroupSta
         version: 1,
         protocol: 'private',
         group,
+        logicalTime,
     };
     contact.invite = inviteCommand;
 };
@@ -187,11 +192,11 @@ const findContactByGroupProfile = (context: GroupContext, state: GroupState, gro
 export const invite = (groupProfile: GroupProfile): GroupFunction => {
     return async (context, state) => {
         const contact = findContactByGroupProfile(context, state, groupProfile);
-
-        sendPrivateInvite(context.groupProfile, groupProfile, state);
-
         const ownSyncData = groupAddMember(context.ownSyncData, contact);
         const members = [...context.peers, contact];
+
+        sendPrivateInvite(context.groupProfile, groupProfile, state, ownSyncData.logicalTime);
+
         return {
             ...context,
             ownSyncData,
@@ -219,11 +224,16 @@ export const receivePrivateInvite = (from: GroupProfile): GroupFunction => {
                 ...fromProfile,
                 address: fromProfileAddress as HexString,
                 peerLastSeenChapterId: undefined,
-                joinLogicalTime: context.logicalTime,
+                joinLogicalTime: state.contexts[from].ownSyncData.joinLogicalTime,
             }])
         ;
+        const ownSyncData = {
+            ...context.ownSyncData,
+            logicalTime: inviteCommand.logicalTime,
+        };
         return {
             ...context,
+            ownSyncData,
             sharedSecret: inviteCommand.group.sharedSecret,
             topic: inviteCommand.group.topic,
             peers: peers,
@@ -323,6 +333,7 @@ export const execute = async (
             unsyncedCommands: [],
             lastSyncedChapterId: undefined,
             logicalTime: 0,
+            joinLogicalTime: 0,
         },
         groupProfile,
         profile,
@@ -331,7 +342,6 @@ export const execute = async (
         posts: [],
         peers: [],
         contacts: contactProfiles.map(contactProfile => makeContextContact(contactProfile)),
-        logicalTime: 0,
     });
 
     const makeContextFromTestConfig = async (

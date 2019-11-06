@@ -89,7 +89,7 @@ export interface PrivateChannelProtocolTester {
     sharePostText: (text: string, createdAt: number) => PrivateChannelFunction;
     sharePost: (post: Post & { _id: HexString }) => PrivateChannelFunction;
     deletePost: (id: HexString) => PrivateChannelFunction;
-    invite: (group: Group) => PrivateChannelFunction;
+    invite: (group: Group, logicalTime: number) => PrivateChannelFunction;
     sync: () => PrivateChannelFunction;
     listPosts: (context: PrivateChannelContext) => Post[];
     makePosts: (profile: PrivateChannelProfile, numPosts: number) => Promise<PrivateChannelAction[]>;
@@ -223,9 +223,9 @@ export const makePrivateChannelProtocolTester = async (randomSeed: string = rand
                 };
             };
         },
-        invite: (group: Group) => {
+        invite: (group: Group, logicalTime: number): PrivateChannelFunction => {
             return async (context) => {
-                const syncData = privateChannelInviteToGroup(context.syncData, group);
+                const syncData = privateChannelInviteToGroup(context.syncData, group, logicalTime);
                 return {
                     ...context,
                     syncData,

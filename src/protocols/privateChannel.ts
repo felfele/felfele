@@ -45,6 +45,7 @@ export interface PrivateChannelCommandInviteToGroup extends PrivateChannelComman
     type: 'invite';
     version: 1;
     group: Group;
+    logicalTime: number;
 }
 
 export type PrivateChannelCommand =
@@ -119,12 +120,13 @@ export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData,
     return privateChannelAppendCommand(privateChannel, command);
 };
 
-export const privateChannelInviteToGroup = (privateChannel: PrivateChannelSyncData, group: Group): PrivateChannelSyncData => {
+export const privateChannelInviteToGroup = (privateChannel: PrivateChannelSyncData, group: Group, logicalTime: number): PrivateChannelSyncData => {
     const command: PrivateChannelCommandInviteToGroup = {
         type: 'invite',
         version: 1,
         protocol: 'private',
         group,
+        logicalTime,
     };
     return privateChannelAppendCommand(privateChannel, command);
 };

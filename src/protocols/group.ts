@@ -30,6 +30,7 @@ export interface OwnSyncData {
     unsyncedCommands: GroupCommand[];
     lastSyncedChapterId: ChapterReference | undefined;
     logicalTime: number;
+    joinLogicalTime: number;
 }
 
 interface OwnSyncDataUpdate extends OwnSyncData {
@@ -343,11 +344,15 @@ export const groupApplySyncUpdate = (
 
     const addedMembers: PeerSyncDataUpdate[] = [];
     const removedMembers: HexString[] = [];
+    let highestSeenLogicalTime = ownSyncData.logicalTime;
     update.peerSyncDataUpdates.map(peerSyncUpdate => {
         reverseMap(peerSyncUpdate.timeline, chapter => {
             const command = chapter.content;
             if (executeRemoteCommand != null) {
                 executeRemoteCommand(command, peerSyncUpdate.address);
+            }
+            if (command.logicalTime > highestSeenLogicalTime) {
+                highestSeenLogicalTime = command.logicalTime;
             }
             switch (command.type) {
                 case 'add-member': {
@@ -386,7 +391,10 @@ export const groupApplySyncUpdate = (
     }));
     return {
         ...update,
-        ownSyncData,
+        ownSyncData: {
+            ...ownSyncData,
+            logicalTime: highestSeenLogicalTime,
+        },
         peers: members,
     };
 };
