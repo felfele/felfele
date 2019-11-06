@@ -470,4 +470,5 @@ export const groupProtocolTests = {
         assertEquals(aPost.text, carolPosts[0].text);
         assertEquals(bPost.text, carolPosts[1].text);
     },
+
 };

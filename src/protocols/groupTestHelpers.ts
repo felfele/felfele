@@ -10,7 +10,7 @@ import { makePostId } from '../helpers/postHelpers';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
-import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group } from './group';
+import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember } from './group';
 import { PrivateChannelCommandInviteToGroup, makeEmptyPrivateChannel, privateChannelInviteToGroup } from './privateChannel';
 import { groupProtocolTests } from './groupTest';
 
@@ -29,6 +29,7 @@ export interface GroupContext extends GroupSyncData {
     storage: ProtocolStorage;
     posts: PeerPost[];
     contacts: GroupContextContact[];
+    logicalTime: number;
 }
 
 // For reference see https://en.wikipedia.org/wiki/Alice_and_Bob
@@ -218,6 +219,7 @@ export const receivePrivateInvite = (from: GroupProfile): GroupFunction => {
                 ...fromProfile,
                 address: fromProfileAddress as HexString,
                 peerLastSeenChapterId: undefined,
+                joinLogicalTime: context.logicalTime,
             }])
         ;
         return {
@@ -279,6 +281,16 @@ export const removePost = (id: HexString): GroupFunction => {
     };
 };
 
+export const removePeer = (peerAddress: HexString): GroupFunction => {
+    return async (context) => {
+        const ownSyncData = groupRemoveMember(context.ownSyncData, peerAddress);
+        return {
+            ...context,
+            ownSyncData,
+        };
+    };
+};
+
 export const execute = async (
     actions: GroupAction[],
     groupTestConfig: GroupTestConfig,
@@ -296,6 +308,7 @@ export const execute = async (
         image: profile.image,
         address: profile.identity.address as HexString,
         peerLastSeenChapterId: undefined,
+        joinLogicalTime: 0,
     });
 
     const makeContextFromProfiles = async (
@@ -309,6 +322,7 @@ export const execute = async (
             ownAddress: profile.identity.address as HexString,
             unsyncedCommands: [],
             lastSyncedChapterId: undefined,
+            logicalTime: 0,
         },
         groupProfile,
         profile,
@@ -317,6 +331,7 @@ export const execute = async (
         posts: [],
         peers: [],
         contacts: contactProfiles.map(contactProfile => makeContextContact(contactProfile)),
+        logicalTime: 0,
     });
 
     const makeContextFromTestConfig = async (

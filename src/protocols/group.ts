@@ -29,6 +29,7 @@ export interface OwnSyncData {
     ownAddress: HexString;
     unsyncedCommands: GroupCommand[];
     lastSyncedChapterId: ChapterReference | undefined;
+    logicalTime: number;
 }
 
 interface OwnSyncDataUpdate extends OwnSyncData {
@@ -40,6 +41,7 @@ export interface GroupPeer {
     address: HexString;
     name: string;
     image: ImageData;
+    joinLogicalTime: number;
 }
 
 export interface GroupSyncPeer extends GroupPeer, PeerSyncData {
@@ -63,6 +65,7 @@ interface GroupSyncUpdate extends Group {
 interface GroupCommandBase {
     protocol: 'group';
     version: 1;
+    logicalTime: number;
 }
 
 export interface GroupCommandAddMember extends GroupCommandBase {
@@ -99,25 +102,39 @@ export type GroupCommand =
 const groupAppendCommand = (syncData: OwnSyncData, command: GroupCommand): OwnSyncData => {
     return {
         ...syncData,
+        logicalTime: command.logicalTime,
         unsyncedCommands: [command, ...syncData.unsyncedCommands],
     };
 };
 
+const makeGroupCommandBase = (syncData: OwnSyncData): GroupCommandBase => ({
+    protocol: 'group',
+    version: 1,
+    logicalTime: syncData.logicalTime + 1,
+});
+
 export const groupAddMember = (syncData: OwnSyncData, member: GroupPeer): OwnSyncData => {
     const command: GroupCommandAddMember = {
+        ...makeGroupCommandBase(syncData),
         type: 'add-member',
-        version: 1,
-        protocol: 'group',
         member,
+    };
+    return groupAppendCommand(syncData, command);
+};
+
+export const groupRemoveMember = (syncData: OwnSyncData, address: HexString): OwnSyncData => {
+    const command: GroupCommandRemoveMember = {
+        ...makeGroupCommandBase(syncData),
+        type: 'remove-member',
+        address,
     };
     return groupAppendCommand(syncData, command);
 };
 
 export const groupPost = (syncData: OwnSyncData, post: PostWithId): OwnSyncData => {
     const command: GroupCommandPost = {
+        ...makeGroupCommandBase(syncData),
         type: 'post',
-        version: 1,
-        protocol: 'group',
         post,
     };
     return groupAppendCommand(syncData, command);
@@ -125,9 +142,8 @@ export const groupPost = (syncData: OwnSyncData, post: PostWithId): OwnSyncData 
 
 export const groupRemovePost = (syncData: OwnSyncData, id: HexString): OwnSyncData => {
     const command: GroupCommandRemovePost = {
+        ...makeGroupCommandBase(syncData),
         type: 'remove-post',
-        version: 1,
-        protocol: 'group',
         id,
     };
     return groupAppendCommand(syncData, command);
