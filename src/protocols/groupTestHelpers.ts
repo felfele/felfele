@@ -230,6 +230,7 @@ export const receivePrivateInvite = (from: GroupProfile): GroupFunction => {
         const ownSyncData = {
             ...context.ownSyncData,
             logicalTime: inviteCommand.logicalTime,
+            joinLogicalTime: inviteCommand.logicalTime,
         };
         return {
             ...context,

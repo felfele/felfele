@@ -109,9 +109,13 @@ export const groupProtocolTests = {
 
         assertEquals(1, aliceContext.peers.length);
         assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
+        assertEquals(1, aliceContext.ownSyncData.logicalTime);
+        assertEquals(0, aliceContext.ownSyncData.joinLogicalTime);
 
         assertEquals(1, bobContext.peers.length);
         assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
+        assertEquals(1, bobContext.ownSyncData.logicalTime);
+        assertEquals(1, bobContext.ownSyncData.joinLogicalTime);
     },
 
     testGroupInviteTwo: async () => {
@@ -134,14 +138,20 @@ export const groupProtocolTests = {
         assertEquals(2, aliceContext.peers.length);
         assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
         assertEquals(aliceContext.peers[1].address, carolContext.profile.identity.address);
+        assertEquals(2, aliceContext.ownSyncData.logicalTime);
+        assertEquals(0, aliceContext.ownSyncData.joinLogicalTime);
 
         assertEquals(2, bobContext.peers.length);
         assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
         assertEquals(bobContext.peers[1].address, carolContext.profile.identity.address);
+        assertEquals(2, bobContext.ownSyncData.logicalTime);
+        assertEquals(1, bobContext.ownSyncData.joinLogicalTime);
 
         assertEquals(2, carolContext.peers.length);
         assertEquals(carolContext.peers[0].address, bobContext.profile.identity.address);
         assertEquals(carolContext.peers[1].address, aliceContext.profile.identity.address);
+        assertEquals(2, carolContext.ownSyncData.logicalTime);
+        assertEquals(2, carolContext.ownSyncData.joinLogicalTime);
     },
 
     testGroupInviteTwoAlternative: async () => {
