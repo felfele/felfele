@@ -14,8 +14,10 @@ import {
     sharePost,
     removePost,
     debugState,
+    listMembers,
 } from './groupTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
+import deepEqual = require('deep-equal');
 
 const sharedSecret = 'abc' as HexString;
 const topic = '0000000000000000000000000000000000000000000000000000000000000000' as HexString;
@@ -135,21 +137,24 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        assertEquals(2, aliceContext.peers.length);
-        assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
-        assertEquals(aliceContext.peers[1].address, carolContext.profile.identity.address);
+        const aliceMembers = listMembers(aliceContext);
+        const bobMembers = listMembers(bobContext);
+        const carolMembers = listMembers(carolContext);
+
+        assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
+        assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
+        assertEquals(carolContext.profile.identity.address, aliceMembers[2]);
+
+        assertEquals(3, aliceMembers.length);
+        assertEquals(aliceMembers, bobMembers, deepEqual);
+        assertEquals(aliceMembers, carolMembers, deepEqual);
+
         assertEquals(2, aliceContext.ownSyncData.logicalTime);
         assertEquals(0, aliceContext.ownSyncData.joinLogicalTime);
 
-        assertEquals(2, bobContext.peers.length);
-        assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(bobContext.peers[1].address, carolContext.profile.identity.address);
         assertEquals(2, bobContext.ownSyncData.logicalTime);
         assertEquals(1, bobContext.ownSyncData.joinLogicalTime);
 
-        assertEquals(2, carolContext.peers.length);
-        assertEquals(carolContext.peers[0].address, bobContext.profile.identity.address);
-        assertEquals(carolContext.peers[1].address, aliceContext.profile.identity.address);
         assertEquals(2, carolContext.ownSyncData.logicalTime);
         assertEquals(2, carolContext.ownSyncData.joinLogicalTime);
     },
@@ -182,17 +187,17 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        assertEquals(2, aliceContext.peers.length);
-        assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
-        assertEquals(aliceContext.peers[1].address, carolContext.profile.identity.address);
+        const aliceMembers = listMembers(aliceContext);
+        const bobMembers = listMembers(bobContext);
+        const carolMembers = listMembers(carolContext);
 
-        assertEquals(2, bobContext.peers.length);
-        assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(bobContext.peers[1].address, carolContext.profile.identity.address);
+        assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
+        assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
+        assertEquals(carolContext.profile.identity.address, aliceMembers[2]);
 
-        assertEquals(2, carolContext.peers.length);
-        assertEquals(carolContext.peers[0].address, bobContext.profile.identity.address);
-        assertEquals(carolContext.peers[1].address, aliceContext.profile.identity.address);
+        assertEquals(3, aliceMembers.length);
+        assertEquals(aliceMembers, bobMembers, deepEqual);
+        assertEquals(aliceMembers, carolMembers, deepEqual);
     },
 
     testGroupChainedInvite: async () => {
@@ -223,17 +228,17 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        assertEquals(2, aliceContext.peers.length);
-        assertEquals(aliceContext.peers[0].address, bobContext.profile.identity.address);
-        assertEquals(aliceContext.peers[1].address, carolContext.profile.identity.address);
+        const aliceMembers = listMembers(aliceContext);
+        const bobMembers = listMembers(bobContext);
+        const carolMembers = listMembers(carolContext);
 
-        assertEquals(2, bobContext.peers.length);
-        assertEquals(bobContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(bobContext.peers[1].address, carolContext.profile.identity.address);
+        assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
+        assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
+        assertEquals(carolContext.profile.identity.address, aliceMembers[2]);
 
-        assertEquals(2, carolContext.peers.length);
-        assertEquals(carolContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(carolContext.peers[1].address, bobContext.profile.identity.address);
+        assertEquals(3, aliceMembers.length);
+        assertEquals(aliceMembers, bobMembers, deepEqual);
+        assertEquals(aliceMembers, carolMembers, deepEqual);
     },
 
     testGroupChainedInviteNonContact: async () => {
@@ -265,17 +270,17 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, davidContext.sharedSecret);
         assertEquals(topic, davidContext.topic);
 
-        assertEquals(2, aliceContext.peers.length);
-        assertEquals(aliceContext.peers[0].address, carolContext.profile.identity.address);
-        assertEquals(aliceContext.peers[1].address, davidContext.profile.identity.address);
+        const aliceMembers = listMembers(aliceContext);
+        const carolMembers = listMembers(carolContext);
+        const davidMembers = listMembers(davidContext);
 
-        assertEquals(2, carolContext.peers.length);
-        assertEquals(carolContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(carolContext.peers[1].address, davidContext.profile.identity.address);
+        assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
+        assertEquals(carolContext.profile.identity.address, aliceMembers[1]);
+        assertEquals(davidContext.profile.identity.address, aliceMembers[2]);
 
-        assertEquals(2, davidContext.peers.length);
-        assertEquals(davidContext.peers[0].address, aliceContext.profile.identity.address);
-        assertEquals(davidContext.peers[1].address, carolContext.profile.identity.address);
+        assertEquals(3, aliceMembers.length);
+        assertEquals(aliceMembers, carolMembers, deepEqual);
+        assertEquals(aliceMembers, davidMembers, deepEqual);
     },
 
     testGroupBasicPost: async () => {

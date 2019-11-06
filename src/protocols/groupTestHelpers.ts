@@ -10,7 +10,7 @@ import { makePostId } from '../helpers/postHelpers';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
-import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember } from './group';
+import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember, GroupPeer } from './group';
 import { PrivateChannelCommandInviteToGroup } from './privateChannel';
 
 interface PeerPost extends Post {
@@ -96,7 +96,7 @@ export type GroupTestConfig = FixedArray<GroupTestContactConfig>;
 
 export const debugState = (state: GroupState, profiles?: GroupProfile[]) => {
     for (const context of state.contexts) {
-        if (profiles != null && !(context.groupProfile in profiles)) {
+        if (profiles != null && profiles.indexOf(context.groupProfile) === -1) {
             continue;
         }
         const posts = listPosts(context);
@@ -115,6 +115,21 @@ export const listPosts = (context: GroupContext): Post[] => {
     const logicalTimeCompare = (a: PeerPost, b: PeerPost) => a.logicalTime - b.logicalTime;
     return context.posts
         .sort((a, b) => logicalTimeCompare(a, b) || idCompare(a, b))
+    ;
+};
+
+export const listMembers = (context: GroupContext): HexString[] => {
+    const peerAdresses = context.peers.map(peer => ({
+        address: peer.address,
+        joinLogicalTime: peer.joinLogicalTime,
+    }));
+    return peerAdresses
+        .concat([{
+            address: context.profile.identity.address as HexString,
+            joinLogicalTime: context.ownSyncData.joinLogicalTime,
+        }])
+        .sort((a, b) => a.joinLogicalTime - b.joinLogicalTime)
+        .map(pa => pa.address)
     ;
 };
 
@@ -193,7 +208,11 @@ export const invite = (groupProfile: GroupProfile): GroupFunction => {
     return async (context, state) => {
         const contact = findContactByGroupProfile(context, state, groupProfile);
         const ownSyncData = groupAddMember(context.ownSyncData, contact);
-        const members = [...context.peers, contact];
+        const invitedMember = {
+            ...contact,
+            joinLogicalTime: ownSyncData.logicalTime,
+        };
+        const members = [...context.peers, invitedMember];
 
         sendPrivateInvite(context.groupProfile, groupProfile, state, ownSyncData.logicalTime);
 

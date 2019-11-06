@@ -366,6 +366,7 @@ export const groupApplySyncUpdate = (
                     addedMembers.push({
                         ...command.member,
                         peerLastSeenChapterId: undefined,
+                        joinLogicalTime: command.logicalTime,
                         timeline: [],
                     });
                     return;
