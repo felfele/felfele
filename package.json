@@ -39,7 +39,7 @@
     "react-native-typescript-transformer": "1.2.10",
     "react-native-version": "3.1.0",
     "react-test-renderer": "16.8.3",
-    "typescript": "3.5.1"
+    "typescript": "3.7.2"
   },
   "scripts": {
     "start": "react-native start",
