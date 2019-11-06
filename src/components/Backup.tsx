@@ -117,7 +117,7 @@ export class Backup extends React.PureComponent<Props, State> {
         </FragmentSafeAreaViewWithoutTabBar>
     )
 
-    private completeSetState = <K extends keyof State>(state: ((prevState: Readonly<State>, props: Readonly<Props>) => (Pick<State, K> | State | null)) | (Pick<State, K> | State | null)): Promise<void> => {
+    private completeSetState = <K extends keyof State>(state: Pick<State, K>): Promise<void> => {
         return new Promise((resolve, reject) => {
             this.setState(state, () => resolve());
         });
