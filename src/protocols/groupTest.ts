@@ -14,7 +14,8 @@ import {
     sharePost,
     removePost,
     debugState,
-    listMembers,
+    listGroupContextMembers,
+    removePeer,
 } from './groupTestHelpers';
 import { HexString } from '../helpers/opaqueTypes';
 import deepEqual = require('deep-equal');
@@ -137,9 +138,9 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        const aliceMembers = listMembers(aliceContext);
-        const bobMembers = listMembers(bobContext);
-        const carolMembers = listMembers(carolContext);
+        const aliceMembers = listGroupContextMembers(aliceContext);
+        const bobMembers = listGroupContextMembers(bobContext);
+        const carolMembers = listGroupContextMembers(carolContext);
 
         assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
         assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
@@ -187,9 +188,9 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        const aliceMembers = listMembers(aliceContext);
-        const bobMembers = listMembers(bobContext);
-        const carolMembers = listMembers(carolContext);
+        const aliceMembers = listGroupContextMembers(aliceContext);
+        const bobMembers = listGroupContextMembers(bobContext);
+        const carolMembers = listGroupContextMembers(carolContext);
 
         assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
         assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
@@ -228,9 +229,9 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, carolContext.sharedSecret);
         assertEquals(topic, carolContext.topic);
 
-        const aliceMembers = listMembers(aliceContext);
-        const bobMembers = listMembers(bobContext);
-        const carolMembers = listMembers(carolContext);
+        const aliceMembers = listGroupContextMembers(aliceContext);
+        const bobMembers = listGroupContextMembers(bobContext);
+        const carolMembers = listGroupContextMembers(carolContext);
 
         assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
         assertEquals(bobContext.profile.identity.address, aliceMembers[1]);
@@ -270,9 +271,9 @@ export const groupProtocolTests = {
         assertEquals(sharedSecret, davidContext.sharedSecret);
         assertEquals(topic, davidContext.topic);
 
-        const aliceMembers = listMembers(aliceContext);
-        const carolMembers = listMembers(carolContext);
-        const davidMembers = listMembers(davidContext);
+        const aliceMembers = listGroupContextMembers(aliceContext);
+        const carolMembers = listGroupContextMembers(carolContext);
+        const davidMembers = listGroupContextMembers(davidContext);
 
         assertEquals(aliceContext.profile.identity.address, aliceMembers[0]);
         assertEquals(carolContext.profile.identity.address, aliceMembers[1]);
@@ -486,4 +487,21 @@ export const groupProtocolTests = {
         assertEquals(bPost.text, carolPosts[1].text);
     },
 
+    testGroupRemovePeer_BasicRemoval: async () => {
+        const actions = aliceAndBobInviteWithSyncActions
+            .concat([
+                [ALICE, removePeer(BOB)],
+            ])
+        ;
+        const outputState = await execute(actions, groupTestConfig);
+
+        const aliceContext = outputState.contexts[ALICE];
+        const bobContext = outputState.contexts[BOB];
+
+        console.log({aliceContext, bobContext});
+
+        assertEquals(0, aliceContext.peers.length);
+
+        assertEquals('', bobContext.topic);
+    },
 };

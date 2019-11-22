@@ -10,7 +10,7 @@ import { makePostId } from '../helpers/postHelpers';
 import { ProtocolCrypto } from './ProtocolCrypto';
 import { ProtocolStorage } from './ProtocolStorage';
 import { postTimeCompare } from '../selectors/selectors';
-import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember, GroupPeer } from './group';
+import { groupAddMember, groupPost, groupSync, GroupSyncData, groupApplySyncUpdate, GroupCommand, GroupSyncPeer, groupRemovePost, Group, groupRemoveMember, GroupPeer, OwnSyncData, groupListMembers } from './group';
 import { PrivateChannelCommandInviteToGroup } from './privateChannel';
 
 interface PeerPost extends Post {
@@ -118,20 +118,9 @@ export const listPosts = (context: GroupContext): Post[] => {
     ;
 };
 
-export const listMembers = (context: GroupContext): HexString[] => {
-    const peerAdresses = context.peers.map(peer => ({
-        address: peer.address,
-        joinLogicalTime: peer.joinLogicalTime,
-    }));
-    return peerAdresses
-        .concat([{
-            address: context.profile.identity.address as HexString,
-            joinLogicalTime: context.ownSyncData.joinLogicalTime,
-        }])
-        .sort((a, b) => a.joinLogicalTime - b.joinLogicalTime)
-        .map(pa => pa.address)
-    ;
-};
+export const listGroupContextMembers = (context: GroupContext): HexString[] =>
+    groupListMembers(context.peers, context.ownSyncData)
+;
 
 const executeCommand = (command: GroupCommand, context: GroupContext, address: HexString) => {
     Debug.log('executeCommand', {
@@ -159,6 +148,17 @@ const executeCommand = (command: GroupCommand, context: GroupContext, address: H
             );
             Debug.log('executeCommand', command.type, {posts: context.posts});
             return;
+        }
+        case 'remove-member': {
+            if (address !== listGroupContextMembers(context)[0]) {
+                return;
+            }
+            if (command.address === context.profile.identity.address) {
+                context.topic = '' as HexString;
+                return;
+            } else {
+
+            }
         }
     }
 };
@@ -311,8 +311,9 @@ export const removePost = (id: HexString): GroupFunction => {
     };
 };
 
-export const removePeer = (peerAddress: HexString): GroupFunction => {
-    return async (context) => {
+export const removePeer = (groupProfile: GroupProfile): GroupFunction => {
+    return async (context, state) => {
+        const peerAddress = state.profiles[groupProfile].identity.address as HexString;
         const ownSyncData = groupRemoveMember(context.ownSyncData, peerAddress);
         return {
             ...context,

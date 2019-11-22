@@ -317,6 +317,21 @@ export const groupSync = async (
     }
 };
 
+export const groupListMembers = (peers: GroupPeer[], ownSyncData: OwnSyncData): HexString[] => {
+    const peerAdresses = peers.map(peer => ({
+        address: peer.address,
+        joinLogicalTime: peer.joinLogicalTime,
+    }));
+    return peerAdresses
+        .concat([{
+            address: ownSyncData.ownAddress,
+            joinLogicalTime: ownSyncData.joinLogicalTime,
+        }])
+        .sort((a, b) => a.joinLogicalTime - b.joinLogicalTime)
+        .map(pa => pa.address)
+    ;
+};
+
 const reverseMap = <T, K>(arr: T[], fun: (t: T) => K): K[] =>
     arr.map((_, index) => fun(arr[arr.length - 1 - index]))
 ;
@@ -372,14 +387,25 @@ export const groupApplySyncUpdate = (
                     return;
                 }
                 case 'remove-member': {
+                    if (command.address !== groupListMembers(update.peers, update.ownSyncDataUpdate)[0]) {
+                        return;
+                    }
                     removedMembers.push(command.address);
                     return;
                 }
             }
         });
     });
+    if (removedMembers.includes(update.ownSyncDataUpdate.ownAddress)) {
+        return {
+            topic: '' as HexString,
+            sharedSecret: '' as HexString,
+            peers: [],
+            ownSyncData,
+        };
+    }
     const peerSyncDataUpdates = update.peerSyncDataUpdates
-        .filter(peerSyncUpdate => !(peerSyncUpdate.address in removedMembers))
+        .filter(peerSyncUpdate => removedMembers.includes(peerSyncUpdate.address) === false)
         .concat(addedMembers)
     ;
     const members: GroupSyncPeer[] = peerSyncDataUpdates.map(peerSyncUpdate => ({
