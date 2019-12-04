@@ -104,6 +104,7 @@
 		<string>NunitoSans-Italic.ttf</string>
 		<string>NunitoSans-Regular.ttf</string>
 		<string>NunitoSans-SemiBold.ttf</string>
+		<string>icomoon.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
