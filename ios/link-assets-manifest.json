@@ -2,6 +2,22 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "fonts/NunitoSans-Bold.ttf",
+      "sha1": "8ebd43c3b1c36c1acacb5c59bd087da110eb47c7"
+    },
+    {
+      "path": "fonts/NunitoSans-Italic.ttf",
+      "sha1": "2a1e4c2643b35f3e37f1e801ce52b983cf2a89f2"
+    },
+    {
+      "path": "fonts/NunitoSans-Regular.ttf",
+      "sha1": "0660c9ab1b018a073e06d7a13b0b3959940effba"
+    },
+    {
+      "path": "fonts/NunitoSans-SemiBold.ttf",
+      "sha1": "fc511583650c7855cf96d77ef5c939fa05a5638a"
+    },
+    {
       "path": "fonts/Roboto-Bold.ttf",
       "sha1": "6cbb57ba2355cf442e06899898ff5af55867103e"
     },
@@ -14,12 +30,12 @@
       "sha1": "1d1d41fcadc571decb6444211b7993b99ce926e2"
     },
     {
-      "path": "images/assets/defaultuser.png",
-      "sha1": "6cbd9e47f004652893fc96b42e58f5e07d0de4b8"
+      "path": "fonts/icomoon.ttf",
+      "sha1": "8960c2e67b35299f93a095dce2d958820a784f12"
     },
     {
-      "path": "images/assets/felfele-assistant.png",
-      "sha1": "3d0fa3f2a58f819d2004a03213e01a9f90545db2"
+      "path": "images/assets/defaultuser.png",
+      "sha1": "6cbd9e47f004652893fc96b42e58f5e07d0de4b8"
     }
   ]
 }

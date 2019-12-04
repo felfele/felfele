@@ -7,7 +7,7 @@
 	<key>AppGroup</key>
 	<string>$(APP_GROUP)</string>
 	<key>LSApplicationCategoryType</key>
-	<string />
+	<string/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -29,7 +29,7 @@
 	<key>CFBundleVersion</key>
 	<string>25</string>
 	<key>LSRequiresIPhoneOS</key>
-	<true />
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -37,24 +37,24 @@
 			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>swarm.felfele.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>swarm.helmethair.co</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 			</dict>
 			<key>tumblr.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true />
+				<true/>
 				<key>NSIncludesSubdomains</key>
-				<true />
+				<true/>
 			</dict>
 		</dict>
 	</dict>
@@ -100,6 +100,11 @@
 		<string>Roboto-Bold.ttf</string>
 		<string>Roboto-Medium.ttf</string>
 		<string>Roboto-Regular.ttf</string>
+		<string>NunitoSans-Bold.ttf</string>
+		<string>NunitoSans-Italic.ttf</string>
+		<string>NunitoSans-Regular.ttf</string>
+		<string>NunitoSans-SemiBold.ttf</string>
+		<string>icomoon.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -118,6 +123,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false />
+	<false/>
 </dict>
 </plist>
