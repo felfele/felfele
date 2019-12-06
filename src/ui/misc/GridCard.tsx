@@ -9,7 +9,7 @@ import {
     StyleProp,
     ImageStyle,
 } from 'react-native';
-import { Colors } from '../../styles';
+import { Colors, defaultMediumFont } from '../../styles';
 import { MediumText } from './text';
 import { ImageDataView } from '../../components/ImageDataView';
 import { ModelHelper } from '../../models/ModelHelper';
@@ -73,6 +73,13 @@ const styles = StyleSheet.create({
     },
     feedCard: {
         backgroundColor: Colors.WHITE,
+        shadowColor: Colors.BLACK,
+        shadowOpacity: 0.4,
+        shadowRadius: 0.6,
+        shadowOffset: {
+            width: 0,
+            height: 0.5,
+        },
     },
     feedCardOverlay: {
         position: 'absolute',
@@ -92,10 +99,10 @@ const styles = StyleSheet.create({
     },
     feedCardText: {
         color: Colors.DARK_GRAY,
-        fontSize: 14,
+        fontSize: 16,
     },
     feedCardTextContainer: {
-        height: 30,
+        height: 44,
         alignItems: 'center',
         marginHorizontal: 10,
         justifyContent: 'center',

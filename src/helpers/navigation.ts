@@ -107,6 +107,7 @@ export interface Routes {
         isReceiver: boolean;
     };
     EditProfileContainer: {};
+    CreatePage: {};
 }
 
 export interface TypedNavigation {

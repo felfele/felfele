@@ -38,7 +38,7 @@ const mapStateToProps = (state: AppState, ownProps: { navigation: TypedNavigatio
         sections,
         navigation: ownProps.navigation,
         gatewayAddress: state.settings.swarmGatewayAddress,
-        title: 'All public channels',
+        title: 'PAGES',
         showExplore: navParamShowExplore,
     };
 };

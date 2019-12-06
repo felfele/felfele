@@ -15,7 +15,7 @@ export const FragmentSafeAreaViewWithoutTabBar = (props: Props) => (
             backgroundColor={props.topBackgroundColor || ComponentColors.HEADER_COLOR}
             hidden={false}
             translucent={false}
-            barStyle='light-content'
+            barStyle='dark-content'
             networkActivityIndicatorVisible={true}
         />
         <SafeAreaView style={{ flex: 0, backgroundColor: ComponentColors.HEADER_COLOR }} />
@@ -29,7 +29,7 @@ export const FragmentSafeAreaViewForTabBar = (props: Props) => (
                 backgroundColor={props.topBackgroundColor || ComponentColors.HEADER_COLOR}
                 hidden={false}
                 translucent={false}
-                barStyle='light-content'
+                barStyle='dark-content'
                 networkActivityIndicatorVisible={true}
             />
         <SafeAreaView style={{ flex: 0, backgroundColor: ComponentColors.HEADER_COLOR }}/>

@@ -34,7 +34,7 @@ import { DebugScreenContainer } from './containers/DebugScreenContainer';
 import { LoadingScreenContainer } from './containers/LoadingScreenContainer';
 import { appendToLog } from './log';
 import { LogViewerContainer } from './containers/LogViewerContainer';
-import { defaultTextProps, ComponentColors } from './styles';
+import { defaultTextProps, ComponentColors, DefaultTabBarHeight } from './styles';
 import { FeedContainer } from './containers/FeedContainer';
 import { BackupRestore } from './components/BackupRestore';
 import { RestoreContainer } from './containers/RestoreContainer';
@@ -75,6 +75,9 @@ import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkR
 import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
 import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import CustomIcon from './CustomIcon';
+import { PagesContainer } from './ui/screens/pages/PagesContainer';
+import { CreatePageView } from './ui/screens/pages/CreatePageView';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -142,7 +145,7 @@ const ProfileNavigator = createStackNavigator(profileScenes,
 
 const publicChannelTabScenes: NavigationRouteConfigMap = {
     PublicChannelTab: {
-        screen: PublicChannelsContainer,
+        screen: PublicChannelsListContainer,
     },
     Feed: {
         screen: FeedContainer,
@@ -177,6 +180,22 @@ const PublicChannelNavigator = createStackNavigator(publicChannelTabScenes,
             header: null,
         },
         initialRouteName: 'PublicChannelTab',
+    },
+);
+
+const pagesTabScenes: NavigationRouteConfigMap = {
+    PagesTab: {
+        screen: PagesContainer,
+    },
+};
+
+const PagesNavigator = createStackNavigator(pagesTabScenes,
+    {
+        mode: 'card',
+        navigationOptions: {
+            header: null,
+        },
+        initialRouteName: 'PagesTab',
     },
 );
 
@@ -228,78 +247,29 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
 const Root = createBottomTabNavigator(
     {
         PublicChannelTab: {
-            screen: PublicChannelNavigator,
+            screen: PagesNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
                     <MaterialCommunityIcon
                         name={'earth'}
-                        size={24}
+                        size={32}
                         color={tintColor}
                     />
                 ),
-            },
-        },
-        PrivateChannelTab: {
-            screen: PrivateChannelNavigator,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'account-multiple'}
-                        size={24}
-                        color={tintColor}
-                    />
-                ),
-            },
-        },
-        PostTab: {
-            screen: PostEditorContainer,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <View style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 18,
-                        backgroundColor: ComponentColors.TAB_ACTION_BUTTON_COLOR,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}>
-                        <Icon
-                            name={'pencil'}
-                            size={24}
-                            color={ComponentColors.TAB_ACTION_BUTTON_ICON_COLOR}
-                        />
-                    </View>
-                ),
-                tabBarOnPress: ({ navigation }: { navigation: TypedNavigation }) => {
-                    navigation.navigate('Post', {
-                        selectedFeeds: [],
-                    });
-                },
-                tabBarTestID: 'TabBarPostButton',
-            },
-        },
-        ProfileTab: {
-            screen: ProfileNavigator,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <Icon
-                        name={'account-circle'}
-                        size={24}
-                        color={tintColor}
-                    />
-                ),
+                title: 'Pages',
             },
         },
         SettingsTab: {
             screen: SettingsNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }: { tintColor?: string, focused: boolean }) => (
-                    <MaterialIcon
-                        name={'settings'}
-                        size={24}
+                    <MaterialCommunityIcon
+                        name={'fingerprint'}
+                        size={32}
                         color={tintColor}
                     />
                 ),
+                title: 'Account',
             },
         },
     },
@@ -310,20 +280,24 @@ const Root = createBottomTabNavigator(
         tabBarOptions: Platform.OS === 'ios'
             ?
                 {
-                    showLabel: false,
+                    showLabel: true,
                     activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
                     inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
+                    labelStyle : {
+                        fontSize: 12,
+                    },
                     style: {
                         opacity: 0.96,
                         position: 'absolute',
                         left: 0,
                         right: 0,
                         bottom: 0,
+                        height: DefaultTabBarHeight,
                     },
                 }
             :
                 {
-                    showLabel: false,
+                    showLabel: true,
                     showIcon: true,
                     activeTintColor: ComponentColors.TAB_ACTIVE_COLOR,
                     inactiveTintColor: ComponentColors.TAB_INACTIVE_COLOR,
@@ -379,6 +353,9 @@ const Scenes: NavigationRouteConfigMap = {
     ShareWithContainer: {
         screen: ShareWithContainer,
     },
+    CreatePage: {
+        screen: CreatePageView,
+    },
 };
 
 const AppNavigator = createStackNavigator(Scenes,
@@ -411,7 +388,7 @@ const LoadingNavigator = createStackNavigator({
 
 const InitialNavigator = createSwitchNavigator({
     Loading: LoadingNavigator,
-    App: () => <AppNavigator uriPrefix={BASE_URL} />,
+    App: () => <AppNavigator uriPrefix={BASE_URL}/>,
     Onboarding: OnboardingNavigator,
 }, {
     initialRouteName: 'Loading',
