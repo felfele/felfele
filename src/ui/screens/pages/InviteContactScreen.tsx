@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
         padding: 9,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
     changedYourMindLabel: {
         fontSize: 14,
