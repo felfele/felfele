@@ -7,7 +7,7 @@ export const TabBarPlaceholder = (props: { color?: string }) => {
         return (
             <View
                 style={{
-                    height: DefaultTabBarHeight,
+                    height: DefaultTabBarHeight + 20,
                     backgroundColor: props.color ? props.color : ComponentColors.BACKGROUND_COLOR,
                 }}
             />

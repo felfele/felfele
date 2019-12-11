@@ -127,8 +127,8 @@ export const AccountScreen = (props: Props) => {
                     onPress={() => props.navigation.navigate('Debug', {})}
                 />
                 }
+                <TabBarPlaceholder/>
             </ScrollView>
-            <TabBarPlaceholder/>
         </FragmentSafeAreaViewForTabBar>
     );
 };

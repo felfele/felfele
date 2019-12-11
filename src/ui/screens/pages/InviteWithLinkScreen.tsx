@@ -6,7 +6,7 @@ import { FloatingButton } from '../../misc/FloatingButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import { CloseIcon } from '../../../CustomIcon';
 import { RegularText, BoldText } from '../../misc/text';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { PrimaryButton } from '../../misc/Button';
 
 interface DispatchProps {
@@ -31,7 +31,6 @@ export const InviteWithLinkScreen = (props: DispatchProps & StateProps) => (
         />
         <KeyboardAvoidingView
             style={styles.container}
-            keyboardVerticalOffset={DefaultNavigationBarHeight}
             behavior='height'
         >
             <ScrollView style={styles.scrollContainer}>

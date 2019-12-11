@@ -6,7 +6,7 @@ import { FloatingButton } from '../../misc/FloatingButton';
 import { TypedNavigation } from '../../../helpers/navigation';
 import Icon, { CloseIcon } from '../../../CustomIcon';
 import { RegularText, BoldText } from '../../misc/text';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { PrimaryButton } from '../../misc/Button';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -33,7 +33,6 @@ export const InviteWithQRCodeScreen = (props: DispatchProps & StateProps) => (
         />
         <KeyboardAvoidingView
             style={styles.container}
-            keyboardVerticalOffset={DefaultNavigationBarHeight}
             behavior='height'
         >
             <ScrollView style={styles.scrollContainer}>
@@ -114,7 +113,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        width: 80,
+        width: 60,
         paddingLeft: 9,
     },
     generateCodeButton: {

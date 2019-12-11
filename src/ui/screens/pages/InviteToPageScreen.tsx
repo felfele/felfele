@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { StyleSheet, KeyboardAvoidingView, View, TextInput, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, View, ScrollView } from 'react-native';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { FloatingButton } from '../../misc/FloatingButton';
 import { TypedNavigation } from '../../../helpers/navigation';
-import Icon, { CloseIcon } from '../../../CustomIcon';
-import { TouchableView } from '../../../components/TouchableView';
+import Icon from '../../../CustomIcon';
 import { RegularText, BoldText, MediumText } from '../../misc/text';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { PrimaryButton } from '../../misc/Button';
 
 interface Contact {
@@ -85,7 +84,6 @@ export const InviteToPageScreen = (props: DispatchProps & StateProps) => (
         />
         <KeyboardAvoidingView
             style={styles.container}
-            keyboardVerticalOffset={DefaultNavigationBarHeight}
             behavior='height'
         >
             <ScrollView style={styles.scrollContainer}>

@@ -4,10 +4,10 @@ import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaVi
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { FloatingButton } from '../../misc/FloatingButton';
 import { TypedNavigation } from '../../../helpers/navigation';
-import Icon, { CloseIcon } from '../../../CustomIcon';
+import { CloseIcon } from '../../../CustomIcon';
 import { RegularText, BoldText } from '../../misc/text';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
-import { PrimaryButton, Button } from '../../misc/Button';
+import { Colors, ComponentColors } from '../../../styles';
+import { Button } from '../../misc/Button';
 
 interface DispatchProps {
 }
@@ -33,7 +33,6 @@ export const InviteContactScreen = (props: DispatchProps & StateProps) => (
         />
         <KeyboardAvoidingView
             style={styles.container}
-            keyboardVerticalOffset={DefaultNavigationBarHeight}
             behavior='height'
         >
             <ScrollView style={styles.scrollContainer}>

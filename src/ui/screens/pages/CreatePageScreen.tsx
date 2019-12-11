@@ -7,7 +7,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import Icon, { CloseIcon } from '../../../CustomIcon';
 import { TouchableView } from '../../../components/TouchableView';
 import { RegularText, BoldText } from '../../misc/text';
-import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
+import { Colors, ComponentColors } from '../../../styles';
 import { ImageData } from '../../../models/ImageData';
 
 interface DispatchProps {
@@ -76,7 +76,6 @@ export const CreatePage = (props: DispatchProps & StateProps & EnabledProp & Nav
         />
         <KeyboardAvoidingView
             style={styles.container}
-            keyboardVerticalOffset={DefaultNavigationBarHeight}
             behavior='height'
         >
             <ScrollView style={styles.scrollContainer}>
