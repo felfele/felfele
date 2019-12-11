@@ -7,7 +7,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import Icon, { CloseIcon } from '../../../CustomIcon';
 import { RegularText, BoldText } from '../../misc/text';
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
-import { Button } from '../../misc/Button';
+import { PrimaryButton } from '../../misc/Button';
 import QRCode from 'react-native-qrcode-svg';
 
 interface DispatchProps {
@@ -49,7 +49,7 @@ export const InviteWithQRCodeScreen = (props: DispatchProps & StateProps) => (
                 </View>
                 <View style={styles.generateCodeButtonContainer}>
                     <View style={styles.generateCodePadding}></View>
-                    <Button
+                    <PrimaryButton
                         label='GENERATE NEW QR CODE'
                         onPress={() => {}}
                         style={styles.generateCodeButton}

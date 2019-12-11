@@ -112,6 +112,7 @@ export interface Routes {
     CreatePageDone: {};
     InviteWithLink: {};
     InviteWithQRCode: {};
+    InviteContact: {};
 }
 
 export interface TypedNavigation {

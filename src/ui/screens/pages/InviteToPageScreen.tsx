@@ -8,7 +8,7 @@ import Icon, { CloseIcon } from '../../../CustomIcon';
 import { TouchableView } from '../../../components/TouchableView';
 import { RegularText, BoldText, MediumText } from '../../misc/text';
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
-import { Button } from '../../misc/Button';
+import { PrimaryButton } from '../../misc/Button';
 
 interface Contact {
     name: string;
@@ -48,7 +48,7 @@ interface StateProps {
 const InviteActionView = (props: {text: string, buttonLabel: string, onPress: () => void}) => (
     <View style={[styles.row, styles.inviteActionContainer]}>
         <BoldText style={styles.inviteActionLabel}>{props.text}</BoldText>
-        <Button label={props.buttonLabel} onPress={props.onPress} />
+        <PrimaryButton label={props.buttonLabel} onPress={props.onPress} />
     </View>
 );
 
@@ -62,14 +62,14 @@ const makeProfilePagesLabel = (pages: string[]): string =>
     )
 ;
 
-const Contact = (props: {contact: Contact}) => (
+const Contact = (props: {contact: Contact, navigation: TypedNavigation}) => (
     <View style={[styles.row, styles.contactContainer]}>
         <View style={styles.contactProfilePicture}></View>
         <View style={styles.contactLabelContainer}>
             <BoldText style={styles.contactProfileNameLabel}>{props.contact.name}</BoldText>
             <RegularText style={styles.contactProfilePagesLabel}>{makeProfilePagesLabel(props.contact.pages)}</RegularText>
         </View>
-        <Button label='INVITE' onPress={() => {}} />
+        <PrimaryButton label='INVITE' onPress={() => props.navigation.navigate('InviteContact', {})} />
     </View>
 );
 
@@ -103,7 +103,7 @@ export const InviteToPageScreen = (props: DispatchProps & StateProps) => (
                 />
                 <View style={styles.separator}></View>
                 <RegularText style={styles.inviteExistingContactsLabel}>Invite existing contacts (from other pages)</RegularText>
-                { testContacts.map((contact, i) => <Contact contact={contact} key={i} />)}
+                { testContacts.map((contact, i) => <Contact contact={contact} navigation={props.navigation} key={i} />)}
             </ScrollView>
             <FloatingButton
                 iconName='arrow2_right3'

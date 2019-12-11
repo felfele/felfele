@@ -7,7 +7,7 @@ import { TypedNavigation } from '../../../helpers/navigation';
 import { CloseIcon } from '../../../CustomIcon';
 import { RegularText, BoldText } from '../../misc/text';
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
-import { Button } from '../../misc/Button';
+import { PrimaryButton } from '../../misc/Button';
 
 interface DispatchProps {
 }
@@ -40,7 +40,7 @@ export const InviteWithLinkScreen = (props: DispatchProps & StateProps) => (
                 <View style={styles.linkContainer}>
                     <RegularText style={styles.linkText}>{propsLink}</RegularText>
                 </View>
-                <Button
+                <PrimaryButton
                     label='SHARE LINK'
                     onPress={() => {}}
                     style={styles.shareLinkButton}

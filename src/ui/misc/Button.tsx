@@ -3,7 +3,7 @@ import { StyleSheet, StyleProp, ViewStyle } from 'react-native';
 
 import { TouchableView } from '../../components/TouchableView';
 import { BoldText, RegularText } from './text';
-import { Colors } from '../../styles';
+import { Colors, ComponentColors } from '../../styles';
 
 interface Props {
     label: string;
@@ -14,16 +14,31 @@ interface Props {
 
 const isEnabled = (enabled?: boolean) => enabled == null || enabled === true;
 
+const primaryButtonStyle = (enabled?: boolean) => isEnabled(enabled)
+    ? styles.buttonContainerEnabledPrimary
+    : styles.buttonContainerDisabled
+;
+
 const buttonStyle = (enabled?: boolean) => isEnabled(enabled)
     ? styles.buttonContainerEnabled
     : styles.buttonContainerDisabled
 ;
 
+export const PrimaryButton = (props: Props) => (
+    <TouchableView style={[styles.buttonContainer, primaryButtonStyle(props.enabled), props.style]} onPress={props.onPress}>
+        {
+            isEnabled(props.enabled)
+            ? <BoldText style={[styles.buttonLabel, styles.buttonLabelEnabledPrimary]}>{props.label}</BoldText>
+            : <RegularText style={[styles.buttonLabel, styles.buttonLabelDisabled]}>{props.label}</RegularText>
+        }
+    </TouchableView>
+);
+
 export const Button = (props: Props) => (
     <TouchableView style={[styles.buttonContainer, buttonStyle(props.enabled), props.style]} onPress={props.onPress}>
         {
             isEnabled(props.enabled)
-            ? <BoldText style={[styles.buttonLabel, styles.buttonLabelEnabled]}>{props.label}</BoldText>
+            ? <RegularText style={[styles.buttonLabel, styles.buttonLabelEnabled]}>{props.label}</RegularText>
             : <RegularText style={[styles.buttonLabel, styles.buttonLabelDisabled]}>{props.label}</RegularText>
         }
     </TouchableView>
@@ -37,11 +52,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    buttonContainerEnabled: {
+    buttonContainerEnabledPrimary: {
         backgroundColor: Colors.BLACK,
     },
+    buttonContainerEnabled: {
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
+        borderWidth: 1,
+        borderColor: Colors.LIGHT_GRAY,
+    },
     buttonContainerDisabled: {
-        backgroundColor: Colors.VERY_LIGHT_GRAY,
+        backgroundColor: ComponentColors.BACKGROUND_COLOR,
         borderWidth: 1,
         borderColor: Colors.LIGHT_GRAY,
     },
@@ -49,10 +69,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         fontSize: 12,
     },
-    buttonLabelEnabled: {
+    buttonLabelEnabledPrimary: {
         color: Colors.WHITE,
     },
-    buttonLabelDisabled: {
+    buttonLabelEnabled: {
         color: Colors.BLACK,
+    },
+    buttonLabelDisabled: {
+        color: Colors.GRAY,
     },
 });
