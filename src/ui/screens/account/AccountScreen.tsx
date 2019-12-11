@@ -99,7 +99,7 @@ export const AccountScreen = (props: Props) => {
                 <ItalicText style={styles.label}>Automatically saves photos from pages that are shared with you to your phone’s Camera Roll.</ItalicText>
 
                 <RowItem
-                    title='Terms & Privacy Policy'
+                    title='View Terms & Privacy Policy'
                     buttonStyle='navigate'
                     onPress={() => Linking.openURL('https://felfele.org/legal')}
                 />
