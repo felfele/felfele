@@ -99,7 +99,7 @@ export const InviteToPageScreen = (props: DispatchProps & StateProps) => (
                 <InviteActionView
                     text='Face to face?'
                     buttonLabel='SHOW A QR CODE'
-                    onPress={() => {}}
+                    onPress={() => props.navigation.navigate('InviteWithQRCode', {})}
                 />
                 <View style={styles.separator}></View>
                 <RegularText style={styles.inviteExistingContactsLabel}>Invite existing contacts (from other pages)</RegularText>

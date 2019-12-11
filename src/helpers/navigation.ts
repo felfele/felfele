@@ -111,6 +111,7 @@ export interface Routes {
     InviteToPage: {};
     CreatePageDone: {};
     InviteWithLink: {};
+    InviteWithQRCode: {};
 }
 
 export interface TypedNavigation {

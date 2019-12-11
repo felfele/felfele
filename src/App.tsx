@@ -81,6 +81,7 @@ import { CreatePageScreen } from './ui/screens/pages/CreatePageScreen';
 import { InviteToPageScreen } from './ui/screens/pages/InviteToPageScreen';
 import { CreatePageDoneScreen } from './ui/screens/pages/CreatePageDoneScreen';
 import { InviteWithLinkScreen } from './ui/screens/pages/InviteWithLinkScreen';
+import { InviteWithQRCodeScreen } from './ui/screens/pages/InviteWithQRCodeScreen';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -367,6 +368,9 @@ const Scenes: NavigationRouteConfigMap = {
     },
     InviteWithLink: {
         screen: InviteWithLinkScreen,
+    },
+    InviteWithQRCode: {
+        screen: InviteWithQRCodeScreen,
     },
 };
 
