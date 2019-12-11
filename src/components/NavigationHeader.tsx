@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../styles';
 import { TouchableView, TOUCHABLE_VIEW_DEFAULT_HIT_SLOP } from './TouchableView';
-import { MediumText, RegularText } from '../ui/misc/text';
+import { MediumText, RegularText, BoldText } from '../ui/misc/text';
 import { TypedNavigation } from '../helpers/navigation';
 
 export interface ButtonProps {
@@ -59,13 +59,13 @@ export const NavigationHeader = (props: Props) => (
             style={styles.middleContainer}
         >
             {props.titleImage}
-            <MediumText
+            <BoldText
                 style={styles.titleText}
                 ellipsizeMode='tail'
                 numberOfLines={1}
             >
                 {props.title ? props.title : ''}
-            </MediumText>
+            </BoldText>
         </TouchableView>
         <View style={styles.rightContainer}>
             {props.rightButton1 &&
@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 10,
         paddingRight: 10,
-        paddingTop: 2,
         backgroundColor: ComponentColors.HEADER_COLOR,
         zIndex: 100,
         shadowColor: Colors.BLACK,
@@ -147,7 +146,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
     },
     titleText: {
-        fontSize: 15,
+        fontSize: 14,
         color: ComponentColors.NAVIGATION_BUTTON_COLOR,
         textAlign: 'center',
     },

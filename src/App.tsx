@@ -77,7 +77,8 @@ import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer'
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
 import CustomIcon from './CustomIcon';
 import { PagesContainer } from './ui/screens/pages/PagesContainer';
-import { CreatePageView } from './ui/screens/pages/CreatePageView';
+import { CreatePageScreen } from './ui/screens/pages/CreatePageScreen';
+import { InviteToPageScreen } from './ui/screens/pages/InviteToPageScreen';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -354,7 +355,10 @@ const Scenes: NavigationRouteConfigMap = {
         screen: ShareWithContainer,
     },
     CreatePage: {
-        screen: CreatePageView,
+        screen: CreatePageScreen,
+    },
+    InviteToPage: {
+        screen: InviteToPageScreen,
     },
 };
 

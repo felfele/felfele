@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { AppState } from '../../../reducers/AppState';
-import { StateProps, DispatchProps, PagesView } from './PagesView';
+import { StateProps, DispatchProps, PagesScreen } from './PagesScreen';
 import { Feed } from '../../../models/Feed';
 import { TypedNavigation } from '../../../helpers/navigation';
 
@@ -67,4 +67,4 @@ export const mapDispatchToProps = (dispatch: any, ownProps: { navigation: TypedN
     };
 };
 
-export const PagesContainer = connect(mapStateToProps, mapDispatchToProps)(PagesView);
+export const PagesContainer = connect(mapStateToProps, mapDispatchToProps)(PagesScreen);

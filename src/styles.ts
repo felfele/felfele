@@ -9,7 +9,7 @@ export const IconSize = {
 export const Colors = {
     BLACK: '#000000',
     WHITE: '#FFFFFF',
-    LIGHTISH_GRAY: '#9B9B9B',
+    LIGHTISH_GRAY: '#999999',
     PINKISH_GRAY: '#BBBBBB',
     BROWNISH_GRAY: '#696969',
     LIGHT_GRAY: '#DDDDDD',
@@ -26,7 +26,7 @@ export const Colors = {
 };
 export const ComponentColors = {
     STRONG_TEXT: '#303030',
-    TEXT_COLOR: Colors.GRAY,
+    TEXT_COLOR: Colors.BLACK,
     LABEL_COLOR: Colors.LIGHTISH_GRAY,
     HINT_TEXT_COLOR: Colors.BROWNISH_GRAY,
     BACKGROUND_COLOR: Colors.VERY_LIGHT_GRAY,

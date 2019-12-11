@@ -108,6 +108,7 @@ export interface Routes {
     };
     EditProfileContainer: {};
     CreatePage: {};
+    InviteToPage: {};
 }
 
 export interface TypedNavigation {

@@ -9,12 +9,34 @@ interface Props {
     onPress: () => void;
     iconName: string;
     iconSize: number;
+    enabled?: boolean;
+    extraBottom?: number;
 }
 
+const isDisabled = (enabled?: boolean) => enabled != null && enabled === false;
+
+const buttonStyle = (enabled?: boolean) => isDisabled(enabled)
+    ? styles.floatingButtonDisabled
+    : styles.floatingButtonEnabled
+;
+
+const iconColor = (enabled?: boolean) => isDisabled(enabled)
+    ? Colors.BLACK + '4D'
+    : Colors.BLACK
+;
+
+const DEFAULT_BOTTOM_STYLE = 40;
+const extraBottomStyle = (extraBottom?: number) => extraBottom != null
+    ? {
+        bottom: extraBottom + DEFAULT_BOTTOM_STYLE,
+    }
+    : undefined
+;
+
 export const FloatingButton = (props: Props) => (
-    <View style={styles.floatingButtonContainer}>
-        <TouchableView style={styles.floatingButton} onPress={props.onPress}>
-            <Icon name={props.iconName} size={props.iconSize} />
+    <View style={[styles.floatingButtonContainer, extraBottomStyle(props.extraBottom)]}>
+        <TouchableView style={[styles.floatingButton, buttonStyle(props.enabled)]} onPress={props.onPress}>
+            <Icon name={props.iconName} size={props.iconSize} color={iconColor(props.enabled)} />
         </TouchableView>
     </View>
 );
@@ -24,7 +46,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 60,
         position: 'absolute',
-        bottom: 11 + DefaultTabBarHeight + 30,
+        bottom: DEFAULT_BOTTOM_STYLE,
         flexDirection: 'row',
         justifyContent: 'center',
         shadowColor: Colors.BLACK,
@@ -38,10 +60,18 @@ const styles = StyleSheet.create({
     floatingButton: {
         width: 60,
         height: 60,
-        backgroundColor: Colors.WHITE,
         borderRadius: 30,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    floatingButtonEnabled: {
+        backgroundColor: Colors.WHITE,
+    },
+    floatingButtonDisabled: {
+        backgroundColor: Colors.VERY_LIGHT_GRAY,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: Colors.BLACK + '33',
     },
 });
