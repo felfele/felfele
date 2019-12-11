@@ -8,6 +8,7 @@ import Icon, { CloseIcon } from '../../../CustomIcon';
 import { TouchableView } from '../../../components/TouchableView';
 import { RegularText, BoldText, MediumText } from '../../misc/text';
 import { Colors, ComponentColors, DefaultNavigationBarHeight } from '../../../styles';
+import { Button } from '../../misc/Button';
 
 interface Contact {
     name: string;
@@ -43,12 +44,6 @@ interface DispatchProps {
 interface StateProps {
     navigation: TypedNavigation;
 }
-
-const Button = (props: {label: string, onPress: () => void}) => (
-    <TouchableView style={styles.buttonContainer} onPress={props.onPress}>
-        <BoldText style={styles.buttonLabel}>{props.label}</BoldText>
-    </TouchableView>
-);
 
 const InviteActionView = (props: {text: string, buttonLabel: string, onPress: () => void}) => (
     <View style={[styles.row, styles.inviteActionContainer]}>
@@ -99,7 +94,7 @@ export const InviteToPageScreen = (props: DispatchProps & StateProps) => (
                 <InviteActionView
                     text='Invite someone remotely'
                     buttonLabel='SEND A LINK'
-                    onPress={() => {}}
+                    onPress={() => props.navigation.navigate('InviteWithLink', {})}
                 />
                 <InviteActionView
                     text='Face to face?'
@@ -161,19 +156,6 @@ const styles = StyleSheet.create({
     },
     inviteActionLabel: {
         fontSize: 14,
-    },
-    buttonContainer: {
-        backgroundColor: Colors.BLACK,
-        height: 25,
-        borderRadius: 12,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonLabel: {
-        paddingHorizontal: 10,
-        color: Colors.WHITE,
-        fontSize: 12,
     },
     separator: {
         shadowColor: Colors.BLACK,

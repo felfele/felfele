@@ -110,6 +110,7 @@ export interface Routes {
     CreatePage: {};
     InviteToPage: {};
     CreatePageDone: {};
+    InviteWithLink: {};
 }
 
 export interface TypedNavigation {
