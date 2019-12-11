@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         height: 44,
     },
     title: {
-        fontSize: 14,
+        fontSize: 18,
         color: Colors.DARK_GRAY,
     },
     description: {

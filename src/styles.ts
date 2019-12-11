@@ -45,6 +45,7 @@ export const ComponentColors = {
 export const defaultBoldFont = 'NunitoSans-Bold';
 export const defaultRegularFont = 'NunitoSans-Regular';
 export const defaultMediumFont = 'NunitoSans-SemiBold';
+export const defaultItalicFont = 'NunitoSans-Italic';
 export const defaultFont = defaultRegularFont;
 export const defaultTextProps = {
     style: {

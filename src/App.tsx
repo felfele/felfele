@@ -83,6 +83,7 @@ import { CreatePageDoneScreen } from './ui/screens/pages/CreatePageDoneScreen';
 import { InviteWithLinkScreen } from './ui/screens/pages/InviteWithLinkScreen';
 import { InviteWithQRCodeScreen } from './ui/screens/pages/InviteWithQRCodeScreen';
 import { InviteContactScreen } from './ui/screens/pages/InviteContactScreen';
+import { AccountContainer } from './ui/screens/account/AccountContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -205,6 +206,9 @@ const PagesNavigator = createStackNavigator(pagesTabScenes,
 );
 
 const settingsTabScenes: NavigationRouteConfigMap = {
+    AccountTab: {
+        screen: AccountContainer,
+    },
     SettingsTab: {
         screen: SettingsEditorContainer,
     },
@@ -245,7 +249,7 @@ const SettingsNavigator = createStackNavigator(settingsTabScenes,
         navigationOptions: {
             header: null,
         },
-        initialRouteName: 'SettingsTab',
+        initialRouteName: 'AccountTab',
     },
 );
 

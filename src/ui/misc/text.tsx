@@ -4,7 +4,7 @@ import {
     StyleSheet,
     TextProps,
 } from 'react-native';
-import { defaultRegularFont, defaultBoldFont, defaultMediumFont } from '../../styles';
+import { defaultRegularFont, defaultBoldFont, defaultMediumFont, defaultItalicFont } from '../../styles';
 import { ChildrenProps } from './ChildrenProps';
 
 export const BoldText = (props: TextProps & ChildrenProps) => {
@@ -28,6 +28,13 @@ export const RegularText = (props: TextProps & ChildrenProps) => {
     );
 };
 
+export const ItalicText = (props: TextProps & ChildrenProps) => {
+    const { style, ...rest } = props;
+    return (
+        <Text style={[styles.italicFont, style]} {...rest}/>
+    );
+};
+
 const styles = StyleSheet.create({
     boldFont: {
         fontFamily: defaultBoldFont,
@@ -37,5 +44,8 @@ const styles = StyleSheet.create({
     },
     mediumFont: {
         fontFamily: defaultMediumFont,
+    },
+    italicFont: {
+        fontFamily: defaultItalicFont,
     },
 });

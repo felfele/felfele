@@ -35,13 +35,6 @@ export const AvatarPicker = (props: Props) => {
                     borderRadius: 0.25 * props.width,
                 }}
             >
-                <View style={styles.imagePickerIcon}>
-                    <Icon
-                        name={'pencil'}
-                        size={18}
-                        color={Colors.BLACK}
-                    />
-                </View>
             </ImageDataView>
         </TouchableView>
     );

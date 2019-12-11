@@ -122,13 +122,8 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flex: 1,
-        shadowColor: Colors.BLACK,
-        shadowOpacity: 0.2,
-        shadowOffset: {
-            width: 0,
-            height: 0.2,
-        },
-        shadowRadius: 0.5,
+        borderBottomColor: Colors.DARK_GRAY + '22',
+        borderBottomWidth: 0.5,
     },
     inviteTitleLabel: {
         paddingTop: 18,
@@ -158,13 +153,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     separator: {
-        shadowColor: Colors.BLACK,
-        shadowOpacity: 0.2,
-        shadowOffset: {
-            width: 0,
-            height: 0.2,
-        },
-        shadowRadius: 0.5,
+        borderBottomColor: Colors.DARK_GRAY + '22',
+        borderBottomWidth: 0.5,
     },
     inviteExistingContactsLabel: {
         paddingTop: 30,
