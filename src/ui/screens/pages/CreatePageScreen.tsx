@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, KeyboardAvoidingView, View, TextInput, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, View, TextInput, Dimensions, ScrollView, SafeAreaView } from 'react-native';
+import Modal from 'react-native-modal';
 import { FragmentSafeAreaViewWithoutTabBar } from '../../misc/FragmentSafeAreaView';
 import { NavigationHeader } from '../../../components/NavigationHeader';
 import { FloatingButton } from '../../misc/FloatingButton';
@@ -27,6 +28,60 @@ interface ValidatorState {
 }
 
 type ValidatorFunction = (state: ValidatorState) => boolean;
+
+interface StatefulModalProps {
+    isVisible: boolean;
+}
+
+const ModalMenuItem = (props: {iconName: string, label: string, onPress: () => void}) => (
+    <View style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        paddingVertical: 18,
+    }}>
+        <View style={{width: 45}}><Icon name={props.iconName} size={40} /></View>
+        <RegularText style={{fontSize: 18}}>{props.label}</RegularText>
+    </View>
+);
+
+const ModalMenuSeparator = () => <View style={{
+        borderBottomColor: Colors.BLACK + '26',
+        borderBottomWidth: 1,
+    }}/>
+;
+
+class StatefulModal extends React.PureComponent<{}, StatefulModalProps> {
+    public state = {
+        isVisible: true,
+    };
+
+    public render() {
+        return (
+            <Modal
+                isVisible={this.state.isVisible}
+                onBackdropPress={() => this.setState({ isVisible: false })}
+                backdropTransitionOutTiming={0}
+                style={{
+                    justifyContent: 'flex-end',
+                    margin: 0,
+                }}
+            >
+                <SafeAreaView style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    width: '100%',
+                    flex: 1,
+                    backgroundColor: ComponentColors.BACKGROUND_COLOR,
+                }}>
+                    <ModalMenuItem iconName='user_group' label='Take photo' onPress={() => {}} />
+                    <ModalMenuSeparator />
+                    <ModalMenuItem iconName='compose' label='Choose from Library' onPress={() => {}} />
+                </SafeAreaView>
+            </Modal>
+        );
+    }
+}
 
 export class ValidatedCreatePage extends React.Component<StateProps & { isValid: ValidatorFunction}, ValidatorState> {
     public state = {
@@ -113,6 +168,7 @@ export const CreatePage = (props: DispatchProps & StateProps & EnabledProp & Nav
                 enabled={props.enabled}
             />
         </KeyboardAvoidingView>
+        <StatefulModal />
     </FragmentSafeAreaViewWithoutTabBar>
 );
 
