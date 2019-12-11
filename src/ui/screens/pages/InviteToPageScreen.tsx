@@ -108,12 +108,12 @@ export const InviteToPageScreen = (props: DispatchProps & StateProps) => (
                 />
                 <View style={styles.separator}></View>
                 <RegularText style={styles.inviteExistingContactsLabel}>Invite existing contacts (from other pages)</RegularText>
-                { testContacts.map(contact => <Contact contact={contact}/>)}
+                { testContacts.map((contact, i) => <Contact contact={contact} key={i} />)}
             </ScrollView>
             <FloatingButton
                 iconName='arrow2_right3'
                 iconSize={48}
-                onPress={() => {}}
+                onPress={() => props.navigation.navigate('CreatePageDone', {})}
             />
         </KeyboardAvoidingView>
     </FragmentSafeAreaViewWithoutTabBar>

@@ -13,16 +13,16 @@ interface Props {
     extraBottom?: number;
 }
 
-const isDisabled = (enabled?: boolean) => enabled != null && enabled === false;
+const isEnabled = (enabled?: boolean) => enabled == null || enabled === true;
 
-const buttonStyle = (enabled?: boolean) => isDisabled(enabled)
-    ? styles.floatingButtonDisabled
-    : styles.floatingButtonEnabled
+const buttonStyle = (enabled?: boolean) => isEnabled(enabled)
+    ? styles.floatingButtonEnabled
+    : styles.floatingButtonDisabled
 ;
 
-const iconColor = (enabled?: boolean) => isDisabled(enabled)
-    ? Colors.BLACK + '4D'
-    : Colors.BLACK
+const iconColor = (enabled?: boolean) => isEnabled(enabled)
+    ? Colors.BLACK
+    : Colors.BLACK + '4D'
 ;
 
 const DEFAULT_BOTTOM_STYLE = 40;
@@ -35,7 +35,10 @@ const extraBottomStyle = (extraBottom?: number) => extraBottom != null
 
 export const FloatingButton = (props: Props) => (
     <View style={[styles.floatingButtonContainer, extraBottomStyle(props.extraBottom)]}>
-        <TouchableView style={[styles.floatingButton, buttonStyle(props.enabled)]} onPress={props.onPress}>
+        <TouchableView
+            style={[styles.floatingButton, buttonStyle(props.enabled)]}
+            onPress={isEnabled(props.enabled) ? props.onPress : undefined}
+        >
             <Icon name={props.iconName} size={props.iconSize} color={iconColor(props.enabled)} />
         </TouchableView>
     </View>
@@ -51,7 +54,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         shadowColor: Colors.BLACK,
         shadowOpacity: 0.2,
-        shadowRadius: 0.5,
+        shadowRadius: 3,
         shadowOffset: {
             width: 0,
             height: 0.5,
