@@ -1,8 +1,11 @@
+import nacl from 'ecma-nacl';
+
 import { addCommand } from './cliParser';
 import { output } from './cliHelpers';
 import { deriveSharedKey } from '../helpers/contactHelpers';
 import * as Swarm from '../swarm/Swarm';
-import { stringToUint8Array } from '../helpers/conversion';
+import { stringToUint8Array, hexToUint8Array } from '../helpers/conversion';
+import { cryptoHash } from '../helpers/crypto';
 
 const parseNumber = (s: string = '1') => parseInt(s, 10);
 
@@ -29,7 +32,7 @@ export const benchmarkCommandDefinition =
     .
     addCommand('generateIdentity [num]', '', async (optionalNum?: string) => {
         const num = parseNumber(optionalNum);
-        const randomUint8Array = stringToUint8Array(
+        const randomUint8Array = hexToUint8Array(
             '0xebe044bec1031e8e2fa494620dce3e50111a9f5336c358dc08d4d785e4c62ead'
         );
         const promiseUint8Array = Promise.resolve(randomUint8Array);
@@ -37,6 +40,36 @@ export const benchmarkCommandDefinition =
         const startDate = Date.now();
         for (let i = 0; i < num; i++) {
             await Swarm.generateSecureIdentity(generateRandom);
+        }
+        const elapsed = Date.now() - startDate;
+        output(`Number of iterations: ${num}, elapsed: ${elapsed} msec, avg: ${elapsed / num} msec`);
+    })
+    .
+    addCommand('hash [num] [start]', '', async (numValue: string = '1', startValue: string = '0x0000000000000000000000000000000000000000000000000000000000000000') => {
+        const num = parseNumber(numValue);
+        let valueBytes = hexToUint8Array(startValue);
+        const startDate = Date.now();
+        for (let i = 0; i < num; i++) {
+            valueBytes = cryptoHash(valueBytes);
+        }
+        const elapsed = Date.now() - startDate;
+        output(`Number of iterations: ${num}, elapsed: ${elapsed} msec, avg: ${elapsed / num} msec`);
+    })
+    .
+    addCommand('encrypt [num] [start]', '', async (numValue: string = '1', startValue: string = '0x0000000000000000000000000000000000000000000000000000000000000000') => {
+        const num = parseNumber(numValue);
+        let valueBytes = hexToUint8Array(startValue);
+        const secretBytes = hexToUint8Array(
+            '0xebe044bec1031e8e2fa494620dce3e50111a9f5336c358dc08d4d785e4c62ead'
+        );
+        const randomBytes = hexToUint8Array(
+            '75c5d37dd6b51cc6b69ab1003993ac8a05d2abb94851f4bd'
+        );
+        const startDate = Date.now();
+        const encryptor = nacl.secret_box.formatWN.makeEncryptor(secretBytes, randomBytes);
+        for (let i = 0; i < num; i++) {
+            const result = encryptor.pack(valueBytes);
+            valueBytes = result.slice(24 + 16);
         }
         const elapsed = Date.now() - startDate;
         output(`Number of iterations: ${num}, elapsed: ${elapsed} msec, avg: ${elapsed / num} msec`);
