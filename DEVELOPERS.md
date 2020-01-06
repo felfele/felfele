@@ -1,4 +1,3 @@
-Felfele [![Gitter](https://badges.gitter.im/felfele/purple-lounge.svg)](https://gitter.im/felfele/purple-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/felfele/felfele.svg?branch=master)](https://travis-ci.org/felfele/felfele)
 =======
 
@@ -14,9 +13,13 @@ This project uses React Native. You will need Android SDK, XCode, Node.js and NP
 
 `npm run link-assets`
 
-## Build and test in simulator
+## Build and test in iOS simulator (only works on macOS)
 
-`npm run ios `
+`npm run ios`
+
+## Build and test android version
+
+`npm run android`
 
 ## Start tests that run automatically
 
