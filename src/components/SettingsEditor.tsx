@@ -54,6 +54,11 @@ export const SettingsEditor = (props: Props) => {
                     buttonStyle='switch'
                 />
                 <RowItem
+                    title='Export feeds'
+                    buttonStyle='navigate'
+                    onPress={() => props.navigation.navigate('ExportFeedsScreenContainer', {})}
+                />
+                <RowItem
                     title='Send bug report'
                     buttonStyle='navigate'
                     onPress={() => props.navigation.navigate('BugReportView', {})}
