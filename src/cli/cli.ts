@@ -1,10 +1,10 @@
 import { keccak256 } from 'js-sha3';
+import crypto from 'crypto';
 
 import { Version, BuildNumber } from '../Version';
 import { apiTests } from '../social/apiTest';
 import { syncTests } from '../social/syncTest';
 import * as Swarm from '../swarm/Swarm';
-import { generateUnsecureRandom } from '../helpers/unsecureRandom';
 import { stringToByteArray } from '../helpers/conversion';
 import { Debug } from '../Debug';
 import { parseArguments, addOption } from './cliParser';
@@ -106,10 +106,10 @@ const definitions =
             output(hash);
         })
         .
-        addCommand('testId', 'Generate a test identity', async () => {
-            const identity = await Swarm.generateSecureIdentity(generateUnsecureRandom);
+        addCommand('id', 'Generate an identity', async () => {
+            const generateRandom = (length: number) => Promise.resolve(crypto.randomBytes(length));
+            const identity = await Swarm.generateSecureIdentity(generateRandom);
             output('Generated identity:', jsonPrettyPrint(identity));
-            output('WARNING: This is using unsecure random, use it only for testing, not for production!!!');
         })
         .
         addCommand('uploadImage <path-to-image>', 'Upload an image to Swarm', async (localPath) => {
