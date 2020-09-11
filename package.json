@@ -31,7 +31,7 @@
     "metro-react-native-babel-preset": "0.53.1",
     "mocha": "6.2.1",
     "mock-async-storage": "2.0.3",
-    "node-fetch": "2.3.0",
+    "node-fetch": "2.6.1",
     "react-native-asset": "1.1.2",
     "react-native-debugger-open": "0.3.17",
     "react-native-schemes-manager": "2.0.0",
