@@ -75,6 +75,7 @@ import { FeedLinkReaderContainer } from './ui/screens/feed-link-reader/FeedLinkR
 import { RSSFeedLoaderContainer } from './ui/screens/rss-feed/RSSFeedLoaderContainer';
 import { EditProfileContainer } from './ui/screens/profile/EditProfileContainer';
 import { ProfileContainer } from './ui/screens/onboarding/ProfileContainer';
+import { ExportFeedsScreenContainer } from './ui/screens/export-feeds/ExportFeedsScreenContainer';
 
 YellowBox.ignoreWarnings([
     'Method `jumpToIndex` is deprecated.',
@@ -212,6 +213,9 @@ const settingsTabScenes: NavigationRouteConfigMap = {
         screen: ({navigation}: NavigationScreenProps) => (
             <BugReportViewWithTabBar navigation={navigation} errorView={false}/>
         ),
+    },
+    ExportFeedsScreenContainer: {
+        screen: ExportFeedsScreenContainer,
     },
 };
 
