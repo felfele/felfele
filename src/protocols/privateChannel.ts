@@ -22,6 +22,7 @@ import { PostWithId } from '../models/Post';
 import { Debug } from '../Debug';
 import { ImageData } from '../models/ImageData';
 import { cryptoHash } from '../helpers/crypto';
+import { Group } from './group';
 
 interface PrivateChannelCommandBase {
     protocol: 'private';    // TODO this could be a hash to the actual protocol description
@@ -40,9 +41,17 @@ export interface PrivateChannelCommandRemove extends PrivateChannelCommandBase {
     id: HexString;
 }
 
+export interface PrivateChannelCommandInviteToGroup extends PrivateChannelCommandBase {
+    type: 'invite';
+    version: 1;
+    group: Group;
+    logicalTime: number;
+}
+
 export type PrivateChannelCommand =
     | PrivateChannelCommandPost
     | PrivateChannelCommandRemove
+    | PrivateChannelCommandInviteToGroup
 ;
 
 export interface PrivateChannelSyncData {
@@ -107,6 +116,17 @@ export const privateChannelRemovePost = (privateChannel: PrivateChannelSyncData,
         version: 1,
         protocol: 'private',
         id,
+    };
+    return privateChannelAppendCommand(privateChannel, command);
+};
+
+export const privateChannelInviteToGroup = (privateChannel: PrivateChannelSyncData, group: Group, logicalTime: number): PrivateChannelSyncData => {
+    const command: PrivateChannelCommandInviteToGroup = {
+        type: 'invite',
+        version: 1,
+        protocol: 'private',
+        group,
+        logicalTime,
     };
     return privateChannelAppendCommand(privateChannel, command);
 };

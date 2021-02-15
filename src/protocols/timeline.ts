@@ -80,7 +80,6 @@ export const uploadTimeline = async <T>(
 
     const syncedChapters: Timeline<T> = [];
     let previous = previousReference || findPreviousReference(previouslySyncedChapters, address);
-    Debug.log('uploadTimeline', {timeline, reverseUnsyncedChapters, previous});
     for (const chapter of reverseUnsyncedChapters) {
         const chapterWithPrevious = {
             ...chapter,
@@ -124,7 +123,7 @@ export const appendToTimeline = <T>(timeline: Timeline<T>, author: string, conte
 
 export const readTimeline = async (storage: ProtocolStorage, address: HexString, topic: HexString): Promise<ChapterReference | undefined> => {
     const hash = await storage.feeds.read(address, topic);
-    Debug.log('readTimeline', {hash});
+    Debug.log('readTimeline', {address, topic, hash});
     return hash as ChapterReference | undefined;
 };
 
@@ -156,7 +155,7 @@ export const fetchTimeline = async <T>(
     while (reference != null && reference !== lastSeenReference) {
         const chapter = await readChapter<T>(storage, reference, decodeChapter);
         if (chapter == null) {
-            return timeline;
+            break;
         }
         timeline.push(chapter);
         reference = chapter.previous;

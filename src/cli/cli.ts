@@ -19,6 +19,7 @@ import { protocolTestCommandDefinition as protocolCommandDefinition } from './pr
 import { swarmHelperTests } from './swarmHelperTest';
 import { privateChannelProtocolTests } from '../protocols/privateChannelProtocolTest';
 import { benchmarkCommandDefinition } from './benchmarkCommands';
+import { groupProtocolTests } from '../protocols/groupTest';
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require('node-fetch');
@@ -55,6 +56,7 @@ const definitions =
                 ...syncTests,
                 ...swarmHelperTests,
                 ...privateChannelProtocolTests,
+                ...groupProtocolTests,
             };
             if (process.env.SWARM_GATEWAY != null) {
                 output('Running with SWARM at', process.env.SWARM_GATEWAY);
@@ -69,9 +71,13 @@ const definitions =
                 }
                 output(`${Object.keys(allTests).length} tests passed succesfully`);
             } else {
-                const test = allTests[testName];
-                output('\nRunning test: ', testName);
-                await test();
+                for (const name of Object.keys(allTests)) {
+                    if (name.startsWith(testName)) {
+                        const test = allTests[name];
+                        output('\nRunning test: ', name);
+                        await test();
+                    }
+                }
             }
     })
     .addCommand('bugreport [endpoint]', 'Send bugreport to endpoint', async (endpoint) => {
